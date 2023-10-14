@@ -4,5 +4,4 @@ datetime
 typing
 requests
 asyncio
-discord.py-pagination
 pymongo
