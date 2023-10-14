@@ -15,7 +15,7 @@ from typing import Optional
 import Paginator
 from cogs.infractions import *
 from cogs.tickets import *
-client = MongoClient('mongodb://mongo:7637b2b228f62c1be9ce@172.93.103.8:27017')
+client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = client['astro']
 scollection = db['staffrole']
 ticketconfig = db['Tickets Configuration']
