@@ -1,0 +1,9 @@
+discord.py
+jishaku
+datetime
+typing
+requests
+asyncio
+pendulum
+discord.py-pagination
+pymongo
