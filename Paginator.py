@@ -30,10 +30,10 @@ class Simple(discord.ui.View):
 
     def __init__(self, *,
                  timeout: int = 60,
-                 PreviousButton: discord.ui.Button = discord.ui.Button(emoji="⏪"),
-                 NextButton: discord.ui.Button = discord.ui.Button(emoji="⏩"),
-                 FirstEmbedButton: discord.ui.Button = discord.ui.Button(emoji="⏮"),
-                 LastEmbedButton: discord.ui.Button = discord.ui.Button(emoji="⏭"),
+                 PreviousButton: discord.ui.Button = discord.ui.Button(emoji="<"),
+                 NextButton: discord.ui.Button = discord.ui.Button(emoji=">"),
+                 FirstEmbedButton: discord.ui.Button = discord.ui.Button(emoji="<<"),
+                 LastEmbedButton: discord.ui.Button = discord.ui.Button(emoji=">>"),
                  PageCounterStyle: discord.ButtonStyle = discord.ButtonStyle.grey,
                  InitialPage: int = 0,
                  ephemeral: bool = False) -> None:
