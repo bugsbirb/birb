@@ -5,7 +5,6 @@ import platform
 import sys
 import discord.ext
 from discord.ext import commands
-from datetime import UTC
 from urllib.parse import quote_plus
 from discord import app_commands
 import discord
