@@ -64,14 +64,6 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
             embed.add_field(name="Commands", value="* /promote")
-        elif category == 'Ratings':
-            embed.title = "Ratings Module"
-            embed.description = "The Ratings module enables users to provide ratings and feedback for staff members. These ratings carry over to other servers, creating a global staff rating system. This feature allows you to check the reputation and performance of staff members, helping to identify those with positive ratings and a strong reputation within the community."
-            embed.add_field(name="Commands", value="* /mod feedback\n* /mod rating")
-        elif category == 'Partnerships':
-            embed.title = "Partnerships Module"
-            embed.description = "The Partnerships module allows you to establish partnerships with other servers. However, to ensure the integrity of these partnerships, the module includes an automatic termination feature. If the owner of a partnered server leaves your server shortly after establishing the partnership, the system will automatically terminate the partnership. This ensures that your server maintains partnerships with active and committed communities, enhancing the quality of your partnerships."
-            embed.add_field(name="Commands", value="* /partnership log\n* /partnership view\n* /partnership terminate")
         elif category == 'Configuration':
             embed.title = "Configuration"
             embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Anti-Ping, Permissions, and Channels to tailor the bot's behavior to your server's requirements."
