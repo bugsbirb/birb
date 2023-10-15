@@ -495,14 +495,9 @@ class Config(discord.ui.Select):
         **Reports Channel**:
         - Use this channel for reporting issues or rule violations, providing an efficient way to address problems.
 
-        **LOA (Leave of Absence) Channel**:
-        - Members can use this channel to announce their leave of absence, helping you keep track of active members.
-
         **Promotion Channel**:
         - Utilize the Promotion Channel to acknowledge and celebrate staff achievements within your server. Keep your staff members motivated and informed about organizational advancements.
 
-        **Partnership Channel**:
-        - Collaborate with other servers or organizations by using this channel to discuss partnerships and agreements.
 
         Optimize your server's structure with these channels for a seamless experience!
         """,
