@@ -452,7 +452,6 @@ class Config(discord.ui.Select):
         options = [
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
-            discord.SelectOption(label="Anti Ping", emoji=f'{pen}'),
             discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>')
 
         
@@ -516,9 +515,6 @@ class Config(discord.ui.Select):
             view = Channels()
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
 
-        if color == 'Anti Ping':
-          embed = discord.Embed(title="Anti Ping Configuration", description="Please Select **Enable** or **Disable.**", color=0x2b2d31)
-          view = Toggle()
 
         if color == 'Infraction Appeals':
           embed = discord.Embed(title="Appeal Module", description="Please Select **Enable** or **Disable** to enable or disable the Appeal Module", color=0x2b2d31)
@@ -557,10 +553,7 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 2. **Channels**:
    - Configure channels such as the infraction channel, reports channel, LOA (Leave of Absence) channel, promotion channel, and partnership channel.
 
-3. **Anti Ping**:
-   - Enable or disable the Anti-Ping module, which prevents users from mentioning specific roles.
-
-4. **Infraction Appeals**:
+3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
 
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
@@ -572,33 +565,6 @@ Please select an option from the dropdown menu below to get started. If you have
        view = ConfigView()
        await ctx.send(embed=embed, view=view, ephemeral=True)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author.bot:
-            return
-        if isinstance(message.channel, discord.DMChannel):
-         return        
-        self.cursor.execute('SELECT role_id FROM antiping_roles WHERE guild_id = ?', (message.guild.id,))
-        role_id = self.cursor.fetchone()
-
-        if role_id is None:
-            return
-
-        anti_ping_role = message.guild.get_role(role_id[0])
-        if anti_ping_role is None:
-            return
-
-        mentioned_members_with_role = [
-            member for member in message.mentions if anti_ping_role in member.roles
-        ]
-
-        if (
-            mentioned_members_with_role
-            and anti_ping_role not in message.author.roles
-            and message.author.id not in [m.id for m in message.mentions]
-        ):
-            await message.channel.send(f"**{message.author.mention}**, do not mention people with the role `{anti_ping_role.name}`", delete_after=5)    
-            await message.add_reaction("<:PeepoPing:1140606929719263342>")
 
     @config.error
     async def permissionerror(self, ctx, error):
@@ -608,4 +574,5 @@ Please select an option from the dropdown menu below to get started. If you have
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
+        
         
