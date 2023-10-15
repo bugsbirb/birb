@@ -542,7 +542,7 @@ Welcome to the configuration setup for our server! You can use this panel to cus
    - Configure the staff role and admin role for your server.
 
 2. **Channels**:
-   - Configure channels such as the infraction channel, reports channel, LOA (Leave of Absence) channel, promotion channel, and partnership channel.
+   - Configure channels such as the infraction channel, reports channel, promotion channel.
 
 3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
