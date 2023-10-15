@@ -428,9 +428,7 @@ class Channels(discord.ui.View):
         super().__init__()
         self.add_item(InfractionChannel())
         self.add_item(ReportsChannel())
-        self.add_item(LOACHANNEL())
         self.add_item(PromotionChannel())
-        self.add_item(Partnershipchannel())
 
 class Perms(discord.ui.View):
     def __init__(self):
