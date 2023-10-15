@@ -20,11 +20,8 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Tickets", value="Tickets", emoji="<:Tickets:1162488340671643699>"),
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
-            discord.SelectOption(label="LOA", value="LOA", emoji="<:Issue:1150205461736468592>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
-            discord.SelectOption(label="Ratings", value="Ratings", emoji="<:Rate:1162135093129785364>"),
-            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>")
         ]
