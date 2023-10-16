@@ -80,11 +80,11 @@ class Halloween(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.hybrid_group()
+    @commands.group()
     async def candy(self, ctx):
         pass
 
-    @commands.hybrid_command(description="Go trick or treating for candy (Limited Time Event)")
+    @commands.command(description="Go trick or treating for candy (Limited Time Event)")
     @commands.cooldown(1, 10, commands.BucketType.user) 
     async def trickortreat(self, ctx):    
         msg = await ctx.reply(f"🚪*Creeeeaak* ... Who's there?")
@@ -180,7 +180,7 @@ class Halloween(commands.Cog):
         embed.set_thumbnail(url="https://images.emojiterra.com/google/android-12l/512px/1f383.png")
         await ctx.send(embed=embed)
 
-    @commands.hybrid_group()
+    @commands.group()
     async def halloween(self, ctx):
         pass
 
@@ -245,3 +245,4 @@ class Halloween(commands.Cog):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Halloween(client))       
+
