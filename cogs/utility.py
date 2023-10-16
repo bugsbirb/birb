@@ -35,7 +35,7 @@ class HelpMenu(discord.ui.Select):
         if category == 'Halloween Event':
             embed.title = "<:candysweet:1160591383158071376> Trick Or Treating **[Limited Time Event]**"
             embed.description = "The Halloween event is an event that lasts until the **1st Of November**. Whoever gets the most candy will win <:nitro:1160656782054658148> **Nitro Basic**. You must be in the [**Support Server**](https://discord.gg/Pz2FzUqZWe)"
-            embed.add_field(name="Commands", value="* /candy basket\n* /trickortreat\n* /halloween shop")
+            embed.add_field(name="Commands", value="* -candy basket\n* -trickortreat\n* -halloween shop")
         elif category == 'Modmail':
             embed.title = "Modmail Module [Beta]"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
