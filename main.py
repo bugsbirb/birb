@@ -35,7 +35,7 @@ class client(commands.AutoShardedBot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents, shard_count=2)
         self.client = client
-        self.cogslist = ["cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
     async def load_jishaku(self):
         await self.wait_until_ready()
@@ -67,7 +67,7 @@ class client(commands.AutoShardedBot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.40 | {len(client.guilds)} guilds")
+        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.50 | {len(client.guilds)} guilds")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
