@@ -609,8 +609,8 @@ class ModerationModule(commands.Cog):
             await channel.send(embed=embed)
 
     @commands.hybrid_command(description="Unbans a user from the guild")
-    async def unban(self, ctx, id: int, *,reason):
-        user = await self.client.fetch_user(id)
+    async def unban(self, ctx, user_id: int, *,reason):
+        user = await self.client.fetch_user(user_id)
         if not await self.has_ban_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
