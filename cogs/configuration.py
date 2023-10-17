@@ -15,6 +15,7 @@ from pymongo import MongoClient
 from typing import Optional
 import sqlite3
 from emojis import *
+from cogs.ModerationConfig.moderationdropdowns import *
 
 mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = mongo['astro']
@@ -75,24 +76,7 @@ class Done(discord.ui.View):
         embed = discord.Embed(title="", description="> Configuration updated", color=0x2b2d31)
         await interaction.response.edit_message(content=None, view=None, embed=embed)
 
-class Toggle(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.conn = sqlite3.connect('antiping.db')
-        self.cursor = self.conn.cursor()
 
-    @discord.ui.button(label='Enable', style=discord.ButtonStyle.blurple)
-    async def enable_button(self,  interaction: discord.Interaction, button: discord.ui.Button):
-        view = AntiPingDropdownView(interaction.guild.roles)
-        embed = discord.Embed(title="Anti Ping Module", description="Nice you've enabled it! Now you have to select the role.", color=0x2b2d31)
-        await interaction.response.edit_message(content=None, view=view, embed=embed)
-
-    @discord.ui.button(label='Disable', style=discord.ButtonStyle.blurple)
-    async def disable_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-         self.cursor.execute('DELETE FROM antiping_roles WHERE guild_id = ?', (interaction.guild.id,))
-         self.conn.commit()
-         view = Rerun()
-         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've disabled the anti ping module.", view=view, embed=None)
   
 class AppealTogglable(discord.ui.View):
     def __init__(self):
@@ -193,71 +177,6 @@ class PromotionChannel(discord.ui.ChannelSelect):
 
         print(f"Channel ID: {channelid.id}")     
 
-class Partnershipchannel(discord.ui.ChannelSelect):
-    def __init__(self):
-        super().__init__(placeholder='Partnership Channel')
-
-    async def callback(self, interaction: discord.Interaction):
-        channelid = self.values[0]
-
-        
-        filter = {
-            'guild_id': interaction.guild.id
-        }        
-
-        data = {
-            'channel_id': channelid.id,  
-            'guild_id': interaction.guild_id
-        }
-
-        try:
-            existing_record = partnershipch.find_one(filter)
-
-            if existing_record:
-                partnershipch.update_one(filter, {'$set': data})
-            else:
-                partnershipch.insert_one(data)
-
-
-            await interaction.response.edit_message(content=None)
-
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-        print(f"Channel ID: {channelid.id}")     
-
-
-class LOACHANNEL(discord.ui.ChannelSelect):
-    def __init__(self):
-        super().__init__(placeholder='LOA Channel')
-
-    async def callback(self, interaction: discord.Interaction):
-        channelid = self.values[0]
-
-        
-        filter = {
-            'guild_id': interaction.guild.id
-        }        
-
-        data = {
-            'channel_id': channelid.id,  
-            'guild_id': interaction.guild_id
-        }
-
-        try:
-            existing_record = loachannel.find_one(filter)
-
-            if existing_record:
-                loachannel.update_one(filter, {'$set': data})
-            else:
-                loachannel.insert_one(data)
-
-
-            await interaction.response.edit_message(content=None)
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-        print(f"Channel ID: {channelid.id}")  
 
 class ReportsChannel(discord.ui.ChannelSelect):
     def __init__(self):
@@ -383,9 +302,11 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 2. **Channels**:
    - Configure channels such as the infraction channel, reports channel, promotion channel.
 
-
-4. **Infraction Appeals**:
+3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
+
+4. **Moderation Module**:
+   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
 
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
         color=discord.Color.dark_embed()
@@ -399,27 +320,7 @@ Please select an option from the dropdown menu below to get started. If you have
 
 
 
-class AntiPingDropdown(discord.ui.RoleSelect):
-    def __init__(self, roles):
-        super().__init__(placeholder='Select the Anti-Ping Role')
-        self.conn = sqlite3.connect('antiping.db')
-        self.cursor = self.conn.cursor()
 
-    async def callback(self, interaction: discord.Interaction):
-        selected_role_id = int(self.values[0].id)
-        self.cursor.execute('INSERT OR REPLACE INTO antiping_roles (guild_id, role_id) VALUES (?, ?)',
-                            (interaction.guild.id, selected_role_id))
-        self.conn.commit()
-        view = Rerun()
-        embed = discord.Embed(title="Success!", description=f"`@{interaction.guild.get_role(selected_role_id).name}` has been set as the anti-ping role.", color=0x2b2d31)
-        await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> Success!", view=view, embed=embed)
-
-class AntiPingDropdownView(discord.ui.View):
-    def __init__(self, roles):
-        super().__init__()
-        self.conn = sqlite3.connect('antiping.db')
-        self.cursor = self.conn.cursor()
-        self.add_item(AntiPingDropdown(roles))
 
 
 
@@ -448,7 +349,8 @@ class Config(discord.ui.Select):
         options = [
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
-            discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>')
+            discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>'),
+            discord.SelectOption(label="Moderation", emoji='<:Infraction:1162134605885870180>')
 
         
             
@@ -510,7 +412,11 @@ class Config(discord.ui.Select):
         if color == 'Infraction Appeals':
           embed = discord.Embed(title="Appeal Module", description="Please Select **Enable** or **Disable** to enable or disable the Appeal Module", color=0x2b2d31)
           view = AppealTogglable()
-
+        if color == 'Moderation':
+          view = ModerationConfigdrop()
+          embed = discord.Embed(title="Moderation Module", description="* **Moderation Punishments**\n> Choose what roles can do certain role actions make sure this is a staff role and not a role normal members have.\n\n* **Logging**\n> This is the modlogs channel all moderation actions are logged here.\n> **Suggestion:** Make sure moderators can't delete stuff in this channel.\n\n* **Point Configuration**\n> Config different point values you can enable autoban aswell.", color=discord.Color.dark_embed())
+          embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+          embed.set_thumbnail(url=interaction.guild.icon)
         await interaction.response.edit_message(embed=embed, view=view)
 
 class ConfigView(discord.ui.View):
@@ -521,14 +427,6 @@ class ConfigView(discord.ui.View):
 class configuration(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
-        self.conn = sqlite3.connect('antiping.db')
-        self.cursor = self.conn.cursor()
-
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS antiping_roles (
-                                guild_id INTEGER PRIMARY KEY,
-                                role_id INTEGER
-                            )''')
-        self.conn.commit()        
 
     @commands.hybrid_command(description="Configure the bot for your servers needs")
     @commands.has_permissions(administrator=True)
@@ -546,6 +444,9 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 
 3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
+
+4. **Moderation Module**:
+   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
 
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
         color=discord.Color.dark_embed()
