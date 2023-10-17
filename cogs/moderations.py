@@ -786,5 +786,47 @@ class ModerationModule(commands.Cog):
      else:
         await ctx.send(f"{no} Moderation case with ID `{id}` not found.")   
 
+    @commands.hybrid_group()
+    async def points(self, ctx):
+        pass
+
+    @points.command(description="Edit a users moderaton points")
+    async def edit(self, ctx, user: discord.Member, set: int):
+     if not (await self.has_warning_role(ctx) or await self.has_kick_role(ctx) or await self.has_ban_role(ctx) or await self.has_mute_role(ctx)):
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+        return
+
+     filter = {
+        'guild_id': ctx.guild.id,
+        'user_id': user.id
+    }
+
+
+     update = {
+        '$set': {'points': set}
+    }
+
+
+     ModerationPoints.update_one(filter, update, upsert=True)
+
+     await ctx.send(f"{tick} Points for **@{user.display_name}** have been updated to `{set}`.")
+
+    @points.command(description="View a users moderation points")
+    async def view(self, ctx, user: discord.Member):
+
+     filter = {
+        'guild_id': ctx.guild.id,
+        'user_id': user.id
+    }
+
+     points_data = ModerationPoints.find_one(filter)
+
+     if points_data:
+        points = points_data['points']
+        await ctx.send(f"<:ArrowDropDown:1163171628050563153> **@{user.display_name}** has `{points}` moderation points.")
+     else:
+        await ctx.send(f"{no} No moderation points found for **@{user.display_name}**.")
+                
+
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ModerationModule(client))        
