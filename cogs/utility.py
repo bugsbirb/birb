@@ -22,6 +22,7 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
+            discord.SelectOption(label="Moderation", value="Moderation", emoji="<:Moderation:1163933000006893648>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>")
         ]
@@ -35,7 +36,7 @@ class HelpMenu(discord.ui.Select):
         if category == 'Halloween Event':
             embed.title = "<:candysweet:1160591383158071376> Trick Or Treating **[Limited Time Event]**"
             embed.description = "The Halloween event is an event that lasts until the **1st Of November**. Whoever gets the most candy will win <:nitro:1160656782054658148> **Nitro Basic**. You must be in the [**Support Server**](https://discord.gg/Pz2FzUqZWe)"
-            embed.add_field(name="Commands", value="* -candy basket\n* -trickortreat\n* -halloween shop")
+            embed.add_field(name="Commands", value="* /candy basket\n* /trickortreat\n* /halloween shop")
         elif category == 'Modmail':
             embed.title = "Modmail Module [Beta]"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
@@ -72,6 +73,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Utilities"
             embed.description = "The Utility commands module consists of commands unrelated to the bot itself. These commands are designed to provide various helpful functionalities for your server, enhancing its overall utility and convenience."
             embed.add_field(name="Commands", value="* /user\n* /server\n* /ping\n* /help")
+        elif category == 'Moderation':
+            embed.title = "Moderation Module [Beta]"
+            embed.description = "The Moderation Module is different from other moderation bots its a moderation system that uses the points system instead of traditional moderation systems. Its also not like those Point System Moderation bots that makes you have to use another discord moderation bot to use it."
+            embed.add_field(name="Commands", value="* /warn\n* /mute\n* kick\n* /ban\n* /unban\n* /unmute\n* /moderation void\n* /moderation case\n* /moderations")            
         else:
             embed.title = "Unknown Category"
             embed.description = "The specified category does not exist."
@@ -223,3 +228,4 @@ class Support(discord.ui.View):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Utility(client))        
+
