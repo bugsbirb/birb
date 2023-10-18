@@ -145,7 +145,7 @@ class Utility(commands.Cog):
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
 
 
-        embed = discord.Embed(title="", description=f"* {discord_latency_message}\n* **Up Since:** <t:{int(self.client.launch_time.timestamp())}:F>", color=0x2b2d31)
+        embed = discord.Embed(title="", description=f"* {discord_latency_message}\n* **Up Since:** <t:{int(self.client.launch_time.timestamp())}:f>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
         await ctx.send(embed=embed)        
         
