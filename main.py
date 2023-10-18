@@ -152,26 +152,6 @@ async def update_channel_name():
     else:
         print(f'Channel with ID {channel_id} not found.')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandError):
-        if isinstance(error, commands.CommandNotFound):
-            return 
-
-        embed = discord.Embed(title='Command Error', description=f"Command Usage: {ctx.command.name}\n Guild:{ctx.guild.name}", color=discord.Color.red())
-        embed.add_field(name='Error', value=f"```py\n {str(error)}\n```", inline=False)
-
-        logging_channel = client.get_channel(1139907646963597423)
-        if logging_channel:
-            await logging_channel.send(embed=embed)
-        else:
-            print("Logging channel not found.")
-
-        import traceback
-        traceback_str = ''.join(traceback.format_tb(error.__traceback__))
-        print(f'Traceback:\n{traceback_str}')
-
-
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
 
