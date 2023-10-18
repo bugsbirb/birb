@@ -71,7 +71,6 @@ class client(commands.AutoShardedBot):
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
-        update_channel_name.start()
 
     async def on_disconnect(self):
         print("Disconnected from Discord Gateway!")
