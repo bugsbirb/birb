@@ -39,10 +39,10 @@ def user(self, channel_id):
 
 
 
-class client(commands.AutoShardedBot):
+class client(commands.Bot):
     def __init__(self):
         intents = discord.Intents().all()
-        super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents, shard_count=2)
+        super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents)
         self.client = client
         self.cogslist = ["cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
