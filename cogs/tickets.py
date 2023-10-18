@@ -49,7 +49,7 @@ class Tickets(commands.Cog):
 
         embed = discord.Embed(title=title, description=description, color=discord.Color.dark_embed())
 
-        view = TicketConfig(int(ctx.guild.id), embed, panel)  
+        view = TicketConfig(int(ctx.guild.id), embed, panel, ctx.author)  
         await ctx.send(embed=embed, view=view)
         filter = {'guild_id': int(ctx.guild.id)}  
         update = {'$set': {'category': int(category.id)}}
@@ -139,27 +139,49 @@ class TicketOpen(discord.ui.View):
         else:
             await interaction.response.send_message(f"{Warning} Category not found. Please check the server's category settings or contact the server administrator.", ephemeral=True)
 class TicketConfig(discord.ui.View):
-    def __init__(self, guild_id, embed, panel):
+    def __init__(self, guild_id, embed, panel, user):
         super().__init__(timeout=None)
         self.value = None
         self.guild_id = guild_id
         self.embed = embed
  
         self.panel = panel
+        self.user = user
 
     @discord.ui.button(label='Send Panel', style=discord.ButtonStyle.green)
     async def Save(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)         
         view = TicketOpen()
         await self.panel.send(embed=self.embed, view=view)
         await interaction.response.edit_message(content=f"{tick} Ticket panel **sent**", embed=None, view=None)
 
+    @discord.ui.button(label='Send Without Embed', style=discord.ButtonStyle.blurple)
+    async def WithoutEmbed(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        view = TicketOpen()
+        await self.panel.send(view=view)
+        await interaction.response.edit_message(content=f"{tick} Ticket panel **sent**", embed=None, view=None)
         
     @discord.ui.button(label='Change Title', style=discord.ButtonStyle.grey)
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(ChangeTitle(self.guild_id, self.embed,  self.panel))
         
     @discord.ui.button(label='Change Description', style=discord.ButtonStyle.grey)
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)         
         await interaction.response.send_modal(ChangeDescription(self.guild_id, self.embed,  self.panel))
         
 
@@ -219,3 +241,4 @@ class ChangeDescription(discord.ui.Modal, title='Tickets Config'):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Tickets(client))        
+
