@@ -15,6 +15,15 @@ from typing import Optional
 import Paginator
 from cogs.infractions import *
 from cogs.tickets import *
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://6e7e1f3184ef905a9a821a90ab93b557@o4506071966416896.ingest.sentry.io/4506071967793152",
+
+    traces_sample_rate=1.0,
+
+    profiles_sample_rate=1.0,
+)
 client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = client['astro']
 scollection = db['staffrole']
