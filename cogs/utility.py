@@ -91,7 +91,7 @@ class Help(discord.ui.View):
 class Utility(commands.Cog):
     def __init__(self, client):
         self.client = client
-        client.launch_time = datetime.utcnow()    
+        client.launch_time = datetime.now()    
         self.client.help_command = None
 
 
@@ -147,7 +147,6 @@ class Utility(commands.Cog):
 
         embed = discord.Embed(title="", description=f"* {discord_latency_message}\n* **Up Since:** <t:{int(self.client.launch_time.timestamp())}:F>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
-        embed.set_footer(text=f"Shard {str(ctx.guild.shard_id)} | Guild ID: {str(ctx.guild.id)}")
         await ctx.send(embed=embed)        
         
 
