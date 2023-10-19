@@ -62,7 +62,7 @@ class client(commands.Bot):
 
         for ext in self.cogslist:
             await self.load_extension(ext)
-
+            print(f"Cog {ext} loaded")
     async def on_ready(self):
         prfx = (time.strftime("%H:%M:%S GMT", time.gmtime()))
         print(prfx + " Logged in as " + self.user.name)
