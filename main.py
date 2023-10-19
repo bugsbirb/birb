@@ -16,6 +16,7 @@ import Paginator
 from cogs.infractions import *
 from cogs.tickets import *
 import sentry_sdk
+import asyncio
 
 sentry_sdk.init(
     dsn="https://6e7e1f3184ef905a9a821a90ab93b557@o4506071966416896.ingest.sentry.io/4506071967793152",
@@ -24,6 +25,7 @@ sentry_sdk.init(
 
     profiles_sample_rate=1.0,
 )
+
 client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = client['astro']
 scollection = db['staffrole']
@@ -45,6 +47,7 @@ class client(commands.Bot):
         super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents)
         self.client = client
         self.cogslist = ["cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+
 
     async def load_jishaku(self):
         await self.wait_until_ready()
@@ -69,14 +72,14 @@ class client(commands.Bot):
         synced = await self.tree.sync()
         print(prfx + " Slash CMDs Synced " + str(len(synced)) + " Commands")
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
-
+        update_channel_name.start()
         
 
 
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.50 | {len(client.guilds)} guilds")
+        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.40 | {len(client.guilds)} guilds")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
@@ -99,6 +102,7 @@ async def on_guild_remove(guild):
     embed = discord.Embed(title=f"Astro Birb - {guild.name}",description=f"<:Arrow:1115743130461933599>**Owner:** {guild.owner.mention}\n<:Arrow:1115743130461933599>**Guild:** {guild.name}\n<:Arrow:1115743130461933599>**Guild ID** {guild.id}\n <:Arrow:1115743130461933599>**Members:** {guild.member_count}\n<:Arrow:1115743130461933599>**Created:** <t:{guild.created_at.timestamp():.0f}:F>", color=discord.Color.blurple())
     embed.set_thumbnail(url=guild.icon)
     channel = client.get_channel(1150816700489535508)
+
     await channel.send(embed=embed)
 
       
@@ -160,6 +164,9 @@ async def update_channel_name():
         await channel.edit(name=f'| Astro Birb: {guild_count}')
     else:
         print(f'Channel with ID {channel_id} not found.')
+
+
+
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
