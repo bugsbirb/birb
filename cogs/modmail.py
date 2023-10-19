@@ -87,7 +87,7 @@ class Modmail(commands.Cog):
                     )
 
                 try:
-                    response = await self.client.wait_for('message', check=check, timeout=3)
+                    response = await self.client.wait_for('message', check=check, timeout=4)
                     selected_server = mutual_servers[int(response.content) - 1]
                 except asyncio.TimeoutError:
                     return
