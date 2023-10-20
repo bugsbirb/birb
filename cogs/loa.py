@@ -225,7 +225,7 @@ class LOAManage(discord.ui.View):
         self.user = user
         self.guild = guild
         self.author = author
-    @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
+    @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Exterminate:1164970632262451231>")
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user
         author = self.author.id
