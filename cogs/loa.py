@@ -99,6 +99,7 @@ class loamodule(commands.Cog):
           view = Confirm(loadata, ctx.author, ctx.guild)        
           await channel.send(embed=embed, view=view)
           await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
+          print(f"LOA Request @{ctx.guild.name} pending")
          else:
             await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:
@@ -206,9 +207,7 @@ class Confirm(discord.ui.View):
                 pass          
         loa_collection.insert_one(self.loadata)
         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've accepted the LOA", view=None)
-        self.stop()
-
-
+        print(f"LOA Request @{ctx.guild.name} accepted")
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -216,7 +215,7 @@ class Confirm(discord.ui.View):
         except discord.Forbidden:
                 pass 
         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}** I've denied the LOA.", view=None)    
-        self.stop()     
+        print(f"LOA Request @{ctx.guild.name} denied") 
 
 
 class LOAManage(discord.ui.View):
