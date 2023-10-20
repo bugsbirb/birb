@@ -29,6 +29,7 @@ promochannel = db['promo channel']
 partnershipch = db['partnership channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
+loachannel = db['LOA Channel']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self):
         super().__init__(placeholder='Staff Role')
@@ -247,6 +248,44 @@ class AppealsChannel(discord.ui.ChannelSelect):
 
         print(f"Channel ID: {channelid.id}")  
 
+class LOAChannel(discord.ui.ChannelSelect):
+    def __init__(self):
+        super().__init__(placeholder='LOA Channel')
+
+    async def callback(self, interaction: discord.Interaction):
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+            existing_record = loachannel.find_one(filter)
+
+            if existing_record:
+                loachannel.update_one(filter, {'$set': data})
+            else:
+                loachannel.insert_one(data)
+
+            embed = discord.Embed(
+                title="Success!",
+                description=f"> Configuration updated",
+                color=0x2b2d31
+            )
+            view = Rerun()
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")  
+
 class AdminRole(discord.ui.RoleSelect):
     def __init__(self):
         super().__init__(placeholder='Admin Role')
@@ -330,6 +369,7 @@ class Channels(discord.ui.View):
         self.add_item(InfractionChannel())
         self.add_item(ReportsChannel())
         self.add_item(PromotionChannel())
+        self.add_item(LOAChannel())
 
 class Perms(discord.ui.View):
     def __init__(self):
@@ -400,6 +440,8 @@ class Config(discord.ui.Select):
         **Promotion Channel**:
         - Utilize the Promotion Channel to acknowledge and celebrate staff achievements within your server. Keep your staff members motivated and informed about organizational advancements.
 
+        **LOA Channel**:
+        - Utilize the LOA Channel for leave of abscense requests if a staff needs a break it'll be sent here.
 
         Optimize your server's structure with these channels for a seamless experience!
         """,
@@ -466,5 +508,8 @@ Please select an option from the dropdown menu below to get started. If you have
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
+        
+        
+
         
         
