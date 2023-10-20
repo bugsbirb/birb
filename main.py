@@ -79,7 +79,7 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.40 | {len(client.guilds)} guilds")
+        activity2 = discord.CustomActivity(emoji="<:pending:1140623442962546699>", name = f"V2.50 | {len(client.guilds)} guilds")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
