@@ -24,7 +24,8 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Moderation", value="Moderation", emoji="<:Moderation:1163933000006893648>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
-            discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>")
+            discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
+            discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>")
         ]
         super().__init__(placeholder="Help Categories", options=options)
 
@@ -77,6 +78,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Moderation Module [Beta]"
             embed.description = "The Moderation Module is different from other moderation bots its a moderation system that uses the points system instead of traditional moderation systems. Its also not like those Point System Moderation bots that makes you have to use another discord moderation bot to use it."
             embed.add_field(name="Commands", value="* /warn\n* /mute\n* kick\n* /ban\n* /unban\n* /unmute\n* /moderation void\n* /moderation case\n* /moderations")            
+        elif category == 'LOA':
+            embed.title = "LOA Module"
+            embed.description = "The LOA (Leave of Absence) Module simplifies LOA requests in your Discord server. Members can easily request time off with a specified duration and reason. Server Admins can efficiently manage these requests and track active LOAs. When LOAs end, notifications ensure everyone is informed. A streamlined solution for a well-organized server."
+            embed.add_field(name="Commands", value="* /loa request\n* /loa manage\n* /loa active")                        
         else:
             embed.title = "Unknown Category"
             embed.description = "The specified category does not exist."
