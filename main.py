@@ -46,7 +46,7 @@ class client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.loa", "cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
 
     async def load_jishaku(self):
