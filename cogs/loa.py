@@ -225,19 +225,22 @@ class LOAManage(discord.ui.View):
         self.user = user
         self.guild = guild
         self.author = author
-    @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Exterminate:1164970632262451231>")
+
+    @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user
         author = self.author.id
         if interaction.user.id != author:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)            
-        loa_collection.delete_one({'user': user.id})
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        loadata = {'user': user.id, 'guild_id': interaction.guild.id}    
+        loa_collection.delete_one(loadata)
         await interaction.response.edit_message(embed=None, content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA", view=None)
         try:
          await user.send(f"{tick} Your LOA **@{self.guild.name}** has been manually ended.")
         except discord.Forbidden:
                 pass 
+
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(loamodule(client))             
