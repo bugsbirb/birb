@@ -207,7 +207,8 @@ class Confirm(discord.ui.View):
                 pass          
         loa_collection.insert_one(self.loadata)
         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've accepted the LOA", view=None)
-        print(f"LOA Request @{ctx.guild.name} accepted")
+        print(f"LOA Request @{self.guild.name} accepted")
+        
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -215,7 +216,7 @@ class Confirm(discord.ui.View):
         except discord.Forbidden:
                 pass 
         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}** I've denied the LOA.", view=None)    
-        print(f"LOA Request @{ctx.guild.name} denied") 
+        print(f"LOA Request @{self.guild.name} denied") 
 
 
 class LOAManage(discord.ui.View):
