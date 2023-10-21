@@ -17,10 +17,12 @@ import sqlite3
 from emojis import *
 from cogs.ModerationConfig.moderationdropdowns import *
 
+
 mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = mongo['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
+LOARole = db['LOA Role']
 infchannel = db['infraction channel']
 repchannel = db['report channel']
 loachannel = db['loa channel']
@@ -63,6 +65,43 @@ class StaffRole(discord.ui.RoleSelect):
             )
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"selected_role_id: {selected_role_id.id}")
+
+class LOARoled(discord.ui.RoleSelect):
+    def __init__(self):
+        super().__init__(placeholder='LOA Role')
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_role_id = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'guild_id': interaction.guild.id, 
+            'staffrole': selected_role_id.id  
+        }
+
+        try:
+            existing_record = LOARole.find_one(filter)
+
+            if existing_record:
+                LOARole.update_one(filter, {'$set': data})
+            else:
+                LOARole.insert_one(data)
+
+            embed = discord.Embed(
+                title="Success!",
+                description=f"> Configuration updated",
+                color=0x2b2d31
+            )
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.response.edit_message(embed=embed, content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -426,6 +465,7 @@ Please select an option from the dropdown menu below to get started. If you have
 
 
 
+
 class Channels(discord.ui.View):
     def __init__(self):
         super().__init__()
@@ -511,13 +551,20 @@ class ChannelDropdowns(discord.ui.View):
         super().__init__()
         self.add_item(ChannelSelect())
 
+class LoasRole(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(LOARoled())
+
+
 class Config(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
             discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>'),
-            discord.SelectOption(label="Moderation", emoji='<:Infraction:1162134605885870180>')
+            discord.SelectOption(label="Moderation", emoji='<:Infraction:1162134605885870180>'),
+            discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>")
 
         
             
@@ -572,6 +619,12 @@ class Config(discord.ui.Select):
           embed = discord.Embed(title="Moderation Module", description="* **Moderation Punishments**\n> Choose what roles can do certain role actions make sure this is a staff role and not a role normal members have.\n\n* **Logging**\n> This is the modlogs channel all moderation actions are logged here.\n> **Suggestion:** Make sure moderators can't delete stuff in this channel.\n\n* **Point Configuration**\n> Config different point values you can enable autoban aswell.", color=discord.Color.dark_embed())
           embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
           embed.set_thumbnail(url=interaction.guild.icon)
+
+        if color == 'LOA':  
+         view = LoasRole()
+         embed = discord.Embed(title="LOA Configuration", description="* **LOA Role**\n> Set a LOA role if the person goes on LOA they'll be given this role.", color=discord.Color.dark_embed())
+         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+         embed.set_thumbnail(url=interaction.guild.icon)
           
         await interaction.response.edit_message(embed=embed, view=view)
 
