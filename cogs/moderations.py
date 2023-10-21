@@ -21,6 +21,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 moderations = db['Moderations']
 ModerationPoints = db['Moderations Points']
+pointsmanagerole = db['Points Manage Role']
 warningrole = db['WarnRole']
 kickrole = db['KickRole']
 banrole = db['BanRole']
@@ -37,6 +38,21 @@ AutoBanValue = db['Points Autoban Config']
 class ModerationModule(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    async def pointsmanage(self, ctx):
+        filter = {
+            'guild_id': ctx.guild.id
+        }
+        staff_data = pointsmanagerole.find_one(filter)
+
+        if staff_data and 'staffrole' in staff_data:
+            staff_role_id = staff_data['staffrole']
+            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+
+            if staff_role and staff_role in ctx.author.roles:
+                return True
+
+        return False
 
     async def has_warning_role(self, ctx):
         filter = {
@@ -609,8 +625,8 @@ class ModerationModule(commands.Cog):
             await channel.send(embed=embed)
 
     @commands.hybrid_command(description="Unbans a user from the guild")
-    async def unban(self, ctx, user_id: int, *,reason):
-        user = await self.client.fetch_user(user_id)
+    async def unban(self, ctx, id: int, *,reason):
+        user = await self.client.fetch_user(id)
         if not await self.has_ban_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
@@ -785,16 +801,16 @@ class ModerationModule(commands.Cog):
         await ctx.send(f"{tick} Moderation **Revoked**", embed=embed)
      else:
         await ctx.send(f"{no} Moderation case with ID `{id}` not found.")   
-
+   
     @commands.hybrid_group()
     async def points(self, ctx):
         pass
 
     @points.command(description="Edit a users moderaton points")
     async def edit(self, ctx, user: discord.Member, set: int):
-     if not (await self.has_warning_role(ctx) or await self.has_kick_role(ctx) or await self.has_ban_role(ctx) or await self.has_mute_role(ctx)):
-        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
-        return
+     if not await self.pointsmanage(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         return  
 
      filter = {
         'guild_id': ctx.guild.id,
@@ -828,5 +844,8 @@ class ModerationModule(commands.Cog):
         await ctx.send(f"{no} No moderation points found for **@{user.display_name}**.")
                 
 
+
+
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ModerationModule(client))        
+
