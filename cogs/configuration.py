@@ -25,7 +25,7 @@ infchannel = db['infraction channel']
 repchannel = db['report channel']
 loachannel = db['loa channel']
 promochannel = db['promo channel']
-
+feedbackch = db['Staff Feedback Channel']
 partnershipch = db['partnership channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
@@ -178,6 +178,37 @@ class PromotionChannel(discord.ui.ChannelSelect):
 
         print(f"Channel ID: {channelid.id}")     
 
+class StaffFeedbackChannel(discord.ui.ChannelSelect):
+    def __init__(self):
+        super().__init__(placeholder='Staff Feedback Channel')
+
+    async def callback(self, interaction: discord.Interaction):
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+            existing_record = feedbackch.find_one(filter)
+
+            if existing_record:
+                feedbackch.update_one(filter, {'$set': data})
+            else:
+                feedbackch.insert_one(data)
+
+            await interaction.response.edit_message(content=None)
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")   
 
 class ReportsChannel(discord.ui.ChannelSelect):
     def __init__(self):
@@ -370,6 +401,7 @@ class Channels(discord.ui.View):
         self.add_item(ReportsChannel())
         self.add_item(PromotionChannel())
         self.add_item(LOAChannel())
+        self.add_item(StaffFeedbackChannel())
 
 class Perms(discord.ui.View):
     def __init__(self):
@@ -514,8 +546,4 @@ async def setup(client: commands.Bot) -> None:
         
         
 
-        
-        
-
-        
         
