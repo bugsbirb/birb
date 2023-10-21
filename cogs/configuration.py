@@ -426,7 +426,6 @@ Please select an option from the dropdown menu below to get started. If you have
 
 
 
-
 class Channels(discord.ui.View):
     def __init__(self):
         super().__init__()
@@ -434,7 +433,6 @@ class Channels(discord.ui.View):
         self.add_item(ReportsChannel())
         self.add_item(PromotionChannel())
         self.add_item(LOAChannel())
-        self.add_item(PartnershipChannel())
         self.add_item(StaffFeedbackChannel())
 
 class Channels2(discord.ui.View):
