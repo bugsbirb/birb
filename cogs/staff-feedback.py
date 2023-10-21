@@ -60,7 +60,7 @@ class Feedback(commands.Cog):
             embed = discord.Embed(title="Staff Feedback", description=f"* **Staff:** {staff.mention}\n* **Rating:** {rating}\n* **Feedback:** {feedback}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
             embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)            
-            await channel.send(embed=embed)
+            await channel.send(f"{staff.mention}",embed=embed)
 
          else:   
             pass
@@ -94,7 +94,7 @@ class Feedback(commands.Cog):
      embed = discord.Embed(title="", description=f"* **Average Rating**: {average_rating}/10\n* **Last Rating**: {last_rating}/10\n* **Overall**: {rating_text}", color=discord.Color.dark_embed())
      embed.set_thumbnail(url=staff.display_avatar)
      embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)
-     await ctx.send(f"{staff.mention}",embed=embed)
+     await ctx.send(embed=embed)
 
 def get_rating_text(average_rating):
     if average_rating >= 8:
@@ -106,4 +106,4 @@ def get_rating_text(average_rating):
 
 async def setup(client: commands.Bot) -> None:
 
-    await client.add_cog(Feedback(client))                
+    await client.add_cog(Feedback(client))                         
