@@ -33,6 +33,8 @@ appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
+
+
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self):
         super().__init__(placeholder='Staff Role')
@@ -557,9 +559,56 @@ class LoasRole(discord.ui.View):
         self.add_item(LOARoled())
 
 
+
+
+class ConfigView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Config())
+
+class configuration(commands.Cog):
+    def __init__(self, client: commands.Bot):
+        self.client = client
+
+    @commands.hybrid_command(description="Configure the bot for your servers needs")
+    @commands.has_permissions(administrator=True)
+    async def config(self, ctx):
+       embed = discord.Embed(
+        title=f"{ctx.guild.name}'s Config Panel",
+        description="""**Configuration Setup**
+Welcome to the configuration setup for our server! You can use this panel to customize various aspects of our bot's behavior. Follow the steps below to set up the bot according to your preferences:
+
+1. **Permissions**:
+   - Configure the staff role and admin role for your server.
+
+2. **Channels**:
+   - Configure channels such as the infraction channel, reports channel, promotion channel.
+
+3. **Infraction Appeals**:
+   - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
+
+4. **Moderation Module**:
+   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
+
+Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
+        color=discord.Color.dark_embed()
+    )    
+
+       embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+       embed.set_thumbnail(url=ctx.guild.icon)        
+       view = ConfigView()
+       await ctx.send(embed=embed, view=view, ephemeral=True)
+
+
+    @config.error
+    async def permissionerror(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions): 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
+
 class Config(discord.ui.Select):
     def __init__(self):
         options = [
+            discord.SelectOption(label='Overview', emoji='<:Overview:1165359686439153715>'),
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
             discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>'),
@@ -573,8 +622,88 @@ class Config(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
+        if color == 'Overview':
+            staffrolemessage = "`N/A`"
+            adminrolemessage = "`N/A`"            
 
-        if color == 'Permissions':
+
+
+            infchannelmsg = "`N/A`"
+            promotionchannelmsg = "`N/A`"
+            repchannelmsg = "`N/A`"
+            loachannelmsg = "`N/A`"
+            stafffeedbackmsg = "`N/A`"
+            partnershipmsg = "`N/A`"
+            appealsmsg = "`N/A`"
+
+
+
+            staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
+            adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
+
+
+            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
+            promotionchannelresult = promochannel.find_one({'guild_id': interaction.guild.id})
+            repchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})            
+            loachannelresult = loachannel.find_one({'guild_id': interaction.guild.id})              
+            stafffeedbackresult = feedbackch.find_one({'guild_id': interaction.guild.id})              
+
+
+          
+
+
+            partnershipresult = partnershipch.find_one({'guild_id': interaction.guild.id})
+            print("partnershipresult:", partnershipresult)           
+
+            appealsresult = appealschannel.find_one({'guild_id': interaction.guild.id})   
+            # BEGINNING OF ROLES
+            if staffroleresult:
+                staffrole = staffroleresult['staffrole']
+                role = discord.utils.get(interaction.guild.roles, id=staffrole)
+                staffrolemessage = role.mention
+
+            if adminroleresult:
+                staffrole = adminroleresult['adminrole']
+                role = discord.utils.get(interaction.guild.roles, id=staffrole)
+                adminrolemessage = role.mention            
+               
+            if infractionchannelresult:
+                channelid = infractionchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                infchannelmsg = channel.mention
+      
+            if promotionchannelresult:
+                channelid = promotionchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                promotionchannelmsg = channel.mention
+            if repchannelresult:
+                channelid = repchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                repchannelmsg = channel.mention
+            if loachannelresult:
+                channelid = loachannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                loachannelmsg = channel.mention                
+            if stafffeedbackresult:
+                channelid = stafffeedbackresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                stafffeedbackmsg = channel.mention                   
+            if partnershipresult:
+                channelid = partnershipresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                partnershipmsg = channel.mention                   
+            if appealsresult:
+                channelid = appealsresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                appealsmsg = channel.mention                 
+            #END OF CHANNELS
+
+
+            embed = discord.Embed(title=f"Configuration Overview", description=f"* **Permissions**\n> **Staff Role:** {staffrolemessage}\n> **Admin Role:** {adminrolemessage}\n\n* **Channels**\n> **Infraction Channel:** {infchannelmsg}\n> **Promotions Channel** {promotionchannelmsg}\n> **Reports Channel** {repchannelmsg}\n> **LOA Channel**: {loachannelmsg}\n> **Staff Feedback Channel:** {stafffeedbackmsg}\n> **Partnership Channel:** {partnershipmsg}\n> **Appeals Channel:** {appealsmsg}", color=discord.Color.dark_embed())
+            view = None
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+            embed.set_thumbnail(url=interaction.guild.icon)
+        elif color == 'Permissions':
             embed = discord.Embed(
         title="Configure Staff and Admin Roles",
         description="""
@@ -628,56 +757,10 @@ class Config(discord.ui.Select):
           
         await interaction.response.edit_message(embed=embed, view=view)
 
-class ConfigView(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.add_item(Config())
-
-class configuration(commands.Cog):
-    def __init__(self, client: commands.Bot):
-        self.client = client
-
-    @commands.hybrid_command(description="Configure the bot for your servers needs")
-    @commands.has_permissions(administrator=True)
-    async def config(self, ctx):
-       embed = discord.Embed(
-        title=f"{ctx.guild.name}'s Config Panel",
-        description="""**Configuration Setup**
-Welcome to the configuration setup for our server! You can use this panel to customize various aspects of our bot's behavior. Follow the steps below to set up the bot according to your preferences:
-
-1. **Permissions**:
-   - Configure the staff role and admin role for your server.
-
-2. **Channels**:
-   - Configure channels such as the infraction channel, reports channel, promotion channel.
-
-3. **Infraction Appeals**:
-   - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
-
-4. **Moderation Module**:
-   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
-
-Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
-        color=discord.Color.dark_embed()
-    )    
-
-       embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-       embed.set_thumbnail(url=ctx.guild.icon)        
-       view = ConfigView()
-       await ctx.send(embed=embed, view=view, ephemeral=True)
-
-
-    @config.error
-    async def permissionerror(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions): 
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
-
-
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
         
         
 
-        
 
         
