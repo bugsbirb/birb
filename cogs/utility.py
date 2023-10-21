@@ -25,7 +25,8 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Moderation", value="Moderation", emoji="<:Moderation:1163933000006893648>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
-            discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>")
+            discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
+            discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>")            
         ]
         super().__init__(placeholder="Help Categories", options=options)
 
@@ -82,6 +83,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "LOA Module"
             embed.description = "The LOA (Leave of Absence) Module simplifies LOA requests in your Discord server. Members can easily request time off with a specified duration and reason. Server Admins can efficiently manage these requests and track active LOAs. When LOAs end, notifications ensure everyone is informed. A streamlined solution for a well-organized server."
             embed.add_field(name="Commands", value="* /loa request\n* /loa manage\n* /loa active")                        
+        elif category == 'Staff Feedback':
+            embed.title = "Staff Feedback Module"
+            embed.description = "This module facilitates the process of providing feedback and ratings for staff members. Users can use the commands within this module to share their feedback and experiences with the staff, helping to maintain a positive and efficient community environment."
+            embed.add_field(name="Commands", value="* /staff feedback\n* /staff rating")                
         else:
             embed.title = "Unknown Category"
             embed.description = "The specified category does not exist."
