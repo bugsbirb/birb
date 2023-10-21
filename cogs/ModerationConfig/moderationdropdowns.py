@@ -34,11 +34,13 @@ class ModerationConfig(discord.ui.Select):
             embed = discord.Embed(title="Moderation Permissions", description="* **Warning Role**\n> What users can warn people?\n\n* **Muting Role**\n> What users can mute people?\n\n* **Kicking Role**\n> What users can kick people?\n\n* **Banning Role**\n> What users can ban people?", color=discord.Color.dark_embed())
             embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
             embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
             view = ModerationPerms()
         if color == 'Logging':    
             embed = discord.Embed(title="Logging Channel", description="* **What does this actually log?**\n> In this channel it logs, `autobans`, `warnings`, `mutes`, `kicks`, `bans`.", color=discord.Color.dark_embed())
             embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
             embed.set_thumbnail(url=interaction.guild.icon)            
+            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
             view = ModerationsChannel()
 
         if color == 'Points':    
@@ -46,6 +48,7 @@ class ModerationConfig(discord.ui.Select):
             embed = discord.Embed(title="Point Values", description="* **What do the values represent?**\n> The values respresents how many points does a punishment give for each punishment.\n\n* **What does autoban do?**\n> Once the user reaches the max points it'll autoban them if this is toggled on.\n\n* **What is the max value for?**\n> The max value is the max value before it prompts a message saying they've reached the max amount of points.", color=discord.Color.dark_embed())
             embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
             embed.set_thumbnail(url=interaction.guild.icon) 
+            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
         await interaction.response.edit_message(embed=embed, view=view)
 class ModerationConfigdrop(discord.ui.View):
     def __init__(self):
