@@ -17,10 +17,43 @@ from emojis import *
 
 mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
 db = mongo['astro']
+pointsmanagerole = db['Points Manage Role']
 warningrole = db['WarnRole']
 kickrole = db['KickRole']
 banrole = db['BanRole']
 muterole = db['MuteRole']
+
+class PointsManage(discord.ui.RoleSelect):
+    def __init__(self):
+        super().__init__(placeholder='What role can manage points?')
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_role_id = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'guild_id': interaction.guild.id, 
+            'staffrole': selected_role_id.id  
+        }
+
+        try:
+            existing_record = pointsmanagerole.find_one(filter)
+
+            if existing_record:
+                pointsmanagerole.update_one(filter, {'$set': data})
+            else:
+                pointsmanagerole.insert_one(data)
+
+
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"selected_role_id: {selected_role_id.id}")
 
 class WarningRole(discord.ui.RoleSelect):
     def __init__(self):
@@ -153,10 +186,13 @@ class KickRole(discord.ui.RoleSelect):
 class ModerationPerms(discord.ui.View):
     def __init__(self):
         super().__init__()
+        self.add_item(PointsManage())
         self.add_item(WarningRole())
         self.add_item(MuteRole())
         self.add_item(KickRole())
         self.add_item(BanRole())
 
+
+        
 
         
