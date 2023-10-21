@@ -26,7 +26,8 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
             discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
-            discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>")            
+            discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
+            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>")               
         ]
         super().__init__(placeholder="Help Categories", options=options)
 
@@ -87,6 +88,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Staff Feedback Module"
             embed.description = "This module facilitates the process of providing feedback and ratings for staff members. Users can use the commands within this module to share their feedback and experiences with the staff, helping to maintain a positive and efficient community environment."
             embed.add_field(name="Commands", value="* /staff feedback\n* /staff rating")                
+        elif category == 'Partnerships':
+            embed.title = "Partnerships Module"
+            embed.description = "Log partnerships, terminate partnerships, and view partnerships. This is helpful for servers with partnership requirements that mandate partner owners to remain in the server."
+            embed.add_field(name="Commands", value="* /partnership log\n* /partnership all\n* /partnership terminate")               
         else:
             embed.title = "Unknown Category"
             embed.description = "The specified category does not exist."
@@ -237,4 +242,3 @@ class Support(discord.ui.View):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Utility(client))        
-
