@@ -424,6 +424,7 @@ class Config(discord.ui.Select):
             view = Perms()
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
             embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
 
         if color == 'Channels':
             embed = discord.Embed(
@@ -449,6 +450,7 @@ class Config(discord.ui.Select):
     ) 
             view = Channels()
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
 
 
         if color == 'Infraction Appeals':
@@ -459,6 +461,7 @@ class Config(discord.ui.Select):
           embed = discord.Embed(title="Moderation Module", description="* **Moderation Punishments**\n> Choose what roles can do certain role actions make sure this is a staff role and not a role normal members have.\n\n* **Logging**\n> This is the modlogs channel all moderation actions are logged here.\n> **Suggestion:** Make sure moderators can't delete stuff in this channel.\n\n* **Point Configuration**\n> Config different point values you can enable autoban aswell.", color=discord.Color.dark_embed())
           embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
           embed.set_thumbnail(url=interaction.guild.icon)
+          
         await interaction.response.edit_message(embed=embed, view=view)
 
 class ConfigView(discord.ui.View):
@@ -508,6 +511,9 @@ Please select an option from the dropdown menu below to get started. If you have
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
+        
+        
+
         
         
 
