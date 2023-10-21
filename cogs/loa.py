@@ -20,6 +20,7 @@ loa_collection = db['loa']
 loachannel = db['LOA Channel']
 scollection = db['staffrole']
 arole = db['adminrole']
+LOARole = db['LOA Role']
 class loamodule(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -99,7 +100,7 @@ class loamodule(commands.Cog):
           view = Confirm(loadata, ctx.author, ctx.guild)        
           await channel.send(embed=embed, view=view)
           await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
-          print(f"LOA Request @{ctx.guild.name} pending")
+          print(f"LOA Request @{ctx.guild.name} pending")          
          else:
             await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:
@@ -118,16 +119,23 @@ class loamodule(commands.Cog):
         end_time = request['end_time']
         user_id = request['user']
         guild_id = request['guild_id']
-        user = self.client.get_user(user_id)
         guild = self.client.get_guild(guild_id)
+        user = self.client.get_user(user_id)
         print(f"End Time: {end_time}")
         print(f"Current Time: {current_time}")
 
         if current_time >= end_time:
             if user:
                 await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
-            
-            loa_collection.delete_one({'user': user_id})
+                loa_collection.delete_one({'guild_id': guild_id, 'user': user_id})
+                loarole_data = LOARole.find_one({'guild_id': guild.id})
+                if loarole_data:
+                 loarole = loarole_data['staffrole']
+                 if loarole:
+                  role = discord.utils.get(guild.roles, id=loarole)
+                  if role:
+                   member = guild.get_member(user.id)
+                   await member.remove_roles(role)       
 
     @loa.command(description="Manage someone leave of abscense")
     async def manage(self, ctx, user: discord.Member):
@@ -201,6 +209,7 @@ class Confirm(discord.ui.View):
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji="<:Tick:1140286044114268242>")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        user = self.user
         try:
          await self.user.send(f"{tick} **{self.user.display_name}**, your LOA **@{self.guild.name}** has been accepted.")
         except discord.Forbidden:
@@ -208,7 +217,16 @@ class Confirm(discord.ui.View):
         loa_collection.insert_one(self.loadata)
         await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've accepted the LOA", view=None)
         print(f"LOA Request @{self.guild.name} accepted")
-        
+        loarole_data = LOARole.find_one({'guild_id': interaction.guild.id})
+        if loarole_data:
+         loarole = loarole_data['staffrole']
+         if loarole:
+          role = discord.utils.get(interaction.guild.roles, id=loarole)
+          if role:
+            await user.add_roles(role)
+
+
+
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
@@ -225,7 +243,6 @@ class LOAManage(discord.ui.View):
         self.user = user
         self.guild = guild
         self.author = author
-
     @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Exterminate:1164970632262451231>")
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user
@@ -241,6 +258,13 @@ class LOAManage(discord.ui.View):
          await user.send(f"{tick} Your LOA **@{self.guild.name}** has been manually ended.")
         except discord.Forbidden:
                 pass 
+        loarole_data = LOARole.find_one({'guild_id': interaction.guild.id})
+        if loarole_data:
+         loarole = loarole_data['staffrole']
+         if loarole:
+          role = discord.utils.get(interaction.guild.roles, id=loarole)
+          if role:
+            await user.remove_roles(role)         
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(loamodule(client))             
+    await client.add_cog(loamodule(client))                  
