@@ -30,6 +30,7 @@ partnershipch = db['partnership channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
+partnershipsch = db['Partnerships Channel']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self):
         super().__init__(placeholder='Staff Role')
@@ -170,6 +171,38 @@ class PromotionChannel(discord.ui.ChannelSelect):
                 promochannel.update_one(filter, {'$set': data})
             else:
                 promochannel.insert_one(data)
+
+            await interaction.response.edit_message(content=None)
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")     
+
+class PartnershipChannel(discord.ui.ChannelSelect):
+    def __init__(self):
+        super().__init__(placeholder='Partnership Logging Channel')
+
+    async def callback(self, interaction: discord.Interaction):
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+            existing_record = partnershipsch.find_one(filter)
+
+            if existing_record:
+                partnershipsch.update_one(filter, {'$set': data})
+            else:
+                partnershipsch.insert_one(data)
 
             await interaction.response.edit_message(content=None)
 
@@ -401,7 +434,13 @@ class Channels(discord.ui.View):
         self.add_item(ReportsChannel())
         self.add_item(PromotionChannel())
         self.add_item(LOAChannel())
+        self.add_item(PartnershipChannel())
         self.add_item(StaffFeedbackChannel())
+
+class Channels2(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(PartnershipChannel())
 
 class Perms(discord.ui.View):
     def __init__(self):
@@ -414,7 +453,65 @@ class AppealChannel(discord.ui.View):
         super().__init__()
         self.add_item(AppealsChannel())
 
+class ChannelSelect(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label='Channels', value='channels'),
+            discord.SelectOption(label='Channels 2', value='channels2')
+        ]
+        super().__init__(placeholder="Select a channel configuration", options=options)
 
+    async def callback(self, interaction: discord.Interaction):
+        selected_option = self.values[0]
+
+        if selected_option == 'channels':
+            embed = discord.Embed(
+                title="Server Channels Configuration",
+                description="""
+                Configure various channels for your server to enhance its functionality. Each channel serves a specific purpose and plays a crucial role in managing your server's activities.
+
+                **Infractions Channel**:
+                - This channel is dedicated to recording and managing user infractions, keeping your server organized and transparent.
+
+                **Reports Channel**:
+                - Use this channel for reporting issues or rule violations, providing an efficient way to address problems.
+
+                **Promotion Channel**:
+                - Utilize the Promotion Channel to acknowledge and celebrate staff achievements within your server. Keep your staff members motivated and informed about organizational advancements.
+
+                **LOA Channel**:
+                - Utilize the LOA Channel for leave of absence requests if a staff needs a break it'll be sent here.
+
+                **Staff Feedback Channel**:
+                - Utilize the Staff feedback channel for staff feedback; if a staff receives a review, it'll be sent here.
+
+                Optimize your server's structure with these channels for a seamless experience!
+                """,
+                color=0x2b2d31
+            )
+            view = Channels()
+        elif selected_option == 'channels2':
+            embed = discord.Embed(
+                title="Server Channels Configuration",
+                description="""
+                Configure various channels for your server to enhance its functionality. Each channel serves a specific purpose and plays a crucial role in managing your server's activities.
+
+                **Partnerships Channel**:
+                - This channel is dedicated to logging and managing partnerships.
+
+                Optimize your server's structure with these channels for a seamless experience!
+                """,
+                color=0x2b2d31
+            )
+            view = Channels2()
+
+        await interaction.response.edit_message(embed=embed, view=view)
+
+
+class ChannelDropdowns(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(ChannelSelect())
 
 class Config(discord.ui.Select):
     def __init__(self):
@@ -461,29 +558,13 @@ class Config(discord.ui.Select):
         if color == 'Channels':
             embed = discord.Embed(
         title="Server Channels Configuration",
-        description="""
-        Configure various channels for your server to enhance its functionality. Each channel serves a specific purpose and plays a crucial role in managing your server's activities.
-
-        **Infractions Channel**:
-        - This channel is dedicated to recording and managing user infractions, keeping your server organized and transparent.
-
-        **Reports Channel**:
-        - Use this channel for reporting issues or rule violations, providing an efficient way to address problems.
-
-        **Promotion Channel**:
-        - Utilize the Promotion Channel to acknowledge and celebrate staff achievements within your server. Keep your staff members motivated and informed about organizational advancements.
-
-        **LOA Channel**:
-        - Utilize the LOA Channel for leave of abscense requests if a staff needs a break it'll be sent here.
-
-        Optimize your server's structure with these channels for a seamless experience!
-        """,
+        description="* **Channels 1**\n> LOA Channel, Staff Feedback Channel, Promotions Channel, Infractions Channel, Reports Channel\n\n* **Channels 2**\n> Partnership Channel.",
         color=0x2b2d31
     ) 
-            view = Channels()
+            view = ChannelDropdowns()
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
-            embed.set_footer(text="Configuration is saved upon clicking.", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
-
+            embed.set_footer(text="Due to hitting the max dropdowns there is Channels 1 & 2", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
+            
 
         if color == 'Infraction Appeals':
           embed = discord.Embed(title="Appeal Module", description="Please Select **Enable** or **Disable** to enable or disable the Appeal Module", color=0x2b2d31)
@@ -544,6 +625,8 @@ Please select an option from the dropdown menu below to get started. If you have
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
         
+        
+
         
 
         
