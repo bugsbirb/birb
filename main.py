@@ -48,7 +48,16 @@ class client(commands.Bot):
         self.client = client
         self.cogslist = ["cogs.partnerships","cogs.staff-feedback","cogs.loa", "cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
+    async def is_owner(self, user: discord.User):
+        if user.id in [
+            795743076520820776, # Bugsy
+            872217766487285813 # My ALT
 
+
+        ]:
+            return True
+
+        return await super().is_owner(user)
     async def load_jishaku(self):
         await self.wait_until_ready()
         await self.load_extension('jishaku')
