@@ -87,9 +87,10 @@ class Modmail(commands.Cog):
                     )
 
                 try:
-                    response = await self.client.wait_for('message', check=check, timeout=4)
+                    response = await self.client.wait_for('message', check=check, timeout=5)
                     selected_server = mutual_servers[int(response.content) - 1]
                 except asyncio.TimeoutError:
+                    await message.author.send(f"{no} Server selection expired.")                    
                     return
                 except ValueError:
                     await message.author.send(f"{no} Invalid server number. Please enter a valid number.")
