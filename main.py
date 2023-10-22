@@ -50,7 +50,7 @@ class client(commands.Bot):
 
     async def is_owner(self, user: discord.User):
         if user.id in [
-            795743076520820776, # Bugsy
+            795743076520820776 # Bugsy
 
 
         ]:
