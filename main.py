@@ -51,7 +51,6 @@ class client(commands.Bot):
     async def is_owner(self, user: discord.User):
         if user.id in [
             795743076520820776, # Bugsy
-            872217766487285813 # My ALT
 
 
         ]:
