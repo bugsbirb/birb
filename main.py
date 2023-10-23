@@ -65,6 +65,12 @@ class client(commands.Bot):
             return True
 
         return await super().is_owner(user)
+        
+    async def load_jishaku(self):
+        await self.wait_until_ready()
+        await self.load_extension('jishaku')        
+        print("Jishaku Loaded")
+    
 
     async def load_jishaku(self):
         await self.wait_until_ready()
