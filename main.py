@@ -68,13 +68,7 @@ class client(commands.Bot):
         
     async def load_jishaku(self):
         await self.wait_until_ready()
-        await self.load_extension('jishaku')        
-        print("Jishaku Loaded")
-    
-
-    async def load_jishaku(self):
-        await self.wait_until_ready()
-
+        await self.load_extension('jishaku')
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
