@@ -11,9 +11,11 @@ from discord.ext import commands, tasks
 import pytz
 from pymongo import MongoClient
 import platform
+import os
+from dotenv import load_dotenv
 from emojis import * 
-
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 WarningPointValue = db['Warning Value']
 MutePointValue = db['Mute Value']

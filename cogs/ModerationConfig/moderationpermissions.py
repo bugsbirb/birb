@@ -10,12 +10,14 @@ from discord import app_commands
 from discord.ext import commands, tasks
 import pytz
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 import platform
 from emojis import * 
+MONGO_URL = os.getenv('MONGO_URL')
 
 
-
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 pointsmanagerole = db['Points Manage Role']
 warningrole = db['WarnRole']
@@ -192,7 +194,5 @@ class ModerationPerms(discord.ui.View):
         self.add_item(KickRole())
         self.add_item(BanRole())
 
-
-        
 
         
