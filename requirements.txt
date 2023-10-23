@@ -5,4 +5,4 @@ typing
 requests
 pymongo
 python-dotenv
-
+sentry-sdk
