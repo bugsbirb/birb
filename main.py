@@ -1,6 +1,4 @@
 import discord
-from discord import ui
-import time
 import platform
 import sys
 import discord.ext
@@ -10,23 +8,32 @@ from discord import app_commands
 import discord
 import datetime
 from discord.ext import commands, tasks
-from jishaku import Jishaku
+
 from typing import Optional
 import Paginator
 from cogs.infractions import *
 from cogs.tickets import *
 import sentry_sdk
 import asyncio
+from cogs.loa import *
+import os
+from dotenv import load_dotenv
 
+
+
+load_dotenv()
+TOKEN = os.getenv('TOKEN')
+MONGO_URL = os.getenv('MONGO_URL')
+SENTRY_URL = os.getenv('SENTRY_URL')
 sentry_sdk.init(
-    dsn="https://6e7e1f3184ef905a9a821a90ab93b557@o4506071966416896.ingest.sentry.io/4506071967793152",
+    dsn=SENTRY_URL,
 
     traces_sample_rate=1.0,
 
     profiles_sample_rate=1.0,
 )
 
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 ticketconfig = db['Tickets Configuration']
@@ -50,16 +57,18 @@ class client(commands.Bot):
 
     async def is_owner(self, user: discord.User):
         if user.id in [
-            795743076520820776 # Bugsy
+            795743076520820776
+
 
 
         ]:
             return True
 
         return await super().is_owner(user)
+
     async def load_jishaku(self):
         await self.wait_until_ready()
-        await self.load_extension('jishaku')
+
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
@@ -70,7 +79,7 @@ class client(commands.Bot):
 
         for ext in self.cogslist:
             await self.load_extension(ext)
-            print(f"Cog {ext} loaded")
+
     async def on_ready(self):
         prfx = (time.strftime("%H:%M:%S GMT", time.gmtime()))
         print(prfx + " Logged in as " + self.user.name)
@@ -81,6 +90,7 @@ class client(commands.Bot):
         print(prfx + " Slash CMDs Synced " + str(len(synced)) + " Commands")
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
         update_channel_name.start()
+        
         
 
 
@@ -176,7 +186,8 @@ async def update_channel_name():
 
 
 
+
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
 
-client.run("MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs")    
+client.run(TOKEN)    

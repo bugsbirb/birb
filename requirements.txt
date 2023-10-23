@@ -3,6 +3,4 @@ jishaku
 datetime
 typing
 requests
-asyncio
 pymongo
-sentry_sdk
