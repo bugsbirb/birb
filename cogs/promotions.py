@@ -91,7 +91,10 @@ class promo(commands.Cog):
 
          if channel:
             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**")
-            await channel.send(f"{staff.mention}", embed=embed)
+            try:
+             await channel.send(f"{staff.mention}", embed=embed)
+            except discord.Forbidden: 
+             await ctx.send(f"{no} I don't have permission to view that channel.")               
          else:
             await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:

@@ -63,7 +63,11 @@ class Feedback(commands.Cog):
             embed = discord.Embed(title="Staff Feedback", description=f"* **Staff:** {staff.mention}\n* **Rating:** {rating}\n* **Feedback:** {feedback}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
             embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)            
-            await channel.send(f"{staff.mention}",embed=embed)
+            try:
+             await channel.send(f"{staff.mention}",embed=embed)
+            except discord.Forbidden: 
+               await ctx.send(f"{no} I don't have permission to view this channel.")
+               return
 
          else:   
             pass

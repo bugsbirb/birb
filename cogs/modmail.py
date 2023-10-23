@@ -115,9 +115,17 @@ class Modmail(commands.Cog):
                             )
                             embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                             embed.set_thumbnail(url=message.author.display_avatar)
-                            await channel.send(embed=embed)
+                            try:
+                             await channel.send(embed=embed)
+                            except discord.Forbidden:
+                             await message.reply(f"{no} Please contact server admins I can't see the modmail channel.")                                    
+                             return
                     else:
-                        channel = await category.create_text_channel(f'modmail-{message.author.name}')
+                        try:
+                         channel = await category.create_text_channel(f'modmail-{message.author.name}')
+                        except discord.Forbidden: 
+                            await message.reply(f"{no} Please contact the server admins I can't create a channel.")
+                            return
                         modmail_data = {
                             'user_id': user_id,
                             'guild_id': selected_server.id,
@@ -133,7 +141,10 @@ class Modmail(commands.Cog):
                         )
                         embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                         embed.set_thumbnail(url=message.author.display_avatar)
-                        await channel.send(embed=embed)
+                        try:
+                         await channel.send(embed=embed)
+                        except discord.Forbidden: 
+                            await message.reply(f"{no} I can't see the modmail channel contact a server admin.")
                 else:
                     await message.author.send("Selected category not found.")
             else:
@@ -175,7 +186,10 @@ class Modmail(commands.Cog):
 
                     channel = self.client.get_channel(channel_id)
                     await ctx.send(f"{tick} Response sent.", ephemeral=True)
-                    await channel.send(embed=embed)
+                    try:
+                     await channel.send(embed=embed)
+                    except discord.Forbidden: 
+                        await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)
                     return
         await ctx.send(f"{no} No active modmail channel found for that user.")
      else:

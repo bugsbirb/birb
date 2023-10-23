@@ -127,7 +127,11 @@ class TicketOpen(discord.ui.View):
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 user: discord.PermissionOverwrite(read_messages=True)
             }
-            channel = await category.create_text_channel(f'ticket-{user.display_name}', overwrites=overwrites)
+            try:
+             channel = await category.create_text_channel(f'ticket-{user.display_name}', overwrites=overwrites)
+            except discord.Forbidden: 
+             await interaction.response.send_message(f"{no} Please contact server admins I don't have permission to create channels.", ephemeral=True)
+             return
             embed = discord.Embed(title=f"Support Ticket", description=f"* **Profile**\n> **User:** {user.mention}\n> **Display:** {user.display_name}\n> **ID:** {user.id}\n> **Join:** <t:{int(user.joined_at.timestamp())}:F>\n> **Created:** <t:{int(user.created_at.timestamp())}:F>", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=user, icon_url=user.display_avatar)

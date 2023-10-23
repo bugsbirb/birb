@@ -84,7 +84,10 @@ class Partnerships(commands.Cog):
           embed = discord.Embed(title=f"{(server).capitalize()}", description=f"* **Owner:** {owner.mention}\n* **Invite:** {invite}", color=discord.Color.dark_embed())
           embed.set_author(name=f"Partnership logged by {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
           embed.set_thumbnail(url=owner.display_avatar)
-          await channel.send(embed=embed)
+          try:
+           await channel.send(embed=embed)
+          except discord.Forbidden: 
+            await ctx.send(f"{no} I don't have permission to view that channel.")
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
 
@@ -115,7 +118,10 @@ class Partnerships(commands.Cog):
           embed = discord.Embed(title=f"{(server).capitalize()} Terminated", description=f"* **Owner:** {owner.mention}\n* **Invite:** {invite}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
           embed.set_author(name=f"Partnership terminiated by {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
           embed.set_thumbnail(url=owner.display_avatar)
-          await channel.send(embed=embed)
+          try:
+           await channel.send(embed=embed)
+          except discord.Forbidden: 
+            await ctx.send(f"{no} I don't have permission to view that channel.")           
           partnerships.delete_one({'guild_id': ctx.guild.id, 'server': server})
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")        

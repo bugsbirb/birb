@@ -212,7 +212,11 @@ class ModerationModule(commands.Cog):
                 embed.set_author(name=user.display_name, icon_url=user.display_avatar)
                 embed.set_footer(text=f"Moderation ID | {random_string}")
                 embed.set_thumbnail(url=user.display_avatar)
-                await channel.send(embed=embed)
+                try:
+                 await channel.send(embed=embed)
+                except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")                     
+                 return
              else:   
                 pass            
         else: 
@@ -222,7 +226,7 @@ class ModerationModule(commands.Cog):
             except discord.Forbidden:
                 pass             
             await ctx.send(f"{tick} **@{user.display_name}**, has been warned.\n<:ArrowDropDown:1163171628050563153> they now have `{points_value}/{max_points}` **points**")        
-
+            
         moderation_data = {
             'guild_id': ctx.guild.id,
             'user': user.id,
@@ -242,7 +246,11 @@ class ModerationModule(commands.Cog):
             embed.set_author(name=user.display_name, icon_url=user.display_avatar)
             embed.set_footer(text=f"Moderation ID | {random_string}")
             embed.set_thumbnail(url=user.display_avatar)
-            await channel.send(embed=embed)
+            try:
+                 await channel.send(embed=embed)
+            except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
 
     @commands.hybrid_command(description="Mutes a user for a period of time.")
     async def mute(self, ctx, user: discord.Member,duration: str ,*, reason: str):
@@ -315,7 +323,11 @@ class ModerationModule(commands.Cog):
                 embed.set_author(name=user.display_name, icon_url=user.display_avatar)
                 embed.set_footer(text=f"Moderation ID | {random_string}")
                 embed.set_thumbnail(url=user.display_avatar)
-                await channel.send(embed=embed)
+                try:
+                 await channel.send(embed=embed)
+                except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
              else:   
                 pass            
             
@@ -363,7 +375,11 @@ class ModerationModule(commands.Cog):
             embed.set_author(name=user.display_name, icon_url=user.display_avatar)
             embed.set_footer(text=f"Moderation ID | {random_string}")
             embed.set_thumbnail(url=user.display_avatar)
-            await channel.send(embed=embed)
+            try:
+                 await channel.send(embed=embed)
+            except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
 
     @commands.hybrid_command(description="Unmutes a user")
     async def unmute(self, ctx, user: discord.Member, reason: str):
@@ -414,7 +430,11 @@ class ModerationModule(commands.Cog):
                 embed.set_author(name=user.display_name, icon_url=user.display_avatar)
                 embed.set_footer(text=f"Moderation ID | {random_string}")
                 embed.set_thumbnail(url=user.display_avatar)
-                await channel.send(embed=embed)
+                try:
+                 await channel.send(embed=embed)
+                except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
             else:
                 pass
 
@@ -489,7 +509,11 @@ class ModerationModule(commands.Cog):
                 embed.set_author(name=user.display_name, icon_url=user.display_avatar)
                 embed.set_footer(text=f"Moderation ID | {random_string}")
                 embed.set_thumbnail(url=user.display_avatar)
-                await channel.send(embed=embed)
+                try:
+                 await channel.send(embed=embed)
+                except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
              else:   
                 pass
          else: 
@@ -520,7 +544,11 @@ class ModerationModule(commands.Cog):
             embed.set_author(name=user.display_name, icon_url=user.display_avatar)
             embed.set_footer(text=f"Moderation ID | {random_string}")
             embed.set_thumbnail(url=user.display_avatar)
-            await channel.send(embed=embed)
+            try:
+                 await channel.send(embed=embed)
+            except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
 
     @commands.hybrid_command(description="Bans a user from the guild")
     async def ban(self, ctx, user: discord.Member, *,reason):
@@ -596,7 +624,11 @@ class ModerationModule(commands.Cog):
                 embed.set_author(name=user.display_name, icon_url=user.display_avatar)
                 embed.set_footer(text=f"Moderation ID | {random_string}")
                 embed.set_thumbnail(url=user.display_avatar)
-                await channel.send(embed=embed)
+                try:
+                 await channel.send(embed=embed)
+                except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return                 
              else:   
                 pass            
          else: 
@@ -625,8 +657,11 @@ class ModerationModule(commands.Cog):
             embed.set_author(name=user.display_name, icon_url=user.display_avatar)
             embed.set_footer(text=f"Moderation ID | {random_string}")
             embed.set_thumbnail(url=user.display_avatar)            
-            await channel.send(embed=embed)
-
+            try:
+                 await channel.send(embed=embed)
+            except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
     @commands.hybrid_command(description="Unbans a user from the guild")
     async def unban(self, ctx, id: int, *,reason):
         user = await self.client.fetch_user(id)
@@ -673,7 +708,11 @@ class ModerationModule(commands.Cog):
             embed.set_author(name=user.display_name, icon_url=user.display_avatar)
             embed.set_footer(text=f"Moderation ID | {random_string}")
             embed.set_thumbnail(url=user.display_avatar)            
-            await channel.send(embed=embed)
+            try:
+                 await channel.send(embed=embed)
+            except discord.Forbidden: 
+                 await ctx.send(f"{no} I don't have permission to view that channel.")     
+                 return
 
     @commands.hybrid_command(description="View a user's moderations")
     async def moderations(self, ctx, user: discord.Member):

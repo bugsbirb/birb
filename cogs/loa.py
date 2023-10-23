@@ -100,7 +100,10 @@ class loamodule(commands.Cog):
         'reason': reason
         }        
           view = Confirm(loadata, ctx.author, ctx.guild)        
-          await channel.send(embed=embed, view=view)
+          try:
+           await channel.send(embed=embed, view=view)
+          except discord.Forbidden:
+                await ctx.send(f"{no} Please contact server admins I can't see the LOA Channel.")            
           await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
           print(f"LOA Request @{ctx.guild.name} pending")          
          else:

@@ -130,8 +130,12 @@ class Infractions(commands.Cog):
 
          if channel:
             view = AppealButtonView(ctx.guild.id, random_string, action, reason) if appeal_enabled else None
+            
             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
-            await channel.send(f"{staff.mention}", embed=embed)
+            try:
+             await channel.send(f"{staff.mention}", embed=embed)
+            except discord.Forbidden: 
+             await ctx.send(f"{no} I don't have permission to view that channel.")             
             collection.insert_one(infract_data)
             try:
                 await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed, view=view)
