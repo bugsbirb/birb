@@ -11,8 +11,11 @@ import pytz
 from pymongo import MongoClient
 import platform
 from emojis import * 
-
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+from dotenv import load_dotenv
+import os
+from emojis import * 
+MONGO_URL = os.getenv('MONGO_URL')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 ModerationChannel = db['Moderations Channel']
 
