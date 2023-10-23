@@ -10,15 +10,17 @@ from discord import app_commands
 import discord
 import datetime
 from discord.ext import commands, tasks
-from jishaku import Jishaku
 from pymongo import MongoClient
 from typing import Optional
 import asyncio
+import os
+from dotenv import load_dotenv
 from emojis import *
 import random
 import pymongo
 from typing import Literal
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 candy = db['Hallowen Event']
 inventory = db['Halloween Inventory']
@@ -245,4 +247,3 @@ class Halloween(commands.Cog):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Halloween(client))       
-

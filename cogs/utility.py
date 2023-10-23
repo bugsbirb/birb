@@ -7,7 +7,10 @@ from typing import Union, Optional
 from typing import Literal
 from pymongo import MongoClient
 import typing
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+import os
+from dotenv import load_dotenv
+MONGO_URL = os.getenv('MONGO_URL')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
 

@@ -10,7 +10,10 @@ from discord.ext import commands, tasks
 import pytz
 from pymongo import MongoClient
 from emojis import * 
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+import os
+from dotenv import load_dotenv
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 stafffeedback = db['feedback']
 feedbackch = db['Staff Feedback Channel']
@@ -106,4 +109,4 @@ def get_rating_text(average_rating):
 
 async def setup(client: commands.Bot) -> None:
 
-    await client.add_cog(Feedback(client))                         
+    await client.add_cog(Feedback(client))                

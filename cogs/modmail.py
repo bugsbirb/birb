@@ -11,8 +11,11 @@ from pymongo import MongoClient
 from emojis import *
 import typing
 from typing import Literal
+import os
+from dotenv import load_dotenv
 import Paginator
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -90,7 +93,7 @@ class Modmail(commands.Cog):
                     response = await self.client.wait_for('message', check=check, timeout=5)
                     selected_server = mutual_servers[int(response.content) - 1]
                 except asyncio.TimeoutError:
-                    await message.author.send(f"{no} Server selection expired.")                    
+                    await message.author.send(f"{no} Server selection expired.")
                     return
                 except ValueError:
                     await message.author.send(f"{no} Invalid server number. Please enter a valid number.")

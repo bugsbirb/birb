@@ -10,10 +10,13 @@ from discord import app_commands
 from discord.ext import commands, tasks
 import pytz
 import Paginator
+import os
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from emojis import *
+MONGO_URL = os.getenv('MONGO_URL')
 
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']

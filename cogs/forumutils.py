@@ -7,6 +7,8 @@ import discord.ext
 from discord.ext import commands
 from urllib.parse import quote_plus
 from discord import app_commands
+import os
+from dotenv import load_dotenv
 import discord
 import datetime
 from discord.ext import commands, tasks
@@ -15,8 +17,8 @@ from pymongo import MongoClient
 from typing import Optional
 
 from emojis import *
-
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 

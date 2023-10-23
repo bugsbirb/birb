@@ -7,8 +7,11 @@ from datetime import datetime, timedelta
 from typing import Optional
 import pytz
 from discord import app_commands
+import os
+from dotenv import load_dotenv
 from pymongo import MongoClient
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 repchannel = db['report channel']
 

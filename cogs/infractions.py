@@ -12,9 +12,11 @@ import datetime
 from discord import app_commands
 import Paginator
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 from emojis import *
-
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 collection = db['infractions']
 scollection = db['staffrole']

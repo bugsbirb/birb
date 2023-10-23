@@ -12,13 +12,15 @@ import datetime
 from discord.ext import commands, tasks
 from jishaku import Jishaku
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 from typing import Optional
 import sqlite3
 from emojis import *
 from cogs.ModerationConfig.moderationdropdowns import *
+MONGO_URL = os.getenv('MONGO_URL')
 
-
-mongo = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -760,7 +762,4 @@ class Config(discord.ui.Select):
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
         
-        
-
-
         

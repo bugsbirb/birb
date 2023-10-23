@@ -10,7 +10,10 @@ from pymongo import MongoClient
 from emojis import *
 import typing
 import Paginator
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+import os
+from dotenv import load_dotenv
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']

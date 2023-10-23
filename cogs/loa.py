@@ -12,9 +12,11 @@ import pytz
 from pymongo import MongoClient
 from emojis import * 
 import time
+import os
+from dotenv import load_dotenv
 from datetime import datetime
-
-client = MongoClient('mongodb+srv://deezbird2768:JsVErbxMhh3MlDV2@cluster0.oi5ddvf.mongodb.net/')
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
 db = client['astro']
 loa_collection = db['loa']
 loachannel = db['LOA Channel']
@@ -267,4 +269,4 @@ class LOAManage(discord.ui.View):
             await user.remove_roles(role)         
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(loamodule(client))                  
+    await client.add_cog(loamodule(client))             
