@@ -64,6 +64,10 @@ class promo(commands.Cog):
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
+         
+        if ctx.author == staff:
+         await ctx.send(f"{no} You can't promote yourself.")
+         return
 
         if ctx.author.top_role <= new:
             await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True)
