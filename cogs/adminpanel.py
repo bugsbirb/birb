@@ -348,7 +348,7 @@ class InfractionOption(discord.ui.Select):
         
             
         ]
-        super().__init__(placeholder='Infraction Types', min_values=1, max_values=1, options=options)
+        super().__init__(placeholder='Action', min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
         option = self.values[0]
