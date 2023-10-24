@@ -53,7 +53,7 @@ class client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.partnerships","cogs.staff-feedback","cogs.loa", "cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
     async def is_owner(self, user: discord.User):
         if user.id in [
