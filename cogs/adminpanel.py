@@ -439,6 +439,7 @@ class AdminPanel(discord.ui.View):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                                     
         view = DemotionRoleView(self.user, self.guild, self.author)
         await interaction.response.edit_message(view=view)
     @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey)
