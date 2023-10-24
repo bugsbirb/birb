@@ -242,7 +242,7 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
                  return       
 
                 try:
-                    await channel.send(f"{interaction.user.mention}", embed=embed)
+                    await channel.send(f"{self.user.mention}", embed=embed)
                 except discord.Forbidden:
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
