@@ -408,6 +408,10 @@ class AdminPanelCog(commands.Cog):
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return            
+        if ctx.author == staff:
+         await ctx.send(f"{no} You can't manage yourself.")
+         return
+
         embed = discord.Embed(title=f"Admin Panel - {staff.name}", description=f"**Mention:** {staff.mention}\n**ID:** *{staff.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
         embed.set_footer(text="Staff Management Panel")
