@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 
 
 load_dotenv()
+PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
@@ -51,7 +52,7 @@ def user(self, channel_id):
 class client(commands.Bot):
     def __init__(self):
         intents = discord.Intents().all()
-        super().__init__(command_prefix=commands.when_mentioned_or("-"), intents=intents)
+        super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
         self.cogslist = ["cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.moderations","cogs.tickets","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
