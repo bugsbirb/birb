@@ -507,9 +507,7 @@ class AdminPanelCog(commands.Cog):
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return            
-        if ctx.author == staff:
-         await ctx.send(f"{no} You can't manage yourself.")
-         return
+
 
         infractions = collection.count_documents({"staff": staff.id, "guild_id": ctx.guild.id, "action": {"$ne": "Demotion"}})
         demotions = collection.count_documents({"staff": staff.id, "guild_id": ctx.guild.id, "action": "Demotion"})
@@ -544,6 +542,9 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)               
+        if self.author == self.user:
+         await interaction.response.send_message(f"{no} You can't promote yourself.", ephemeral=True)
+         return
 
         view = PromotionRoleView(self.user, self.guild, self.author)
         await interaction.response.edit_message(view=view)
@@ -554,6 +555,12 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
+
+
+        if self.author == self.user:
+         await interaction.response.send_message(f"{no} You can't infract yourself.", ephemeral=True)
+         return
+
         view = InfractionOptionView(self.user, self.guild, self.author)
         await interaction.response.edit_message(view=view)
         
