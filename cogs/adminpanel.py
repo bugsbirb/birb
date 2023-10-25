@@ -672,17 +672,15 @@ class AdminPanel(discord.ui.View):
         loainactive = loa_collection.find({"user": self.user.id, "guild_id": interaction.guild.id, 'active': False})
         view = None
 
-
-
         if loa is None:
             description = []
             for request in loainactive:
                 start_time = request['start_time']
                 end_time = request['end_time']
                 reason = request['reason']
-                description.append(f"<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
+                description.append(f"**Previous LOA**\n<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
 
-            embed = discord.Embed(title="Leave Of Absense", description="\n".join(description), color=discord.Color.dark_embed())
+            embed = discord.Embed(title="Leave Of Absense", description=f"\n".join(description), color=discord.Color.dark_embed())
             embed.set_thumbnail(url=self.user.display_avatar)
             embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
             view = LOACreate(self.user, interaction.guild, self.author)
