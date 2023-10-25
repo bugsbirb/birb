@@ -97,7 +97,8 @@ class loamodule(commands.Cog):
         'user': ctx.author.id,
         'start_time': start_time,
         'end_time': end_time,
-        'reason': reason
+        'reason': reason,
+        'active': True
         }        
           view = Confirm(loadata, ctx.author, ctx.guild)        
           try:
@@ -126,13 +127,15 @@ class loamodule(commands.Cog):
         guild_id = request['guild_id']
         guild = self.client.get_guild(guild_id)
         user = self.client.get_user(user_id)
-        print(f"End Time: {end_time}")
-        print(f"Current Time: {current_time}")
+        active = request['active']
 
-        if current_time >= end_time:
+        if active == True:
+         if current_time >= end_time:
             if user:
                 await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
-                loa_collection.delete_one({'guild_id': guild_id, 'user': user_id})
+                print(f"End Time: {end_time}")
+                print(f"Current Time: {current_time}")
+                loa_collection.update_one({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
                 loarole_data = LOARole.find_one({'guild_id': guild.id})
                 if loarole_data:
                  loarole = loarole_data['staffrole']
@@ -141,6 +144,9 @@ class loamodule(commands.Cog):
                   if role:
                    member = guild.get_member(user.id)
                    await member.remove_roles(role)       
+        else:
+            pass
+
 
     @loa.command(description="Manage someone leave of Absence")
     async def manage(self, ctx, user: discord.Member):
@@ -158,7 +164,8 @@ class loamodule(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
      current_time = datetime.now()
-     filter = {'guild_id': ctx.guild.id, 'end_time': {'$gte': current_time}}
+     filter = {'guild_id': ctx.guild.id, 'end_time': {'$gte': current_time}, 'active': True}
+
      loa_requests = list(loa_collection.find(filter))
 
      if len(loa_requests) == 0:
