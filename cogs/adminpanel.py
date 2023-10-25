@@ -457,7 +457,7 @@ class AdminPanel(discord.ui.View):
         view = PromotionRoleView(self.user, self.guild, self.author)
         await interaction.response.edit_message(view=view)
 
-    @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey, emoji='<:flag:1166508151290462239>')
+    @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey, emoji='<:Infraction:1162134605885870180>')
     async def Infract(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
