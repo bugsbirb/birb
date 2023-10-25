@@ -64,7 +64,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Infractions':
             embed.title = "Infractions Module"
             embed.description = "The Infractions Module is a powerful tool for managing staff discipline within your server. It offers a range of disciplinary actions, including 'Termination,' 'Demotion,' 'Warnings,' 'Verbal Warning,' and 'Activity Notice.' With these options, you can effectively address various staff-related issues and maintain a harmonious server environment."
-            embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /revoke infraction\n* /admin panel")
+            embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /infraction void\n* /admin panel")
         elif category == 'Promotions':
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."

@@ -632,8 +632,11 @@ class AdminPanel(discord.ui.View):
                 'id': infraction['random_string'],
                 'action': infraction['action'],
                 'reason': infraction['reason'],
-                'notes': infraction['notes']
+                'notes': infraction['notes'],
+                'management': infraction['management']
+
             }
+            
             infraction_list.append(infraction_info)
 
         if not infraction_list:
@@ -643,18 +646,19 @@ class AdminPanel(discord.ui.View):
         print(f"Found {len(infraction_list)} infractions for {self.user.display_name}")
 
         embed = discord.Embed(
-            title=f"{self.user.display_name}'s Infractions",
+            title=f"{self.user.name}'s Infractions",
             description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
             color=discord.Color.dark_embed()
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
-        management = interaction.guild.get_member(infraction['management'])
+        
         for infraction_info in infraction_list:
+            management = interaction.guild.get_member(infraction_info['management'])
             embed.add_field(
-                name=f"Infraction ID: {infraction_info['id']}",
-                value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
-                inline=False
+            name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+            inline=False
             )
         view = RevokeInfraction(self.user, interaction.guild, self.author)
         await interaction.response.edit_message(embed=embed, view=view, content=None)
@@ -678,7 +682,7 @@ class AdminPanel(discord.ui.View):
                 start_time = request['start_time']
                 end_time = request['end_time']
                 reason = request['reason']
-                description.append(f"**Previous LOA**\n<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
+                description.append(f"<:LOA:1164969910238203995> **Previous LOA**\n<:arrow:1166529434493386823><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
 
             embed = discord.Embed(title="Leave Of Absense", description=f"\n".join(description), color=discord.Color.dark_embed())
             embed.set_thumbnail(url=self.user.display_avatar)
@@ -693,7 +697,7 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(
                 title=f"Leave Of Absence",
                 color=discord.Color.dark_embed(),
-                description=f"* **Start Date:** <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}"
+                description=f"<:LOA:1164969910238203995> **Active LOA**\n<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}"
             )
             embed.set_thumbnail(url=self.user.display_avatar)
             embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
@@ -918,8 +922,11 @@ class InfRevokeReturn(discord.ui.View):
                 'id': infraction['random_string'],
                 'action': infraction['action'],
                 'reason': infraction['reason'],
-                'notes': infraction['notes']
+                'notes': infraction['notes'],
+                'management': infraction['management']
+
             }
+            
             infraction_list.append(infraction_info)
 
         if not infraction_list:
@@ -929,18 +936,19 @@ class InfRevokeReturn(discord.ui.View):
         print(f"Found {len(infraction_list)} infractions for {self.user.display_name}")
 
         embed = discord.Embed(
-            title=f"{self.user.display_name}'s Infractions",
+            title=f"{self.user.name}'s Infractions",
             description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
             color=discord.Color.dark_embed()
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
-        management = interaction.guild.get_member(infraction['management'])
+        
         for infraction_info in infraction_list:
+            management = interaction.guild.get_member(infraction_info['management'])
             embed.add_field(
-                name=f"Infraction ID: {infraction_info['id']}",
-                value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
-                inline=False
+            name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+            inline=False
             )
         view = RevokeInfraction(self.user, interaction.guild, self.author)
         await interaction.response.edit_message(embed=embed, view=view, content=None)

@@ -168,7 +168,8 @@ class Infractions(commands.Cog):
             'id': infraction['random_string'],
             'action': infraction['action'],
             'reason': infraction['reason'],
-            'notes': infraction['notes']
+            'notes': infraction['notes'],
+            'management': infraction['management']
         }
         infraction_list.append(infraction_info)
 
@@ -179,17 +180,17 @@ class Infractions(commands.Cog):
      print(f"Found {len(infraction_list)} infractions for {staff.display_name}")
 
      embed = discord.Embed(
-        title=f"{staff.display_name}'s Infractions",
+        title=f"{staff.name}'s Infractions",
         description=f"* **User:** {staff.mention}\n* **User ID:** {staff.id}",
         color=discord.Color.dark_embed()
     )
      embed.set_thumbnail(url=staff.display_avatar)
      embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)
-     management = self.client.get_user(infraction['management'])
      for infraction_info in infraction_list:
+        management = self.client.get_user(infraction_info['management'])        
         embed.add_field(
-            name=f"Infraction ID: {infraction_info['id']}",
-            value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
+            name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
             inline=False
         )
 
@@ -199,8 +200,8 @@ class Infractions(commands.Cog):
     async def infraction(self, ctx):
         return
 
-    @infraction.command(description="Revoke a staff member's infraction")
-    async def revoke(self, ctx, id: str):
+    @infraction.command(description="Void a staff member's infraction")
+    async def void(self, ctx, id: str):
      if not await self.has_admin_role(ctx):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
         return
@@ -218,7 +219,7 @@ class Infractions(commands.Cog):
 
      collection.delete_one(filter)
  
-     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've revoked the infraction with ID `{id}` in this guild.")
+     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.")
      
 
 
@@ -269,7 +270,7 @@ class BanAppeal(discord.ui.Modal, title='Infraction Appeal'):
                     response_embed2.set_author(name=guild.name, icon_url=guild.icon)
 
                     await interaction.response.send_message(embed=response_embed2)   
-                    print(f"Infraction Appeal at {interaction.guild.name}")
+                    print(f"Infraction Appeal at {guild.name}")
                     view = AcceptOrdeny()
                     await channel.send(embed=embed, view=view)
                     await view.wait()
@@ -281,7 +282,7 @@ class BanAppeal(discord.ui.Modal, title='Infraction Appeal'):
                         description=f"{tick} Your appeal has been **accepted!**",
 
                         color=discord.Color.dark_embed())
-                     print(f"Infraction Appeal Accepted at {interaction.guild.name}")
+                     print(f"Infraction Appeal Accepted at {guild.name}")
                     
                      embed.set_author(name=guild.name, icon_url=guild.icon)
                      await interaction.user.send(embed=embed)                      
@@ -292,7 +293,7 @@ class BanAppeal(discord.ui.Modal, title='Infraction Appeal'):
                         description=f"{no} Your appeal has been **denied.**",
                         color=discord.Color.dark_embed())
                      embed.set_author(name=guild.name, icon_url=guild.icon)                    
-                     print(f"Infraction Appeal Denied at {interaction.guild.name}")                     
+                     print(f"Infraction Appeal Denied at {guild.name}")                     
                      await interaction.user.send(embed=embed)  
 
 
