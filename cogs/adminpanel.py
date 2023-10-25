@@ -52,6 +52,10 @@ class VoidInf(discord.ui.Modal, title='Void Infraction'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
         id = self.InfractionID.value    
         filter = {
         'guild_id': interaction.guild.id,
