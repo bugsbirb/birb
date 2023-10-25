@@ -8,7 +8,9 @@ from typing import Literal
 from pymongo import MongoClient
 import typing
 import os
+import dotenv
 from dotenv import load_dotenv
+
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
@@ -59,18 +61,14 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Tags Module"
             embed.description = "The Tags Module allows you to create, manage, and use custom text-based tags within your server. Tags are short snippets of text that can be easily retrieved and sent in chat. This module enhances communication and enables you to create quick responses or share information efficiently."
             embed.add_field(name="Commands", value="* /tags send\n* /tags info\n* /tags delete\n* /tags all")
-        elif category == 'LOA':
-            embed.title = "LOA Module"
-            embed.description = "The LOA module serves as a dedicated system for managing staff breaks and Leave Of Absence (LOA) requests. Staff members can easily submit LOA requests when they need to take a break, ensuring smooth staff management and workflow."
-            embed.add_field(name="Commands", value="* /loa request\n* /loa view\n* /loa manage")
         elif category == 'Infractions':
             embed.title = "Infractions Module"
             embed.description = "The Infractions Module is a powerful tool for managing staff discipline within your server. It offers a range of disciplinary actions, including 'Termination,' 'Demotion,' 'Warnings,' 'Verbal Warning,' and 'Activity Notice.' With these options, you can effectively address various staff-related issues and maintain a harmonious server environment."
-            embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /revoke infraction")
+            embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /revoke infraction\n* /admin panel")
         elif category == 'Promotions':
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
-            embed.add_field(name="Commands", value="* /promote")
+            embed.add_field(name="Commands", value="* /promote\n* /admin panel")
         elif category == 'Configuration':
             embed.title = "Configuration"
             embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Anti-Ping, Permissions, and Channels to tailor the bot's behavior to your server's requirements."
@@ -86,7 +84,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'LOA':
             embed.title = "LOA Module"
             embed.description = "The LOA (Leave of Absence) Module simplifies LOA requests in your Discord server. Members can easily request time off with a specified duration and reason. Server Admins can efficiently manage these requests and track active LOAs. When LOAs end, notifications ensure everyone is informed. A streamlined solution for a well-organized server."
-            embed.add_field(name="Commands", value="* /loa request\n* /loa manage\n* /loa active")                        
+            embed.add_field(name="Commands", value="* /loa request\n* /admin panel\n* /loa active")                        
         elif category == 'Staff Feedback':
             embed.title = "Staff Feedback Module"
             embed.description = "This module facilitates the process of providing feedback and ratings for staff members. Users can use the commands within this module to share their feedback and experiences with the staff, helping to maintain a positive and efficient community environment."

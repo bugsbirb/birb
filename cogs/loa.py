@@ -147,26 +147,8 @@ class loamodule(commands.Cog):
      if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return            
-     filter = {'guild_id': ctx.guild.id, 'user': user.id} 
-     loa_requests = list(loa_collection.find(filter))
+     await ctx.send(f"<:LOA:1164969910238203995> **Hey,** loa manage has been moved over to `/admin panel`!")
 
-     if len(loa_requests) == 0:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active LOAs for this user.")
-     else:
-        for request in loa_requests:
-            start_time = request['start_time']
-            end_time = request['end_time']
-            reason = request['reason']
-            
-            embed = discord.Embed(
-                title=f"LOA Manage for {user.display_name}",
-                color=discord.Color.dark_embed(),
-                description=f"* **Start Date:** <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}"
-            )
-            embed.set_thumbnail(url=user.display_avatar)
-            embed.set_author(icon_url=user.display_avatar, name=user.display_name)
-            view = LOAManage(user, ctx.guild, ctx.author)
-            await ctx.send(embed=embed, view=view)
 
 
 
