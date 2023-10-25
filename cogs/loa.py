@@ -194,8 +194,26 @@ class Confirm(discord.ui.View):
         self.user = user
         self.guild = guild
 
+    async def has_admin_role(self, interaction):
+        filter = {
+            'guild_id': interaction.guild.id
+        }
+        admin_data = arole.find_one(filter)
+
+        if admin_data and 'adminrole' in admin_data:
+            admin_role_id = admin_data['adminrole']
+            admin_role = discord.utils.get(interaction.guild.roles, id=admin_role_id)
+            if admin_role in interaction.user.roles:
+                return True
+
+        return False     
+
+
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji="<:Tick:1140286044114268242>")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not await self.has_admin_role(interaction):
+          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.", ephemeral=True)
+          return                
         user = self.user
         try:
          await self.user.send(f"{tick} **{self.user.display_name}**, your LOA **@{self.guild.name}** has been accepted.")
@@ -216,6 +234,10 @@ class Confirm(discord.ui.View):
 
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not await self.has_admin_role(interaction):
+          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.", ephemeral=True)
+          return                
+
         try:
          await self.user.send(f"{no} **{self.user.display_name}**, your LOA **@{self.guild.name}** has been denied.")        
         except discord.Forbidden:
