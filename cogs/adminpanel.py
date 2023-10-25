@@ -35,6 +35,45 @@ arole = db['adminrole']
 promochannel = db['promo channel']
 LOARole = db['LOA Role']
 
+class VoidInf(discord.ui.Modal, title='Void Infraction'):
+    def __init__(self, user, guild, author):
+        super().__init__()
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+
+
+    InfractionID = discord.ui.TextInput(
+        label='ID',
+        placeholder='e.g 20454073',
+    )
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        id = self.InfractionID.value    
+        filter = {
+        'guild_id': interaction.guild.id,
+        'random_string': id
+    }
+
+        infraction = collection.find_one(filter)
+
+        if infraction is None:
+         await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, I couldn't find the infraction with ID `{id}`.", view=LOARevokeReturn(self.user, self.guild, self.author), embed=None)
+         return
+
+        collection.delete_one(filter)
+ 
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've revoked the infraction with ID `{id}`", view=LOARevokeReturn(self.user, self.guild, self.author), embed=None)
+
+
+
+
+
+
+
 class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
     def __init__(self, user, guild, author):
         super().__init__()
@@ -612,7 +651,7 @@ class AdminPanel(discord.ui.View):
                 value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
                 inline=False
             )
-        view = Return(self.user, interaction.guild, self.author)
+        view = RevokeLOA(self.user, interaction.guild, self.author)
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
     @discord.ui.button(label='LOA', style=discord.ButtonStyle.grey, emoji='<:LOA:1164969910238203995>')
@@ -781,6 +820,105 @@ class LOACreate(discord.ui.View):
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")        
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
+
+class RevokeLOA(discord.ui.View):
+    def __init__(self, user, guild, author):
+        super().__init__(timeout=None)
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+
+    @discord.ui.button(label='Void Infraction', style=discord.ButtonStyle.grey, emoji='<:bin:1160543529542635520>')
+    async def LOARevoke(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_modal(VoidInf(self.user, interaction.guild, self.author))
+
+    @discord.ui.button(label='Return', style=discord.ButtonStyle.grey, emoji='<:Return:1166514220960063568>')
+    async def Return3(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        infractions = collection.count_documents({"staff": self.user.id, "guild_id": interaction.guild.id, "action": {"$ne": "Demotion"}})
+        demotions = collection.count_documents({"staff": self.user.id, "guild_id": interaction.guild.id, "action": "Demotion"})
+        loa = loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id})
+        loasmg = ""
+        if loa:
+            loamsg = "True"
+        else:
+            loamsg = "False"
+        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
+        embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
+        embed.set_thumbnail(url=self.user.display_avatar)
+        embed.add_field(name="<:data:1166529224094523422> Staff Data", value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}")        
+        view = AdminPanel(self.user, interaction.guild, self.author)
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")        
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
+
+
+
+class LOARevokeReturn(discord.ui.View):
+    def __init__(self, user, guild, author):
+        super().__init__(timeout=None)
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+    @discord.ui.button(label='Return', style=discord.ButtonStyle.grey, emoji='<:Return:1166514220960063568>')
+    async def Return3(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        print(f"Searching infractions for staff ID: {self.user.id} in guild ID: {self.user.guild.id}")
+
+        filter = {
+            'guild_id': interaction.guild.id,
+            'staff': self.user.id,
+        }
+
+        infractions = collection.find(filter)
+
+        infraction_list = []
+
+        for infraction in infractions:
+            infraction_info = {
+                'id': infraction['random_string'],
+                'action': infraction['action'],
+                'reason': infraction['reason'],
+                'notes': infraction['notes']
+            }
+            infraction_list.append(infraction_info)
+
+        if not infraction_list:
+            await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, there are no infractions found for **@{self.user.display_name}**.", ephemeral=True)
+            return
+
+        print(f"Found {len(infraction_list)} infractions for {self.user.display_name}")
+
+        embed = discord.Embed(
+            title=f"{self.user.display_name}'s Infractions",
+            description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
+            color=discord.Color.dark_embed()
+        )
+        embed.set_thumbnail(url=self.user.display_avatar)
+        embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
+        management = interaction.guild.get_member(infraction['management'])
+        for infraction_info in infraction_list:
+            embed.add_field(
+                name=f"Infraction ID: {infraction_info['id']}",
+                value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
+                inline=False
+            )
+        view = RevokeLOA(self.user, interaction.guild, self.author)
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(AdminPanelCog(client))                
