@@ -27,7 +27,7 @@ arole = db['adminrole']
 infchannel = db['infraction channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
-
+loa_collection = db['loa']
 
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -60,7 +60,7 @@ class DemotedToRole(discord.ui.RoleSelect):
         if interaction.user.top_role <= role:
             await interaction.response.edit_message(
                 content=f"{no} **{interaction.user.display_name}**, you are below the role `{role.name}` and do not have the authority to promote this member.",
-                view=None,
+                view=Return(self.user, self.guild, self.author),
                 embed=None
             )
             return
@@ -128,20 +128,21 @@ class DemotionReason(discord.ui.Modal, title='Reason'):
                  await self.user.remove_roles(role)
             except discord.Forbidden:
                  await interaction.response.edit_message(content=f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to remove roles.",                         embed=None,
-                        view=None)
+                        view=Return(self.user, self.guild, self.author))
                  return               
-            await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've demoted **@{self.user.display_name}**", embed=None, view=None)
+            
             try:
              await channel.send(f"{self.user.mention}", embed=embed)
             except discord.Forbidden: 
-             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None)             
+             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=Return(self.user, self.guild, self.author), embed=None)             
+            await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've demoted **@{self.user.display_name}**", embed=None, view=Return(self.user, self.guild, self.author))
             collection.insert_one(infract_data)
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=view)
             except discord.Forbidden:
                 pass
         else:
-          await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=None)
+          await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=Return(self.user, self.guild, self.author))
 
 
 
@@ -182,7 +183,7 @@ class PromotionRole(discord.ui.RoleSelect):
         if interaction.user.top_role <= role:
             await interaction.response.edit_message(
                 content=f"{no} **{interaction.user.display_name}**, you are below the role `{role.name}` and do not have the authority to promote this member.",
-                view=None,
+                view=Return(self.user, self.guild, self.author),
                 embed=None
             )
             return
@@ -238,7 +239,7 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
                  await self.user.add_roles(role)
                 except discord.Forbidden:
                  await interaction.response.edit_message(content=f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to add roles.",                         embed=None,
-                        view=None)
+                        view=Return(self.user, self.guild, self.author))
                  return       
 
                 try:
@@ -247,14 +248,14 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
                         embed=None,
-                        view=None
+                        view=Return(self.user, self.guild, self.author)
                     )
                     return   
 
                 await interaction.response.edit_message(
                     content=f"{tick} **{self.author.display_name}**, I've promoted **@{self.user.display_name}**",
                     embed=None,
-                    view=None
+                    view=Return(self.user, self.guild, self.author)
                 )
 
 
@@ -320,18 +321,20 @@ class Reason(discord.ui.Modal, title='Reason'):
          if channel:
             view = AppealButtonView(interaction.guild.id, random_string, self.option, self.Reason) if appeal_enabled else None
             
-            await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've infracted **@{self.user.display_name}**", embed=None, view=None)
+            
             try:
              await channel.send(f"{self.user.mention}", embed=embed)
             except discord.Forbidden: 
-             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None)             
+             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=Return(self.user, self.guild, self.author), embed=None)             
+             return
+            await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've infracted **@{self.user.display_name}**", embed=None, view=Return(self.user, self.guild, self.author))
             collection.insert_one(infract_data)
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=view)
             except discord.Forbidden:
                 pass
         else:
-          await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=None)
+          await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=Return(self.user, self.guild, self.author))
 
 class InfractionOption(discord.ui.Select):
     def __init__(self, user, guild, author):
@@ -342,8 +345,9 @@ class InfractionOption(discord.ui.Select):
             discord.SelectOption(label='Activity Notice'),
             discord.SelectOption(label='Verbal Warning'),                
             discord.SelectOption(label='Warning'),            
-            discord.SelectOption(label='Strike')                
- 
+            discord.SelectOption(label='Strike'),                
+            discord.SelectOption(label='Demotion'), 
+            discord.SelectOption(label='Termination'),            
 
         
             
@@ -352,8 +356,13 @@ class InfractionOption(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         option = self.values[0]
+        if option == 'Demotion':
 
-        await interaction.response.send_modal(Reason(self.user, self.guild, self.author, option))
+         view = DemotionRoleView(self.user, self.guild, self.author)
+         await interaction.response.edit_message(view=view)
+
+        else:
+         await interaction.response.send_modal(Reason(self.user, self.guild, self.author, option))
 
 class InfractionOptionView(discord.ui.View):
     def __init__(self, user, guild, author):
@@ -412,9 +421,19 @@ class AdminPanelCog(commands.Cog):
          await ctx.send(f"{no} You can't manage yourself.")
          return
 
+        infractions = collection.count_documents({"staff": staff.id, "guild_id": ctx.guild.id, "action": {"$ne": "Demotion"}})
+        demotions = collection.count_documents({"staff": staff.id, "guild_id": ctx.guild.id, "action": "Demotion"})
+        loa = loa_collection.find_one({"user": staff.id, "guild_id": ctx.guild.id})
+        loasmg = ""
+        if loa is None:
+            loamsg = "False"
+        else:
+            loamsg = "True"
+
         embed = discord.Embed(title=f"Admin Panel - {staff.name}", description=f"**Mention:** {staff.mention}\n**ID:** *{staff.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed.add_field(name="<:data:1166529224094523422> Staff Data", value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}")
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
-        embed.set_footer(text="Staff Management Panel")
+        embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
         embed.set_thumbnail(url=staff.display_avatar)
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
@@ -428,7 +447,7 @@ class AdminPanel(discord.ui.View):
         self.guild = guild
         self.author = author
 
-    @discord.ui.button(label='Promote', style=discord.ButtonStyle.grey)
+    @discord.ui.button(label='Promote', style=discord.ButtonStyle.grey, emoji='<:Promotion:1162134864594735315>')
     async def Promote(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
@@ -438,15 +457,7 @@ class AdminPanel(discord.ui.View):
         view = PromotionRoleView(self.user, self.guild, self.author)
         await interaction.response.edit_message(view=view)
 
-    @discord.ui.button(label='Demotion', style=discord.ButtonStyle.grey)
-    async def Demotion(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)                                     
-        view = DemotionRoleView(self.user, self.guild, self.author)
-        await interaction.response.edit_message(view=view)
-    @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey)
+    @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey, emoji='<:flag:1166508151290462239>')
     async def Infract(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
@@ -456,8 +467,86 @@ class AdminPanel(discord.ui.View):
         await interaction.response.edit_message(view=view)
         
 
+    @discord.ui.button(label='Search', style=discord.ButtonStyle.grey, emoji='<:Search:1166509265951932546>')
+    async def Search(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        print(f"Searching infractions for staff ID: {self.user.id} in guild ID: {self.user.guild.id}")
+
+        filter = {
+            'guild_id': interaction.guild.id,
+            'staff': self.user.id,
+        }
+
+        infractions = collection.find(filter)
+
+        infraction_list = []
+
+        for infraction in infractions:
+            infraction_info = {
+                'id': infraction['random_string'],
+                'action': infraction['action'],
+                'reason': infraction['reason'],
+                'notes': infraction['notes']
+            }
+            infraction_list.append(infraction_info)
+
+        if not infraction_list:
+            await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, there are no infractions found for **@{self.user.display_name}**.", ephemeral=True)
+            return
+
+        print(f"Found {len(infraction_list)} infractions for {self.user.display_name}")
+
+        embed = discord.Embed(
+            title=f"{self.user.display_name}'s Infractions",
+            description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
+            color=discord.Color.dark_embed()
+        )
+        embed.set_thumbnail(url=self.user.display_avatar)
+        embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
+        management = interaction.guild.get_member(infraction['management'])
+        for infraction_info in infraction_list:
+            embed.add_field(
+                name=f"Infraction ID: {infraction_info['id']}",
+                value=f"* **Infracted By:** {management.mention}\n* **Action:** {infraction_info['action']}\n* **Reason:** {infraction_info['reason']}\n* **Notes:** {infraction_info['notes']}",
+                inline=False
+            )
+        view = Return(self.user, interaction.guild, self.author)
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 
+class Return(discord.ui.View):
+    def __init__(self, user, guild, author):
+        super().__init__(timeout=None)
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+    @discord.ui.button(label='Return', style=discord.ButtonStyle.grey, emoji='<:Return:1166514220960063568>')
+    async def Return(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        infractions = collection.count_documents({"staff": self.user.id, "guild_id": interaction.guild.id, "action": {"$ne": "Demotion"}})
+        demotions = collection.count_documents({"staff": self.user.id, "guild_id": interaction.guild.id, "action": "Demotion"})
+        loa = loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id})
+        loasmg = ""
+        if loa:
+            loamsg = "True"
+        else:
+            loamsg = "False"
+        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
+        embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
+        embed.set_thumbnail(url=self.user.display_avatar)
+        embed.add_field(name="<:data:1166529224094523422> Staff Data", value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}")        
+        view = AdminPanel(self.user, interaction.guild, self.author)
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(AdminPanelCog(client))                

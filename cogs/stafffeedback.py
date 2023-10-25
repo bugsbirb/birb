@@ -26,7 +26,7 @@ class Feedback(commands.Cog):
     async def staff(self, ctx):
         pass
 
-    @staff.command(description="Rate a staff membr")
+    @staff.command(description="Rate a staff member")
     async def feedback(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        if staff == ctx.author:
@@ -112,5 +112,4 @@ def get_rating_text(average_rating):
         return "Critical"
 
 async def setup(client: commands.Bot) -> None:
-
-    await client.add_cog(Feedback(client))                
+    await client.add_cog(Feedback(client))        

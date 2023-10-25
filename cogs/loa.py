@@ -62,7 +62,7 @@ class loamodule(commands.Cog):
     async def loa(self, ctx):
         pass
 
-    @loa.command(description="Request a Leave Of Abscense")
+    @loa.command(description="Request a Leave Of Absence")
     @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reasonfor this LOA?")
     async def request(self, ctx, duration: str, reason: str):
         if not await self.has_staff_role(ctx):
@@ -142,7 +142,7 @@ class loamodule(commands.Cog):
                    member = guild.get_member(user.id)
                    await member.remove_roles(role)       
 
-    @loa.command(description="Manage someone leave of abscense")
+    @loa.command(description="Manage someone leave of Absence")
     async def manage(self, ctx, user: discord.Member):
      if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
@@ -170,7 +170,7 @@ class loamodule(commands.Cog):
 
 
 
-    @loa.command(description="View all Leave Of Abscenses")
+    @loa.command(description="View all Leave Of Absence")
     async def active(self, ctx):
      if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
