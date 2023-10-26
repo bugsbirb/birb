@@ -26,6 +26,7 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
+            discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Moderation", value="Moderation", emoji="<:Moderation:1163933000006893648>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
@@ -65,6 +66,12 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Infractions Module"
             embed.description = "The Infractions Module is a powerful tool for managing staff discipline within your server. It offers a range of disciplinary actions, including 'Termination,' 'Demotion,' 'Warnings,' 'Verbal Warning,' and 'Activity Notice.' With these options, you can effectively address various staff-related issues and maintain a harmonious server environment."
             embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /infraction void\n* /admin panel")
+
+        elif category == 'Suspensions':
+            embed.title = "Suspensions Module"
+            embed.description = "Manage staff suspensions with ease. This module allows authorized users to suspend staff members for a specified duration, optionally removing their roles during the suspension. It also handles the automatic removal of suspensions when the duration expires and restoration of roles to the suspended staff members."
+            embed.add_field(name="Commands", value="* /suspend\n* /suspension manage\n* /suspension active")
+
         elif category == 'Promotions':
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
