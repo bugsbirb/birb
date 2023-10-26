@@ -188,20 +188,12 @@ class Suspensions(commands.Cog):
         user_id = request['staff']
         guild_id = request['guild_id']
         guild = self.client.get_guild(guild_id)
-
-        if guild is None:
-
-            continue
-
         user = self.client.get_user(user_id)
-        active = request['active']
-
-        if active:
-            if current_time >= end_time:
+        if current_time >= end_time:
                 if user:
-                    await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
-                delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
-                suspensions.delete_one(delete_filter)
+                 await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
+                 delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
+                 suspensions.delete_one(delete_filter)
 
                 try:
                     roles_removed = request['roles_removed']
@@ -283,6 +275,12 @@ class Suspension(discord.ui.RoleSelect):
                         embed=None
                     )
                     return
+  
+                try:
+                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
+                except discord.Forbidden:
+                 pass
+
 
                 suspensions.insert_one(infract_data)
                 await interaction.response.edit_message(
