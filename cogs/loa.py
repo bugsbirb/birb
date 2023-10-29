@@ -135,7 +135,7 @@ class loamodule(commands.Cog):
                 await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
                 print(f"End Time: {end_time}")
                 print(f"Current Time: {current_time}")
-                loa_collection.update_one({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
+                loa_collection.update_many({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
                 loarole_data = LOARole.find_one({'guild_id': guild.id})
                 if loarole_data:
                  loarole = loarole_data['staffrole']
@@ -184,8 +184,8 @@ class loamodule(commands.Cog):
             reason = request['reason']
 
             embed.add_field(
-                name=f"{user.display_name}",
-                value=f"* **Start Date:** <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}",
+                name=f"<:LOA:1164969910238203995>{user.name.capitalize()}",
+                value=f"<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
                 inline=False
             )
 
