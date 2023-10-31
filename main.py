@@ -12,7 +12,6 @@ from discord.ext import commands, tasks
 from typing import Optional
 import Paginator
 from cogs.infractions import *
-from cogs.tickets import *
 import sentry_sdk
 import asyncio
 from cogs.loa import *
