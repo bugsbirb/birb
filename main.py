@@ -72,8 +72,6 @@ class client(commands.Bot):
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
-        self.add_view(TicketOpen())
-        self.add_view(TicketHelp())
 
 
 
