@@ -22,7 +22,6 @@ class HelpMenu(discord.ui.Select):
         options = [
             discord.SelectOption(label="Halloween Event", value="Halloween Event", emoji="<:candysweet:1160591383158071376>"),
             discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
-            discord.SelectOption(label="Tickets", value="Tickets", emoji="<:Tickets:1162488340671643699>"),
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
@@ -47,13 +46,9 @@ class HelpMenu(discord.ui.Select):
             embed.description = "The Halloween event is an event that lasts until the **1st Of November**. Whoever gets the most candy will win <:nitro:1160656782054658148> **Nitro Basic**. You must be in the [**Support Server**](https://discord.gg/Pz2FzUqZWe)"
             embed.add_field(name="Commands", value="* /candy basket\n* /trickortreat\n* /halloween shop")
         elif category == 'Modmail':
-            embed.title = "Modmail Module [Beta]"
+            embed.title = "Modmail Module"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
             embed.add_field(name="Commands", value="* /modmail reply\n* /modmail close\n* /modmail config")
-        elif category == 'Tickets':
-            embed.title = "Tickets Module [Beta]"
-            embed.description = "This Ticket module is a system for handling messages face to face in a private channel. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chats."
-            embed.add_field(name="Commands", value="* /tickets close\n* /tickets claim\n* /tickets config")    
         elif category == 'Forums':
             embed.title = "Forums Utils Module"
             embed.description = "This module provides commands for managing forums within your server."
@@ -79,7 +74,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Configuration':
             embed.title = "Configuration"
             embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Anti-Ping, Permissions, and Channels to tailor the bot's behavior to your server's requirements."
-            embed.add_field(name="Commands", value="* /config\n* /modmail config\n* /tickets config")
+            embed.add_field(name="Commands", value="* /config\n* /modmail config")
         elif category == 'Utility':
             embed.title = "Utilities"
             embed.description = "The Utility commands module consists of commands unrelated to the bot itself. These commands are designed to provide various helpful functionalities for your server, enhancing its overall utility and convenience."
