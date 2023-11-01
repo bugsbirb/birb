@@ -78,7 +78,7 @@ class management(commands.Cog):
     @commands.is_owner()
     async def helpdesk(self, ctx):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
-        banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169316252355936306/Astro_Banner.png?ex=6554f59f&is=6542809f&hm=5451f41931dd5e7903cdbe250ca3a521bae9a1b77fdde968721a6dead15299b5&")
+        banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
 
         main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
         main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/f9f6b1924078f9487bda623e7f6d6d71.png?size=512")
