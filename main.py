@@ -18,7 +18,7 @@ from cogs.loa import *
 import os
 from dotenv import load_dotenv
 
-
+from cogs.astro import * 
 
 load_dotenv()
 PREFIX = os.getenv('PREFIX')
@@ -64,7 +64,7 @@ class client(commands.Bot):
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
-
+        self.add_view(Helpdesk())
 
 
         for ext in self.cogslist:
