@@ -40,7 +40,6 @@ class HelpMenu(discord.ui.Select):
         embed = discord.Embed(title="", description="", color=discord.Color.dark_embed())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
 
-
         if category == 'Modmail':
             embed.title = "Modmail Module"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
@@ -69,7 +68,7 @@ class HelpMenu(discord.ui.Select):
             embed.add_field(name="Commands", value="* /promote\n* /admin panel")
         elif category == 'Configuration':
             embed.title = "Configuration"
-            embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Anti-Ping, Permissions, and Channels to tailor the bot's behavior to your server's requirements."
+            embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Permissions, and Channels to tailor the bot's behavior to your server's requirements."
             embed.add_field(name="Commands", value="* /config\n* /modmail config")
         elif category == 'Utility':
             embed.title = "Utilities"
