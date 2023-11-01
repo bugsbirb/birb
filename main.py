@@ -39,21 +39,13 @@ scollection = db['staffrole']
 ticketconfig = db['Tickets Configuration']
 tickets = db['Tickets']
 
-def user(self, channel_id):
-        ticket_data = tickets.find_one({'channel_id': channel_id})
-        if ticket_data:
-            user = ticket_data['user_id']
-            return user
-        return None, None
-
-
 
 class client(commands.Bot):
     def __init__(self):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.moderations","cogs.astro-management", "cogs.halloween","cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.moderations","cogs.astro-management", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
     async def is_owner(self, user: discord.User):
         if user.id in [
