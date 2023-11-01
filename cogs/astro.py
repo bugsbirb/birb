@@ -30,7 +30,7 @@ class HelpdeskDropdown(discord.ui.Select):
         
             
         ]
-        super().__init__(placeholder='Helpdesk', min_values=1, max_values=1, options=options)
+        super().__init__(placeholder='Helpdesk', min_values=1, max_values=1, options=options, custom_id='persitent:HelpDeskDropwon')
     async def callback(self, interaction: discord.Interaction):
 
         selected = self.values[0] 
@@ -47,7 +47,7 @@ class HelpdeskDropdown(discord.ui.Select):
 
 class Helpdesk(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.add_item(HelpdeskDropdown())
 
 class management(commands.Cog):
@@ -75,11 +75,12 @@ class management(commands.Cog):
         await ctx.send(f"{tick} removed **`{badge}`** to **@{user.display_name}**")
   
     @commands.command()
+    @commands.is_owner()
     async def helpdesk(self, ctx):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
         banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169316252355936306/Astro_Banner.png?ex=6554f59f&is=6542809f&hm=5451f41931dd5e7903cdbe250ca3a521bae9a1b77fdde968721a6dead15299b5&")
 
-        main = discord.Embed(color=discord.Color.dark_embed(), title="<:Folder:1148813584957194250> Bot & Server Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
+        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
         main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/f9f6b1924078f9487bda623e7f6d6d71.png?size=512")
         main.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = Helpdesk()
