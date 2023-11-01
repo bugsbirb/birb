@@ -20,7 +20,6 @@ badges = db['User Badges']
 class HelpMenu(discord.ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label="Halloween Event", value="Halloween Event", emoji="<:candysweet:1160591383158071376>"),
             discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
@@ -41,11 +40,8 @@ class HelpMenu(discord.ui.Select):
         embed = discord.Embed(title="", description="", color=discord.Color.dark_embed())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
 
-        if category == 'Halloween Event':
-            embed.title = "<:candysweet:1160591383158071376> Trick Or Treating **[Limited Time Event]**"
-            embed.description = "The Halloween event is an event that lasts until the **1st Of November**. Whoever gets the most candy will win <:nitro:1160656782054658148> **Nitro Basic**. You must be in the [**Support Server**](https://discord.gg/Pz2FzUqZWe)"
-            embed.add_field(name="Commands", value="* /candy basket\n* /trickortreat\n* /halloween shop")
-        elif category == 'Modmail':
+
+        if category == 'Modmail':
             embed.title = "Modmail Module"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
             embed.add_field(name="Commands", value="* /modmail reply\n* /modmail close\n* /modmail config")
