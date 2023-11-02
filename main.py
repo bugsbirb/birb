@@ -116,16 +116,19 @@ async def on_guild_remove(guild):
 
 @client.event
 async def on_member_join(member):
-    guild_on_join = client.get_guild(1092976553752789054)    
+    target_guild_id = 1092976553752789054  
+    guild_on_join = client.get_guild(target_guild_id)
+
     if guild_on_join:
-     channel = client.get_channel(1092976554541326372)
-     guild = member.guild
+        if member.guild.id == target_guild_id:  
+            channel_id = 1092976554541326372  
+            channel = guild_on_join.get_channel(channel_id)  
 
-     member_count = guild_on_join.member_count
-     message = f"Welcome {member.mention} to **Astro Systems**! 👋"
-     view = Welcome(member_count)
-     await channel.send(message, view=view)      
-
+            if channel:
+                member_count = guild_on_join.member_count
+                message = f"Welcome {member.mention} to **Astro Systems**! 👋"
+                view = Welcome(member_count)
+                await channel.send(message, view=view)
 @client.command()
 @commands.is_owner()
 async def servers(ctx):
