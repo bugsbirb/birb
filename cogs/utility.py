@@ -234,7 +234,7 @@ class invite(discord.ui.View):
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url = f'https://discord.gg/eSa72HAXsY'
+        url = f'https://discord.gg/DhWdgfh3hN'
         self.add_item(discord.ui.Button(label='Join', url=url, style=discord.ButtonStyle.blurple))
 
 
