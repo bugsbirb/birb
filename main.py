@@ -114,7 +114,17 @@ async def on_guild_remove(guild):
 
     await channel.send(embed=embed)
 
-      
+@client.event
+async def on_member_join(member):
+    guild_on_join = client.get_guild(1092976553752789054)    
+    if guild_on_join:
+     channel = client.get_channel(1092976554541326372)
+     guild = member.guild
+
+     member_count = guild_on_join.member_count
+     message = f"Welcome {member.mention} to **Astro Systems**! 👋"
+     view = Welcome(member_count)
+     await channel.send(message, view=view)      
 
 @client.command()
 @commands.is_owner()
@@ -176,7 +186,14 @@ async def update_channel_name():
 
 
 
+class Welcome(discord.ui.View):
+    def __init__(self, member_count):
+        super().__init__()
+        self.gray_button.label = member_count
 
+    @discord.ui.button(style=discord.ButtonStyle.gray, disabled=True)
+    async def gray_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print("Hallo")
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
