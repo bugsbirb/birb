@@ -22,9 +22,10 @@ badges = db['User Badges']
 class HelpdeskDropdown(discord.ui.Select):
     def __init__(self):
         options = [
+            discord.SelectOption(label='Whats the servers rules?', emoji='<:arrow:1166529434493386823>'),
             discord.SelectOption(label='What is Astro Birb?', emoji='<:arrow:1166529434493386823>'),
             discord.SelectOption(label="What is Quota?", emoji="<:arrow:1166529434493386823>"),
-            discord.SelectOption(label="How do I become staff here?", emoji="<:arrow:1166529434493386823>"),
+            discord.SelectOption(label="How do I become staff here?", emoji="<:arrow:1166529434493386823>")
 
 
         
@@ -40,7 +41,8 @@ class HelpdeskDropdown(discord.ui.Select):
             embed = discord.Embed(title="<:Tip:1167083259444875264> What is Quota?", description="Quota is a Discord moderation bot designed to manage message quotas for staff members, ensuring their activity levels are met and helping identify potential areas for improvement or necessary punitive actions.")
         elif selected == 'How do I become staff here?':
             embed = discord.Embed(title="<:Tip:1167083259444875264> How do I become staff?", description="Currently support & QA is handpicked meaning you have to show your activity in the support server by either answering support forums or activily talking in the server.")
-
+        elif selected == 'Whats the servers rules?':
+            embed = discord.Embed(title="Astro Guidelines", description=f"1. **Respect**\n<:ArrowDropDown:1163171628050563153> you must respect others\n2. **Common Sense**\n<:ArrowDropDown:1163171628050563153> you must use your common sense.\n3. **Inappropriate/Gore**\n<:ArrowDropDown:1163171628050563153> you must not post NSFW or Gore.\n4. **Advertisement**\n<:ArrowDropDown:1163171628050563153> you must not self advertise or advertise.\n5. **Spamming & Wordwall**\n<:ArrowDropDown:1163171628050563153> you must not spam or word wall.\n6. **Discords TOS**\n<:ArrowDropDown:1163171628050563153> you must not break discords TOS")
         embed.color = discord.Color.dark_embed()    
         await interaction.response.send_message(embed=embed, ephemeral=True)
             
