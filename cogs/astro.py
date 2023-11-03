@@ -36,7 +36,7 @@ class HelpdeskDropdown(discord.ui.Select):
 
         selected = self.values[0] 
         if selected == 'What is Astro Birb?':
-            embed = discord.Embed(title="", description="## 🐦 What is Astro Birb?\n> Astro Birb is a versatile bot designed for streamlining punishment and staff management tasks. It boasts a wide array of features, including but not limited to infractions, promotions, modmail, moderations, tags. What sets its infraction system apart is its comprehensive logging functionality, allowing you to effortlessly access and review the infraction history of your staff members with a simple command: /infractions {user}.")
+            embed = discord.Embed(title="", description="## 🐦 What is Astro Birb?\n> Astro Birb is a versatile bot designed for streamlining punishment and staff management tasks. It boasts a wide array of features, including but not limited to infractions, promotions, modmail, tags. What sets its infraction system apart is its comprehensive logging functionality, allowing you to effortlessly access and review the infraction history of your staff members with a simple command: /infractions {user}.")
         elif selected == 'What is Quota?':    
             embed = discord.Embed(title="", description="## <:Messages:1148610048151523339> What is Quota?\nQuota is a Discord moderation bot designed to manage message quotas for staff members, ensuring their activity levels are met and helping identify potential areas for improvement or necessary punitive actions.")
         elif selected == 'How do I become staff here?':
