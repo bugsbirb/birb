@@ -451,8 +451,6 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
 
-4. **Moderation Module**:
-   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
 
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
         color=discord.Color.dark_embed()
@@ -589,9 +587,6 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
 
-4. **Moderation Module**:
-   - This moderation module is *different* it uses a *standalone* point system its different as instead of other bots that use a point system that you have to have another moderation bot for to use it this one is built into the moderation system.
-
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
         color=discord.Color.dark_embed()
     )    
@@ -614,7 +609,6 @@ class Config(discord.ui.Select):
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
             discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>'),
-            discord.SelectOption(label="Moderation", emoji='<:Infraction:1162134605885870180>'),
             discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>")
 
         
