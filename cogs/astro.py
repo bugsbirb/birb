@@ -83,7 +83,7 @@ class management(commands.Cog):
         banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
 
         main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
-        main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/f9f6b1924078f9487bda623e7f6d6d71.png?size=512")
+        main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
         main.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = Helpdesk()
         await ctx.send(embeds=(banner, main), view=view)
@@ -100,7 +100,7 @@ class management(commands.Cog):
         banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
         embed = discord.Embed(title=f"<:forum:1162134180218556497> Astro Support", description="> Welcome to Astro Support please wait for a support resprenstive to respond!", color=discord.Color.dark_embed())
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
-        embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/f9f6b1924078f9487bda623e7f6d6d71.png?size=512")
+        embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
         msg = await thread.send(content='<@&1092977110412439583>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True)) 
 
 
