@@ -90,7 +90,7 @@ class Forums(commands.Cog):
         "channel_id": channel.id,
         "role": role.id if role else None,
         "title": title if title else f"<:forum:1162134180218556497> {ctx.guild.name} Support",
-        "description": description if description else f"> Welcome to {ctx.guild.name} support please wait for a support resprenstive to respond!",
+        "description": description if description else f"> Welcome to **{ctx.guild.name}**, support please wait for a support representative to respond!",
         "thumbnail": thumbnail.url if thumbnail else None,
         "guild_id": ctx.guild.id
     }
