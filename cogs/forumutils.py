@@ -97,7 +97,7 @@ class Forums(commands.Cog):
     thumbnail: Optional[discord.Attachment] = None,):
         guild_id = ctx.guild.id    
         if option == 'Enable':
-         if embed == 'False' and role is None:   
+         if embeded == 'False' and role is None:   
             await ctx.send(f"{no} You need to enable `embed` or `role`")
             return
 
@@ -131,7 +131,7 @@ class Forums(commands.Cog):
             return
         await asyncio.sleep(1)
         if config_data:
-         if config_data("embed", True):   
+         if config_data["embed", True]:   
           embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=discord.Color.dark_embed())
           thumbnail_url = config_data['thumbnail']
           if thumbnail_url:
