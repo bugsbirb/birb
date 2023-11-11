@@ -188,7 +188,6 @@ async def update_channel_name():
         print(f'Channel with ID {channel_id} not found.')
 
 
-
 class Welcome(discord.ui.View):
     def __init__(self, member_count, member):
         super().__init__()
@@ -197,7 +196,7 @@ class Welcome(discord.ui.View):
 
     @discord.ui.button(style=discord.ButtonStyle.gray, emoji="<:logMembershipJoin:1172854752346918942>")
     async def gray_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        user = self.user
+        user = self.member
         user_badges = badges.find({'user_id': user.id})            
         badge_values = ""
         for badge_data in user_badges:
@@ -210,6 +209,8 @@ class Welcome(discord.ui.View):
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
         embed.add_field(name="**Roles**", value=user_roles, inline=False)  
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
