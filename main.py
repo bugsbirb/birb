@@ -90,7 +90,7 @@ class client(commands.Bot):
     async def on_connect(self):
         total_users = 0
 
-        for guild in self.client.guilds:
+        for guild in client.guilds:
          members = await guild.fetch_members(limit=None).flatten()
          total_users += len(members)
 
