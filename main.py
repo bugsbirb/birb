@@ -88,7 +88,7 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ 8386 users")
+        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ 8000+ users")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
