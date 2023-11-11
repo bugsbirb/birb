@@ -190,7 +190,7 @@ async def update_channel_name():
 
 class Welcome(discord.ui.View):
     def __init__(self, member_count, member):
-        super().__init__()
+        super().__init__(timeout=None)
         self.gray_button.label = member_count
         self.member = member
 
