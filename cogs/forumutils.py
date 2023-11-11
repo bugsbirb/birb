@@ -91,10 +91,10 @@ class Forums(commands.Cog):
     option: typing.Literal["Enable", "Disable"],
     channel: discord.ForumChannel,
     embeded: typing.Literal["True", "False"],        
-    role: discord.Role = None,
-    title: str = None,
-    description: str = None,
-    thumbnail: discord.Attachment = None,):
+    role: Optional[discord.Role] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    thumbnail: Optional[discord.Attachment] = None,):
         guild_id = ctx.guild.id    
         if option == 'Enable':
          if embed == 'False' and role is None:   
