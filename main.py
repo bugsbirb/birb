@@ -88,7 +88,13 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ {len(self.client.users)} users")
+        total_users = 0
+
+        for guild in self.client.guilds:
+         members = await guild.fetch_members(limit=None).flatten()
+         total_users += len(members)
+
+        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ {total_users} users")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
