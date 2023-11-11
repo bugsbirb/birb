@@ -86,16 +86,16 @@ class Forums(commands.Cog):
     @forums.command(name="config", description="Configure on forum creation embed")
     @commands.has_permissions(administrator=True)
     async def configuration(
-        self,
-        ctx,
-        option: typing.Literal["Enable", "Disable"],
-        channel: discord.ForumChannel,
-        embeds: typing.Literal["True", "False"] = "False",
-        role: Role = None,
-        title: str = None,
-        description: str = None,
-        thumbnail: discord.Attachment = None,
-    ):
+    self,
+    ctx,
+    option: typing.Literal["Enable", "Disable"],
+    channel: discord.ForumChannel,
+    embeds: typing.Literal["True", "False"] = "False",        
+    role: discord.Role = None,
+    title: str = None,
+    description: str = None,
+    thumbnail: discord.Attachment = None,
+):
         guild_id = ctx.guild.id    
         if option == 'Enable':
          if embed == 'False' and role is None:   
