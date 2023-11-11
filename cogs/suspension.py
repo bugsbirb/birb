@@ -200,8 +200,14 @@ class Suspensions(commands.Cog):
                     roles_to_return = [discord.utils.get(guild.roles, id=role_id) for role_id in roles_removed if guild.get_member(user_id)]
                     
                     if roles_to_return:
-                        member = guild.get_member(user_id)
-                        await member.add_roles(*roles_to_return)
+                        try:
+                          member = guild.get_member(user_id)
+                        except discord.Forbidden:
+                            pass
+                        try:                        
+                         await member.add_roles(*roles_to_return)
+                        except discord.Forbidden:
+                            pass                         
                 except KeyError:
                     pass
 
