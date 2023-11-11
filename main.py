@@ -127,7 +127,7 @@ async def on_member_join(member):
             if channel:
                 member_count = guild_on_join.member_count
                 message = f"Welcome {member.mention} to **Astro Systems**! 👋"
-                view = Welcome(member_count)
+                view = Welcome(member_count, member)
                 await channel.send(message, view=view)
 @client.command()
 @commands.is_owner()
@@ -190,14 +190,26 @@ async def update_channel_name():
 
 
 class Welcome(discord.ui.View):
-    def __init__(self, member_count):
+    def __init__(self, member_count, member):
         super().__init__()
         self.gray_button.label = member_count
+        self.member = member
 
-
-    @discord.ui.button(style=discord.ButtonStyle.gray, disabled=True, emoji="<:logMembershipJoin:1172854752346918942>")
+    @discord.ui.button(style=discord.ButtonStyle.gray, emoji="<:logMembershipJoin:1172854752346918942>")
     async def gray_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        print("Hallo")
+        user = self.user
+        user_badges = badges.find({'user_id': user.id})            
+        badge_values = ""
+        for badge_data in user_badges:
+         badge = badge_data['badge']
+         badge_values += f"{badge}\n"
+      
+        embed = discord.Embed(title=f"@{user.display_name}", description=f"{badge_values}", color=0x2b2d31)
+        embed.set_thumbnail(url=user.display_avatar.url)    
+        embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
+        user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
+        embed.add_field(name="**Roles**", value=user_roles, inline=False)  
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
