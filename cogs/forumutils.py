@@ -111,7 +111,7 @@ class Forums(commands.Cog):
         "embed": embeded
     }
          forumsconfig.update_one({"guild_id": guild_id}, {"$set": config_data}, upsert=True)
-         embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Embed:** {embed}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
+         embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Embed:** {embeded}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
          embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
          await ctx.send(embed=embed)
         elif option == 'Disable' :
