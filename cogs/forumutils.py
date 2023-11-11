@@ -83,7 +83,7 @@ class Forums(commands.Cog):
 
     @forums.command(name="config", description="Configure on forum creation embed")
     @commands.has_permissions(administrator=True)
-    async def configuration(self, ctx, option: Literal['Enable', 'Disable'], channel: discord.ForumChannel, embed = Literal['True', 'False'], role: discord.Role = None, title: str = None, description: str = None, thumbnail: discord.Attachment = None):
+    async def configuration(self, ctx, option: Literal['Enable', 'Disable'], channel: discord.ForumChannel, embedded = Literal['True', 'False'], role: discord.Role = None, title: str = None, description: str = None, thumbnail: discord.Attachment = None):
         guild_id = ctx.guild.id
         if option == 'Enable':
          if embed == 'False' and role is None:   
@@ -97,7 +97,7 @@ class Forums(commands.Cog):
         "description": description if description else f"> Welcome to **{ctx.guild.name}**, support please wait for a support representative to respond!",
         "thumbnail": thumbnail.url if thumbnail else None,
         "guild_id": ctx.guild.id,
-        "embed": embed
+        "embed": embedded
     }
          forumsconfig.update_one({"guild_id": guild_id}, {"$set": config_data}, upsert=True)
          embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Embed:** {embed}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
