@@ -90,7 +90,7 @@ class Forums(commands.Cog):
     ctx,
     option: typing.Literal["Enable", "Disable"],
     channel: discord.ForumChannel,
-    embeded: bool,        
+    embeded: typing.Literal["True", "False"],        
     role: Optional[discord.Role] = None,
     title: Optional[str] = None,
     description: Optional[str] = None,
@@ -100,7 +100,10 @@ class Forums(commands.Cog):
          if embeded == 'False' and role is None:   
             await ctx.send(f"{no} You need to enable `embed` or `role`")
             return
-
+         if embeded == 'True':
+          embeded = True
+         if embeded == 'False':
+          embeded = False          
          config_data = {
         "channel_id": channel.id,
         "role": role.id if role else None,
