@@ -83,19 +83,24 @@ class Forums(commands.Cog):
 
     @forums.command(name="config", description="Configure on forum creation embed")
     @commands.has_permissions(administrator=True)
-    async def configuration(self, ctx, option: Literal['Enable', 'Disable'], channel: discord.ForumChannel, role: discord.Role = None, title: str = None, description: str = None, thumbnail: discord.Attachment = None):
+    async def configuration(self, ctx, option: Literal['Enable', 'Disable'], channel: discord.ForumChannel, embed = Literal['True', 'False'], role: discord.Role = None, title: str = None, description: str = None, thumbnail: discord.Attachment = None):
         guild_id = ctx.guild.id
         if option == 'Enable':
+         if embed == 'False' and role is None:   
+            await ctx.send(f"{no} You need to enable `embed` or `role`")
+            return
+
          config_data = {
         "channel_id": channel.id,
         "role": role.id if role else None,
         "title": title if title else f"<:forum:1162134180218556497> {ctx.guild.name} Support",
         "description": description if description else f"> Welcome to **{ctx.guild.name}**, support please wait for a support representative to respond!",
         "thumbnail": thumbnail.url if thumbnail else None,
-        "guild_id": ctx.guild.id
+        "guild_id": ctx.guild.id,
+        "embed": embed
     }
          forumsconfig.update_one({"guild_id": guild_id}, {"$set": config_data}, upsert=True)
-         embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
+         embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Embed:** {embed}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
          embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
          await ctx.send(embed=embed)
         elif option == 'Disable' :
@@ -115,15 +120,20 @@ class Forums(commands.Cog):
             return
         await asyncio.sleep(1)
         if config_data:
-         embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=discord.Color.dark_embed())
-         thumbnail_url = config_data['thumbnail']
-         if thumbnail_url:
+         if config_data("embed", True):   
+          embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=discord.Color.dark_embed())
+          thumbnail_url = config_data['thumbnail']
+          if thumbnail_url:
                 embed.set_thumbnail(url=thumbnail_url)
 
-         role = discord.utils.get(thread.guild.roles, id=config_data['role'])
+          role = discord.utils.get(thread.guild.roles, id=config_data['role'])
 
-         mention = role.mention if role else ""
-         msg = await thread.send(content=f"{mention}", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+          mention = role.mention if role else ""
+          msg = await thread.send(content=f"{mention}", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
+         else:
+            role = discord.utils.get(thread.guild.roles, id=config_data['role'])
+            mention = role.mention if role else ""
+            msg = await thread.send(content=f"{mention}")          
 
 
     @configuration.error
