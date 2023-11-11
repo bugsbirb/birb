@@ -131,7 +131,7 @@ class Forums(commands.Cog):
             return
         await asyncio.sleep(1)
         if config_data:
-         if config_data["embed", True]:   
+         if config_data["embed"] == True:   
           embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=discord.Color.dark_embed())
           thumbnail_url = config_data['thumbnail']
           if thumbnail_url:
