@@ -90,7 +90,7 @@ class Forums(commands.Cog):
     ctx,
     option: typing.Literal["Enable", "Disable"],
     channel: discord.ForumChannel,
-    embeded: typing.Literal[True, False],        
+    embeded: bool,        
     role: Optional[discord.Role] = None,
     title: Optional[str] = None,
     description: Optional[str] = None,
