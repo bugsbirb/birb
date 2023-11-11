@@ -194,7 +194,8 @@ class Welcome(discord.ui.View):
         super().__init__()
         self.gray_button.label = member_count
 
-    @discord.ui.button(style=discord.ButtonStyle.gray, disabled=True)
+
+    @discord.ui.button(style=discord.ButtonStyle.gray, disabled=True, emoji="<:logMembershipJoin:1172854752346918942>")
     async def gray_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         print("Hallo")
 
