@@ -330,8 +330,8 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
 
 
     Reason = discord.ui.TextInput(
-        label='reason?',
-        placeholder='Promotion reason?',
+        label='Reason?',
+        placeholder='Whats the reason for the promotion?',
     )
 
 
@@ -408,8 +408,8 @@ class Reason(discord.ui.Modal, title='Reason'):
 
 
     Reason = discord.ui.TextInput(
-        label='reason?',
-        placeholder='Infraction reason?',
+        label='Reason?',
+        placeholder='Whats the reason for the infraction?',
     )
 
 
@@ -484,13 +484,7 @@ class InfractionOption(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         option = self.values[0]
-        if option == 'Demotion':
-
-         view = DemotionRoleView(self.user, self.guild, self.author)
-         await interaction.response.edit_message(view=view)
-
-        else:
-         await interaction.response.send_modal(Reason(self.user, self.guild, self.author, option))
+        await interaction.response.send_modal(Reason(self.user, self.guild, self.author, option))
 
 class InfractionOptionView(discord.ui.View):
     def __init__(self, user, guild, author):
