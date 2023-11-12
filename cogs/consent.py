@@ -30,7 +30,7 @@ class Consent(commands.Cog):
     
      if consent_data is None:
         consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
-        consent_data = {"infractionalert": "Enabled", "PromotionAlerts": "Enabled"} 
+        consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
 
      if consent_data.get('infractionalert') == "Enabled":
         infraction_alerts = "<:check:1140623556271685683>"
