@@ -26,26 +26,27 @@ class Consent(commands.Cog):
 
     @commands.hybrid_command(description="Configure notifications", name="consent")
     async def consent(self, ctx):
-        consent_data = consentdb.find_one({"user_id": ctx.author.id})
-        if consent_data is None:
-            consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
+     consent_data = consentdb.find_one({"user_id": ctx.author.id})
+    
+     if consent_data is None:
+        consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
+        consent_data = {"infractionalert": "Enabled", "PromotionAlerts": "Enabled"} 
 
-        if consent_data.get('infractionalert') == "Enabled":
-            infraction_alerts = "<:check:1140623556271685683>"
-        else:
-            infraction_alerts = "<:crossX:1140623638207397939>"
+     if consent_data.get('infractionalert') == "Enabled":
+        infraction_alerts = "<:check:1140623556271685683>"
+     else:
+        infraction_alerts = "<:crossX:1140623638207397939>"
 
-        if consent_data.get('PromotionAlerts') == "Enabled":
-            promotion_alert = "<:check:1140623556271685683>"
-        else:
-            promotion_alert = "<:crossX:1140623638207397939>"
+     if consent_data.get('PromotionAlerts') == "Enabled":
+        promotion_alert = "<:check:1140623556271685683>"
+     else:
+        promotion_alert = "<:crossX:1140623638207397939>"
 
-        embed = discord.Embed(title="<:Moderation:1163933000006893648> Notifications", description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}", color=discord.Color.dark_embed())
-        embed.set_thumbnail(url=ctx.author.display_avatar.url)
+     embed = discord.Embed(title="<:Moderation:1163933000006893648> Notifications", description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}", color=discord.Color.dark_embed())
+     embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
-        view = Confirm(consent_data, ctx.author)
-        await ctx.send(embed=embed, view=view)
-
+     view = Confirm(consent_data, ctx.author)
+     await ctx.send(embed=embed, view=view)
 
 class Confirm(discord.ui.View):
     def __init__(self, consent_data, author):
