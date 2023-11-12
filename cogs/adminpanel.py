@@ -344,7 +344,9 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
         reason = self.Reason.value
         role = discord.utils.get(interaction.guild.roles, id=self.role)
         user_mention = self.user.mention if self.user is not None else "Unknown User"
-
+        consent_data = consent.find_one({"user_id": self.user.id})
+        if consent_data is None:
+            consent.insert_one({"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
         embed = discord.Embed(
             title="Staff Promotion",
             color=0x2b2d31,
@@ -386,7 +388,10 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
                     view=Return(self.user, self.guild, self.author)
                 )
 
-
+                if consent_data['PromotionAlerts'] == "Enabled":
+                 await self.user.send(f"🎉 You were promoted **@{interaction.guild.name}!**", embed=embed)
+                else:    
+                 pass
 
 
 
@@ -418,6 +423,9 @@ class Reason(discord.ui.Modal, title='Reason'):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        consent_data = consent.find_one({"user_id": self.user.id})
+        if consent_data is None:
+            consent.insert_one({"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})            
         random_string = ''.join(random.choices(string.digits, k=8))
         reason = self.Reason.value 
         embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** {self.option}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
@@ -457,9 +465,12 @@ class Reason(discord.ui.Modal, title='Reason'):
              return
             await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've infracted **@{self.user.display_name}**", embed=None, view=Return(self.user, self.guild, self.author))
             collection.insert_one(infract_data)
-            try:
+            if consent_data['infractionalert'] == "Enabled":
+             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=view)
-            except discord.Forbidden:
+             except discord.Forbidden:
+                pass
+            else:
                 pass
         else:
           await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=Return(self.user, self.guild, self.author))

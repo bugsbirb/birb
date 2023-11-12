@@ -21,6 +21,7 @@ db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 promochannel = db['promo channel']
+consent = db['consent']
 class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -88,7 +89,9 @@ class promo(commands.Cog):
 
         guild_id = ctx.guild.id
         data = promochannel.find_one({'guild_id': guild_id})
-
+        consent_data = consent.find_one({"user_id": staff.id})
+        if consent_data is None:
+            consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -99,6 +102,10 @@ class promo(commands.Cog):
              await channel.send(f"{staff.mention}", embed=embed)
             except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")               
+            if consent_data.get('PromotionAlerts') == "Enabled":
+                await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
+            else:    
+                pass
          else:
             await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:

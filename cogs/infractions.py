@@ -24,7 +24,7 @@ arole = db['adminrole']
 infchannel = db['infraction channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
-
+consent = db['consent']
 
 
 
@@ -119,6 +119,10 @@ class Infractions(commands.Cog):
         guild_id = ctx.guild.id
         data = infchannel.find_one({'guild_id': guild_id})
         appeal_data = appealable.find_one({'guild_id': str(ctx.guild.id)})
+        consent_data = consent.find_one({"user_id": staff.id})
+        if consent_data is None:
+            consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})            
+
 
         if appeal_data is not None:
          appeal_enabled = appeal_data.get('enabled', False)
@@ -137,9 +141,12 @@ class Infractions(commands.Cog):
             except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")             
             collection.insert_one(infract_data)
-            try:
+            if consent_data.get('infractionalert') == "Enabled":
+             try:
                 await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed, view=view)
-            except discord.Forbidden:
+             except discord.Forbidden:
+                pass
+            else:
                 pass
          else:
             await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
