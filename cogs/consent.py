@@ -17,18 +17,18 @@ client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
-consent = db['consent']
+consentdb = db['consent']
 
 
 class Consent(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_command(description="Configure notifications")
+    @commands.hybrid_command(description="Configure notifications", name="consent")
     async def consent(self, ctx):
-        consent_data = consent.find_one({"user_id": ctx.author.id})
+        consent_data = consentdb.find_one({"user_id": ctx.author.id})
         if consent_data is None:
-            consent.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
+            consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
 
         if consent_data.get('infractionalert') == "Enabled":
             infraction_alerts = "<:check:1140623556271685683>"
@@ -54,7 +54,7 @@ class Confirm(discord.ui.View):
         self.consent_data = consent_data
 
     async def update_embed(self, interaction: discord.Interaction):
-        consent_data = consent.find_one({"user_id": interaction.user.id})        
+        consent_data = consentdb.find_one({"user_id": interaction.user.id})        
         
         if consent_data.get('infractionalert') == "Enabled":
             infraction_alerts = "<:check:1140623556271685683>"
@@ -81,7 +81,7 @@ class Confirm(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)              
         self.consent_data['infractionalert'] = "Enabled" if self.consent_data['infractionalert'] == "Disabled" else "Disabled"
-        consent.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data})
+        consentdb.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data})
         await interaction.response.edit_message(content=None)        
         await self.update_embed(interaction)
 
@@ -92,7 +92,7 @@ class Confirm(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)              
         self.consent_data['PromotionAlerts'] = "Enabled" if self.consent_data['PromotionAlerts'] == "Disabled" else "Disabled"
-        consent.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data})
+        consentdb.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data})
         await interaction.response.edit_message(content=None)
         await self.update_embed(interaction)
 
