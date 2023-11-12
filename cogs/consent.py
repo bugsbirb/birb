@@ -24,7 +24,7 @@ class Consent(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_command(description="")
+    @commands.hybrid_command(description="Configure notifications")
     async def consent(self, ctx):
         consent_data = consent.find_one({"user_id": ctx.author.id})
         if consent_data is None:
