@@ -65,12 +65,12 @@ class VoidInf(discord.ui.Modal, title='Void Infraction'):
         infraction = collection.find_one(filter)
 
         if infraction is None:
-         await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, I couldn't find the infraction with ID `{id}`.", view=InfRevokeReturn(self.user, self.guild, self.author), embed=None)
+         await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, I couldn't find the infraction with ID `{id}`.", view=Return(self.user, self.guild, self.author), embed=None)
          return
 
         collection.delete_one(filter)
  
-        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've revoked the infraction with ID `{id}`", view=InfRevokeReturn(self.user, self.guild, self.author), embed=None)
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've revoked the infraction with ID `{id}`", view=Return(self.user, self.guild, self.author), embed=None)
 
 
 
@@ -897,66 +897,7 @@ class RevokeInfraction(discord.ui.View):
 
 
 
-class InfRevokeReturn(discord.ui.View):
-    def __init__(self, user, guild, author):
-        super().__init__(timeout=None)
-        self.user = user
-        self.guild = guild
-        self.author = author
 
-    @discord.ui.button(label='Return', style=discord.ButtonStyle.grey, emoji='<:Return:1166514220960063568>')
-    async def Return3(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        print(f"Searching infractions for staff ID: {self.user.id} in guild ID: {self.user.guild.id}")
-
-        filter = {
-            'guild_id': interaction.guild.id,
-            'staff': self.user.id,
-        }
-
-        infractions = collection.find(filter)
-
-        infraction_list = []
-
-        for infraction in infractions:
-            infraction_info = {
-                'id': infraction['random_string'],
-                'action': infraction['action'],
-                'reason': infraction['reason'],
-                'notes': infraction['notes'],
-                'management': infraction['management']
-
-            }
-            
-            infraction_list.append(infraction_info)
-
-        if not infraction_list:
-            await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, there are no infractions found for **@{self.user.display_name}**.", ephemeral=True)
-            return
-
-        print(f"Found {len(infraction_list)} infractions for {self.user.display_name}")
-
-        embed = discord.Embed(
-            title=f"{self.user.name}'s Infractions",
-            description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
-            color=discord.Color.dark_embed()
-        )
-        embed.set_thumbnail(url=self.user.display_avatar)
-        embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
-        
-        for infraction_info in infraction_list:
-            management = interaction.guild.get_member(infraction_info['management'])
-            embed.add_field(
-            name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
-            inline=False
-            )
-        view = RevokeInfraction(self.user, interaction.guild, self.author)
-        await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(AdminPanelCog(client))                
