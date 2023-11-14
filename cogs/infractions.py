@@ -122,7 +122,7 @@ class Infractions(commands.Cog):
         consent_data = consent.find_one({"user_id": staff.id})
         if consent_data is None:
             consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})            
-
+            consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
 
         if appeal_data is not None:
          appeal_enabled = appeal_data.get('enabled', False)
@@ -141,7 +141,7 @@ class Infractions(commands.Cog):
             except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")             
             collection.insert_one(infract_data)
-            if consent_data.get('infractionalert') == "Enabled":
+            if consent_data['infractionalert'] == "Enabled":
              try:
                 await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed, view=view)
              except discord.Forbidden:

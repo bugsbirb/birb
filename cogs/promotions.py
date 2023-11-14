@@ -92,6 +92,7 @@ class promo(commands.Cog):
         consent_data = consent.find_one({"user_id": staff.id})
         if consent_data is None:
             consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
+            consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}            
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -102,7 +103,7 @@ class promo(commands.Cog):
              await channel.send(f"{staff.mention}", embed=embed)
             except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")               
-            if consent_data.get('PromotionAlerts') == "Enabled":
+            if consent_data['PromotionAlerts'] == "Enabled":
                 await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
             else:    
                 pass

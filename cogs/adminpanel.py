@@ -347,6 +347,7 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
         consent_data = consent.find_one({"user_id": self.user.id})
         if consent_data is None:
             consent.insert_one({"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
+            consent_data = {"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
         embed = discord.Embed(
             title="Staff Promotion",
             color=0x2b2d31,
@@ -426,6 +427,7 @@ class Reason(discord.ui.Modal, title='Reason'):
         consent_data = consent.find_one({"user_id": self.user.id})
         if consent_data is None:
             consent.insert_one({"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})            
+            consent_data = {"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}            
         random_string = ''.join(random.choices(string.digits, k=8))
         reason = self.Reason.value 
         embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** {self.option}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
