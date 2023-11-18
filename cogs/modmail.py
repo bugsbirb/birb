@@ -54,7 +54,9 @@ class Modmail(commands.Cog):
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
             modmail_data = modmail.find_one({'user_id': user_id})
-
+            if message.content.lower().strip() == '!closemodmail':
+                    await self.close_modmail(message.author, modmail_data['channel_id'])
+                    return
             if not modmail_data:
                 if message.content.isdigit():
                     return
@@ -132,7 +134,7 @@ class Modmail(commands.Cog):
                             'channel_id': channel.id
                         }
                         modmail.insert_one(modmail_data)
-                        await message.author.send(f"{tick} Conversation started.")
+                        await message.author.send(f"{tick} Conversation started.\n<:ArrowDropDown:1163171628050563153> Use !closemodmail to end your own modmail.")
                         await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.")
                         embed = discord.Embed(
                             color=discord.Color.dark_embed(),
@@ -159,6 +161,17 @@ class Modmail(commands.Cog):
                     embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                     embed.set_thumbnail(url=message.author.display_avatar)
                     await channel.send(embed=embed)
+
+    async def close_modmail(self, user, channel_id):
+        channel = self.client.get_channel(channel_id)
+        if channel:
+            await channel.send(f"<:Messages:1148610048151523339> Modmail conversation closed by {user.display_name}.")
+            await user.send("<:Messages:1148610048151523339> You've closed your modmail conversation.")
+            modmail.delete_one({'user_id': user.id, 'channel_id': channel.id})
+            await channel.delete()
+
+        else:
+            await user.send(f"<:dnd:1162074644023627889> There was an issue closing the modmail conversation. Please contact server admins.")
 
 
     @modmail.command(description="Reply to a modmail")
