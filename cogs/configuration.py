@@ -36,6 +36,93 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 
+mongo2 = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+db2 = mongo2['quotab']
+scollection2 = db2['staffrole']
+message_quota_collection = db2["message_quota"]
+arole2 = db2['adminrole']
+srole = db2['staffrole']
+class StaffRole2(discord.ui.RoleSelect):
+    def __init__(self):
+        super().__init__(placeholder='Quota Staff Role')
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_role_id = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'guild_id': interaction.guild.id, 
+            'staffrole': selected_role_id.id  
+        }
+
+        try:
+            existing_record = srole.find_one(filter)
+
+            if existing_record:
+                srole.update_one(filter, {'$set': data})
+            else:
+                srole.insert_one(data)
+
+            embed = discord.Embed(
+                title="Success!",
+                description=f"Great, now submit a admin role.",
+                color=0x2b2d31
+            )
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"selected_role_id: {selected_role_id.id}")
+
+        
+
+class AdminRole2(discord.ui.RoleSelect):
+    def __init__(self):
+        super().__init__(placeholder='Quota Admin Role')
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_role_id = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'guild_id': interaction.guild.id, 
+            'adminrole': selected_role_id.id  
+        }
+
+        try:
+            existing_record = arole2.find_one(filter)
+
+            if existing_record:
+                arole2.update_one(filter, {'$set': data})
+            else:
+                arole2.insert_one(data)
+
+            embed = discord.Embed(
+                title="Success!",
+                description=f"> Configuration updated",
+                color=0x2b2d31
+            )
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"selected_role_id: {selected_role_id.id}")
+
+
+
+
+
 
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self):
@@ -464,7 +551,13 @@ Please select an option from the dropdown menu below to get started. If you have
 
 
 
+class Staff(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(StaffRole2())
+        self.add_item(AdminRole2())
 
+        
 
 
 
@@ -587,6 +680,11 @@ Welcome to the configuration setup for our server! You can use this panel to cus
 3. **Infraction Appeals**:
    - Enable or disable the Infraction Appeals module, allowing users to appeal their infractions.
 
+4. **Message Quota**:
+   - Configure the staff roles & admin roles for the Message Quota module.
+   - Set the message quota amount and how much they have to do to pass.
+
+
 Please select an option from the dropdown menu below to get started. If you have any questions or need assistance, [**join the support server**](https://discord.gg/M7eGhqEFZG)""",
         color=discord.Color.dark_embed()
     )    
@@ -602,6 +700,53 @@ Please select an option from the dropdown menu below to get started. If you have
         if isinstance(error, commands.MissingPermissions): 
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
 
+
+class MsgQuotab(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.value = None
+
+
+    @discord.ui.button(label='Set Quota', style=discord.ButtonStyle.blurple)
+    async def quota(self, interaction: discord.Interaction, button: discord.ui.Button):
+            await interaction.response.send_modal(MessageQuota())
+
+
+
+
+class MessageQuota(discord.ui.Modal, title='Message Quota'):
+
+    quota = discord.ui.TextInput(
+        label='Message Quota',
+        placeholder='Enter the guild\'s message quota here...',
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        try:
+            quota_value = int(self.quota.value)
+        except ValueError:
+            await interaction.response.send_message('Invalid input. Please enter a valid number for the message quota.', ephemeral=True)
+            return
+
+
+        guild_id = interaction.guild.id
+
+
+        message_quota_collection.update_one(
+            {'guild_id': guild_id},
+            {'$set': {'quota': quota_value}},
+            upsert=True  
+        )
+        embed = discord.Embed(
+                title="Success!",
+                description=f"Configuration updated.",
+                color=0x2b2d31
+            )
+        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+        await interaction.response.edit_message(embed=embed, view=None)
+
+
+
 class Config(discord.ui.Select):
     def __init__(self):
         options = [
@@ -609,8 +754,10 @@ class Config(discord.ui.Select):
             discord.SelectOption(label='Permissions', emoji='<:Config:1148610134147338381>'),
             discord.SelectOption(label='Channels', emoji=f'{folder}'),
             discord.SelectOption(label="Infraction Appeals", emoji=f'<:pending:1140623442962546699>'),
-            discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>")
+            discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>"),
+            discord.SelectOption(label='Message Quota', emoji='<:Messages:1148610048151523339>'),            
 
+            discord.SelectOption(label='Message Quota Permissions', emoji='<:Messages:1148610048151523339>'),  
         
             
         ]
@@ -750,8 +897,18 @@ class Config(discord.ui.Select):
          embed = discord.Embed(title="LOA Configuration", description="* **LOA Role**\n> Set a LOA role if the person goes on LOA they'll be given this role.", color=discord.Color.dark_embed())
          embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
          embed.set_thumbnail(url=interaction.guild.icon)
-          
+        if color == 'Message Quota':
+            embed = discord.Embed(title="Message Quota", description="Please configure what you want the staff quota to be.", color=0x2b2d31)
+            view = MsgQuotab()          
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+        if color == 'Message Quota Permissions': 
+            embed = discord.Embed(title="Permissions", description="Please configure permissions for the message quota module.\n\n* **Staff Role.** is the role where the users message get counted.\n* **Admin Role.** This role can update peoples messages.", color=0x2b2d31)
+            view = Staff()         
         await interaction.response.edit_message(embed=embed, view=view)
+
+
+
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(configuration(client))     
