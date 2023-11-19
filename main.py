@@ -17,7 +17,8 @@ import asyncio
 from cogs.loa import *
 import os
 from dotenv import load_dotenv
-
+from jishaku import Jishaku
+import jishaku
 from cogs.astro import * 
 
 load_dotenv()
@@ -25,6 +26,14 @@ PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
+#quota
+mongo = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+
+
+db2 = mongo['quotab']
+scollection2 = db2['staffrole']
+mccollection = db2["messages"]
+
 sentry_sdk.init(
     dsn=SENTRY_URL,
 
@@ -33,11 +42,10 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 
-client = MongoClient(MONGO_URL)
-db = client['astro']
-scollection = db['staffrole']
-ticketconfig = db['Tickets Configuration']
-tickets = db['Tickets']
+
+
+
+
 
 
 class client(commands.Bot):
@@ -45,32 +53,32 @@ class client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
-
-    async def is_owner(self, user: discord.User):
-        if user.id in [
-            795743076520820776
+        self.cogslist = ["cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
 
 
-        ]:
-            return True
 
-        return await super().is_owner(user)
-        
     async def load_jishaku(self):
         await self.wait_until_ready()
-        await self.load_extension('jishaku')
+        await self.load_extension('jishaku')        
+        print("Jishaku Loaded")
+
+
+
+
+
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
         self.add_view(Helpdesk())
 
 
+
         for ext in self.cogslist:
             await self.load_extension(ext)
             print(f"Cog {ext} loaded")
-            
+
+
     async def on_ready(self):
         prfx = (time.strftime("%H:%M:%S GMT", time.gmtime()))
         print(prfx + " Logged in as " + self.user.name)
@@ -88,13 +96,27 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ 8000+ users")
+        activity2 = discord.CustomActivity(name=f"🎨 New Logo! | ✨ 8386 users")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
 
     async def on_disconnect(self):
         print("Disconnected from Discord Gateway!")
+
+
+
+    async def is_owner(self, user: discord.User):
+        if user.id in [
+            795743076520820776
+
+
+
+        ]:
+            return True
+
+        return await super().is_owner(user)
+
 
 client = client()
 
@@ -114,6 +136,9 @@ async def on_guild_remove(guild):
 
     await channel.send(embed=embed)
 
+      
+
+
 @client.event
 async def on_member_join(member):
     target_guild_id = 1092976553752789054  
@@ -129,6 +154,7 @@ async def on_member_join(member):
                 message = f"Welcome {member.mention} to **Astro Systems**! 👋"
                 view = Welcome(member_count, member)
                 await channel.send(message, view=view)
+
 @client.command()
 @commands.is_owner()
 async def servers(ctx):
@@ -211,6 +237,30 @@ class Welcome(discord.ui.View):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
+@client.event
+async def on_message(message):
+        if message.author.bot:
+            return
+
+
+        staff_data = scollection.find_one({'guild_id': message.guild.id})
+
+        if staff_data and 'staffrole' in staff_data:
+            staff_role_id = staff_data['staffrole']
+            staff_role = discord.utils.get(message.guild.roles, id=staff_role_id)
+
+            if staff_role and staff_role in message.author.roles:
+                guild_id = message.guild.id
+                author_id = message.author.id
+
+
+                mccollection.update_one(
+                    {'guild_id': guild_id, 'user_id': author_id},
+                    {'$inc': {'message_count': 1}},
+                    upsert=True
+                )
+
+        await client.process_commands(message)
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
