@@ -243,7 +243,9 @@ async def on_message(message):
             return
 
 
-        staff_data = scollection.find_one({'guild_id': message.guild.id})
+        staff_data = scollection2.find_one({'guild_id': message.guild.id})
+        if staff_data is None:
+            return
 
         if staff_data and 'staffrole' in staff_data:
             staff_role_id = staff_data['staffrole']
