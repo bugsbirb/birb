@@ -23,10 +23,10 @@ class Feedback(commands.Cog):
         self.client = client
 
     @commands.hybrid_group()    
-    async def staff(self, ctx):
+    async def staffs(self, ctx):
         pass
 
-    @staff.command(description="Rate a staff member")
+    @staffs.command(description="Rate a staff member")
     async def feedback(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        if staff == ctx.author:
@@ -72,7 +72,7 @@ class Feedback(commands.Cog):
          else:   
             pass
 
-    @staff.command(description="View a staff members rating")
+    @staffs.command(description="View a staff members rating")
     async def rating(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
      if scope == "global":
         staff_ratings = list(stafffeedback.find({'staff': staff.id}))
