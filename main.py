@@ -206,10 +206,9 @@ async def servers(ctx):
 async def update_channel_name():
     guild_count = len(client.guilds)
     channel_id = 1131245978704420964 
-
     channel = client.get_channel(channel_id)
     if channel:
-        await channel.edit(name=f'| Astro Birb: {guild_count}')
+        await channel.edit(name=f'{guild_count} Guilds | {len(client.users)} Users')
     else:
         print(f'Channel with ID {channel_id} not found.')
 
