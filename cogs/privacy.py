@@ -17,9 +17,9 @@ class privacy(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    @commands.hybrid_command(name="privacy", description="Statstics + Information about the bot.")
+    @commands.hybrid_command(name="privacy", description="Privacy information")
     async def privacy(self, ctx):
-        embed = discord.Embed(title="**Astro Birb Privacy**")
+        embed = discord.Embed(title="**Astro Birb Privacy**", color=discord.Color.dark_embed())
         embed.add_field(name="Data Management", value="All your data is automatically deleted from the bot after 30 days of inactivity (defined by not running a command.)")
         embed.add_field(name="Help", value="To prevent automatic deletion of data contact us in our [**Support Server**](https://discord.gg/Qsz6DyGMTB)")
         embed.add_field(name="Coming soon", value=f"Data management module")
