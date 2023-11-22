@@ -34,6 +34,11 @@ db2 = mongo['quotab']
 scollection2 = db2['staffrole']
 mccollection = db2["messages"]
 
+MONGO_URL = os.getenv('MONGO_URL')
+astro = MongoClient(MONGO_URL)
+db = astro['astro']
+modules = db['Modules']
+
 sentry_sdk.init(
     dsn=SENTRY_URL,
 
@@ -53,7 +58,7 @@ class client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions", "cogs.privacy" ]
+        self.cogslist = ["cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.configuration", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
 
 
@@ -96,7 +101,7 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(name=f"🎉 Verified | ✨ 11k+ users")
+        activity2 = discord.CustomActivity(name=f"🎉 Verified | ✨ 10k+ users")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
@@ -236,32 +241,30 @@ class Welcome(discord.ui.View):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
+
+
 @client.event
 async def on_message(message):
-        if message.author.bot:
-            return
+    if message.author.bot:
+        return
+    staff_data = scollection.find_one({'guild_id': message.guild.id})
+    if staff_data is None:
+        return
 
+    if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        if not isinstance(staff_role_ids, list):
+         staff_role_ids = [staff_role_ids]
+        if any(role_id in staff_role_ids for role_id in [role.id for role in message.author.roles]):
+            guild_id = message.guild.id
+            author_id = message.author.id
 
-        staff_data = scollection2.find_one({'guild_id': message.guild.id})
-        if staff_data is None:
-            return
-
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(message.guild.roles, id=staff_role_id)
-
-            if staff_role and staff_role in message.author.roles:
-                guild_id = message.guild.id
-                author_id = message.author.id
-
-
-                mccollection.update_one(
-                    {'guild_id': guild_id, 'user_id': author_id},
-                    {'$inc': {'message_count': 1}},
-                    upsert=True
-                )
-
-        await client.process_commands(message)
+            mccollection.update_one(
+                {'guild_id': guild_id, 'user_id': author_id},
+                {'$inc': {'message_count': 1}},
+                upsert=True
+            )
+        await client.process_commands(message)            
 
 #main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
 #beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
