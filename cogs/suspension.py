@@ -27,23 +27,51 @@ class Suspensions(commands.Cog):
         self.check_suspensions.start()
         print("Suspension loop started")
 
+    async def has_staff_role(self, ctx):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
+
+
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
+
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
         return False
+     elif modulesdata['Suspensions'] == True:   
+        return True
 
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
     async def suspend(self, ctx, staff: discord.Member, length: str, reason: str):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
         if not await self.has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return
@@ -89,6 +117,9 @@ class Suspensions(commands.Cog):
 
     @suspension.command(description="View all active suspension")
     async def active(self, ctx):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
      if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
@@ -124,6 +155,9 @@ class Suspensions(commands.Cog):
     @suspension.command(description="Manage suspensions on a user")
 
     async def manage(self, ctx, staff: discord.Member):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return              
      if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return   
@@ -191,7 +225,10 @@ class Suspensions(commands.Cog):
         user = self.client.get_user(user_id)
         if current_time >= end_time:
                 if user:
-                 await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
+                 try:   
+                  await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
+                 except discord.Forbidden: 
+                    pass
                  delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
                  suspensions.delete_one(delete_filter)
 

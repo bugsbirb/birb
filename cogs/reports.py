@@ -9,12 +9,13 @@ import pytz
 from discord import app_commands
 import os
 from dotenv import load_dotenv
+from emojis import *
 from pymongo import MongoClient
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 repchannel = db['report channel']
-
+modules = db['Modules']
 class Reports(commands.Cog):
     def __init__(self, bot):
         self.client = bot
@@ -22,7 +23,12 @@ class Reports(commands.Cog):
         reported_at = datetime.utcnow().timestamp()
         reported_at_format = f"<t:{int(reported_at)}:F>"
 
- 
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Reports'] == True:   
+        return True 
 
 
     @commands.hybrid_command(description="Report users breaking server rules.")
@@ -31,7 +37,9 @@ class Reports(commands.Cog):
         reason='What is the reason for reporting this user',
         message_link='Do you have proof of this person doing this?')
     async def report(self, ctx, member: discord.User, *, reason: str, message_link: Optional[str] = None, proof: discord.Attachment, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
-
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return         
 
         proof_urls = [proof.url]
 

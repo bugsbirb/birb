@@ -27,19 +27,35 @@ class Modmail(commands.Cog):
         self.client = client
 
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
-        return False
+     return False
+
+
+    async def has_admin_role(self, ctx):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
 
     @commands.hybrid_group()
     async def modmail(self, ctx):

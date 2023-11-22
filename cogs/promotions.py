@@ -22,9 +22,17 @@ scollection = db['staffrole']
 arole = db['adminrole']
 promochannel = db['promo channel']
 consent = db['consent']
+modules = db['Modules']
 class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Promotions'] == True:   
+        return True
 
     async def has_staff_role(self, ctx):
         filter = {
@@ -62,6 +70,9 @@ class promo(commands.Cog):
     new='What the role you are awarding them with?',
     reason='What makes them deserve the promotion?') 
     async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             

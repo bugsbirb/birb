@@ -80,7 +80,7 @@ class management(commands.Cog):
     @commands.is_owner()
     async def helpdesk(self, ctx):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
-        banner.set_image(url="https://cdn.discordapp.com/attachments/1176591593797582848/1176595220511588382/ASTRO.png?ex=656f70b0&is=655cfbb0&hm=b126ffe5b3f45209b51660e90bc96a819fcfaeabd4bae92bcc6e3127645779c6&")
+        banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
 
         main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
         main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
@@ -97,7 +97,7 @@ class management(commands.Cog):
 
         await asyncio.sleep(2)
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
-        banner.set_image(url="https://cdn.discordapp.com/attachments/1176591593797582848/1176595220511588382/ASTRO.png?ex=656f70b0&is=655cfbb0&hm=b126ffe5b3f45209b51660e90bc96a819fcfaeabd4bae92bcc6e3127645779c6&")
+        banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
         embed = discord.Embed(title=f"<:forum:1162134180218556497> Astro Support", description="> Welcome to Astro Support please wait for a support resprenstive to respond!", color=discord.Color.dark_embed())
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")

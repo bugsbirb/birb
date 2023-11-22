@@ -18,41 +18,48 @@ db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 tags = db['tags']
-
+modules = db['Modules']
 
 class Tags(commands.Cog):
     def __init__(self, client):
         self.client = client
  
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
+     return False
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
         return False
-
+     elif modulesdata['Tags'] == True:   
+        return True
 
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-        return False
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
  
 
     async def tag_name_autocompletion(
@@ -79,6 +86,9 @@ class Tags(commands.Cog):
 
     @tags.command(description="Create a tag")    
     async def create(self, ctx, name: str, content: str):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return               
@@ -95,6 +105,9 @@ class Tags(commands.Cog):
 
     @tags.command(description="List all available tags")
     async def all(self, ctx):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
      if not await self.has_staff_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return               
@@ -123,6 +136,9 @@ class Tags(commands.Cog):
     @tags.command(description="Information about a tag")
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def info(self, ctx, name):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await self.has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return
@@ -148,6 +164,9 @@ class Tags(commands.Cog):
     @tags.command(description="Send a existing tag to this channel.")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def send(self, ctx, name):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await self.has_staff_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return        
@@ -169,6 +188,9 @@ class Tags(commands.Cog):
     @tags.command(description="Delete a existing tag")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def delete(self, ctx, name):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await self.has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return        

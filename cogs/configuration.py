@@ -17,7 +17,9 @@ from dotenv import load_dotenv
 from typing import Optional
 import sqlite3
 from emojis import *
-from cogs.ModerationConfig.moderationdropdowns import *
+
+
+
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -887,7 +889,7 @@ class Config(discord.ui.Select):
           embed = discord.Embed(title="Appeal Module", description="Please Select **Enable** or **Disable** to enable or disable the Appeal Module", color=0x2b2d31)
           view = AppealTogglable()
         if color == 'Moderation':
-          view = ModerationConfigdrop()
+          view = None
           embed = discord.Embed(title="Moderation Module", description="* **Moderation Punishments**\n> Choose what roles can do certain role actions make sure this is a staff role and not a role normal members have.\n\n* **Logging**\n> This is the modlogs channel all moderation actions are logged here.\n> **Suggestion:** Make sure moderators can't delete stuff in this channel.\n\n* **Point Configuration**\n> Config different point values you can enable autoban aswell.", color=discord.Color.dark_embed())
           embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
           embed.set_thumbnail(url=interaction.guild.icon)
