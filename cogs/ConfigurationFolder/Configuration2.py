@@ -172,7 +172,10 @@ class Config(discord.ui.Select):
             if infractionchannelresult:    
                 channelid = infractionchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                infchannelmsg = channel.mention                
+                if channel is None:
+                    infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 infchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}", color=discord.Color.dark_embed())
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -189,6 +192,8 @@ class Config(discord.ui.Select):
           adminrolemessage = ", ".join(staff_roles_mentions)             
          if staffroleresult:
           staff_roles_ids = staffroleresult.get('staffrole', [])
+         if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]          
           staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
           staffrolemessage = ", ".join(staff_roles_mentions)
         
@@ -217,7 +222,10 @@ class Config(discord.ui.Select):
             if promochannelresult:    
                 channelid = promochannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                promochannelmsg = channel.mention                          
+                if channel is None:
+                 promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", description=f"**Enabled:** {modulemsg}\n**Promotion Channel:** {promochannelmsg}", color=discord.Color.dark_embed())
             view = PromotionModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -239,7 +247,10 @@ class Config(discord.ui.Select):
             if loachannelresult:     
                 channelid = loachannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                loachannelmsg = channel.mention       
+                if channel is None:
+                    loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 loachannelmsg = channel.mention       
             embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", description=f"**Enabled:** {modulemsg}\n**LOA Channel:** {loachannelmsg}\n**LOA Role:** {loarolemsg}", color=discord.Color.dark_embed())
             view = LOAModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -278,7 +289,10 @@ class Config(discord.ui.Select):
             if feedbackchannelresult:    
                 channelid = feedbackchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                feedbackchannelmsg = channel.mention                
+                if channel is None:
+                    feedbackchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 feedbackchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", description=f"**Enabled:** {modulemsg}\n**Feedback Channel:** {feedbackchannelmsg}", color=discord.Color.dark_embed())
             view = FeedbackModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -307,7 +321,10 @@ class Config(discord.ui.Select):
             if partnershipchannelresult:    
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                partnershipchannelmsg = channel.mention                
+                if channel is None:
+                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:
+                 partnershipchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
             view = PartnershipModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -332,7 +349,10 @@ class Config(discord.ui.Select):
             if partnershipchannelresult:    
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                partnershipchannelmsg = channel.mention                
+                if channel is None:
+                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 partnershipchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
