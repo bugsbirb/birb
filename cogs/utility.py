@@ -242,7 +242,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Stopping Astro Birb", description="Shutdown command was invoked", color=discord.Color.red())
         embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
         await ctx.send(embed=embed)
-        exit(2)
+        exit(0)
 
 class invite(discord.ui.View):
     def __init__(self):
