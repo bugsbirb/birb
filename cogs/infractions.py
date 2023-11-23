@@ -25,7 +25,7 @@ infchannel = db['infraction channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 consent = db['consent']
-
+modules = db['Modules']
 
 
 
@@ -63,37 +63,50 @@ class Infractions(commands.Cog):
         self.client = client
 
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
-        return False
+     return False
 
 
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
         return False
+     elif modulesdata['infractions'] == True:   
+        return True
 
+     
     @commands.hybrid_command(description="Infract staff members")
     async def infract(self, ctx, staff: discord.Member, reason: str, action: Literal['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination'], notes: Optional[str]):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return    
+
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return           
@@ -143,7 +156,7 @@ class Infractions(commands.Cog):
             collection.insert_one(infract_data)
             if consent_data['infractionalert'] == "Enabled":
              try:
-                await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed, view=view)
+                await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed)
              except discord.Forbidden:
                 pass
             else:
@@ -155,6 +168,10 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="View a staff members infractions")
     async def infractions(self, ctx, staff: discord.Member):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return    
+
      if not await self.has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return               
@@ -209,6 +226,9 @@ class Infractions(commands.Cog):
 
     @infraction.command(description="Void a staff member's infraction")
     async def void(self, ctx, id: str):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return         
      if not await self.has_admin_role(ctx):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
         return

@@ -10,9 +10,15 @@ import pymongo
 from pymongo import MongoClient
 import Paginator
 from emojis import *
-
+import os
 mongo = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 
+MONGO_URL = os.getenv('MONGO_URL')
+client = MongoClient(MONGO_URL)
+db = client['astro']
+scollection = db['staffrole']
+arole = db['adminrole']
+modules = db['Modules']
 class SetMessages(discord.ui.Modal, title='Set Message Count'):
     def __init__(self, user_id):
         super().__init__()
@@ -68,12 +74,10 @@ class StaffManage(discord.ui.View):
 
 
 
-db = mongo['quotab']
-scollection = db['staffrole']
-mccollection = db["messages"]
-message_quota_collection = db["message_quota"]
-arole = db['adminrole']
-lcollection = db['loarole']
+dbq = mongo['quotab']
+mccollection = dbq["messages"]
+message_quota_collection = dbq["message_quota"]
+lcollection = dbq['loarole']
 
 
 class quota(commands.Cog):
@@ -84,34 +88,40 @@ class quota(commands.Cog):
 
 
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
+     return False
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
         return False
-
+     elif modulesdata['Quota'] == True:   
+        return True
 
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-        return False
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
 
     @commands.hybrid_group(name="staff")
     async def staff(self, ctx):
@@ -139,6 +149,9 @@ class quota(commands.Cog):
 
     @staff.command(name="manage", description="Manage your staffs messages.")    
     async def manage(self, ctx, staff: discord.Member):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                    
      mccollection = db["messages"]
      message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
     
@@ -168,6 +181,9 @@ class quota(commands.Cog):
     @leader.command(name="reset", description="Reset the leaderboard")
     async def reset_staff_message_counts(self, ctx):
         await ctx.defer()
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                    
         if await self.has_admin_role(ctx):
             
             mccollection = db["messages"]
@@ -197,6 +213,9 @@ class quota(commands.Cog):
 
     @staff.command(name="messages", description="Displays how many message they've sent instead of looking for it on the leaderboard.")
     async def messages(self, ctx, staff: discord.Member):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                    
      if not await self.has_staff_role(ctx):
         await ctx.send(f"**{ctx.author.display_name}**, you don't have permission to use this command.")
         return        
@@ -220,6 +239,9 @@ class quota(commands.Cog):
 
     @staff.command(description="View the staff leaderboard")
     async def leaderboard(self, ctx):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                    
      await ctx.defer()
      if not await self.has_staff_role(ctx):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
@@ -252,7 +274,7 @@ class quota(commands.Cog):
             else:
                     has_loa_role = False
 
-            if message_quota and message_count >= message_quota['quota']:
+            if message_count >= int(message_quota['quota']):
                     emoji = "`LOA`" if has_loa_role else "<:Confirmed:1122636234255253545>"
             else:
                     emoji = "`LOA`" if has_loa_role else "<:Cancelled:1122637466353008810>"

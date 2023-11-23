@@ -534,23 +534,42 @@ class AdminPanelCog(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+
+
     @commands.hybrid_group(name="admin")    
     async def admin(self, ctx):
         pass        
 
+    async def has_staff_role(self, ctx):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
+
+
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-        return False    
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
     
 
     @admin.command(description="Manage a staff member.")
@@ -587,12 +606,37 @@ class AdminPanel(discord.ui.View):
         self.guild = guild
         self.author = author
 
+    async def InfractionModuleCheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['infractions'] == True:   
+        return True
+
+    async def PromotionModuleCheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Promotions'] == True:   
+        return True
+
+    async def LOAModuleCheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['LOA'] == True:   
+        return True
+
+
     @discord.ui.button(label='Promote', style=discord.ButtonStyle.grey, emoji='<:Promotion:1162134864594735315>')
     async def Promote(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)               
+        if not await self.PromotionModuleCheck(interaction):
+         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, this module is currently disabled.", ephemeral=True)
+         return                    
         if self.author == self.user:
          await interaction.response.send_message(f"{no} You can't promote yourself.", ephemeral=True)
          return
@@ -602,12 +646,15 @@ class AdminPanel(discord.ui.View):
 
     @discord.ui.button(label='Infract', style=discord.ButtonStyle.grey, emoji='<:Infraction:1162134605885870180>')
     async def Infract(self, interaction: discord.Interaction, button: discord.ui.Button):
+  
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
 
-
+        if not await self.InfractionModuleCheck(interaction):
+         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, this module is currently disabled.", ephemeral=True)
+         return        
         if self.author == self.user:
          await interaction.response.send_message(f"{no} You can't infract yourself.", ephemeral=True)
          return
@@ -622,7 +669,9 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-
+        if not await self.InfractionModuleCheck(interaction):
+         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, this module is currently disabled.", ephemeral=True)
+         return        
         print(f"Searching infractions for staff ID: {self.user.id} in guild ID: {self.user.guild.id}")
 
         filter = {
@@ -678,7 +727,9 @@ class AdminPanel(discord.ui.View):
                 color=discord.Colour.dark_embed()
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-
+        if not await self.LOAModuleCheck(interaction):
+         await interaction.response.send_message(f"{no} **{interaction.author.display_name}**, this module is currently disabled.", ephemeral=True)
+         return        
         loa = loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id, 'active': True})
         loainactive = loa_collection.find({"user": self.user.id, "guild_id": interaction.guild.id, 'active': False})
         view = None

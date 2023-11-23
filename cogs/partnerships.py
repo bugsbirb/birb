@@ -21,23 +21,41 @@ scollection = db['staffrole']
 arole = db['adminrole']
 partnerships = db['Partnerships']
 partnershipsch = db['Partnerships Channel']
+modules = db['Modules']
 class Partnerships(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    async def has_staff_role(self, ctx):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
+
+
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-        return False
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
+
+     return False
 
     async def servers_autocomplete(
         self,
@@ -60,8 +78,20 @@ class Partnerships(commands.Cog):
     async def partnership(self, ctx):
         pass
 
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Partnerships'] == True:   
+        return True
+
     @partnership.command(description="Log a partnership")
     async def log(self, ctx, owner: discord.Member, server: str, invite: str):
+
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
+
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return      
@@ -94,9 +124,15 @@ class Partnerships(commands.Cog):
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
     async def terminate(self, ctx, server, reason: str):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
+
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return              
+
+
         partnership_data = partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if partnership_data is None:   
             await ctx.send(f"{no} I could not find that partnership.")
@@ -128,6 +164,10 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="View all Partnerships in this server.")
     async def all(self, ctx):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
+
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return              

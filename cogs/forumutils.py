@@ -25,7 +25,7 @@ client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 forumsconfig = db['Forum Configuration']
-
+modules = db['Modules']
 class Forums(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -35,21 +35,26 @@ class Forums(commands.Cog):
         return
 
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
+     return False
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
         return False
-
-
+     elif modulesdata['Forums'] == True:   
+        return True
     @forums.command(description="Lock a forum thread")        
     async def lock(self, ctx):
      if not await self.has_staff_role(ctx):

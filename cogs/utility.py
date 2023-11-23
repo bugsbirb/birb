@@ -10,16 +10,17 @@ import typing
 import os
 import dotenv
 from dotenv import load_dotenv
-
+from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
-
+modules = db['Modules']
 
 class HelpMenu(discord.ui.Select):
     def __init__(self):
         options = [
+            discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
@@ -86,6 +87,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Partnerships Module"
             embed.description = "Log partnerships, terminate partnerships, and view partnerships. This is helpful for servers with partnership requirements that mandate partner owners to remain in the server."
             embed.add_field(name="Commands", value="* /partnership log\n* /partnership all\n* /partnership terminate")               
+        elif category == 'Message Quota':
+            embed.title = "Message Quota Module"
+            embed.description = "If you servers staff team has a message quota this feature is extremely helpful for tracking it."
+            embed.add_field(name="Commands", value="* /staff leaderboard\n* /staff manage\n* /staff messages")   
         else:
             embed.title = "Unknown Category"
             embed.description = "The specified category does not exist."
@@ -103,11 +108,23 @@ class Utility(commands.Cog):
         client.launch_time = datetime.now()    
         self.client.help_command = None
 
-
-
+    async def modulecheck(self, ctx): 
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return True
+     if modulesdata['Utility'] == True:   
+        return True
+     else:
+        return False
 
     @commands.hybrid_command(aliases=["serverinfo"])
     async def server(self, ctx):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
+         return          
         """ Check info about current server """
         if ctx.invoked_subcommand is None:
             find_bots = sum(1 for member in ctx.guild.members if member.bot)
@@ -127,6 +144,9 @@ class Utility(commands.Cog):
 
     @commands.hybrid_command()
     async def user(self, ctx, user: Optional[discord.Member] = None):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
+         return            
         """Displays users information"""
         if user is None:
             user = ctx.author
@@ -161,7 +181,7 @@ class Utility(commands.Cog):
 
 
     @commands.hybrid_command(description="Displays all the commands.")
-    async def help(self, ctx):
+    async def help(self, ctx):         
      embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
      embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get information about different modules and commands."
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
