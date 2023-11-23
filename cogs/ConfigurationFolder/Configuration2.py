@@ -188,11 +188,11 @@ class Config(discord.ui.Select):
          adminrolemessage = "Not Configured"
     
          if adminroleresult:
-          staff_roles_ids = adminroleresult.get('staffrole', [])
-         if not isinstance(staff_roles_ids, list):
-            staff_roles_ids = [staff_roles_ids]              
-         staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-         adminrolemessage = ", ".join(staff_roles_mentions)             
+          admin_roles_ids = adminroleresult.get('staffrole', [])
+         if not isinstance(admin_roles_ids, list):
+            admin_roles_ids = [admin_roles_ids]              
+         admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
+         adminrolemessage = ", ".join(admin_roles_mentions)             
 
          if staffroleresult:
           staff_roles_ids = staffroleresult.get('staffrole', [])
@@ -465,12 +465,11 @@ class ConfigCog(commands.Cog):
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         if adminroleresult:
-        
-         staff_roles_ids = adminroleresult.get('staffrole', [])
-         if not isinstance(staff_roles_ids, list):
-          staff_roles_ids = [staff_roles_ids]            
-         staff_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-         adminrolemessage = ", ".join(staff_roles_mentions)             
+          admin_roles_ids = adminroleresult.get('staffrole', [])
+          if not isinstance(admin_roles_ids, list):
+            admin_roles_ids = [admin_roles_ids]              
+          admin_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
+          adminrolemessage = ", ".join(admin_roles_mentions)             
         if staffroleresult:
          staff_roles_ids = staffroleresult.get('staffrole', [])
          if not isinstance(staff_roles_ids, list):
