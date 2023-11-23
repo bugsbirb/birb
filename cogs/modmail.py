@@ -35,7 +35,8 @@ class Modmail(commands.Cog):
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
         staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]   
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
 
@@ -51,7 +52,8 @@ class Modmail(commands.Cog):
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
         staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]     
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
 

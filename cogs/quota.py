@@ -87,6 +87,16 @@ class quota(commands.Cog):
 
 
 
+
+
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Quota'] == True:   
+        return True
+
     async def has_staff_role(self, ctx):
      filter = {
         'guild_id': ctx.guild.id
@@ -96,17 +106,13 @@ class quota(commands.Cog):
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
         staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]   
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
 
      return False
-    async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
-     if modulesdata is None:
-        return False
-     elif modulesdata['Quota'] == True:   
-        return True
+
 
     async def has_admin_role(self, ctx):
      filter = {
@@ -117,7 +123,8 @@ class quota(commands.Cog):
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
         staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]     
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
 

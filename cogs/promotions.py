@@ -35,34 +35,37 @@ class promo(commands.Cog):
         return True
 
     async def has_staff_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        staff_data = scollection.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
 
-        if staff_data and 'staffrole' in staff_data:
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]   
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
-            if staff_role and staff_role in ctx.author.roles:
-                return True
-
-        return False
+     return False
 
 
     async def has_admin_role(self, ctx):
-        filter = {
-            'guild_id': ctx.guild.id
-        }
-        admin_data = arole.find_one(filter)
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
-            if admin_role in ctx.author.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]     
+        if any(role.id in staff_role_ids for role in ctx.author.roles):
+            return True
 
-        return False
+     return False
 
     @commands.hybrid_command(description="Promote a staff member")
     @app_commands.describe(
