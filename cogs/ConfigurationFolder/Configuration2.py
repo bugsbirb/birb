@@ -188,12 +188,14 @@ class Config(discord.ui.Select):
          adminrolemessage = "Not Configured"
          if adminroleresult:
           staff_roles_ids = adminroleresult.get('staffrole', [])
+          if not isinstance(staff_role_ids, list):
+           staff_role_ids = [staff_role_ids]              
           staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
           adminrolemessage = ", ".join(staff_roles_mentions)             
          if staffroleresult:
           staff_roles_ids = staffroleresult.get('staffrole', [])
-         if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]          
+          if not isinstance(staff_role_ids, list):
+           staff_role_ids = [staff_role_ids]          
           staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
           staffrolemessage = ", ".join(staff_roles_mentions)
         
