@@ -194,8 +194,8 @@ class Config(discord.ui.Select):
          staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
          adminrolemessage = ", ".join(staff_roles_mentions)             
 
-        if staffroleresult:
-         staff_roles_ids = staffroleresult.get('staffrole', [])
+         if staffroleresult:
+          staff_roles_ids = staffroleresult.get('staffrole', [])
          if not isinstance(staff_roles_ids, list):
             staff_roles_ids = [staff_roles_ids]          
          staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
