@@ -56,12 +56,10 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Infractions Module"
             embed.description = "The Infractions Module is a powerful tool for managing staff discipline within your server. It offers a range of disciplinary actions, including 'Termination,' 'Demotion,' 'Warnings,' 'Verbal Warning,' and 'Activity Notice.' With these options, you can effectively address various staff-related issues and maintain a harmonious server environment."
             embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /infraction void\n* /admin panel")
-
         elif category == 'Suspensions':
             embed.title = "Suspensions Module"
             embed.description = "Manage staff suspensions with ease. This module allows authorized users to suspend staff members for a specified duration, optionally removing their roles during the suspension. It also handles the automatic removal of suspensions when the duration expires and restoration of roles to the suspended staff members."
             embed.add_field(name="Commands", value="* /suspend\n* /suspension manage\n* /suspension active")
-
         elif category == 'Promotions':
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
@@ -74,7 +72,6 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Utilities"
             embed.description = "The Utility commands module consists of commands unrelated to the bot itself. These commands are designed to provide various helpful functionalities for your server, enhancing its overall utility and convenience."
             embed.add_field(name="Commands", value="* /user\n* /server\n* /ping\n* /help")
-
         elif category == 'LOA':
             embed.title = "LOA Module"
             embed.description = "The LOA (Leave of Absence) Module simplifies LOA requests in your Discord server. Members can easily request time off with a specified duration and reason. Server Admins can efficiently manage these requests and track active LOAs. When LOAs end, notifications ensure everyone is informed. A streamlined solution for a well-organized server."
@@ -92,8 +89,9 @@ class HelpMenu(discord.ui.Select):
             embed.description = "If you servers staff team has a message quota this feature is extremely helpful for tracking it."
             embed.add_field(name="Commands", value="* /staff leaderboard\n* /staff manage\n* /staff messages")   
         else:
-            embed.title = "Unknown Category"
-            embed.description = "The specified category does not exist."
+            embed.title = "Error"
+            embed.description = "The specified category could not be found, our team has been notified."
+            print("Category not found in utility.py.")
 
         await interaction.response.edit_message(embed=embed)
 class Help(discord.ui.View):
@@ -168,12 +166,9 @@ class Utility(commands.Cog):
     async def ping(self, ctx):
         server_name = ctx.guild.name
         server_icon = ctx.guild.icon.url if ctx.guild.icon else None
-
-
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
-
-
+        
         embed = discord.Embed(title="", description=f"* {discord_latency_message}\n* **Up Since:** <t:{int(self.client.launch_time.timestamp())}:f>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
         await ctx.send(embed=embed)        
@@ -196,9 +191,8 @@ class Utility(commands.Cog):
     async def support(self, ctx):
         view = Support()
         bot_user = self.client.user
-        embed = discord.Embed(title="Support Server", description="You having issues? Join the support server and get some help.", color=0x2b2d31)
+        embed = discord.Embed(title="Support Server", description="Having bot issues? Join our support server and our team will help you.", color=0x2b2d31)
         embed.set_thumbnail(url=bot_user.avatar.url)
-
         await ctx.send(embed=embed, view=view)
        
 
@@ -235,10 +229,18 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def restarting(self, ctx):
-        embed = discord.Embed(title="Astro Birb - Restarting", description="Astro Birb is currently restarting.", color=discord.Color.orange())
+        embed = discord.Embed(title="Astro Birb - Restarting", description="Astro Birb is currently restarting, this will take about five minutes.", color=discord.Color.orange())
         embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
         embed.set_thumbnail(url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1148682557618147391/1140809567865933824.png")
         await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def shutdown(self, ctx):
+        embed = discord.Embed(title="Stopping Astro Birb", description="Shutdown command was invoked", color=discord.Color.red())
+        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
+        await ctx.send(embed=embed)
+        exit(2)
 
 class invite(discord.ui.View):
     def __init__(self):
