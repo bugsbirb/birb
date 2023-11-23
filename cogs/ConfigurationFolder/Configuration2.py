@@ -186,23 +186,26 @@ class Config(discord.ui.Select):
          adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
          staffrolemessage = "Not Configured"
          adminrolemessage = "Not Configured"
+    
          if adminroleresult:
           staff_roles_ids = adminroleresult.get('staffrole', [])
-          if not isinstance(staff_role_ids, list):
-           staff_role_ids = [staff_role_ids]              
-          staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-          adminrolemessage = ", ".join(staff_roles_mentions)             
-         if staffroleresult:
-          staff_roles_ids = staffroleresult.get('staffrole', [])
-          if not isinstance(staff_role_ids, list):
-           staff_role_ids = [staff_role_ids]          
-          staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-          staffrolemessage = ", ".join(staff_roles_mentions)
-        
+         if not isinstance(staff_roles_ids, list):
+            staff_roles_ids = [staff_roles_ids]              
+         staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
+         adminrolemessage = ", ".join(staff_roles_mentions)             
+
+        if staffroleresult:
+         staff_roles_ids = staffroleresult.get('staffrole', [])
+         if not isinstance(staff_roles_ids, list):
+            staff_roles_ids = [staff_roles_ids]          
+         staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
+         staffrolemessage = ", ".join(staff_roles_mentions)
+
          embed = discord.Embed(title="<:Setting:1154092651193323661> Settings", description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}", color=discord.Color.dark_embed())
          embed.set_thumbnail(url=interaction.guild.icon)
          embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)            
          view = ConfigViewMain(self.author)
+
          
         elif color == 'Utility':         # Utility
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
