@@ -15,6 +15,7 @@ import time
 import os
 from dotenv import load_dotenv
 from datetime import datetime
+import re
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
@@ -85,6 +86,10 @@ class loamodule(commands.Cog):
         if not await self.has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return    
+        if not re.match(r'^\d+[mhdw]$', duration):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+         return
+
         duration_value = int(duration[:-1])
         duration_unit = duration[-1]
         duration_seconds = duration_value
