@@ -122,10 +122,11 @@ class Utility(commands.Cog):
 
     @commands.hybrid_command(aliases=["serverinfo"])
     async def server(self, ctx):
+        """ Check info about current server """        
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
          return          
-        """ Check info about current server """
+
         if ctx.invoked_subcommand is None:
             find_bots = sum(1 for member in ctx.guild.members if member.bot)
             guild = ctx.guild
@@ -144,10 +145,11 @@ class Utility(commands.Cog):
 
     @commands.hybrid_command()
     async def user(self, ctx, user: Optional[discord.Member] = None):
+        """Displays users information"""        
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
          return            
-        """Displays users information"""
+
         if user is None:
             user = ctx.author
         user_badges = badges.find({'user_id': user.id})            
