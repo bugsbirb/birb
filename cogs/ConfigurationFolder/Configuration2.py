@@ -329,7 +329,7 @@ class Config(discord.ui.Select):
                 if channel is None:
                  partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:
-                 partnershipchannelmsg = channel.mention                
+                 partnershipchannelmsg = f"{channel.mention}"                
             embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
             view = PartnershipModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
