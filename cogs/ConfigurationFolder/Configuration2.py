@@ -116,22 +116,14 @@ class Adminrole(discord.ui.RoleSelect):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
-        filter = {
-            'guild_id': interaction.guild.id
-        }        
+  
         data = {
             'guild_id': interaction.guild.id, 
             'staffrole': selected_role_ids
         }
-        try:
-            existing_record = scollection.find_one(filter)
-            if existing_record:
-                arole.update_one(filter, {'$set': data})
-            else:
-                arole.insert_one(data)
-            await interaction.response.edit_message(content=None)
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+
+        arole.update_one({'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=None)
         print(f"Select Roles {selected_role_ids}")
 
 class Config(discord.ui.Select):
@@ -188,14 +180,14 @@ class Config(discord.ui.Select):
          adminrolemessage = "Not Configured"
     
          if adminroleresult:
-          admin_roles_ids = adminroleresult.get('staffrole', [])
+          admin_roles_ids = adminroleresult['staffrole', []]
           if not isinstance(admin_roles_ids, list):
             admin_roles_ids = [admin_roles_ids]              
           admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
           adminrolemessage = ", ".join(admin_roles_mentions)             
 
          if staffroleresult:
-          staff_roles_ids = staffroleresult.get('staffrole', [])
+          staff_roles_ids = staffroleresult['staffrole', []]
           if not isinstance(staff_roles_ids, list):
             staff_roles_ids = [staff_roles_ids]          
           staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
