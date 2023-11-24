@@ -118,11 +118,12 @@ class Adminrole(discord.ui.RoleSelect):
         selected_role_ids = [role.id for role in self.values]    
   
         data = {
-            'guild_id': interaction.guild.id, 
+            'guild_id': interaction.guild.id,
             'staffrole': selected_role_ids
         }
 
-        arole.update_one({'$set': data}, upsert=True)
+
+        arole.update_one({'$set': data}, upsert=True, update=True)
         await interaction.response.edit_message(content=None)
         print(f"Select Roles {selected_role_ids}")
 
@@ -180,7 +181,7 @@ class Config(discord.ui.Select):
          adminrolemessage = "Not Configured"
     
          if adminroleresult:
-          admin_roles_ids = adminroleresult['staffrole', []]
+          admin_roles_ids = adminroleresult('staffrole', [])
           if not isinstance(admin_roles_ids, list):
             admin_roles_ids = [admin_roles_ids]              
           admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
