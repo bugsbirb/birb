@@ -37,7 +37,7 @@ modules = db['Modules']
 class ReportChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Report Channel')
-
+        self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
