@@ -55,12 +55,12 @@ class PartnershipChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = partnershipch.find_one(filter)
+            existing_record = partnershipsch.find_one(filter)
 
             if existing_record:
-                partnershipch.update_one(filter, {'$set': data})
+                partnershipsch.update_one(filter, {'$set': data})
             else:
-                partnershipch.insert_one(data)
+                partnershipsch.insert_one(data)
 
             await interaction.response.edit_message(content=None)
         except Exception as e:
