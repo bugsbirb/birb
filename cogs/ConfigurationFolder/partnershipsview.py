@@ -28,7 +28,6 @@ repchannel = db['report channel']
 loachannel = db['loa channel']
 promochannel = db['promo channel']
 feedbackch = db['Staff Feedback Channel']
-partnershipch = db['partnership channel']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
@@ -39,6 +38,10 @@ class PartnershipChannel(discord.ui.ChannelSelect):
         super().__init__(placeholder='Partnership Channel')
 
     async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
 
         

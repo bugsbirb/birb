@@ -63,11 +63,11 @@ repchannel = db['report channel']
 loachannel = db['loa channel']
 promochannel = db['promo channel']
 feedbackch = db['Staff Feedback Channel']
-partnershipch = db['partnership channel']
+
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
-partnershipsch = db['Partnerships Channel']
+partnershipch = db['Partnerships Channel']
 modules = db['Modules']
 
 mongo2 = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
@@ -288,7 +288,7 @@ class Config(discord.ui.Select):
             feedbackchannelresult = feedbackch.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            feedbackchannelmsg = ""
+            feedbackchannelmsg = "Not Configured"
             if moduleddata:
                 modulemsg = f"{moduleddata['Feedback']}"
             if feedbackchannelresult:    
@@ -317,19 +317,19 @@ class Config(discord.ui.Select):
 
 
         elif color == 'Partnerships':    #Partnerships
-            partnershipchannelresult = partnershipsch.find_one({'guild_id': interaction.guild.id})
+            partnershipchannelresult = partnershipch.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            partnershipchannelmsg = ""
+            partnershipchannelmsg = "Not Configured"
             if moduleddata:
                 modulemsg = f"{moduleddata['Feedback']}"
             if partnershipchannelresult:    
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
-                if channel is None:
-                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                if channel:
+                 partnershipchannelmsg = f"{channel.mention}"                     
                 else:
-                 partnershipchannelmsg = f"{channel.mention}"                
+                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
             embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
             view = PartnershipModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)

@@ -39,6 +39,10 @@ class InfractionChannel(discord.ui.ChannelSelect):
         super().__init__(placeholder='Infractions Channel')
 
     async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
 
         
