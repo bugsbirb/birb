@@ -475,7 +475,10 @@ class ConfigCog(commands.Cog):
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         await ctx.send(embed=embed, view = ConfigViewMain(ctx.author))
 
-
+    @config.error
+    async def permissionerror(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions): 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConfigCog(client))     
