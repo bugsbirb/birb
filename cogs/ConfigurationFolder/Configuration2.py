@@ -341,7 +341,7 @@ class Config(discord.ui.Select):
             partnershipchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            partnershipchannelmsg = ""
+            partnershipchannelmsg = "Not Configured"
             if moduleddata:
                 modulemsg = f"{moduleddata['Reports']}"
             if partnershipchannelresult:    
@@ -351,7 +351,7 @@ class Config(discord.ui.Select):
                  partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
                  partnershipchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Reports Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
