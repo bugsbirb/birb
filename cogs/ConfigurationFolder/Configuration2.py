@@ -315,7 +315,7 @@ class Config(discord.ui.Select):
             modulemsg = ""
             partnershipchannelmsg = "Not Configured"
             if moduleddata:
-                modulemsg = f"{moduleddata['Feedback']}"
+                modulemsg = f"{moduleddata['Partnerships']}"
             if partnershipchannelresult:    
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
