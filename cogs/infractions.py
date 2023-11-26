@@ -113,6 +113,10 @@ class Infractions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return           
 
+        if ctx.author == staff:
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.")
+         return
+
         random_string = ''.join(random.choices(string.digits, k=8))
         if notes:
          embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Notes:** {notes}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
