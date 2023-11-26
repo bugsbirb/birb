@@ -174,32 +174,39 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
 
-        elif color == 'Basic Settings':    #basic
-         staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
-         adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
-         staffrolemessage = "Not Configured"
-         adminrolemessage = "Not Configured"
-    
-         if adminroleresult:
-          admin_roles_ids = adminroleresult.get('staffrole', [])
-          if not isinstance(admin_roles_ids, list):
-            admin_roles_ids = [admin_roles_ids]              
-          admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
-          adminrolemessage = ", ".join(admin_roles_mentions)             
+        elif color == 'Basic Settings':  # basic
+            staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
+            adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
+            staffrolemessage = "Not Configured"
+            adminrolemessage = "Not Configured"
 
-         if staffroleresult:
-          staff_roles_ids = staffroleresult.get('staffrole', [])
-          if not isinstance(staff_roles_ids, list):
-            staff_roles_ids = [staff_roles_ids]          
-          staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-          staffrolemessage = ", ".join(staff_roles_mentions)
+            if adminroleresult:
+             admin_roles_ids = adminroleresult.get('staffrole', [])
+             if not isinstance(admin_roles_ids, list):
+                admin_roles_ids = [admin_roles_ids]
+             admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
+                                    for role_id in admin_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
+             if not admin_roles_mentions:
+                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+             else:
+                adminrolemessage = ", ".join(admin_roles_mentions)
 
-         embed = discord.Embed(title="<:Setting:1154092651193323661> Settings", description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}", color=discord.Color.dark_embed())
-         embed.set_thumbnail(url=interaction.guild.icon)
-         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)            
-         view = ConfigViewMain(self.author)
-
-         
+            if staffroleresult:
+             staff_roles_ids = staffroleresult.get('staffrole', [])
+             if not isinstance(staff_roles_ids, list):
+                staff_roles_ids = [staff_roles_ids]
+             staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
+                                    for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
+             if not staff_roles_mentions:
+                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+             else:
+                staffrolemessage = ", ".join(staff_roles_mentions)
+             embed = discord.Embed(title="<:Setting:1154092651193323661> Settings",
+                                  description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}",
+                                  color=discord.Color.dark_embed())
+             embed.set_thumbnail(url=interaction.guild.icon)
+             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+             view = ConfigViewMain(self.author)
         elif color == 'Utility':         # Utility
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
             modulemsg = "True"
@@ -458,17 +465,26 @@ class ConfigCog(commands.Cog):
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         if adminroleresult:
-          admin_roles_ids = adminroleresult.get('staffrole', [])
-          if not isinstance(admin_roles_ids, list):
-            admin_roles_ids = [admin_roles_ids]              
-          admin_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention for role_id in admin_roles_ids]
-          adminrolemessage = ", ".join(admin_roles_mentions)             
+            admin_roles_ids = adminroleresult.get('staffrole', [])
+            if not isinstance(admin_roles_ids, list):
+                admin_roles_ids = [admin_roles_ids]
+            admin_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention
+                                    for role_id in admin_roles_ids if discord.utils.get(ctx.guild.roles, id=role_id) is not None]
+            if not admin_roles_mentions:
+                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+            else:
+                adminrolemessage = ", ".join(admin_roles_mentions)
+        
         if staffroleresult:
-         staff_roles_ids = staffroleresult.get('staffrole', [])
-         if not isinstance(staff_roles_ids, list):
-          staff_roles_ids = [staff_roles_ids]               
-         staff_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention for role_id in staff_roles_ids]
-         staffrolemessage = ", ".join(staff_roles_mentions)
+            staff_roles_ids = staffroleresult.get('staffrole', [])
+            if not isinstance(staff_roles_ids, list):
+                staff_roles_ids = [staff_roles_ids]
+            staff_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention
+                                    for role_id in staff_roles_ids if discord.utils.get(ctx.guild.roles, id=role_id) is not None]
+            if not staff_roles_mentions:
+                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+            else:
+                staffrolemessage = ", ".join(staff_roles_mentions)
         
         embed = discord.Embed(title="<:Setting:1154092651193323661> Settings", description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.guild.icon)
