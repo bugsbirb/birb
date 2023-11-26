@@ -100,7 +100,24 @@ class management(commands.Cog):
         embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
         msg = await thread.send(content='<@&1092977110412439583>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True)) 
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        channel_id = 1178362100737916988 
+        channel = self.client.get_channel(channel_id)
+        if channel:
+         webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
 
+        await webhook.send(f"<:join:1140670830792159373> Welcomed to **@{guild.name}.** I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        channel_id = 1178362100737916988 
+        channel = self.client.get_channel(channel_id)
+        if channel:
+         webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
+
+        await webhook.send(f"<:leave:1140670848664096789> Farewell, **@{guild.name}.** I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
+     
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(management(client))     
