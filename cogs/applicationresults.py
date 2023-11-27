@@ -65,6 +65,8 @@ class ApplicationResults(commands.Cog):
         return False
      elif modulesdata['Applications'] == True:   
         return True
+     else:   
+        return False
 
 
     @commands.hybrid_group()
