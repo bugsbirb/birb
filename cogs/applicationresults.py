@@ -63,8 +63,10 @@ class ApplicationResults(commands.Cog):
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Applications'] == True:   
+     elif modulesdata.get('Applications', False) == True: 
         return True
+     else:   
+        return False
 
 
     @commands.hybrid_group()
