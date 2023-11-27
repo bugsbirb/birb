@@ -80,6 +80,16 @@ class ApplicationResults(commands.Cog):
         *,
         feedback,
     ):
+
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return    
+
+        if not await self.has_admin_role(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         return           
+
+
         if result == "Passed":
             if not feedback:
                 feedback = "None Given"
