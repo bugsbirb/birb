@@ -58,7 +58,7 @@ class client(commands.Bot):
         intents = discord.Intents().all()
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.applicationsresults", "cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
 
 
