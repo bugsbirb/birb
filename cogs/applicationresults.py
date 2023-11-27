@@ -78,7 +78,7 @@ class ApplicationResults(commands.Cog):
         applicant: discord.Member,
         result: Literal["Passed", "Failed"],
         *,
-        feedback,
+        feedback = None,
     ):
 
         if not await self.modulecheck(ctx):
