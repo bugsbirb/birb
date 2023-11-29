@@ -26,6 +26,25 @@ class Feedback(commands.Cog):
     async def staffs(self, ctx):
         pass
 
+
+    async def staffcheck(self, ctx):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = scollection.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+
+        if not isinstance(staff_role_ids, list):
+            staff_role_ids = [staff_role_ids]
+
+        user_roles = [role.id for role in ctx.author.roles]
+        if any(role_id in user_roles for role_id in staff_role_ids):
+            return True
+
+     return False
+
     @staffs.command(description="Rate a staff member")
     async def feedback(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
@@ -36,7 +55,7 @@ class Feedback(commands.Cog):
        staff_role_id = staff_role_data['staffrole']  
 
 
-       has_staff_role = discord.utils.get(staff.roles, id=staff_role_id) is not None
+       has_staff_role = await self.staffcheck(ctx)
 
        if not has_staff_role:
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.")
