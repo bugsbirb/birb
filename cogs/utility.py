@@ -25,7 +25,9 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
+            discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),                   
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
+            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"),                        
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
@@ -88,6 +90,26 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Message Quota Module"
             embed.description = "If you servers staff team has a message quota this feature is extremely helpful for tracking it."
             embed.add_field(name="Commands", value="* /staff leaderboard\n* /staff manage\n* /staff messages")   
+
+        elif category == 'Applications Results':
+            embed.title = "Application Results Module"
+            embed.description = """
+❓ **How would this work?**
+* **Application Results Module.** is a module that automatically assigns roles to applicants after passing based on your application results configuration settings. It also logs a application result in a channel of your choosing.
+<:ArrowDropDown:1163171628050563153> Hi I just want to note there will also be a application feature coming later in the future currently the **/application results** is more of a logging command.
+"""
+            embed.add_field(name="Commands", value="* /application results")    
+
+
+        elif category == 'Staff List':
+            embed.title = "Staff List Module"
+            embed.description = """
+❓ **How would this work?**
+* **Roles.** It uses the staff roles & admin roles from config.
+* **Role Hierarchy Sorting.** It considers the role hierarchy, sorting roles based on their positions to ensure an accurate representation of the staff list.
+* **Hoisted Roles.** It selects hoisted roles, ensuring that only roles marked as hoisted are included in the staff list.
+"""
+            embed.add_field(name="Commands", value="* /stafflist")               
         else:
             embed.title = "Error"
             embed.description = "The specified category could not be found, our team has been notified."
