@@ -12,12 +12,14 @@ from pymongo import MongoClient
 from emojis import * 
 import os
 from dotenv import load_dotenv
+
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
 stafffeedback = db['feedback']
 feedbackch = db['Staff Feedback Channel']
 scollection = db['staffrole']
+modules = db['Modules']
 class Feedback(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -27,7 +29,7 @@ class Feedback(commands.Cog):
         pass
 
 
-    async def staffcheck(self, ctx):
+    async def staffcheck(self, ctx, staff):
      filter = {
         'guild_id': ctx.guild.id
     }
@@ -39,15 +41,26 @@ class Feedback(commands.Cog):
         if not isinstance(staff_role_ids, list):
             staff_role_ids = [staff_role_ids]
 
-        user_roles = [role.id for role in ctx.author.roles]
-        if any(role_id in user_roles for role_id in staff_role_ids):
+        staff_roles = [role.id for role in staff.roles]
+        if any(role_id in staff_roles for role_id in staff_role_ids):
             return True
 
      return False
 
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata['Feedback'] == True:   
+        return True
+
+
     @staffs.command(description="Rate a staff member")
     async def feedback(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
+       if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return          
        if staff == ctx.author:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.")
             return
@@ -55,7 +68,7 @@ class Feedback(commands.Cog):
        staff_role_id = staff_role_data['staffrole']  
 
 
-       has_staff_role = await self.staffcheck(ctx)
+       has_staff_role = await self.staffcheck(ctx, staff)
 
        if not has_staff_role:
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.")
