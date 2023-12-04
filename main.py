@@ -266,7 +266,6 @@ async def on_message(message):
             )
     await client.process_commands(message)            
 
-#main MTExMzI0NTU2OTQ5MDYxNjQwMA.GV8KM5.6mdY5QBSJjXrNylBvM32mtvl-aiLmshNODo-vs
-#beta MTExNzkxMDM0Mjc1MjgwMDc5OA.G63j3t.xHu-FfHNAAVSreeQlZqGYJZdwCyswxeoLi9e5g 
+
 
 client.run(TOKEN)    
