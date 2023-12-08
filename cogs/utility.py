@@ -204,7 +204,7 @@ class Utility(commands.Cog):
      embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
      embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get information about different modules and commands."
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-     embed.add_field(name="**Command Prefix**", value="`/`)
+     embed.add_field(name="**Command Prefix**", value="`/`")
      embed.add_field(name="**Support Server**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.")     
      view = Help()
 
