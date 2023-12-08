@@ -55,7 +55,8 @@ sentry_sdk.init(
 
 class client(commands.Bot):
     def __init__(self):
-        intents = None
+        intents = discord.Intents.default()
+        intents.members = True
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
         self.cogslist = ["cogs.stafflist", "cogs.applicationresults", "cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
