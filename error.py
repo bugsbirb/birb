@@ -27,7 +27,16 @@ class errorcog(commands.Cog):
     async def appcommanderror(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             return 
+        if isinstance(error, discord.Forbidden):
+            if "Cannot send messages to this user" in str(error):
+                return
 
+        if isinstance(error, commands.CommandNotFound):
+            return
+        if isinstance(error, commands.CheckFailure):
+            return
+        if isinstance(error, commands.MissingRequiredArgument):
+            return
         error_id = ''.join(random.choices(string.digits, k=6))
         embed = discord.Embed(title=f"<:crossX:1140623638207397939> An Error Occured", description=f"**Error ID:** `{error_id}`", color=discord.Color.brand_red())
         view = Support()
