@@ -11,7 +11,6 @@ from discord.ext import commands, tasks
 
 from typing import Optional
 import Paginator
-from cogs.infractions import *
 import sentry_sdk
 import asyncio
 from cogs.loa import *
@@ -20,6 +19,7 @@ from dotenv import load_dotenv
 from jishaku import Jishaku
 import jishaku
 from cogs.astro import * 
+from cogs.suggestions import *
 
 load_dotenv()
 PREFIX = os.getenv('PREFIX')
@@ -59,7 +59,7 @@ class client(commands.Bot):
         intents.members = True
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
-        self.cogslist = ["cogs.stafflist", "cogs.applicationresults", "cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
+        self.cogslist = ["cogs.suggestions", "cogs.stafflist", "cogs.applicationresults", "cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
 
 
 
@@ -77,6 +77,7 @@ class client(commands.Bot):
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
         self.add_view(Helpdesk())
+        self.add_view(SuggestionView())
 
 
 
