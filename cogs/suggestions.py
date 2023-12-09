@@ -50,8 +50,10 @@ class suggestions(commands.Cog):
         result = suggestions_collection.insert_one(suggestion_data)
         suggestion_id = result.inserted_id
 
-        embed = discord.Embed(title="Suggestion", description=f"```{suggestion}```", color=discord.Color.dark_embed())
+        embed = discord.Embed(title="", description=f"**Submitter**\n {ctx.author.mention} \n\n**Suggestion**\n{suggestion}", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.author.display_avatar)
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+        embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
         embed.set_footer(text=f"0 Upvotes | 0 Downvotes")
         view = SuggestionView()
         channeldata = suggestschannel.find_one({"guild_id": ctx.guild.id})
