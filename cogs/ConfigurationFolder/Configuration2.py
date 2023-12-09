@@ -52,6 +52,9 @@ from cogs.ConfigurationFolder.applicationsview import ToggleApplications
 
 from cogs.ConfigurationFolder.stafflist import ToggleList
 
+from cogs.ConfigurationFolder.suggestionview import SuggestionsChannel
+from cogs.ConfigurationFolder.suggestionview import ToggleSuggestions
+
 quota = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 dbq = quota['quotab']
 message_quota_collection = dbq["message_quota"]
@@ -85,7 +88,7 @@ scollection2 = db2['staffrole']
 message_quota_collection = db2["message_quota"]
 arole2 = db2['adminrole']
 srole = db2['staffrole']
-
+suggestschannel = db["suggestion channel"]
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -144,7 +147,7 @@ class Config(discord.ui.Select):
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),            
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),            
             discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
-            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"),            
+            discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
             discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),            
@@ -153,7 +156,8 @@ class Config(discord.ui.Select):
             discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
             discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
             discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>"),                
-            discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>")                
+            discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>"),                
+            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>")          
 
         
             
@@ -425,6 +429,28 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = ListModule(self.author)
+
+
+        elif color == 'Suggestions':    # Suggestions
+            suschannelresult = suggestschannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            suggestionchannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = moduleddata.get('Suggestions', 'False')
+            if suschannelresult:    
+                channelid = suschannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 suggestionchannelmsg = channel.mention                
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Suggestions Module", description=f"**Enabled:** {modulemsg}\n**Suggestion Channel:** {suggestionchannelmsg}", color=discord.Color.dark_embed())
+            view = SuggestionModule(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+
+
         await interaction.response.edit_message(embed=embed, view=view)
             
 
@@ -433,6 +459,13 @@ class ConfigViewMain(discord.ui.View):
         super().__init__()
         self.add_item(StaffRole(author))
         self.add_item(Adminrole(author))
+        self.add_item(Config(author))
+
+class SuggestionModule(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(SuggestionsChannel(author))
+        self.add_item(ToggleSuggestions(author))
         self.add_item(Config(author))
 
 class InfractModule(discord.ui.View):
@@ -537,8 +570,8 @@ class ConfigCog(commands.Cog):
         adminroleresult = arole.find_one({'guild_id': ctx.guild.id})
         modulesdata = modules.find_one({'guild_id': ctx.guild.id})
         if modulesdata is None:
-            modulesdata = {'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False}
-            modules.insert_one({'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False})
+            modulesdata = {'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False}
+            modules.insert_one({'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False})
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         if adminroleresult:
