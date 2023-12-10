@@ -24,6 +24,7 @@ from cogs.suggestions import *
 load_dotenv()
 PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
+STATUS = os.getenv('STATUS')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
 #quota
@@ -103,7 +104,7 @@ class client(commands.Bot):
 
     
     async def on_connect(self):
-        activity2 = discord.CustomActivity(name=f"✨ 20k+ users!")
+        activity2 = discord.CustomActivity(name=f"{STATUS}")
 
         print("Connected to Discord Gateway!")
         await self.change_presence(activity=activity2)
