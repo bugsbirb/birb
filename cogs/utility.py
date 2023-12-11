@@ -159,7 +159,7 @@ class Utility(commands.Cog):
             embed.add_field(name="Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {ctx.guild.premium_subscription_count} (Level: {ctx.guild.premium_tier})\n* **Total Roles:** {len(ctx.guild.roles)}", inline=True)         
             embed.add_field(name="Security", value=f"* **Verification Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{str(ctx.guild.explicit_content_filter).capitalize()}`")
             embed.set_thumbnail(url=ctx.guild.icon)
-            embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.avatar.url)
+            embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
             await ctx.send(embed=embed)
         
 
