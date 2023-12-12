@@ -263,7 +263,7 @@ class Config(discord.ui.Select):
                 roleid = loaroleresult['staffrole']
                 role = discord.utils.get(interaction.guild.roles, id=roleid)
                 if role is None:
-                 loarolemsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 loarolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
                 else: 
                  loarolemsg = f"{role.mention}"
 
