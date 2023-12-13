@@ -42,7 +42,7 @@ class Consent(commands.Cog):
      else:
         promotion_alert = "<:crossX:1140623638207397939>"
 
-     embed = discord.Embed(title="<:Moderation:1163933000006893648> Notifications", description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}", color=discord.Color.dark_embed())
+     embed = discord.Embed(title="<:Notification:1184528462338347039> Notifications", description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}", color=discord.Color.dark_embed())
      embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
      view = Confirm(consent_data, ctx.author)

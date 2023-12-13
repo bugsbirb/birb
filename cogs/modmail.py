@@ -151,6 +151,7 @@ class Modmail(commands.Cog):
                             'guild_id': selected_server.id,
                             'channel_id': channel.id
                         }
+
                         modmail.insert_one(modmail_data)
                         await message.author.send(f"{tick} Conversation started.\n<:ArrowDropDown:1163171628050563153> Use !closemodmail to end your own modmail.")
                         await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.")

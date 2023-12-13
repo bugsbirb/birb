@@ -94,7 +94,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Applications Results':
             embed.title = "Application Results Module"
             embed.description = """
-❓ **How would this work?**
+❓ **How does this work?**
 * **Application Results Module.** is a module that automatically assigns roles to applicants after passing based on your application results configuration settings. It also logs a application result in a channel of your choosing.
 <:ArrowDropDown:1163171628050563153> Hi I just want to note there will also be a application feature coming later in the future currently the **/application results** is more of a logging command.
 """
@@ -104,7 +104,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Staff List':
             embed.title = "Staff List Module"
             embed.description = """
-❓ **How would this work?**
+❓ **How does this work?**
 * **Roles.** It uses the staff roles & admin roles from config.
 * **Role Hierarchy Sorting.** It considers the role hierarchy, sorting roles based on their positions to ensure an accurate representation of the staff list.
 * **Hoisted Roles.** It selects hoisted roles, ensuring that only roles marked as hoisted are included in the staff list.
@@ -139,6 +139,17 @@ class Utility(commands.Cog):
         return True
      else:
         return False
+
+
+    def check_database_connection(self):
+        try:
+
+            db.command("ping")
+            return "Connected"
+        except Exception as e:
+            print(f"Error interacting with the database: {e}")
+            return "Not Connected"
+
 
     @commands.hybrid_command(aliases=["serverinfo"])
     async def server(self, ctx):
@@ -189,12 +200,14 @@ class Utility(commands.Cog):
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):
         server_name = ctx.guild.name
-        server_icon = ctx.guild.icon.url if ctx.guild.icon else None
+        server_icon = ctx.guild.icon
+        
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
-        
-        embed = discord.Embed(title="", description=f"* {discord_latency_message}\n* **Up Since:** <t:{int(self.client.launch_time.timestamp())}:f>", color=0x2b2d31)
+        database_status = self.check_database_connection()
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"**Latency:** {discord_latency_message}\n**Database** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
+        embed.set_thumbnail(url=ctx.guild.icon)
         await ctx.send(embed=embed)        
         
 
