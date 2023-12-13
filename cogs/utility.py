@@ -129,9 +129,6 @@ class Utility(commands.Cog):
         self.client.help_command = None
 
     async def modulecheck(self, ctx): 
-     filter = {
-        'guild_id': ctx.guild.id
-    }
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return True
@@ -201,11 +198,10 @@ class Utility(commands.Cog):
     async def ping(self, ctx):
         server_name = ctx.guild.name
         server_icon = ctx.guild.icon
-        
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"**Latency:** {discord_latency_message}\n**Database** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"**Latency:** {discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=ctx.guild.icon)
         await ctx.send(embed=embed)        
@@ -218,7 +214,7 @@ class Utility(commands.Cog):
      embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get information about different modules and commands."
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
      embed.add_field(name="**Command Prefix**", value="`/`")
-     embed.add_field(name="**Support Server**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.")     
+     embed.add_field(name="**Support Links**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.\n[**Read the documentation**](https://docs.astrobirb.dev) for some extra help.")     
      view = Help()
 
      await ctx.send(embed=embed, view=view)

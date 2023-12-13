@@ -24,7 +24,9 @@ class HelpdeskDropdown(discord.ui.Select):
         options = [
             discord.SelectOption(label='Whats the servers rules?', emoji='<:arrow:1166529434493386823>'),
             discord.SelectOption(label='What is Astro Birb?', emoji='<:arrow:1166529434493386823>'),
-            discord.SelectOption(label="How do I become staff here?", emoji="<:arrow:1166529434493386823>")
+            discord.SelectOption(label="How do I become staff here?", emoji="<:arrow:1166529434493386823>"),
+            discord.SelectOption(label="Wheres the documentation?", emoji="<:arrow:1166529434493386823>"),
+            discord.SelectOption(label="How do you setup the bot?", emoji="<:arrow:1166529434493386823>")
 
 
         
@@ -35,12 +37,18 @@ class HelpdeskDropdown(discord.ui.Select):
 
         selected = self.values[0] 
         if selected == 'What is Astro Birb?':
-            embed = discord.Embed(title="", description="## 🐦 What is Astro Birb?\n> Astro Birb is designed to simplify tasks related to managing punishments and staff. It includes features such as handling infractions, promotions, and monitoring message quotas.")
+            embed = discord.Embed(title="", description="## 🐦 What is Astro Birb?\n> Astro Birb is designed to simplify tasks related to managing punishments and staff. It includes features such as handling infractions, promotions, and monitoring message quotas.", color=discord.Color.dark_embed())
         elif selected == 'How do I become staff here?':
-            embed = discord.Embed(title="", description="## <:leaf:1160541147320553562> How do I become staff?\nCurrently support & QA is handpicked meaning you have to show your activity in the support server by either answering support forums or activily talking in the server.")
+            embed = discord.Embed(title="", description="## <:leaf:1160541147320553562> How do I become staff?\nCurrently support & QA is handpicked meaning you have to show your activity in the support server by either answering support forums or activily talking in the server.", color=discord.Color.dark_embed())
         elif selected == 'Whats the servers rules?':
-            embed = discord.Embed(title="", description=f"## 🌿 Community Guidelines\n* **Respectful Conduct.** Let's keep the atmosphere respectful and welcoming. Avoid spam, NSFW content, advertising, and political discussions. Help us maintain a community free from these topics in both general discussions and private messages.\n* **Maturity Matters.** When a healthy debate begins to escalate into an argument, consider taking a step back. Our team is here to assist, so please cooperate with their guidance. We're all striving for a positive environment.\n* **Mindful Conversations.** Join us in keeping conversations relevant to their respective channels and maintaining a high standard of quality. Engage in meaningful discussions that contribute positively to our volunteer-driven Discord community.\n\nYour adherence to these guidelines ensures that our community remains a friendly and enjoyable space for all members. Thank you for your cooperation! 🌿")
-        embed.color = discord.Color.dark_embed()    
+            embed = discord.Embed(title="", description=f"## 🌿 Community Guidelines\n* **Respectful Conduct.** Let's keep the atmosphere respectful and welcoming. Avoid spam, NSFW content, advertising, and political discussions. Help us maintain a community free from these topics in both general discussions and private messages.\n* **Maturity Matters.** When a healthy debate begins to escalate into an argument, consider taking a step back. Our team is here to assist, so please cooperate with their guidance. We're all striving for a positive environment.\n* **Mindful Conversations.** Join us in keeping conversations relevant to their respective channels and maintaining a high standard of quality. Engage in meaningful discussions that contribute positively to our volunteer-driven Discord community.\n\nYour adherence to these guidelines ensures that our community remains a friendly and enjoyable space for all members. Thank you for your cooperation! 🌿", color=discord.Color.dark_embed())
+        elif selected =='Wheres the documentation?':    
+            embed = discord.Embed(description="**https://docs.astrobirb.dev/**", color=discord.Color.dark_embed())
+        elif selected =='How do you setup the bot?':                
+            embed = discord.Embed(title="<:Help:1184535847513624586> Setup Instructions", description="**1)** Set the `Admin Roles` & `Staff Roles`.\n**2)** Select A Module\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)**Fill out the required data for that module.\n\n> **Any problems?** Head to <#1101807246079442944>!", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+        embed.color = discord.Color.dark_embed()
         await interaction.response.send_message(embed=embed, ephemeral=True)
             
 
@@ -79,7 +87,7 @@ class management(commands.Cog):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
         banner.set_image(url="https://cdn.discordapp.com/attachments/1176591593797582848/1176595220511588382/ASTRO.png?ex=656f70b0&is=655cfbb0&hm=b126ffe5b3f45209b51660e90bc96a819fcfaeabd4bae92bcc6e3127645779c6&")
 
-        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb & Quota! These bots are useful and productive for staff management & message quotas.")
+        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb! Here you can look for you inquirys. If you can't find what you need help head to <#1101807246079442944>!")
         main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
         main.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = Helpdesk()
