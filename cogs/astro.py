@@ -87,7 +87,7 @@ class management(commands.Cog):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
         banner.set_image(url="https://cdn.discordapp.com/attachments/1176591593797582848/1176595220511588382/ASTRO.png?ex=656f70b0&is=655cfbb0&hm=b126ffe5b3f45209b51660e90bc96a819fcfaeabd4bae92bcc6e3127645779c6&")
 
-        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="> Welcome to the support server for Astro Birb! Here you can look for you inquirys. If you can't find what you need help head to <#1101807246079442944>!")
+        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="Welcome to the support server for Astro Birb! Here, you can find answers to your inquiries. If you can't find what you need on the helpdesk, feel free to head to <#1101807246079442944> for further assistance!")
         main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
         main.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = Helpdesk()
