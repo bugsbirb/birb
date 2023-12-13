@@ -17,8 +17,97 @@ db = mongo['astro']
 badges = db['User Badges']
 modules = db['Modules']
 
+
+
+class SetupGuide(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Setup Guide", emoji="<:Help:1184535847513624586>"),
+            discord.SelectOption(label="Message Quota", emoji="<:Messages:1148610048151523339>"),
+            discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
+            discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
+            discord.SelectOption(label="Tags", emoji="<:tag:1162134250414415922>"),
+            discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
+            discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
+            discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>"),
+            discord.SelectOption(label="Staff Feedback", emoji="<:Rate:1162135093129785364>"),         
+            discord.SelectOption(label="Partnerships", emoji="<:Partner:1162135285031772300>"),   
+            discord.SelectOption(label="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"), 
+            discord.SelectOption(label="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
+        ]
+        super().__init__(placeholder="Setup Guides", options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)           
+        category = self.values[0]
+        if category == 'Basic Settings':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Basic Settings Instructions", description="**1)** Set the `Admin Roles` & `Staff Roles`.\n**2)** Select A Module\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4) **Fill out the required data for that module.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+        elif category =='Message Quota':    
+            embed = discord.Embed(title="<:Help:1184535847513624586> Message Quota Instructions", description="**1)** Run `/config` \n**2)** Select the `message quota` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)**Set the message quota amount.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+        elif category == 'Modmail':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Modmail Instructions", description="**1)** Run `/modmail config` \n**2)** Fill the `category` argurement this is the category where the modmail channels will be created.\n**3)** Now dm the bot and test it out.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)            
+        elif category == 'Forums':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Forums Instructions", description="**1)** Run `/forums config` \n**2)** Enable the module using the `Option` argurement. \n**3)** Create your desired embed using the categories or turn of the embed completely and just make it ping.\n**4)** Now test it go to your forum channel and create a forum and it'll send your embed/message", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
+        elif category == 'Tags':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Tags Instructions", description="**1)** Run /config \n**2)** Select the `Tags` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Run /tag create (make sure you have the `admin role`)", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)             
+        elif category == 'Infractions':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Infractions Instructions", description="**1)** Run `/config` \n**2)** Select the `Infractions` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Set the infractions channel.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                         
+        elif category == 'Promotions':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Promotions Instructions", description="**1)** Run `/config` \n**2)** Select the `Promotions` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Set the promotions channel.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                                              
+        elif category == 'LOA':
+            embed = discord.Embed(title="<:Help:1184535847513624586> LOAs Instructions", description="**1)** Run `/config` \n**2)** Select the `LOA` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Select the LOA channel.\n**5)** Set the loa role this will be the role given once someone is on LOA.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
+        elif category == 'Staff Feedback':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Staff Feedback Instructions", description="**1)** Run `/config` \n**2)** Select the `Staff Feedback` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Set the Staff Feedback channel.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)         
+        elif category == 'Partnerships':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Partnerships Instructions", description="**1)** Run `/config` \n**2)** Select the `Partnerships` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Set the Partnerships channel.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)            
+        elif category == 'Applications Results':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Applications Results Instructions", description="**1)** Run `/config` \n**2)** Select the `Partnerships` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Set the Partnerships channel.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+        elif category == 'Suspensions':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Suspensions Instructions", description="**1)** Run `/config` \n**2)** Select the `Suspensions` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                
+        await interaction.response.edit_message(embed=embed)
+
+
+
+
+
+
+
+
+
+
+
+
 class HelpMenu(discord.ui.Select):
-    def __init__(self):
+    def __init__(self, author):
+        self.author = author
         options = [
             discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
@@ -38,6 +127,10 @@ class HelpMenu(discord.ui.Select):
         super().__init__(placeholder="Help Categories", options=options)
 
     async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
         category = self.values[0]
         embed = discord.Embed(title="", description="", color=discord.Color.dark_embed())
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -49,7 +142,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Forums':
             embed.title = "Forums Utils Module"
             embed.description = "This module provides commands for managing forums within your server & on forum creation embeds."
-            embed.add_field(name="Commands", value="* /forums unlock\n* /forums lock\n* /forums archive\n * /forums config")
+            embed.add_field(name="Commands", value="* /forums unlock\n* /forums lock\n* /forums archive\n* /forums config")
         elif category == 'Tags':
             embed.title = "Tags Module"
             embed.description = "The Tags Module allows you to create, manage, and use custom text-based tags within your server. Tags are short snippets of text that can be easily retrieved and sent in chat. This module enhances communication and enables you to create quick responses or share information efficiently."
@@ -117,9 +210,11 @@ class HelpMenu(discord.ui.Select):
 
         await interaction.response.edit_message(embed=embed)
 class Help(discord.ui.View):
-    def __init__(self):
+    def __init__(self, author):
         super().__init__()
-        self.add_item(HelpMenu())
+        self.author = author
+        self.add_item(HelpMenu(self.author))
+        self.add_item(SetupGuide(self.author))
 
 
 class Utility(commands.Cog):
@@ -215,7 +310,7 @@ class Utility(commands.Cog):
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
      embed.add_field(name="**Command Prefix**", value="`/`")
      embed.add_field(name="**Support Links**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.\n[**Read the documentation**](https://docs.astrobirb.dev) for some extra help.")     
-     view = Help()
+     view = Help(ctx.author)
 
      await ctx.send(embed=embed, view=view)
 
