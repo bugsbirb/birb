@@ -23,7 +23,7 @@ class SetupGuide(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
-            discord.SelectOption(label="Setup Guide", emoji="<:Help:1184535847513624586>"),
+            discord.SelectOption(label="Basic Settings", emoji="<:Help:1184535847513624586>"),
             discord.SelectOption(label="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
