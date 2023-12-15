@@ -24,7 +24,7 @@ class privacy(commands.Cog):
         embed.add_field(name="Help", value="To prevent automatic deletion of data contact us in our [**Support Server**](https://discord.gg/Qsz6DyGMTB)")
         embed.add_field(name="Coming soon", value=f"Data management module")
         embed.set_thumbnail(url=self.client.user.avatar.url)
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed) 
     
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(privacy(client))             

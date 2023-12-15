@@ -296,7 +296,7 @@ class Utility(commands.Cog):
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"**Latency:** {discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=ctx.guild.icon)
         await ctx.send(embed=embed)        
