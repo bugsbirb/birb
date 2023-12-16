@@ -193,23 +193,9 @@ class quota(commands.Cog):
          return                    
         if await self.has_admin_role(ctx):
             
-            mccollection = db["messages"]
-            staff_data = scollection.find_one({'guild_id': ctx.guild.id})
-            staff_role_id = staff_data['staffrole']
-            staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_id)
-            staff_members = [member for member in ctx.guild.members if staff_role in member.roles]
-
-            for member in staff_members:
-                filter = {'guild_id': ctx.guild.id, 'user_id': member.id}
-                update = {'$set': {'message_count': 0}}
-                print("test")
-
-                try:
-                    mccollection.update_one(filter, update)
-                except Exception as e:
-                    print(f"Error resetting message count for {member.display_name}: {str(e)}")
-                    await ctx.send(f"An error occurred while resetting message counts for {member.display_name}.")
-            await ctx.send(f"**{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
+            mccollection = dbq["messages"]
+            mccollection.delete_many({'guild_id': ctx.guild.id})
+            await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
             try:
                 owner = ctx.guild.owner
                 await owner.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
