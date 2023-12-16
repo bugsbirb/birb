@@ -29,8 +29,10 @@ class suggestions(commands.Cog):
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Suggestions'] == True:   
+     elif modulesdata.get('Suggestions', False) == True: 
         return True
+     else:   
+        return False
 
 
     @commands.hybrid_command(description="Submit a suggestion for improvement")
