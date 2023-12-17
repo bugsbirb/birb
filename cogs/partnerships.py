@@ -255,38 +255,6 @@ class Partnerships(commands.Cog):
         await paginator.start(ctx, pages=embeds)
 
 
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        partnership_data = partnerships.find_one({'guild_id': member.guild.id, 'owner': member.id})
-        if partnership_data:
-            server = partnership_data['server']
-            invite = partnership_data['invite']            
-            data = partnershipsch.find_one({'guild_id': member.guild.id})
-            if data:
-                channel_id = data['channel_id']
-                channel = self.client.get_channel(channel_id)
-
-                if channel:
-
-                    fetched_invite = await self.client.fetch_invite(invite)
-                    guild_name = server if fetched_invite.guild is None or fetched_invite.guild.name is None else fetched_invite.guild.name
-                    guild_id = "Unknown" if fetched_invite.guild is None or fetched_invite.guild.id is None else fetched_invite.guild.id
-                    icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if fetched_invite.guild is None or fetched_invite.guild.icon is None else fetched_invite.guild.icon
-
-                    embed = discord.Embed(
-                                title="Partnership Termination",
-                                description=f"* **Owner:** {member.mention}\n"
-                                            f"* **Server:** {guild_name}\n"
-                                            f"* **Server ID:** {guild_id}\n"
-                                            f"* **Invite:** {fetched_invite.url}\n"
-                                            f"* **Reason:** Owner of **@{server}** left this server.",
-                                color=discord.Color.dark_embed()
-                            )
-                    embed.set_author(name=guild_name, icon_url=icon_url)
-                    embed.set_thumbnail(url=icon_url)
-
-                    await channel.send(embed=embed)
-
 
 
 async def setup(client: commands.Bot) -> None:
