@@ -8,7 +8,6 @@ from discord import app_commands
 import discord
 import datetime
 from discord.ext import commands, tasks
-sys.dont_write_bytecode = True
 from typing import Optional
 import Paginator
 import sentry_sdk
@@ -54,7 +53,7 @@ sentry_sdk.init(
 
 
 
-class client(commands.AutoShardedBot):
+class client(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
