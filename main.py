@@ -8,7 +8,7 @@ from discord import app_commands
 import discord
 import datetime
 from discord.ext import commands, tasks
-
+sys.dont_write_bytecode = True
 from typing import Optional
 import Paginator
 import sentry_sdk
