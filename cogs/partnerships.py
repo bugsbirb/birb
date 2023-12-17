@@ -97,6 +97,12 @@ class Partnerships(commands.Cog):
         if not await self.has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return      
+        try:
+         invite = await self.client.fetch_invite(url=invite)
+        except discord.NotFound:
+          await ctx.send(f"{no} {ctx.author.mention}, that invite is invalid.")
+          return
+
         data = partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
@@ -112,10 +118,14 @@ class Partnerships(commands.Cog):
             'server': server
         }
 
-          partnerships.insert_one(partnershipdata)
-          embed = discord.Embed(title=f"{(server).capitalize()}", description=f"* **Owner:** {owner.mention}\n* **Invite:** {invite}", color=discord.Color.dark_embed())
-          embed.set_author(name=f"Partnership logged by {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
-          embed.set_thumbnail(url=owner.display_avatar)
+          guild = invite.guild
+          guild_name = server if guild is None or guild.name is None else guild.name
+          guild_id = "Unknown" if guild is None or guild.id is None else guild.id
+          icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
+          invite = "Unknown" if guild is None or invite.url is None else invite.url
+          embed = discord.Embed(title=f"<:Partner:1162135285031772300> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
+          embed.set_author(name=guild_name, icon_url=icon_url)
+          embed.set_thumbnail(url=guild.icon.url)
           try:
            await channel.send(embed=embed)
           except discord.Forbidden: 
@@ -142,9 +152,10 @@ class Partnerships(commands.Cog):
         if partnership_data:
             server = partnership_data['server']
             ownerid = partnership_data['owner']
+            adminid = partnership_data['admin']
             invite = partnership_data['invite']            
             owner = ctx.guild.get_member(ownerid)
-
+            admin = ctx.guild.get_member(adminid)
         data = partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
@@ -152,10 +163,15 @@ class Partnerships(commands.Cog):
 
          if channel:
           await ctx.send(f"{tick} **Partnership** terminiated.")
-
-          embed = discord.Embed(title=f"{(server).capitalize()} Terminated", description=f"* **Owner:** {owner.mention}\n* **Invite:** {invite}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
-          embed.set_author(name=f"Partnership terminiated by {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
-          embed.set_thumbnail(url=owner.display_avatar)
+          invite = await self.client.fetch_invite(url=invite)
+          guild = invite.guild
+          guild_name = server if guild is None or guild.name is None else guild.name
+          guild_id = "Unknown" if guild is None or guild.id is None else guild.id
+          icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
+          invite = "Unknown" if guild is None or invite.url is None else invite.url
+          embed = discord.Embed(title=f"<:Partner:1162135285031772300> Partnership Terminated", description=f"\n**Logged By:** {admin.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}\n**Reason:** {reason}", color=discord.Color.dark_embed())
+          embed.set_author(name=guild_name, icon_url=icon_url)
+          embed.set_thumbnail(url=guild.icon.url)
           try:
            await channel.send(embed=embed)
           except discord.Forbidden: 
@@ -181,19 +197,40 @@ class Partnerships(commands.Cog):
         embeds = []
 
         for partnership in partnership_data:
-            server = partnership['server']
-            owner_id = partnership['owner']
-            invite = partnership['invite']
-            admin_id = partnership['admin']
-            admin = ctx.guild.get_member(admin_id)
-            owner = ctx.guild.get_member(owner_id)
-            
-            embed = discord.Embed(title="Active Partnerships", color=discord.Color.dark_embed())
-            embed.set_thumbnail(url=ctx.guild.icon)
-            embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-            embed.add_field(name=server, value=f"> **Invite:** {invite}\n> **Owner:** {owner.mention}\n> **Logged By:** {admin.display_name}")
+         server = partnership['server']
+         owner_id = partnership['owner']
+         invite = partnership['invite']
+         admin_id = partnership['admin']
+         admin = ctx.guild.get_member(admin_id)
+         owner = ctx.guild.get_member(owner_id)
 
-            embeds.append(embed)
+         try:
+            invite = await self.client.fetch_invite(url=invite)
+            guild = invite.guild  
+         except discord.NotFound:
+            invite = None
+            guild = None
+
+
+         guild_name = server if guild is None or guild.name is None else guild.name
+         guild_id = "Unknown" if guild is None or guild.id is None else guild.id
+         icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
+         admin_mention = "Unknown" if admin is None or admin.mention is None else admin.mention
+         owner_mention = "Unknown" if owner is None or owner.mention is None else owner.mention
+         embed = discord.Embed(
+            title=f"<:Partner:1162135285031772300> Partnership Logged",
+            description=f"\n**Logged By:** {admin_mention}\n"
+                        f"**Owner:** {owner_mention}\n"
+                        f"**Server:** {guild_name}\n"
+                        f"**Server ID:** {guild_id}\n"
+                        f"**Invite:** {invite if invite else 'Unknown'}",
+            color=discord.Color.dark_embed()
+        )
+         embed.set_author(name=guild_name, icon_url=icon_url)
+         embed.set_thumbnail(url=icon_url)
+         embeds.append(embed)
+
+
 
         if not embeds:
             await ctx.send(f"No active partnerships on this server.")
@@ -220,26 +257,35 @@ class Partnerships(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        partnership_data = partnerships.find_one({'guild_id': member.guild.id})
-
-        if partnership_data and partnership_data['owner'] == member.id:
-            partnerships.delete_one({'guild_id': member.guild.id, 'owner': member.id})
-            print(f"@{member.guild.name} partnership terminated")
+        partnership_data = partnerships.find_one({'guild_id': member.guild.id, 'owner': member.id})
+        if partnership_data:
             server = partnership_data['server']
-            adminid = partnership_data['admin']
             invite = partnership_data['invite']            
-            admin = member.guild.get_member(adminid)
             data = partnershipsch.find_one({'guild_id': member.guild.id})
             if data:
                 channel_id = data['channel_id']
                 channel = self.client.get_channel(channel_id)
-                print(f"@{member.guild.name} partnership channel found")
+
                 if channel:
-                    embed = discord.Embed(title="Partnership Termination", description=f"* **Owner:** {member.mention}\n* **Server:** {server}\n* **Invite:** {invite}\n* **Reason:** Owner of **@{server}** left this server.", color=discord.Color.dark_embed())
-                    embed.set_thumbnail(url=member.display_avatar)
-                    embed.set_author(name=f"{server}", icon_url=member.display_avatar)
+
+                    fetched_invite = await self.client.fetch_invite(invite)
+                    guild_name = server if fetched_invite.guild is None or fetched_invite.guild.name is None else fetched_invite.guild.name
+                    guild_id = "Unknown" if fetched_invite.guild is None or fetched_invite.guild.id is None else fetched_invite.guild.id
+                    icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if fetched_invite.guild is None or fetched_invite.guild.icon is None else fetched_invite.guild.icon
+
+                    embed = discord.Embed(
+                                title="Partnership Termination",
+                                description=f"* **Owner:** {member.mention}\n"
+                                            f"* **Server:** {guild_name}\n"
+                                            f"* **Server ID:** {guild_id}\n"
+                                            f"* **Invite:** {fetched_invite.url}\n"
+                                            f"* **Reason:** Owner of **@{server}** left this server.",
+                                color=discord.Color.dark_embed()
+                            )
+                    embed.set_author(name=guild_name, icon_url=icon_url)
+                    embed.set_thumbnail(url=icon_url)
+
                     await channel.send(embed=embed)
-                    print(f"@{member.guild.name} partnership revoke message sent")
 
 
 
