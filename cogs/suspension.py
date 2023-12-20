@@ -212,7 +212,7 @@ class Suspensions(commands.Cog):
     
 
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=10)
     async def check_suspensions(self):
      current_time = datetime.now()
      filter = {'end_time': {'$lte': current_time}, 'action': 'Suspension'}

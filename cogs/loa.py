@@ -134,7 +134,7 @@ class loamodule(commands.Cog):
           await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
 
       
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=10)
     async def check_loa_status(self):
      current_time = datetime.now()
 

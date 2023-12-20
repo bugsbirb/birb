@@ -96,7 +96,7 @@ class client(commands.Bot):
         print(prfx + " Slash CMDs Synced " + str(len(synced)) + " Commands")
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
         update_channel_name.start()
-        
+
         
 
 
@@ -243,6 +243,7 @@ class Welcome(discord.ui.View):
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
         embed.add_field(name="**Roles**", value=user_roles, inline=False)  
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 
 
