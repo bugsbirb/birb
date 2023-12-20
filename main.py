@@ -55,8 +55,7 @@ sentry_sdk.init(
 
 class client(commands.Bot):
     def __init__(self):
-        intents = discord.Intents.default()
-        intents.members = True
+        intents = intents.members = True
         super().__init__(command_prefix=commands.when_mentioned_or(PREFIX), intents=intents)
         self.client = client
         self.cogslist = ["cogs.suggestions", "cogs.stafflist", "cogs.applicationresults", "cogs.ConfigurationFolder.Configuration2", "cogs.quota", "cogs.consent", "cogs.suspension", "cogs.adminpanel","cogs.partnerships","cogs.stafffeedback","cogs.loa", "cogs.astro", "cogs.modmail", "cogs.forumutils", "cogs.tags" ,"cogs.botinfo", "cogs.infractions", "cogs.utility", "cogs.reports",  "cogs.promotions"]
@@ -104,9 +103,11 @@ class client(commands.Bot):
     
     async def on_connect(self):
         activity2 = discord.CustomActivity(name=f"{STATUS}")
-
-        print("Connected to Discord Gateway!")
-        await self.change_presence(activity=activity2)
+        if STATUS:
+            await self.change_presence(activity=activity2)
+        else:
+            print("STATUS not defined in .env, bot will not set a custom status.")    
+        
 
     async def on_disconnect(self):
         print("Disconnected from Discord Gateway!")
@@ -245,28 +246,7 @@ class Welcome(discord.ui.View):
 
 
 
-@client.event
-async def on_message(message):
-    if message.author.bot:
-        return
-    staff_data = scollection.find_one({'guild_id': message.guild.id})
-    if staff_data is None:
-        return
-
-    if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        if not isinstance(staff_role_ids, list):
-         staff_role_ids = [staff_role_ids]
-        if any(role_id in staff_role_ids for role_id in [role.id for role in message.author.roles]):
-            guild_id = message.guild.id
-            author_id = message.author.id
-
-            mccollection.update_one(
-                {'guild_id': guild_id, 'user_id': author_id},
-                {'$inc': {'message_count': 1}},
-                upsert=True
-            )
-    await client.process_commands(message)            
+       
 
 
 
