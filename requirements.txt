@@ -6,3 +6,4 @@ requests
 pymongo
 python-dotenv
 sentry_sdk
+motor
