@@ -67,6 +67,7 @@ class client(commands.Bot):
         'Cogs.Configuration.Configuration',
         'Cogs.Events.AstroSupport.aon_thread_create',
         'Cogs.Events.AstroSupport.guilds',
+        'Cogs.Events.AstroSupport.webhookguilds',        
         'Cogs.Events.AstroSupport.welcome',
         'Cogs.Events.messagevent',
         'Cogs.Events.modmailevent',
