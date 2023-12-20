@@ -14,7 +14,7 @@ import os
 from dotenv import load_dotenv
 
 
-class GuildJoins(commands.Cog):
+class webGuildJoins(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -40,4 +40,4 @@ class GuildJoins(commands.Cog):
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(GuildJoins(client))   
+    await client.add_cog(webGuildJoins(client))   
