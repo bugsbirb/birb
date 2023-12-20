@@ -156,6 +156,7 @@ class quota(commands.Cog):
 
     @staff.command(name="manage", description="Manage your staffs messages.")    
     async def manage(self, ctx, staff: discord.Member):
+
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
@@ -187,6 +188,8 @@ class quota(commands.Cog):
 
     @leader.command(name="reset", description="Reset the message quota leaderboard")
     async def reset_staff_message_counts(self, ctx):
+
+
         await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
@@ -206,6 +209,7 @@ class quota(commands.Cog):
 
     @staff.command(name="messages", description="Display the amount the message count of a staff member.")
     async def messages(self, ctx, staff: discord.Member):
+
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
@@ -232,6 +236,7 @@ class quota(commands.Cog):
 
     @staff.command(description="View the staff message leaderboard to see if anyone has passed their quota")
     async def leaderboard(self, ctx):
+
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    

@@ -19,7 +19,7 @@ from jishaku import Jishaku
 import jishaku
 from cogs.astro import * 
 from cogs.suggestions import *
-
+from motor.motor_asyncio import AsyncIOMotorClient
 load_dotenv()
 PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
@@ -27,7 +27,7 @@ STATUS = os.getenv('STATUS')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
 #quota
-mongo = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+mongo = AsyncIOMotorClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 
 
 db2 = mongo['quotab']
@@ -35,7 +35,7 @@ scollection2 = db2['staffrole']
 mccollection = db2["messages"]
 
 MONGO_URL = os.getenv('MONGO_URL')
-astro = MongoClient(MONGO_URL)
+astro = AsyncIOMotorClient(MONGO_URL)
 db = astro['astro']
 modules = db['Modules']
 
@@ -245,9 +245,31 @@ class Welcome(discord.ui.View):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
 
+    staff_data = await scollection2.find_one({'guild_id': message.guild.id})
+    if staff_data is None:
+        return
 
+    if 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        if not isinstance(staff_role_ids, list):
+            staff_role_ids = [staff_role_ids]
 
+        if any(role.id in staff_role_ids for role in message.author.roles):
+            guild_id = message.guild.id
+            author_id = message.author.id
+
+            await mccollection.update_one(
+                {'guild_id': guild_id, 'user_id': author_id},
+                {'$inc': {'message_count': 1}},
+                upsert=True
+            )
+
+    await client.process_commands(message)
 
 
 
