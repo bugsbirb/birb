@@ -146,7 +146,7 @@ class loamodule(commands.Cog):
         end_time = request['end_time']
         user_id = request['user']
         guild_id = request['guild_id']
-        guild = await self.client.fetch_guild(guild_id)
+        guild = self.client.get_guild(guild_id)
         user = await self.client.fetch_user(user_id)
         active = request['active']
 
