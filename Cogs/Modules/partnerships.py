@@ -201,8 +201,8 @@ class Partnerships(commands.Cog):
          owner_id = partnership['owner']
          invite = partnership['invite']
          admin_id = partnership['admin']
-         admin = await ctx.guild.fetch_user(admin_id)
-         owner = await ctx.guild.fetch_user(owner_id)
+         admin = await self.client.fetch_user(admin_id)
+         owner = await self.client.fetch_user(owner_id)
 
          try:
             invite = await self.client.fetch_invite(url=invite)
