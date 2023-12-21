@@ -250,7 +250,6 @@ class DemotionReason(discord.ui.Modal, title='Reason'):
          channel = interaction.guild.get_channel(channel_id)
 
          if channel:
-            view = AppealButtonView(interaction.guild.id, random_string, "Demotion", self.Reason) if appeal_enabled else None
             try:
                  await self.user.remove_roles(role)
             except discord.Forbidden:
@@ -266,7 +265,7 @@ class DemotionReason(discord.ui.Modal, title='Reason'):
             await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've demoted **@{self.user.display_name}**", embed=None, view=Return(self.user, self.guild, self.author))
             collection.insert_one(infract_data)
             try:
-                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=view)
+                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed)
             except discord.Forbidden:
                 pass
         else:
@@ -457,7 +456,7 @@ class Reason(discord.ui.Modal, title='Reason'):
          channel = interaction.guild.get_channel(channel_id)
 
          if channel:
-            view = AppealButtonView(interaction.guild.id, random_string, self.option, self.Reason) if appeal_enabled else None
+
             
             
             try:
@@ -469,7 +468,7 @@ class Reason(discord.ui.Modal, title='Reason'):
             collection.insert_one(infract_data)
             if consent_data['infractionalert'] == "Enabled":
              try:
-                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=view)
+                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed)
              except discord.Forbidden:
                 pass
             else:
@@ -593,7 +592,7 @@ class AdminPanelCog(commands.Cog):
         embed = discord.Embed(title=f"Admin Panel - {staff.name}", description=f"**Mention:** {staff.mention}\n**ID:** *{staff.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
         embed.add_field(name="<:data:1166529224094523422> Staff Data", value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}")
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
-        embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
+        embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1187454549099806811/1154092651193323661.png?ex=6596f23a&is=65847d3a&hm=289bd45a9c6779853b2a78d7848636433e8aa63173781aec51447c25f8a06453&=")
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = AdminPanel(staff, ctx.guild, ctx.author)
@@ -713,9 +712,13 @@ class AdminPanel(discord.ui.View):
         
         for infraction_info in infraction_list:
             management = interaction.guild.get_member(infraction_info['management'])
+            if management is None:
+               management = "Left Guild"
+            else:
+               management = management.mention
             embed.add_field(
             name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
             inline=False
             )
         view = RevokeInfraction(self.user, interaction.guild, self.author)

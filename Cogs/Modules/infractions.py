@@ -29,35 +29,7 @@ modules = db['Modules']
 
 
 
-class AppealButtonView(discord.ui.View):
-    def __init__(self, guild_id, random_string, action, reason):
-        super().__init__(timeout=None)
-        self.guild_id = guild_id
-        self.random_string = random_string
-        self.action = action
-        self.reason = reason
 
-    @discord.ui.button(label='Appeal', style=discord.ButtonStyle.grey, custom_id='persistent:appealing')
-    async def appealing(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(BanAppeal(self.guild_id, self.random_string, self.action, self.reason))
-        
-
-class AcceptOrdeny(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.Accepted = False
-        self.Denied = False
-    @discord.ui.button(label='Accept', style=discord.ButtonStyle.grey, custom_id='persistent:Accept')
-    async def Accept(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f"{tick} Appeal **`Accepted`** by **{interaction.user.display_name}**", view=None)
-        self.Accepted = True        
-        self.stop()
-
-    @discord.ui.button(label='Deny', style=discord.ButtonStyle.grey, custom_id='persistent:Deny')
-    async def Deny(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f"{no} Appeal **`Denied`** by **{interaction.user.display_name}**", view=None)        
-        self.Denied = True
-        self.stop()
 class Infractions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -151,9 +123,7 @@ class Infractions(commands.Cog):
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
 
-         if channel:
-            view = AppealButtonView(ctx.guild.id, random_string, action, reason) if appeal_enabled else None
-            
+         if channel:      
             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
             try:
              await channel.send(f"{staff.mention}", embed=embed)
@@ -217,7 +187,7 @@ class Infractions(commands.Cog):
      embed.set_thumbnail(url=staff.display_avatar)
      embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)
      for infraction_info in infraction_list:
-        management = self.client.get_user(infraction_info['management'])        
+        management = await self.client.fetch_user(infraction_info['management'])        
         embed.add_field(
             name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
             value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
@@ -256,86 +226,6 @@ class Infractions(commands.Cog):
      
 
 
-class BanAppeal(discord.ui.Modal, title='Infraction Appeal'):
-    def __init__(self, guild_id, random_string, action, reason):
-        super().__init__()
-        self.guild_id = guild_id
-        self.random_string = random_string
-        self.action = action
-        self.reason = reason
-
-
-    Why1 = discord.ui.TextInput(
-        label='Why were you infracted?',
-        placeholder='',
-    )
-    Why2 = discord.ui.TextInput(
-        label='Why should your infraction get revoked??',
-        placeholder='',
-    )
-
-    async def on_submit(self, interaction: discord.Interaction):
-        guild = interaction.client.get_guild(self.guild_id)
-        guild_id = self.guild_id
-        data = appealschannel.find_one({'guild_id': guild_id})
-
-        if data:
-                channel_id = data['channel_id']
-                channel = interaction.client.get_channel(channel_id)
-
-                if channel:
-                    embed = discord.Embed(
-                        title="Infraction Appeal Submission",
-                        description=f"**Why were you infracted?**\n{self.Why1.value}\n\n**Why should you be uninfracted?**\n{self.Why2.value}",
-                        color=0x2b2d31
-                    )
-                    embed.add_field(
-            name=f"Infraction ID: {self.random_string}",
-            value=f"* **Action:** {self.action}\n* **Reason:** {self.reason}",
-            inline=False
-        )                    
-                    embed.set_author(name=interaction.user.name, icon_url=interaction.user.display_avatar)     
-                    response_embed2 = discord.Embed(
-                        title="Success!",
-                        description="Your infraction appeal has been submitted successfully.",
-                        color=0x2b2d31
-                    )
-                    response_embed2.set_author(name=guild.name, icon_url=guild.icon)
-
-                    await interaction.response.send_message(embed=response_embed2)   
-                    print(f"Infraction Appeal at {guild.name}")
-                    view = AcceptOrdeny()
-                    await channel.send(embed=embed, view=view)
-                    await view.wait()
-           
-                    if view.Accepted:
-                     collection.delete_one({'random_string': self.random_string})
-                     embed = discord.Embed(
-                        title="Infraction Appeal Update",
-                        description=f"{tick} Your appeal has been **accepted!**",
-
-                        color=discord.Color.dark_embed())
-                     print(f"Infraction Appeal Accepted at {guild.name}")
-                    
-                     embed.set_author(name=guild.name, icon_url=guild.icon)
-                     await interaction.user.send(embed=embed)                      
-
-                    elif view.Denied:
-                     embed = discord.Embed(
-                        title="Infraction Appeal Update",
-                        description=f"{no} Your appeal has been **denied.**",
-                        color=discord.Color.dark_embed())
-                     embed.set_author(name=guild.name, icon_url=guild.icon)                    
-                     print(f"Infraction Appeal Denied at {guild.name}")                     
-                     await interaction.user.send(embed=embed)  
-
-
-                              
-
-                else:
-                    await interaction.response.send_message("The appeal channel does not exist or the bot does not have access to it.")
-
-       
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Infractions(client))       

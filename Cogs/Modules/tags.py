@@ -157,7 +157,7 @@ class Tags(commands.Cog):
         if tag_data:
             created_by = tag_data['management']
             context = tag_data['content']
-            manager = self.client.get_user(created_by)
+            manager = await self.client.fetch_user(created_by)
 
             embed = discord.Embed(title=f"{name} Information", description=f"* **Created By:** {manager.mention}\n* **Content:** {context}", color=discord.Color.dark_embed())
             embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)

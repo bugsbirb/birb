@@ -146,8 +146,8 @@ class loamodule(commands.Cog):
         end_time = request['end_time']
         user_id = request['user']
         guild_id = request['guild_id']
-        guild = self.client.get_guild(guild_id)
-        user = self.client.get_user(user_id)
+        guild = await self.client.fetch_guild(guild_id)
+        user = await self.client.fetch_user(user_id)
         active = request['active']
 
         if active == True:
@@ -163,7 +163,7 @@ class loamodule(commands.Cog):
                  if loarole:
                   role = discord.utils.get(guild.roles, id=loarole)
                   if role:
-                   member = guild.get_member(user.id)
+                   member = await guild.fetch_user(user.id)
                    await member.remove_roles(role)       
         else:
             pass
@@ -203,7 +203,7 @@ class loamodule(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(icon_url=ctx.guild.icon , name=ctx.guild.name)
         for request in loa_requests:
-            user = self.client.get_user(request['user'])
+            user = await self.client.fetch_user(request['user'])
             start_time = request['start_time']
             end_time = request['end_time']
             reason = request['reason']

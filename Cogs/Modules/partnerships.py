@@ -154,8 +154,8 @@ class Partnerships(commands.Cog):
             ownerid = partnership_data['owner']
             adminid = partnership_data['admin']
             invite = partnership_data['invite']            
-            owner = ctx.guild.get_member(ownerid)
-            admin = ctx.guild.get_member(adminid)
+            owner = ctx.guild.fetch_user(ownerid)
+            admin = ctx.guild.fetch_user(adminid)
         data = partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
@@ -201,8 +201,8 @@ class Partnerships(commands.Cog):
          owner_id = partnership['owner']
          invite = partnership['invite']
          admin_id = partnership['admin']
-         admin = ctx.guild.get_member(admin_id)
-         owner = ctx.guild.get_member(owner_id)
+         admin = await ctx.guild.fetch_user(admin_id)
+         owner = await ctx.guild.fetch_user(owner_id)
 
          try:
             invite = await self.client.fetch_invite(url=invite)
