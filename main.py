@@ -50,6 +50,7 @@ class client(commands.Bot):
         'Cogs.Modules.suggestions',
         'Cogs.Modules.loa',    
         'Cogs.Modules.utility',
+        'Cogs.Modules.botinfo',
         'Cogs.Modules.tags',
         'Cogs.Modules.suspension',
         'Cogs.Modules.stafflist',
