@@ -177,7 +177,7 @@ class HelpMenu(discord.ui.Select):
             embed.add_field(name="Commands", value="* /staff feedback\n* /staff rating")                
         elif category == 'Partnerships':
             embed.title = "Partnerships Module"
-            embed.description = "Log partnerships, terminate partnerships, and view partnerships. This is helpful for servers with partnership requirements that mandate partner owners to remain in the server."
+            embed.description = "Log partnerships, terminate partnerships, and view partnerships."
             embed.add_field(name="Commands", value="* /partnership log\n* /partnership all\n* /partnership terminate")               
         elif category == 'Message Quota':
             embed.title = "Message Quota Module"

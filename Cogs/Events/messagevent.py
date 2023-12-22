@@ -11,7 +11,7 @@ STATUS = os.getenv('STATUS')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
 #quota
-mongo = AsyncIOMotorClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+mongo = AsyncIOMotorClient(MONGO_URL)
 
 
 db2 = mongo['quotab']

@@ -11,9 +11,10 @@ from pymongo import MongoClient
 import Paginator
 from emojis import *
 import os
-mongo = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
-
 MONGO_URL = os.getenv('MONGO_URL')
+mongo = MongoClient(MONGO_URL)
+
+
 client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
