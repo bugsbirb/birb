@@ -82,7 +82,7 @@ class Modmail(commands.Cog):
 
             if user_id and selected_server_id:
                 selected_server = discord.utils.get(self.client.guilds, id=selected_server_id)
-                user = self.client.fetch_user(user_id)
+                user = await self.client.fetch_user(user_id)
 
                 if selected_server and user:
                     embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```")
