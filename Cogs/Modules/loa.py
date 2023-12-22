@@ -163,7 +163,7 @@ class loamodule(commands.Cog):
                  if loarole:
                   role = discord.utils.get(guild.roles, id=loarole)
                   if role:
-                   member = await guild.fetch_user(user.id)
+                   member = await self.client.fetch_user(user.id)
                    await member.remove_roles(role)       
         else:
             pass
