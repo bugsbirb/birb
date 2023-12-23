@@ -1,5 +1,4 @@
 import discord
-
 import platform
 import sys
 sys.dont_write_bytecode = True
@@ -23,21 +22,24 @@ from Cogs.Modules.astro import *
 from Cogs.Modules.suggestions import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
+import axiom
 load_dotenv()
+axiomkey = os.getenv('AXIOM_KEY')
+axiomorg = os.getenv('AXIOM_ORG')
 PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
 STATUS = os.getenv('STATUS')
 MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
+axiomcl = axiom.Client(axiomkey, axiomorg)
 
+#sentry_sdk.init(
+#    dsn=SENTRY_URL,
 
-sentry_sdk.init(
-    dsn=SENTRY_URL,
+#    traces_sample_rate=1.0,
 
-    traces_sample_rate=1.0,
-
-    profiles_sample_rate=1.0,
-)
+#    profiles_sample_rate=1.0,
+#)
 
 class client(commands.Bot):
     def __init__(self):
@@ -82,6 +84,12 @@ class client(commands.Bot):
         await self.wait_until_ready()
         await self.load_extension('jishaku')        
         print("Jishaku Loaded")
+        axiomcl.ingest_events(
+            dataset="logs",
+            events=[
+                {"type": "log", "event": f"Loaded Jishaku"},
+            ])
+        print("Sent 1 event to Axiom")
 
 
     async def setup_hook(self):
@@ -94,6 +102,12 @@ class client(commands.Bot):
         for ext in self.cogslist:
             await self.load_extension(ext)
             print(f"{ext} loaded")
+            axiomcl.ingest_events(
+                dataset="logs",
+                events=[
+                    {"type": "log", "event": f"Loaded cog {ext}"},
+                ])
+            print("Sent 1 event to Axiom")
 
 
     async def on_ready(self):
@@ -105,14 +119,37 @@ class client(commands.Bot):
         synced = await self.tree.sync()
         print(prfx + " Slash CMDs Synced " + str(len(synced)) + " Commands")
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
+        axiomcl.ingest_events(
+            dataset="logs",
+            events=[
+                {"type": "log", "event": "Logged in as: " + self.user.name},
+                {"type": "log", "event": "User ID: " + str(self.user.id)},
+                {"type": "log", "event": "Discord Version: " + discord.__version__},
+                {"type": "log", "event": "Python Version: " + str(platform.python_version())},
+                {"type": "log", "event": "Synced " + str(len(synced)) + " commands."},
+                {"type": "log", "event": "Found " + str(len(self.guilds)) + " servers."},
+                    ])
+        print("Sent 6 events to Axiom")
         update_channel_name.start()
 
     async def on_connect(self):
         activity2 = discord.CustomActivity(name=f"{STATUS}")
         if STATUS:
             await self.change_presence(activity=activity2)
+            axiomcl.ingest_events(
+                dataset="logs",
+                events=[
+                    {"type": "log", "event": f"Set status to {STATUS}"},
+                ])
+            print("Sent 1 event to Axiom")
         else:
-            print("STATUS not defined in .env, bot will not set a custom status.")    
+            print("STATUS not defined in .env, bot will not set a custom status.")
+            axiomcl.ingest_events(
+                dataset="logs",
+                events=[
+                    {"type": "warn", "event": f"No status defined in .env."},
+                ])
+            print("Sent 1 event to Axiom")
         
 
     async def on_disconnect(self):
@@ -140,8 +177,26 @@ async def update_channel_name():
     channel = client.get_channel(channel_id)
     if channel:
         await channel.edit(name=f'{guild_count} Guilds | {len(client.users)} Users')
+        axiomcl.ingest_events(
+            dataset="logs",
+            events=[
+                {"type": "log","event": f"Found {guild_count} guilds and {len(client.users)} Users."},
+            ])
+        print("Sent 1 event to Axiom")
     else:
         print(f'Channel with ID {channel_id} not found.')
+        axiomcl.ingest_events(
+            dataset="logs",
+            events=[
+                {"type": "warn","event": f"Could not find {channel_id} when starting."},
+            ])
+        print("Sent 1 event to Axiom")
 
 
-client.run(TOKEN)    
+axiomcl.ingest_events(
+    dataset="logs",
+    events=[
+        {"type": "log", "event": "Starting client"},
+    ])
+print("Sent 1 event to Axiom")
+client.run(TOKEN)
