@@ -25,28 +25,23 @@ class ConnectionRolesEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        added_roles = set(after.roles) - set(before.roles)
-        removed_roles = set(before.roles) - set(after.roles)
+     added_roles = set(after.roles) - set(before.roles)
+     removed_roles = set(before.roles) - set(after.roles)
 
+     for role in added_roles:
+        parent_roles_data = await connectionroles.find({"parent": role.id}).to_list(length=1000)
+        for parent_role_data in parent_roles_data:
+            child_role_id = parent_role_data["child"]
+            child_role = after.guild.get_role(child_role_id)
+            if child_role:
+                await after.add_roles(child_role)
 
-        for role in added_roles:
-            parent_role_data = await connectionroles.find_one({"parent": role.id})
-            if parent_role_data:
-                child_role_id = parent_role_data["child"]
-                
-                child_role = after.guild.get_role(child_role_id)
-                if child_role:
-                    await after.add_roles(child_role)
-
-
-        for role in removed_roles:
-            parent_role_data = await connectionroles.find_one({"parent": role.id})
-            if parent_role_data:
-                child_role_id = parent_role_data["child"]
-                
-                child_role = after.guild.get_role(child_role_id)
-                if child_role:
-                    await after.remove_roles(child_role)
-
+     for role in removed_roles:
+        parent_roles_data = await connectionroles.find({"parent": role.id}).to_list(length=1000)
+        for parent_role_data in parent_roles_data:
+            child_role_id = parent_role_data["child"]
+            child_role = after.guild.get_role(child_role_id)
+            if child_role:
+                await after.remove_roles(child_role)
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConnectionRolesEvent(client))   

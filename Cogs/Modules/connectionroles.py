@@ -38,7 +38,6 @@ class ConnectionRoles(commands.Cog):
 
     async def modulecheck(self, ctx): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
-     print(f"modulesdata: {modulesdata}")
 
      if modulesdata is None:
         return False
@@ -47,7 +46,7 @@ class ConnectionRoles(commands.Cog):
      else:   
         return False
 
-    async def roles_name_autocompletion(
+    async def tag_name_autocompletion(
         self,
         interaction: discord.Interaction,
         current: str
@@ -56,14 +55,13 @@ class ConnectionRoles(commands.Cog):
             'guild_id': interaction.guild_id 
         }
 
-        tag_names = await connectionroles.distinct("name", filter)
+        tag_names = connectionroles.distinct("name", filter)
 
         filtered_names = [name for name in tag_names if current.lower() in name.lower()]
 
         choices = [app_commands.Choice(name=name, value=name) for name in filtered_names]
 
         return choices
-
 
     @connectionrole.command(name="add", description="Add a connection role to your server")
     @commands.has_guild_permissions(manage_roles=True)
@@ -82,7 +80,7 @@ class ConnectionRoles(commands.Cog):
 
 
     @connectionrole.command(name="remove", description="Remove a connection role from your server")
-    @app_commands.autocomplete(name=roles_name_autocompletion)
+    @app_commands.autocomplete(name=tag_name_autocompletion)
     @commands.has_guild_permissions(manage_roles=True)
     @app_commands.describe(name="The name of the connection role")
     async def connectionrole_remove(self, ctx, name):
@@ -94,7 +92,7 @@ class ConnectionRoles(commands.Cog):
             await ctx.send(f"{no} **{ctx.author.display_name}**, The connection role does not exist.")
             return
         
-        await connectionroles.delete_one({
+        await connectionroles.delete_many({
             "guild": ctx.guild.id,
             "name": name
         })
@@ -121,7 +119,7 @@ class ConnectionRoles(commands.Cog):
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
 
         for role in roleresult:
-            embed.add_field(name=f"{role['name']}", value=f"**Parent:** <@&{role['parent']}>\n**Child:** <@&{role['child']}>", inline=True)
+            embed.add_field(name=f"{role['name']}", value=f"**Parent:** <@&{role['parent']}>\n**Child:** <@&{role['child']}>", inline=False)
 
 
         await ctx.send(embed=embed)
