@@ -73,6 +73,8 @@ class client(commands.Bot):
         'Cogs.Events.messagevent',
         'Cogs.Events.modmailevent',
         'Cogs.Events.on_thread_create',
+        'Cogs.Events.connectionrolesevent',
+        'Cogs.Modules.connectionroles'
         
         ]
 

@@ -55,6 +55,9 @@ from Cogs.Configuration.Views.stafflist import ToggleList
 from Cogs.Configuration.Views.suggestionview import SuggestionsChannel
 from Cogs.Configuration.Views.suggestionview import ToggleSuggestions
 
+from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
+
+
 quota = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 dbq = quota['quotab']
 message_quota_collection = dbq["message_quota"]
@@ -150,6 +153,7 @@ class Config(discord.ui.Select):
             discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
             discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
+            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
             discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),            
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
@@ -433,6 +437,18 @@ class Config(discord.ui.Select):
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = ListModule(self.author)
 
+        elif color == 'Connection Roles':         # 
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            modulemsg = "True"
+            if moduleddata:
+                modulemsg = moduleddata.get('Connection', 'False')
+            else:
+                modulemsg = 'False'        
+            embed = discord.Embed(title="<:Role:1162074735803387944> Connection Roles Module", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
+            view = ConnectionsModule(self.author)
+
 
         elif color == 'Suggestions':    # Suggestions
             suschannelresult = suggestschannel.find_one({'guild_id': interaction.guild.id})
@@ -562,6 +578,12 @@ class ListModule(discord.ui.View):
         self.add_item(ToggleList(author))         
         self.add_item(Config(author)) 
 
+class ConnectionsModule(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(ToggleConnectionRoles(author))         
+        self.add_item(Config(author)) 
+
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -573,8 +595,8 @@ class ConfigCog(commands.Cog):
         adminroleresult = arole.find_one({'guild_id': ctx.guild.id})
         modulesdata = modules.find_one({'guild_id': ctx.guild.id})
         if modulesdata is None:
-            modulesdata = {'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False}
-            modules.insert_one({'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False})
+            modulesdata = {'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False, 'Connection': False  }
+            modules.insert_one({'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False, 'Connection': False  })
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         if adminroleresult:
