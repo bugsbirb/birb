@@ -34,6 +34,8 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
+ReportModeratorRole = db['Report Moderator Role']
+
 class ReportChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Report Channel')
@@ -68,6 +70,39 @@ class ReportChannel(discord.ui.ChannelSelect):
             print(f"An error occurred: {str(e)}")
 
         print(f"Channel ID: {channelid.id}")        
+
+class ReportsModeratorRole(discord.ui.RoleSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Reports Moderator')
+        self.author = author
+        
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_id = self.values[0]
+
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+        data = {
+            'guild_id': interaction.guild.id, 
+            'staffrole': selected_role_id.id  
+        }
+        try:
+            existing_record = ReportModeratorRole.find_one(filter)
+
+            if existing_record:
+                ReportModeratorRole.update_one(filter, {'$set': data})
+            else:
+                ReportModeratorRole.insert_one(data)
+
+            await interaction.response.edit_message( content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"selected_role_id: {selected_role_id.id}")
 
 class ToggleReportsDropdown(discord.ui.Select):
     def __init__(self, author):

@@ -45,6 +45,7 @@ from Cogs.Configuration.Views.forumsview import ToggleForums
 
 from Cogs.Configuration.Views.reportview import ReportChannel
 from Cogs.Configuration.Views.reportview import ToggleReportsDropdown
+from Cogs.Configuration.Views.reportview import ReportsModeratorRole
 
 from Cogs.Configuration.Views.applicationsview import ApplicationChannel
 from Cogs.Configuration.Views.applicationsview import ApplicationsRoles
@@ -84,7 +85,7 @@ modules = db['Modules']
 
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
-
+ReportModeratorRole = db['Report Moderator Role']
 mongo2 = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 db2 = mongo2['quotab']
 scollection2 = db2['staffrole']
@@ -368,9 +369,11 @@ class Config(discord.ui.Select):
 
         elif color == 'Reports':    #Reports
             partnershipchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})
+            reportsmoderatorresult = ReportModeratorRole.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             partnershipchannelmsg = "Not Configured"
+            reprolemsg = "Not Configured"
             if moduleddata:
                 modulemsg = f"{moduleddata['Reports']}"
             if partnershipchannelresult:    
@@ -379,8 +382,16 @@ class Config(discord.ui.Select):
                 if channel is None:
                  partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
-                 partnershipchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Reports Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
+                 partnershipchannelmsg = channel.mention    
+
+            if reportsmoderatorresult:    
+                roleid = reportsmoderatorresult['staffrole']
+                role = discord.utils.get(interaction.guild.roles, id=roleid)
+                if role is None:
+                 reprolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                else: 
+                 reprolemsg = f"{role.mention}"
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Reports Channel:** {partnershipchannelmsg}\n**Reports Moderator Role:** {reprolemsg}", color=discord.Color.dark_embed())
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -561,6 +572,7 @@ class ReportsModule(discord.ui.View):
     def __init__(self, author):
         super().__init__()
         self.add_item(ReportChannel(author))         
+        self.add_item(ReportsModeratorRole(author))
         self.add_item(ToggleReportsDropdown(author))                          
         self.add_item(Config(author)) 
 

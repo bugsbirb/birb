@@ -20,6 +20,8 @@ from dotenv import load_dotenv
 from jishaku import Jishaku
 import jishaku
 from Cogs.Modules.astro import * 
+from Cogs.Modules.reports import ReportPanel
+from Cogs.Modules.reports import ActionsPanel
 from Cogs.Modules.suggestions import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
@@ -90,6 +92,7 @@ class client(commands.Bot):
         self.loop.create_task(self.load_jishaku()) 
         self.add_view(Helpdesk())
         self.add_view(SuggestionView())
+        self.add_view(ReportPanel())
 
 
 
