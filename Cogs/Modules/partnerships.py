@@ -119,7 +119,7 @@ class Partnerships(commands.Cog):
         }
 
           guild = invite.guild
-          guild_name = server if guild is None or guild.name is None else guild.name
+          guild_name = server
           guild_id = "Unknown" if guild is None or guild.id is None else guild.id
           icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
           invite = "Unknown" if guild is None or invite.url is None else invite.url
@@ -212,7 +212,7 @@ class Partnerships(commands.Cog):
             guild = None
 
 
-         guild_name = server if guild is None or guild.name is None else guild.name
+         guild_name = server
          guild_id = "Unknown" if guild is None or guild.id is None else guild.id
          icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
          admin_mention = "Unknown" if admin is None or admin.mention is None else admin.mention

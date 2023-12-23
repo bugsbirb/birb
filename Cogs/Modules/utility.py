@@ -28,6 +28,7 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", emoji="<:tag:1162134250414415922>"),
+            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>"),
@@ -91,7 +92,13 @@ class SetupGuide(discord.ui.Select):
         elif category == 'Suspensions':
             embed = discord.Embed(title="<:Help:1184535847513624586> Suspensions Instructions", description="**1)** Run `/config` \n**2)** Select the `Suspensions` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+        elif category == 'Connection Roles':
+            embed = discord.Embed(title="<:Help:1184535847513624586> Connection Roles Instructions", description="**1)** Run /config \n**2)** Select the `Connection Roles` module on `Config Menu`\n**3)** On `Module Toggle` press enabled which will enable the module.\n**4)** Run /connectionrole add (make sure you have `Manage Roles` permission)`)", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+
+
         await interaction.response.edit_message(embed=embed)
 
 
@@ -114,6 +121,7 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
+            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
             discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),                   
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
             discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"),                        
@@ -183,13 +191,16 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Message Quota Module"
             embed.description = "If you servers staff team has a message quota this feature is extremely helpful for tracking it."
             embed.add_field(name="Commands", value="* /staff leaderboard\n* /staff manage\n* /staff messages")   
+        elif category == 'Connection Roles':
+            embed.title = "Connection Roles Module"
+            embed.description = "The connection roles module is a module where if the parent role is given to a member it also gives the child role to the member."
+            embed.add_field(name="Commands", value="* /connectionrole add\n* /connectionrole remove\n* /connectionrole list")   
 
         elif category == 'Applications Results':
             embed.title = "Application Results Module"
             embed.description = """
 ❓ **How does this work?**
 * **Application Results Module.** is a module that automatically assigns roles to applicants after passing based on your application results configuration settings. It also logs a application result in a channel of your choosing.
-<:ArrowDropDown:1163171628050563153> Hi I just want to note there will also be a application feature coming later in the future currently the **/application results** is more of a logging command.
 """
             embed.add_field(name="Commands", value="* /application results")    
 
