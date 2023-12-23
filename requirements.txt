@@ -7,4 +7,4 @@ pymongo
 python-dotenv
 sentry_sdk
 motor
-axiom
+axiom-py
