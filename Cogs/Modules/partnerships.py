@@ -193,7 +193,7 @@ class Partnerships(commands.Cog):
          return              
         partnership_data = partnerships.find({'guild_id': ctx.guild.id})
         if not partnership_data:
-            await ctx.send(f"No active partnerships on this server.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, there are no active partnerships on this server.")
             return
 
         embeds = []
