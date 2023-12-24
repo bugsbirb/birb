@@ -109,27 +109,25 @@ class Infractions(commands.Cog):
 
         guild_id = ctx.guild.id
         data = infchannel.find_one({'guild_id': guild_id})
-        appeal_data = appealable.find_one({'guild_id': str(ctx.guild.id)})
         consent_data = consent.find_one({"user_id": staff.id})
         if consent_data is None:
             consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})            
             consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
 
-        if appeal_data is not None:
-         appeal_enabled = appeal_data.get('enabled', False)
-        else:
-          appeal_enabled = False
+
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
 
          if channel:      
-            await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
+
             try:
              await channel.send(f"{staff.mention}", embed=embed)
+             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
+             collection.insert_one(infract_data)
             except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")             
-            collection.insert_one(infract_data)
+             return
             if consent_data['infractionalert'] == "Enabled":
              try:
                 await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed)

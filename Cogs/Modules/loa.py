@@ -221,11 +221,12 @@ class loamodule(commands.Cog):
         'messageid': msg.id,
         'active': False}   
            loa_collection.insert_one(loadata)
-      
+           await ctx.send(f"{tick} LOA Request sent", ephemeral=True)   
+           print(f"LOA Request @{ctx.guild.name} pending")       
           except discord.Forbidden:
                 await ctx.send(f"{no} Please contact server admins I can't see the LOA Channel.")            
-          await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
-          print(f"LOA Request @{ctx.guild.name} pending")          
+
+      
          else:
             await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:

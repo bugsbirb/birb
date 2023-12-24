@@ -112,11 +112,12 @@ class promo(commands.Cog):
          channel = self.client.get_channel(channel_id)
 
          if channel:
-            await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**")
-            try:
+            try:            
+             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**")
              await channel.send(f"{staff.mention}", embed=embed)
             except discord.Forbidden: 
-             await ctx.send(f"{no} I don't have permission to view that channel.")               
+             await ctx.send(f"{no} I don't have permission to view that channel.")        
+             return       
             if consent_data['PromotionAlerts'] == "Enabled":
                 await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
             else:    

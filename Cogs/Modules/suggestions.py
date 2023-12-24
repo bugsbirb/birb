@@ -65,11 +65,12 @@ class suggestions(commands.Cog):
          if channel:
           try:  
            msg = await channel.send(embed=embed, view=view)
+           await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.")
+           suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})           
           except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")              
              return
-          await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.")
-          suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})
+
         else: 
             await ctx.send(f"{no} {ctx.author.display_name}, this channel isn't configured. Please do `/config`.")
 

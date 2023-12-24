@@ -123,7 +123,8 @@ class ApplicationResults(commands.Cog):
                 except discord.Forbidden:
                     await ctx.send(
                         f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in {channel.mention}."
-                    )                    
+                    )        
+                    return            
                 view = JumpUrl(msg.jump_url)
                 try:
                  await applicant.send(f"<:ApplicationFeedback:1178754449125167254> **{applicant.display_name}**, you application has been reviewed.", view=view)

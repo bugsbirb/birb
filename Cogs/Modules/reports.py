@@ -289,9 +289,13 @@ class Reports(commands.Cog):
 
                 if channel:
                     view = ReportPanel()
-                    msg = await channel.send(embed=embed, view=view)
-                    reports.insert_one({'guild_id': ctx.guild.id, 'channel_id': channel_id, 'reportedby': ctx.author.id, 'reporteduser': member.id, 'reason': reason, 'message_link': message_link, 'proof': proof_message, 'reported_at': reported_at_format, 'message_id': msg.id})
-                    
+                    try:
+                     msg = await channel.send(embed=embed, view=view)
+
+                     reports.insert_one({'guild_id': ctx.guild.id, 'channel_id': channel_id, 'reportedby': ctx.author.id, 'reporteduser': member.id, 'reason': reason, 'message_link': message_link, 'proof': proof_message, 'reported_at': reported_at_format, 'message_id': msg.id})
+                    except discord.Forbidden:
+                       await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view the channel please contact **administrators**.")
+                       return
                 else:
                     await ctx.send(f"**{ctx.author.display_name}**, I don't have permission to view this channel.")
             else:
