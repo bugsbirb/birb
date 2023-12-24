@@ -98,7 +98,7 @@ class Partnerships(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return      
         try:
-         invite = await self.client.fetch_invite(url=invite)
+         invited = await self.client.fetch_invite(url=invite)
         except discord.NotFound:
           await ctx.send(f"{no} {ctx.author.mention}, that invite is invalid.")
           return
@@ -118,11 +118,11 @@ class Partnerships(commands.Cog):
             'server': server
         }
 
-          guild = invite.guild
+          guild = invited.guild
           guild_name = server
           guild_id = "Unknown" if guild is None or guild.id is None else guild.id
           icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
-          invite = "Unknown" if guild is None or invite.url is None else invite.url
+          invite = "Unknown" if guild is None or invited.url is None else invited.url
           embed = discord.Embed(title=f"<:Partner:1162135285031772300> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
           embed.set_author(name=guild_name, icon_url=icon_url)
           embed.set_thumbnail(url=guild.icon.url)
