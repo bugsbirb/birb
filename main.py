@@ -35,13 +35,13 @@ MONGO_URL = os.getenv('MONGO_URL')
 SENTRY_URL = os.getenv('SENTRY_URL')
 axiomcl = axiom.Client(axiomkey, axiomorg)
 
-#sentry_sdk.init(
-#    dsn=SENTRY_URL,
+sentry_sdk.init(
+    dsn=SENTRY_URL,
 
-#    traces_sample_rate=1.0,
+    traces_sample_rate=1.0,
 
-#    profiles_sample_rate=1.0,
-#)
+   profiles_sample_rate=1.0,
+)
 
 class client(commands.Bot):
     def __init__(self):

@@ -109,7 +109,7 @@ class Partnerships(commands.Cog):
          channel = self.client.get_channel(channel_id)
 
          if channel:
-          await ctx.send(f"{tick} **Partnership** logged.")
+          
           partnershipdata = {
             'guild_id': ctx.guild.id,
             'owner': owner.id,
@@ -128,6 +128,8 @@ class Partnerships(commands.Cog):
           embed.set_thumbnail(url=guild.icon.url)
           try:
            await channel.send(embed=embed)
+           await ctx.send(f"{tick} **Partnership** logged.")  
+           partnerships.insert_one(partnershipdata)
           except discord.Forbidden: 
             await ctx.send(f"{no} I don't have permission to view that channel.")
         else:  
