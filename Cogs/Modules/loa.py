@@ -76,62 +76,7 @@ class loamodule(commands.Cog):
     async def loa(self, ctx):
         pass
 
-    @loa.command(description="Request a Leave Of Absence")
-    @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reasonfor this LOA?")
-    async def request(self, ctx, duration: str, reason: str):
-        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return            
-        if not await self.has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
-         return    
-        if not re.match(r'^\d+[mhdw]$', duration):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
-         return
 
-        duration_value = int(duration[:-1])
-        duration_unit = duration[-1]
-        duration_seconds = duration_value
-
-        if duration_unit == 'm':
-            duration_seconds *= 60
-        elif duration_unit == 'h':
-            duration_seconds *= 3600
-        elif duration_unit == 'd':
-            duration_seconds *= 86400
-        elif duration_unit == 'w':    
-            duration_seconds *= 604800
-
-        start_time = datetime.now()
-        end_time = start_time + timedelta(seconds=duration_seconds)
-        embed = discord.Embed(title=f"Loa Request", description=f"* **User:** {ctx.author.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}", color=discord.Color.dark_embed())
-        embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.display_name)
-        embed.set_thumbnail(url=ctx.author.display_avatar)
-        data = loachannel.find_one({'guild_id': ctx.guild.id})
-        if data:
-         channel_id = data['channel_id']
-         channel = self.client.get_channel(channel_id)
-
-         if channel:
-
-          loadata = {'guild_id': ctx.guild.id,
-        'user': ctx.author.id,
-        'start_time': start_time,
-        'end_time': end_time,
-        'reason': reason,
-        'active': True
-        }        
-          view = Confirm(loadata, ctx.author, ctx.guild)        
-          try:
-           await channel.send(embed=embed, view=view)
-          except discord.Forbidden:
-                await ctx.send(f"{no} Please contact server admins I can't see the LOA Channel.")            
-          await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
-          print(f"LOA Request @{ctx.guild.name} pending")          
-         else:
-            await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
-        else:
-          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
 
       
     @tasks.loop(minutes=10)
@@ -149,7 +94,12 @@ class loamodule(commands.Cog):
         guild = self.client.get_guild(guild_id)
         user = await self.client.fetch_user(user_id)
         active = request['active']
-
+        if guild is None:
+           loa_collection.delete_one({'guild_id': guild_id, 'user': user_id, 'end_time': end_time})
+           return
+        if user is None:
+           loa_collection.delete_one({'guild_id': guild_id, 'user': user_id, 'end_time': end_time})
+           return           
         if active == True:
          if current_time >= end_time:
             if user:
@@ -217,14 +167,74 @@ class loamodule(commands.Cog):
         await ctx.send(embed=embed)
 
 
+    @loa.command(description="Request a Leave Of Absence")
+    @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reasonfor this LOA?")
+    async def request(self, ctx, duration: str, reason: str):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return            
+        if not await self.has_staff_role(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         return    
+        if not re.match(r'^\d+[mhdw]$', duration):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+         return
+        loa_data = loa_collection.find_one({'guild_id': ctx.guild.id, 'user': ctx.author.id, 'active': True})
+        if loa_data:
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you already have an active LOA.")
+         return
+        
+        duration_value = int(duration[:-1])
+        duration_unit = duration[-1]
+        duration_seconds = duration_value
 
+        if duration_unit == 'm':
+            duration_seconds *= 60
+        elif duration_unit == 'h':
+            duration_seconds *= 3600
+        elif duration_unit == 'd':
+            duration_seconds *= 86400
+        elif duration_unit == 'w':    
+            duration_seconds *= 604800
+
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=duration_seconds)
+        embed = discord.Embed(title=f"LOA Request - Pending", description=f"* **User:** {ctx.author.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+        embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.display_name)
+        embed.set_thumbnail(url=ctx.author.display_avatar)
+        data = loachannel.find_one({'guild_id': ctx.guild.id})
+        if data:
+         channel_id = data['channel_id']
+         channel = self.client.get_channel(channel_id)
+
+         if channel:
+
+  
+          view = Confirm()        
+          try:
+           msg = await channel.send(embed=embed, view=view)
+           loadata = {'guild_id': ctx.guild.id,
+        'user': ctx.author.id,
+        'start_time': start_time,
+        'end_time': end_time,
+        'reason': reason,
+        'messageid': msg.id,
+        'active': False}   
+           loa_collection.insert_one(loadata)
+      
+          except discord.Forbidden:
+                await ctx.send(f"{no} Please contact server admins I can't see the LOA Channel.")            
+          await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
+          print(f"LOA Request @{ctx.guild.name} pending")          
+         else:
+            await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
+        else:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
 
 class Confirm(discord.ui.View):
-    def __init__(self, loadata, user, guild):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.loadata = loadata
-        self.user = user
-        self.guild = guild
+
 
     async def has_admin_role(self, interaction):
         filter = {
@@ -242,15 +252,25 @@ class Confirm(discord.ui.View):
 
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji="<:Tick:1140286044114268242>")
-    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):           
+    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):   
+        if not await self.has_admin_role(interaction):
+            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.", view=None)
+            return                
+        loa_data = loa_collection.find_one({'messageid': interaction.message.id}) 
+        if loa_data:
+         self.user = await interaction.guild.fetch_member(loa_data['user'])
         user = self.user
         try:
-         await self.user.send(f"{tick} **{self.user.display_name}**, your LOA **@{self.guild.name}** has been accepted.")
+         await self.user.send(f"{tick} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been accepted.")
         except discord.Forbidden:
                 pass          
-        loa_collection.insert_one(self.loadata)
-        await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've accepted the LOA", view=None)
-        print(f"LOA Request @{self.guild.name} accepted")
+        embed = interaction.message.embeds[0]
+        embed.color = discord.Color.brand_green()
+        embed.title = f"<:Tick_1:1178749612929069096> LOA Request - Accepted"
+        embed.set_footer(text=f"Accepted by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
+        loa_collection.update_one({'messageid': interaction.message.id}, {'$set': {'active': True}}) 
+        await interaction.response.edit_message(embed=embed, view=None)
+        print(f"LOA Request @{interaction.guild.name} accepted")
         loarole_data = LOARole.find_one({'guild_id': interaction.guild.id})
         if loarole_data:
          loarole = loarole_data['staffrole']
@@ -263,12 +283,24 @@ class Confirm(discord.ui.View):
 
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not await self.has_admin_role(interaction):
+            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.", view=None)
+            return           
+        loa_data = loa_collection.find_one({'messageid': interaction.message.id}) 
+        if loa_data:
+         self.user = await interaction.guild.fetch_member(loa_data['user'])
         try:
-         await self.user.send(f"{no} **{self.user.display_name}**, your LOA **@{self.guild.name}** has been denied.")        
+         await self.user.send(f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied.")        
         except discord.Forbidden:
                 pass 
-        await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}** I've denied the LOA.", view=None)    
-        print(f"LOA Request @{self.guild.name} denied") 
+        
+        embed = interaction.message.embeds[0]
+        embed.color = discord.Color.brand_red()
+        embed.title = f"<:crossX:1140623638207397939> LOA Request - Denied"
+        embed.set_footer(text=f"Denied by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
+        loa_collection.delete_one({'messageid': interaction.message.id})
+        await interaction.response.edit_message(embed=embed, view=None)    
+        print(f"LOA Request @{interaction.guild.name} denied") 
 
 
 class LOAManage(discord.ui.View):

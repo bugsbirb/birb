@@ -25,6 +25,7 @@ from Cogs.Modules.suggestions import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
 import axiom
+from Cogs.Modules.loa import Confirm
 load_dotenv()
 axiomkey = os.getenv('AXIOM_KEY')
 axiomorg = os.getenv('AXIOM_ORG')
@@ -101,6 +102,7 @@ class client(commands.Bot):
         self.add_view(Helpdesk())
         self.add_view(SuggestionView())
         self.add_view(ReportPanel())
+        self.add_view(Confirm())
 
 
 
