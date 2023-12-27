@@ -15,14 +15,14 @@ mongo = AsyncIOMotorClient(MONGO_URL)
 
 
 db2 = mongo['quotab']
-scollection2 = db2['staffrole']
+
 mccollection = db2["messages"]
 
 MONGO_URL = os.getenv('MONGO_URL')
 astro = AsyncIOMotorClient(MONGO_URL)
 db = astro['astro']
 modules = db['Modules']
-
+scollection2 = db['staffrole']
 
 class messageevent(commands.Cog):
     def __init__(self, client):

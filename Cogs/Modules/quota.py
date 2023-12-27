@@ -264,16 +264,20 @@ class quota(commands.Cog):
         message_count = user_data['message_count']
         member = ctx.guild.get_member(user_id)
         loa_role_data = lcollection.find_one({'guild_id': ctx.guild.id})
-
+       
         if member:
-            message_quota = message_quota_collection.find_one({'guild_id': ctx.guild.id})
+            message_quotaresult = message_quota_collection.find_one({'guild_id': ctx.guild.id})
+
+            message_quota = message_quotaresult['message_quota']
+            if message_quota is None:
+               message_quota = 100
             if loa_role_data:
                     loa_role_id = loa_role_data.get('loarole')
                     has_loa_role = discord.utils.get(member.roles, id=loa_role_id) is not None
             else:
                     has_loa_role = False
 
-            if message_count >= int(message_quota['quota']):
+            if message_count >= message_quota:
                     emoji = "`LOA`" if has_loa_role else "<:Confirmed:1122636234255253545>"
             else:
                     emoji = "`LOA`" if has_loa_role else "<:Cancelled:1122637466353008810>"
