@@ -268,9 +268,11 @@ class quota(commands.Cog):
         if member:
             message_quotaresult = message_quota_collection.find_one({'guild_id': ctx.guild.id})
 
-            message_quota = message_quotaresult['message_quota']
-            if message_quota is None:
-               message_quota = 100
+            if message_quotaresult:
+                message_quota = message_quotaresult.get('message_quota', 100)
+            else:
+                message_quota = 100
+
             if loa_role_data:
                     loa_role_id = loa_role_data.get('loarole')
                     has_loa_role = discord.utils.get(member.roles, id=loa_role_id) is not None
