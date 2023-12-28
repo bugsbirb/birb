@@ -149,15 +149,15 @@ class Partnerships(commands.Cog):
 
         partnership_data = partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if partnership_data is None:   
-            await ctx.send(f"{no} I could not find that partnership.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find that partnership.")
             return
         if partnership_data:
             server = partnership_data['server']
             ownerid = partnership_data['owner']
             adminid = partnership_data['admin']
             invite = partnership_data['invite']            
-            owner = ctx.guild.fetch_user(ownerid)
-            admin = ctx.guild.fetch_user(adminid)
+            owner = await self.client.fetch_user(ownerid)
+            admin = await self.client.fetch_user(adminid)
         data = partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
@@ -177,7 +177,8 @@ class Partnerships(commands.Cog):
           try:
            await channel.send(embed=embed)
           except discord.Forbidden: 
-            await ctx.send(f"{no} I don't have permission to view that channel.")           
+            await ctx.send(f"{no} I don't have permission to view that channel.")     
+            return      
           partnerships.delete_one({'guild_id': ctx.guild.id, 'server': server})
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")        
