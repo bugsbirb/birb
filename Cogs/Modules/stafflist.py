@@ -93,7 +93,7 @@ class StaffList(commands.Cog):
 
             for role_name, mentions in members_by_role.items():
                 value = "\n".join(mentions)[:1024]
-                embed.add_field(name=f"<:dot:1179836742640095282>{role_name}", value=value, inline=False)
+                embed.add_field(name=f"<:astroDot:1190671915057160223>{role_name}", value=value, inline=False)
 
             channel = ctx.channel
             if display == 'True':
