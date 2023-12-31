@@ -94,7 +94,7 @@ class ApplicationResults(commands.Cog):
             if not feedback:
                 feedback = "None Given"
             embed = discord.Embed(
-                title=f"<:Tick_1:1178749612929069096> Application Passed",
+                title=f"{greencheck} Application Passed",
                 description=f"**Applicant:** {applicant.mention}\n**Feedback:** {feedback}",
                 color=discord.Color.brand_green(),
             )
@@ -102,7 +102,7 @@ class ApplicationResults(commands.Cog):
             if not feedback:
                 feedback = "None Given"
             embed = discord.Embed(
-                title=f"<:crossX:1140623638207397939> Application Failed",
+                title=f"{redx} Application Failed",
                 description=f"**Applicant:** {applicant.mention}\n**Feedback:** {feedback}",
                 color=discord.Color.brand_red(),
             )

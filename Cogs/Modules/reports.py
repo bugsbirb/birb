@@ -75,7 +75,7 @@ class MuteReason(discord.ui.Modal, title='Reason'):
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to mute this user!", ephemeral=True)
             return 
 
-        self.embed.title = "<:Tick_1:1178749612929069096> Report Resolved"
+        self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
         self.embed.set_footer(text=f"Muted By {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
         self.embed.add_field(name="Mute Reason", value=self.Reason.value, inline=True)
@@ -126,7 +126,7 @@ class KickReason(discord.ui.Modal, title='Reason'):
         except discord.Forbidden:
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to kick this user!", ephemeral=True)
          return 
-        self.embed.title = "<:Tick_1:1178749612929069096> Report Resolved"
+        self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
         self.embed.set_footer(text=f"Kicked By {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
         self.embed.add_field(name="Kick Reason", value=self.Reason.value, inline=False)
@@ -176,7 +176,7 @@ class BanReason(discord.ui.Modal, title='Reason'):
         except discord.Forbidden:
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to ban this user!", ephemeral=True)
          return 
-        self.embed.title = "<:Tick_1:1178749612929069096> Report Resolved"
+        self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
         self.embed.set_footer(text=f"Banned By {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
         self.embed.add_field(name="Ban Reason", value=self.Reason.value, inline=False)
@@ -262,7 +262,7 @@ class Reports(commands.Cog):
         reported_at_format = f"<t:{int(reported_at.timestamp())}:t>"
 
 
-        embed = discord.Embed(title="<:idle:1140670802153451601> Pending Report", color=discord.Color.orange())
+        embed = discord.Embed(title=f"{cpending} Pending Report", color=discord.Color.orange())
         embed.add_field(name="Reported User", value=f"* **User:** {member.mention}\n* **ID:** {member.id}", inline=False)
         embed.set_thumbnail(url=member.display_avatar.url)
         if message_link:
@@ -374,7 +374,7 @@ class ReportPanel(discord.ui.View):
         view = ActionsPanel(embed, interaction.message.id, message)
         await interaction.response.send_message(view=view, ephemeral=True)
                         
-    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.grey, custom_id='ignore:button', emoji=f"<:crossX:1140623638207397939>")
+    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.grey, custom_id='ignore:button', emoji=f"{redx}")
     async def Ignore(self, interaction: discord.Interaction, button: discord.ui.Button):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.", ephemeral=True)
@@ -382,7 +382,7 @@ class ReportPanel(discord.ui.View):
    
        embed = interaction.message.embeds[0]
        
-       embed.title = "<:crossX:1140623638207397939> Report Ignored"
+       embed.title = f"{redx} Report Ignored"
        embed.color = discord.Color.brand_red()
        embed.set_footer(text=f"Ignored by {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
        await interaction.response.edit_message(embed=embed, view=None)
