@@ -22,7 +22,6 @@ class ConnectionRolesEvent(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
      added_roles = set(after.roles) - set(before.roles)
@@ -43,5 +42,6 @@ class ConnectionRolesEvent(commands.Cog):
             child_role = after.guild.get_role(child_role_id)
             if child_role:
                 await after.remove_roles(child_role)
+
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConnectionRolesEvent(client))   

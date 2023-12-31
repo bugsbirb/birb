@@ -252,7 +252,7 @@ class Confirm(discord.ui.View):
         return False     
 
 
-    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji="<:Tick:1140286044114268242>")
+    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji=f"{greencheck}")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):   
         if not await self.has_admin_role(interaction):
             await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.", view=None)
@@ -282,7 +282,7 @@ class Confirm(discord.ui.View):
 
 
 
-    @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji="<:X_:1140286086883586150>")
+    @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji=f"{redx}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.has_admin_role(interaction):
             await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.", view=None)
