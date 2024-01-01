@@ -24,9 +24,13 @@ class blacklist(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
      blacklist = await blacklists.find_one({'user': guild.owner.id})
-     if guild.owner.id in blacklist:
+
+     if blacklist:
         await guild.leave()
         print(f'Left guild {guild.name} owned by blacklisted user {guild.owner}')
+     else:
+       pass
+    
 
 
     @commands.command()
