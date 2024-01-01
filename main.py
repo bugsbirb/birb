@@ -79,7 +79,8 @@ class client(commands.AutoShardedBot):
         'Cogs.Events.modmailevent',
         'Cogs.Events.on_thread_create',
         'Cogs.Events.connectionrolesevent',
-        'Cogs.Modules.connectionroles'
+        'Cogs.Modules.connectionroles',
+        'Cogs.Events.AstroSupport.blacklist'
         
         ]
 
