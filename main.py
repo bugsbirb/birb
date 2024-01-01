@@ -44,7 +44,7 @@ sentry_sdk.init(
    profiles_sample_rate=1.0,
 )
 
-class client(commands.Bot):
+class client(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
