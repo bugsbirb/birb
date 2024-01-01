@@ -22,7 +22,7 @@ class blacklist(commands.Cog):
         self.client = client
 
     @commands.Cog.listener()
-    async def on_guild_join(guild):
+    async def on_guild_join(self, guild):
      blacklist = await blacklists.find_one({'user': guild.owner.id})
      if guild.owner.id in blacklist:
         await guild.leave()
