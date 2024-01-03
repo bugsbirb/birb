@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Union, Optional
 from typing import Literal
 from pymongo import MongoClient
+import requests
 import typing
 import os
 import dotenv
@@ -299,6 +300,19 @@ class Utility(commands.Cog):
         embed.add_field(name="**Roles**", value=user_roles, inline=False)        
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command(description="Get silly birb photo")
+    async def birb(self, ctx):
+        try:
+         api_url = "https://api.alexflipnote.dev/birb"
+         response = requests.get(api_url)
+         response.raise_for_status() 
+         data = response.json()
+         birb_image_url = data["file"]
+         embed = discord.Embed(color=discord.Color.dark_embed())
+         embed.set_image(url=birb_image_url)
+         await ctx.send(embed=embed)
+        except requests.exceptions.RequestException:
+            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Status Code:** `{response.status_code}`")
 
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):
@@ -333,7 +347,6 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Support Server", description="Having bot issues? Join our support server and our team will help you.", color=0x2b2d31)
         embed.set_thumbnail(url=bot_user.avatar.url)
         await ctx.send(embed=embed, view=view)
-       
 
     @commands.command(aliases=["joinme", "join", "botinvite"])
     async def invite(self, ctx):
