@@ -26,7 +26,7 @@ class webGuildJoins(commands.Cog):
         if channel:
             webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
 
-            await webhook.send(f"<:join:1140670830792159373> Welcomed to **@{guild.name}.** I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
+            await webhook.send(f"<:join:1140670830792159373> I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon, allowed_mentions = discord.AllowedMentions(roles = False))
         owner = guild.owner
         view = Support()
         await owner.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1163171628050563153> Guild `#{len(self.client.guilds)}`", view=view)
