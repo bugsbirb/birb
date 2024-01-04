@@ -827,7 +827,7 @@ class LOAPanel(discord.ui.View):
             loamsg = "True"
         else:
             loamsg = "False"
-        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.now(), color=discord.Color.dark_embed())
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
         embed.set_thumbnail(url=self.user.display_avatar)
@@ -867,7 +867,7 @@ class LOACreate(discord.ui.View):
             loamsg = "True"
         else:
             loamsg = "False"
-        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.now(), color=discord.Color.dark_embed())
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
         embed.set_thumbnail(url=self.user.display_avatar)
@@ -915,7 +915,7 @@ class RevokeInfraction(discord.ui.View):
             loamsg = "True"
         else:
             loamsg = "False"
-        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"Admin Panel - {self.user.name}", description=f"**Mention:** {self.user.mention}\n**ID:** *{self.user.id}* ",timestamp=datetime.now(), color=discord.Color.dark_embed())
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=")
         embed.set_thumbnail(url=self.user.display_avatar)
