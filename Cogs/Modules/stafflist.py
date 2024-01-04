@@ -4,6 +4,7 @@ import os
 from pymongo import MongoClient
 from emojis import *
 from typing import Literal, Optional
+from permissions import *
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
@@ -23,38 +24,7 @@ class StaffList(commands.Cog):
      else:   
         return False
 
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
-
-
-    async def has_admin_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = arole.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
 
     @commands.hybrid_command(description="Lists the staff team")
     async def stafflist(self, ctx, display: Optional[Literal['True', 'False']]):
@@ -64,7 +34,7 @@ class StaffList(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return    
 
-        if not await self.has_staff_role(ctx):
+        if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return        
         if guild:

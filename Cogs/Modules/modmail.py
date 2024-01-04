@@ -21,7 +21,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 modmail = db['modmail']
 modmailcategory = db['modmailcategory']
-
+from permissions import has_admin_role, has_staff_role
 class Modmail(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -69,7 +69,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Reply to a modmail")
     async def reply(self, ctx, *, content):
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
      if isinstance(ctx.channel, discord.TextChannel):
@@ -104,7 +104,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Close a modmail channel.")
     async def close(self, ctx):
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
      if isinstance(ctx.channel, discord.TextChannel):

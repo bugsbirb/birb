@@ -19,7 +19,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 tags = db['tags']
 modules = db['Modules']
-
+from permissions import *
 class Tags(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -93,7 +93,7 @@ class Tags(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
-        if not await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return               
 
@@ -112,7 +112,7 @@ class Tags(commands.Cog):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return               
      filter = {
@@ -143,7 +143,7 @@ class Tags(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
-        if not await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return
 
@@ -171,7 +171,7 @@ class Tags(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
-        if not await self.has_staff_role(ctx):
+        if not await has_staff_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return        
         filter = {
@@ -195,7 +195,7 @@ class Tags(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
-        if not await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return        
         filter = {

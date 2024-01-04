@@ -20,6 +20,7 @@ from typing import Literal
 from discord import Embed, Attachment, AllowedMentions, Color, ForumChannel, Role
 from emojis import *
 import typing
+from permissions import *
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
@@ -34,21 +35,6 @@ class Forums(commands.Cog):
     async def forums(self, ctx):
         return
 
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
 
 
 
@@ -61,7 +47,7 @@ class Forums(commands.Cog):
         return True
     @forums.command(description="Lock a forum thread")        
     async def lock(self, ctx):
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return              
      if isinstance(ctx.channel, discord.Thread):        
@@ -72,7 +58,7 @@ class Forums(commands.Cog):
 
     @forums.command(description="Unlock a forum thread")        
     async def unlock(self, ctx):
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return              
      if isinstance(ctx.channel, discord.Thread):        
@@ -83,7 +69,7 @@ class Forums(commands.Cog):
 
     @forums.command(description="Archive a forum thread")        
     async def archive(self, ctx):
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return            
      if isinstance(ctx.channel, discord.Thread):        

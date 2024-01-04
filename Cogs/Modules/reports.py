@@ -211,21 +211,9 @@ class Reports(commands.Cog):
      elif modulesdata['Reports'] == True:   
         return True 
 
-    async def has_moderator_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = ReportModeratorRole.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
+    
 
-     return False
     @commands.hybrid_command(description="Report users breaking server rules.")
     @app_commands.describe(
         member='Who are you reporting?',

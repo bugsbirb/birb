@@ -14,7 +14,7 @@ import os
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
 
-
+from permissions import has_admin_role, has_staff_role
 client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
@@ -98,38 +98,7 @@ class quota(commands.Cog):
      elif modulesdata['Quota'] == True:   
         return True
 
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
-
-
-    async def has_admin_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = arole.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
 
     @commands.hybrid_group(name="staff")
     async def staff(self, ctx):
@@ -137,7 +106,7 @@ class quota(commands.Cog):
 
     @commands.command()
     async def staffcommand(self, ctx):
-        if await self.has_staff_role(ctx):
+        if await has_staff_role(ctx):
             await ctx.send("Worked")
         else:
             await ctx.send("You don't have the staff role.")
@@ -146,7 +115,7 @@ class quota(commands.Cog):
 
     @commands.command()
     async def checkadmin(self, ctx):
-        if await self.has_admin_role(ctx):
+        if await has_admin_role(ctx):
             await ctx.send("You have an admin role!")
         else:
             await ctx.send("You don't have an admin role.")
@@ -160,7 +129,10 @@ class quota(commands.Cog):
 
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return                    
+         return   
+     if not await has_admin_role(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+            return                      
      mccollection = db["messages"]
      message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
     
@@ -170,18 +142,17 @@ class quota(commands.Cog):
         message_count = 0
 
      view = StaffManage(staff.id, ctx.author)
-     if await self.has_admin_role(ctx):    
-      embed = discord.Embed(
+
+     embed = discord.Embed(
         title=f"{staff.display_name}",
         description=f"* **Messages:** {message_count}",
         color=discord.Color.dark_embed()
     )
-      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-      embed.set_thumbnail(url=staff.display_avatar)
+     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+     embed.set_thumbnail(url=staff.display_avatar)
     
-      await ctx.send(embed=embed, view=view)
-     else:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+     await ctx.send(embed=embed, view=view)
+
 
     @commands.hybrid_group(name="leaderboard")
     async def leader(self, ctx):
@@ -195,18 +166,19 @@ class quota(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
-        if await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+            return  
             
-            mccollection = dbq["messages"]
-            mccollection.delete_many({'guild_id': ctx.guild.id})
-            await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
-            try:
+        mccollection = dbq["messages"]
+        mccollection.delete_many({'guild_id': ctx.guild.id})
+        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
+        try:
                 owner = ctx.guild.owner
                 await owner.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
-            except Exception as e:
+        except Exception as e:
                  await ctx.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
-        else:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+
 
     @staff.command(name="messages", description="Display the amount the message count of a staff member.")
     async def messages(self, ctx, staff: discord.Member):
@@ -214,7 +186,7 @@ class quota(commands.Cog):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
         await ctx.send(f"**{ctx.author.display_name}**, you don't have permission to use this command.")
         return        
      message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
@@ -242,7 +214,7 @@ class quota(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
      await ctx.defer()
-     if not await self.has_staff_role(ctx):
+     if not await has_staff_role(ctx):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
         return
 

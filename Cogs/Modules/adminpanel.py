@@ -16,6 +16,8 @@ import os
 from dotenv import load_dotenv
 from emojis import *
 from Cogs.Modules.infractions import *
+from datetime import datetime
+
 from datetime import timedelta
 
 MONGO_URL = os.getenv('MONGO_URL')
@@ -539,43 +541,12 @@ class AdminPanelCog(commands.Cog):
     async def admin(self, ctx):
         pass        
 
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
-
-
-    async def has_admin_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = arole.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
     
 
     @admin.command(description="Manage a staff member.")
     async def panel(self, ctx, staff: discord.Member):
-        if not await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return            
 
@@ -589,7 +560,7 @@ class AdminPanelCog(commands.Cog):
         else:
             loamsg = "True"
 
-        embed = discord.Embed(title=f"Admin Panel - {staff.name}", description=f"**Mention:** {staff.mention}\n**ID:** *{staff.id}* ",timestamp=datetime.datetime.now(), color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"Admin Panel - {staff.name}", description=f"**Mention:** {staff.mention}\n**ID:** *{staff.id}* ",timestamp=datetime.now(), color=discord.Color.dark_embed())
         embed.add_field(name="<:data:1166529224094523422> Staff Data", value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}")
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
         embed.set_footer(text="Staff Management Panel", icon_url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1187454549099806811/1154092651193323661.png?ex=6596f23a&is=65847d3a&hm=289bd45a9c6779853b2a78d7848636433e8aa63173781aec51447c25f8a06453&=")

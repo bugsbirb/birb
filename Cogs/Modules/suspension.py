@@ -19,7 +19,7 @@ from datetime import datetime
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 suspensions = db['Suspensions']
-
+from permissions import *
 
 class Suspensions(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -28,38 +28,7 @@ class Suspensions(commands.Cog):
         print("Suspension loop started")
 
 
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
-
-
-    async def has_admin_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = arole.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
 
     async def modulecheck(self, ctx): 
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
@@ -74,7 +43,7 @@ class Suspensions(commands.Cog):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
-        if not await self.has_admin_role(ctx):
+        if not await has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
             return
 
@@ -122,7 +91,7 @@ class Suspensions(commands.Cog):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
-     if not await self.has_admin_role(ctx):
+     if not await has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return             
 
@@ -160,7 +129,7 @@ class Suspensions(commands.Cog):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return              
-     if not await self.has_admin_role(ctx):
+     if not await has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
          return   
      filter = {'guild_id': ctx.guild.id, 'staff': staff.id}
