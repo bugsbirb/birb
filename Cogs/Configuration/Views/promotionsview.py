@@ -91,11 +91,11 @@ class PromotionModuleToggle(discord.ui.Select):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
         if color == 'Enable':    
-            await interaction.response.send_message(content="<:Tick:1140286044114268242> Enabled", ephemeral=True)
+            await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': True}}, upsert=True)  
 
         if color == 'Disable':    
-            await interaction.response.send_message(content="<:X_:1140286086883586150> Disabled", ephemeral=True)
+            await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': False}}, upsert=True)            
 
     

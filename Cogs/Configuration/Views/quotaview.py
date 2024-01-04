@@ -16,7 +16,7 @@ from Cogs.Configuration.Configuration import *
 import os
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+mongo = MongoClient(MONGO_URL)
 dbq = mongo['quotab']
 message_quota_collection = dbq["message_quota"]
 
@@ -60,11 +60,11 @@ class QuotaToggle(discord.ui.Select):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
         if color == 'Enable':    
-            await interaction.response.send_message(content="<:Tick:1140286044114268242> Enabled", ephemeral=True)
+            await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': True}}, upsert=True)  
 
         if color == 'Disable':    
-            await interaction.response.send_message(content="<:X_:1140286086883586150> Disabled", ephemeral=True)
+            await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': False}}, upsert=True) 
 
 
