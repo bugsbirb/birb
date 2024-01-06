@@ -151,7 +151,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Forums':
             embed.title = "Forums Utils Module"
             embed.description = "This module provides commands for managing forums within your server & on forum creation embeds."
-            embed.add_field(name="Commands", value="* /forums unlock\n* /forums lock\n* /forums archive\n* /forums config")
+            embed.add_field(name="Commands", value="* /forums unlock\n* /forums lock\n* /forums archive\n* /forums manage")
         elif category == 'Tags':
             embed.title = "Tags Module"
             embed.description = "The Tags Module allows you to create, manage, and use custom text-based tags within your server. Tags are short snippets of text that can be easily retrieved and sent in chat. This module enhances communication and enables you to create quick responses or share information efficiently."
