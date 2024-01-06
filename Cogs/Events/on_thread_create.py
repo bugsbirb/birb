@@ -43,8 +43,8 @@ class ForumCreaton(commands.Cog):
           if thumbnail_url:
                 embed.set_thumbnail(url=thumbnail_url)
 
-          role_id_str = str(config_data.get('role', ""))
-          role_id = int(role_id_str) if role_id_str.isdigit() else None 
+          role_ids = config_data['role']
+          role_id = int(role_id) if role_ids else None
 
           role = discord.utils.get(thread.guild.roles, id=role_id)
 
