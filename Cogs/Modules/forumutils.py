@@ -191,7 +191,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-        result = forumsconfig.find_one({"name": self.name.value})
+        result = forumsconfig.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         embed = interaction.message.embeds[0]
         if result:
          embed = discord.Embed()
