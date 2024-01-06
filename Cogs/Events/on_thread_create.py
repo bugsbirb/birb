@@ -44,7 +44,7 @@ class ForumCreaton(commands.Cog):
                 embed.set_thumbnail(url=thumbnail_url)
 
           role_ids = config_data['role']
-          role_id = int(role_id) if role_ids else None
+          role_id = int(role_ids) if role_ids else None
 
           role = discord.utils.get(thread.guild.roles, id=role_id)
 
