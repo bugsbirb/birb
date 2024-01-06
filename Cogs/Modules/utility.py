@@ -303,11 +303,11 @@ class Utility(commands.Cog):
     @commands.hybrid_command(description="Get silly birb photo")
     async def birb(self, ctx):
         try:
-         api_url = "https://api.alexflipnote.dev/birb"
+         api_url = "https://birbapi.astrobirb.dev/birb"
          response = requests.get(api_url)
          response.raise_for_status() 
          data = response.json()
-         birb_image_url = data["file"]
+         birb_image_url = data["image_url"]
          embed = discord.Embed(color=discord.Color.dark_embed())
          embed.set_image(url=birb_image_url)
          await ctx.send(embed=embed)
