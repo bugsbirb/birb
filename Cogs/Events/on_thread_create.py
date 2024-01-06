@@ -26,7 +26,7 @@ class ForumCreaton(commands.Cog):
     @commands.Cog.listener()
     async def on_thread_create(self, thread: discord.Thread):
         guild_id = thread.guild.id
-        config_data = forumsconfig.find_one({"guild_id": guild_id})
+        config_data = forumsconfig.find_one({"guild_id": guild_id, "channel_id": thread.parent_id})
         if not config_data or "channel_id" not in config_data:
          return
 
@@ -36,20 +36,21 @@ class ForumCreaton(commands.Cog):
             return
         await asyncio.sleep(1)
         if config_data:
-         if config_data["embed"] == True:   
-          embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=discord.Color.dark_embed())
+          color_str = config_data.get("color", "2b2d31") 
+          color = discord.Color(int(color_str, 16))
+          embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=color)
           thumbnail_url = config_data['thumbnail']
           if thumbnail_url:
                 embed.set_thumbnail(url=thumbnail_url)
 
-          role = discord.utils.get(thread.guild.roles, id=config_data['role'])
+          role_id_str = config_data.get('role', "")
+          role_id = int(role_id_str) if role_id_str.isdigit() else None
+
+          role = discord.utils.get(thread.guild.roles, id=role_id)
 
           mention = role.mention if role else ""
           msg = await thread.send(content=f"{mention}", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-         else:
-            role = discord.utils.get(thread.guild.roles, id=config_data['role'])
-            mention = role.mention if role else ""
-            msg = await thread.send(content=f"{mention}")     
+          await msg.pin()
 
 
 async def setup(client: commands.Bot) -> None:

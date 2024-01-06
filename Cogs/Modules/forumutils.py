@@ -1,23 +1,11 @@
 import discord
-from discord import ui
-import time
-import platform
-import sys
 import discord.ext
 from discord.ext import commands
-from urllib.parse import quote_plus
-from discord import app_commands
 import os
-from dotenv import load_dotenv
 import discord
-import datetime
-from discord.ext import commands, tasks
-from jishaku import Jishaku
+from discord.ext import commands
 from pymongo import MongoClient
 from typing import Optional
-import asyncio
-from typing import Literal
-from discord import Embed, Attachment, AllowedMentions, Color, ForumChannel, Role
 from emojis import *
 import typing
 from permissions import *
@@ -27,6 +15,229 @@ db = client['astro']
 scollection = db['staffrole']
 forumsconfig = db['Forum Configuration']
 modules = db['Modules']
+
+class Title(discord.ui.Modal, title='Title'):
+    def __init__(self):
+        super().__init__()
+
+
+
+    Titles = discord.ui.TextInput(
+        label='title',
+        placeholder='What is the title?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        embed.title = self.Titles.value
+        await interaction.response.edit_message(embed=embed)
+
+
+class Description(discord.ui.Modal, title='Description'):
+    def __init__(self):
+        super().__init__()
+
+
+
+    description = discord.ui.TextInput(
+        label='Description',
+        placeholder='What is the description?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        embed.description = self.description.value
+        await interaction.response.edit_message(embed=embed)
+
+class Colour(discord.ui.Modal, title='Colour'):
+    def __init__(self):
+        super().__init__()
+
+
+
+    color = discord.ui.TextInput(
+        label='Colour',
+        placeholder='Do not include the hashtag',
+    )
+
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        color_value = self.color.value
+        try:
+            color = discord.Color(int(color_value, 16))
+        except ValueError:
+            await interaction.response.send_message(f" {no} Please provide a valid hex color without the hashtag.", ephemeral=True)
+            return
+        
+        embed = interaction.message.embeds[0]
+        embed.color = color
+        await interaction.response.edit_message(embed=embed)
+
+class Roleping(discord.ui.Modal, title='Role Ping'):
+    def __init__(self):
+        super().__init__()
+
+
+
+    role = discord.ui.TextInput(
+        label='Role ID',
+        placeholder='What is the role id?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.edit_message(content=f"{self.role.value}")
+
+class Thumbnail(discord.ui.Modal, title='Thumbnail'):
+    def __init__(self):
+        super().__init__()
+
+
+
+    Thumbnaile = discord.ui.TextInput(
+        label='Thumbnail',
+        placeholder='Whats the thumbnail URL?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        try:
+         embed.set_thumbnail(url=self.Thumbnaile.value)
+         await interaction.response.edit_message(embed=embed)
+        except:
+           await interaction.response.send_message(f"{no} Please provide a valid url.", ephemeral=True)
+           return
+ 
+
+
+
+
+class ForumView(discord.ui.View):
+    def __init__(self, author, name):
+        super().__init__()
+        self.author = author
+        self.name = name
+        self.add_item(ForumChannel(author, self.name))
+
+
+
+
+
+
+
+
+
+
+
+class ForumChannel(discord.ui.ChannelSelect):
+    def __init__(self, author, name):
+        super().__init__(placeholder='Forum Channel')
+        self.author = author
+        self.name = name
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+    
+
+        view = Embed(self.author, self.name, channelid)
+        embed = discord.Embed(title="Untitled Embed",  color=discord.Color.dark_embed())
+        await interaction.response.edit_message(embed=embed ,view=view)
+
+
+        
+
+        print(f"Channel ID: {channelid.id}")      
+
+class ForumView(discord.ui.View):
+    def __init__(self, author, name):
+        super().__init__()
+        self.author = author
+        self.name = name
+        self.add_item(ForumChannel(author, self.name))
+
+
+
+class CreateForum(discord.ui.Modal, title='Create Forum Message'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='What do you want the name to be?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        result = forumsconfig.find_one({"name": self.name.value})
+        embed = interaction.message.embeds[0]
+        if result:
+         embed = discord.Embed()
+         embed.title = f"{redx} that already exists."
+         embed.color = discord.Color.brand_red()
+         embed.description=f"Please try again."
+         await interaction.response.edit_message(embed=embed, view=None)
+         return           
+        name = self.name.value
+        embed = discord.Embed(title=f"<:tag:1162134250414415922> Forum Channel", description=f"> Okay, now select a **forum channel.**", color=discord.Color.dark_embed())
+        view = ForumView(self.author, name)
+        await interaction.response.edit_message(embed=embed, view=view)
+
+
+class DeleteForum(discord.ui.Modal, title='Delete Forum'):
+    def __init__(self):
+        super().__init__()
+
+
+
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='Whats the name of the forum channel?',
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+       result = forumsconfig.find_one({"name": self.name.value})
+       embed = interaction.message.embeds[0]
+       if result is None:
+        embed.title = f"{redx} I could not find that."
+        embed.color = discord.Color.brand_red()
+        await interaction.response.edit_message(embed=embed)
+        return
+       forumsconfig.delete_one({"name": self.name.value})
+       embed = discord.Embed(description="Succesfully deleted the Forum message.")
+       embed.title = f"{greencheck} Forum Deleted"
+       embed.color = discord.Color.brand_green()
+       await interaction.response.edit_message(embed=embed, view=None)
+
+
+
+
 class Forums(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -78,51 +289,156 @@ class Forums(commands.Cog):
      else:   
         await ctx.send(f"{no} This command only works in **forum channels.**")
 
-    @forums.command(name="config", description="Configure on forum creation embed")
-    @commands.has_permissions(administrator=True)
-    async def configuration(
-    self,
-    ctx,
-    option: typing.Literal["Enable", "Disable"],
-    channel: discord.ForumChannel,
-    embeded: typing.Literal["True", "False"],        
-    role: Optional[discord.Role] = None,
-    title: Optional[str] = None,
-    description: Optional[str] = None,
-    thumbnail: Optional[discord.Attachment] = None,):
-        guild_id = ctx.guild.id    
-        if option == 'Enable':
-         if embeded == 'False' and role is None:   
-            await ctx.send(f"{no} You need to enable `embed` or `role`")
-            return
-         if embeded == 'True':
-          embeded = True
-         if embeded == 'False':
-          embeded = False          
-         config_data = {
-        "channel_id": channel.id,
-        "role": role.id if role else None,
-        "title": title if title else f"<:forum:1162134180218556497> {ctx.guild.name} Support",
-        "description": description if description else f"> Welcome to **{ctx.guild.name}**, support please wait for a support representative to respond!",
-        "thumbnail": thumbnail.url if thumbnail else None,
-        "guild_id": ctx.guild.id,
-        "embed": embeded
-    }
-         forumsconfig.update_one({"guild_id": guild_id}, {"$set": config_data}, upsert=True)
-         embed = discord.Embed(title="Forum Configuration Updated", description=f"* **Forum Channel:** {channel.mention}\n* **Role:** {role}\n* **Embed:** {embeded}\n* **Title:** {title}\n* **Description:** {description}\n* **Thumbnail:** {thumbnail}", color=discord.Color.dark_embed())
-         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-         await ctx.send(embed=embed)
-        elif option == 'Disable' :
-         forumsconfig.delete_one({"guild_id": ctx.guild.id})
-         await ctx.send(f"{tick} All Forum configuration data purged.")
+
+    @forums.command(description="Create a Forum Creation Embed")
+    @commands.has_guild_permissions(administrator=True)
+    async def manage(self, ctx):   
+       embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="A Forum Message is when someone opens a forum post is automaticly posts a forum message.", color=discord.Color.dark_embed())
+       for result in forumsconfig.find({"guild_id": ctx.guild.id}):
+        role = result['role']
+        role = discord.utils.get(ctx.guild.roles, id=role)
+        if role is None:
+           role = None
+        else:
+           role = role.mention
+              
+        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=f"<:arrow:1166529434493386823>**Channel:** <#{result['channel_id']}>\n<:arrow:1166529434493386823>**Role:** {role}\n<:arrow:1166529434493386823>**Title:** {result['title']}\n<:arrow:1166529434493386823>**Description:** {result['description']}\n<:arrow:1166529434493386823>**Thumbnail:** {result['thumbnail']}", inline=False)
+       embed.set_thumbnail(url=ctx.guild.icon.url)
+       embed.set_author(name=f"{ctx.author.display_name}", icon_url=ctx.author.display_avatar)
+       view = ForumsManage(ctx.author)
+       await ctx.send(embed=embed, view=view)
+
+
+
+
 
      
 
 
-    @configuration.error
+    @manage.error
     async def permissionerror(self, ctx, error):
         if isinstance(error, commands.MissingPermissions): 
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to manage forums.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
+
+
+class ForumsManage(discord.ui.View):
+    def __init__(self, author):
+        super().__init__(timeout=None)
+        self.author = author
+
+
+    @discord.ui.button(label='Create', style=discord.ButtonStyle.green,  emoji="<:Add:1163095623600447558>")
+    async def Create(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(CreateForum(self.author))
+
+
+    @discord.ui.button(label='Delete', style=discord.ButtonStyle.red,  emoji="<:bin:1160543529542635520>")
+    async def Delete(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)   
+        await interaction.response.send_modal(DeleteForum())
+
+
+
+
+class Embed(discord.ui.View):
+    def __init__(self, author, name,channel):
+        super().__init__(timeout=None)
+        self.author = author
+        self.name = name
+        self.channel = channel
+
+
+
+
+    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
+    async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Title())
+
+
+    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
+    async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Description())
+
+    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Thumbnail())
+
+    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
+    async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Colour())        
+
+    @discord.ui.button(label='Ping', style=discord.ButtonStyle.grey, emoji="<:Role:1162074735803387944>")
+    async def Ping(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Roleping())
+
+
+    @discord.ui.button(label='Finish', style=discord.ButtonStyle.green, emoji=f"{tick}")
+    async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+
+        embed = interaction.message.embeds[0]
+        message = interaction.message.content     
+        if message is None:
+           message = None
+        color_hex = f"{embed.color.value:06x}"
+        embed_data = {
+            "title": embed.title,
+            "description": embed.description,
+            "color": color_hex,
+            "thumbnail": embed.thumbnail.url if embed.thumbnail else None,
+            "guild_id": interaction.guild.id,
+            "channel_id": self.channel.id,
+            "role": message,
+            "name": self.name
+            }
+        forumsconfig.insert_one(embed_data)
+        embed = discord.Embed()
+        embed.title = f"{greencheck} Succesfully Created"
+        embed.description = f"Start by trying to create forum in <#{self.channel.id}>!"
+        embed.color = discord.Colour.brand_green()
+        await interaction.response.edit_message(embed=embed, view=None)
+           
+
+
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Forums(client))     
