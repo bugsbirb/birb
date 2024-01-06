@@ -293,7 +293,7 @@ class Forums(commands.Cog):
     @forums.command(description="Create a Forum Creation Embed")
     @commands.has_guild_permissions(administrator=True)
     async def manage(self, ctx):   
-       embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="A Forum Message is when someone opens a forum post is automaticly posts a forum message.", color=discord.Color.dark_embed())
+       embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
        for result in forumsconfig.find({"guild_id": ctx.guild.id}):
         role = result['role']
         role = discord.utils.get(ctx.guild.roles, id=role)
@@ -434,7 +434,7 @@ class Embed(discord.ui.View):
         embed.title = f"{greencheck} Succesfully Created"
         embed.description = f"Start by trying to create forum in <#{self.channel.id}>!"
         embed.color = discord.Colour.brand_green()
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.response.edit_message(content=None, embed=embed, view=None)
            
 
 
