@@ -121,7 +121,7 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
         elif duration_unit == 'w':    
             duration_seconds *= 604800
 
-        start_time = datetime.datetime.now()
+        start_time = datetime.now()
         end_time = start_time + timedelta(seconds=duration_seconds)
 
         data = loachannel.find_one({'guild_id': interaction.guild.id})
