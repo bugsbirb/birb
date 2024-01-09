@@ -21,9 +21,6 @@ class Feedback(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_group()    
-    async def staffs(self, ctx):
-        pass
 
 
     async def staffcheck(self, ctx, staff):
