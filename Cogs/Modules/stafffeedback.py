@@ -172,7 +172,7 @@ class ViewRatings(discord.ui.View):
 
 
 
-    @discord.ui.button(label='View Ratings', style=discord.ButtonStyle.grey)
+    @discord.ui.button(label='View Ratings', style=discord.ButtonStyle.grey, emoji="<:Rate:1162135093129785364>")
     async def Ratings(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -201,8 +201,8 @@ class ViewRatings(discord.ui.View):
                date_str = datetime.utcfromtimestamp(date).strftime('%d/%m/%Y')
 
             embed.add_field(
-    name=f"{rating['rating']}/10",
-    value=f"**Date:** {date_str}\n**Feedback ID:** {Id}\n**Feedback:** {feedback}",
+    name=f"<:Star:1133346299668873216> {rating['rating']}/10",
+    value=f"<:arrow:1166529434493386823>**Date:** {date_str}\n<:arrow:1166529434493386823>**Feedback ID:** {Id}\n<:arrow:1166529434493386823>**Feedback:** {feedback}",
     inline=False
 )
 
