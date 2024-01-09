@@ -183,7 +183,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Staff Feedback':
             embed.title = "Staff Feedback Module"
             embed.description = "This module facilitates the process of providing feedback and ratings for staff members. Users can use the commands within this module to share their feedback and experiences with the staff, helping to maintain a positive and efficient community environment."
-            embed.add_field(name="Commands", value="* /staff feedback\n* /staff rating")                
+            embed.add_field(name="Commands", value="* /feedback give\n* /feedback ratings")                
         elif category == 'Partnerships':
             embed.title = "Partnerships Module"
             embed.description = "Log partnerships, terminate partnerships, and view partnerships."
