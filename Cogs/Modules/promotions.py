@@ -24,6 +24,7 @@ arole = db['adminrole']
 promochannel = db['promo channel']
 consent = db['consent']
 modules = db['Modules']
+Customisation = db['Customisation']
 class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -65,10 +66,56 @@ class promo(commands.Cog):
             return
 
 
+        custom = Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Promotions'})
+        if custom:
+            replacements = {
+            '{staff.mention}': staff.mention,
+            '{staff.name}': staff.display_name,
+            '{author.mention}': ctx.author.mention,
+            '{author.name}': ctx.author.display_name,
+            '{reason}': reason,
+            '{newrank}': new.mention
 
-        embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description=f"* **User:** {staff.mention}\n* **Updated Rank:** {new.mention}\n* **Reason:** {reason}")
-        embed.set_thumbnail(url=staff.display_avatar)
-        embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
+           }
+            embed_title = await self.replace_variables(custom['title'], replacements)
+            embed_description = await self.replace_variables(custom['description'], replacements)
+
+            embed_author = await self.replace_variables(custom['author'], replacements)
+            if custom['thumbnail'] == "{staff.avatar}":
+              embed_thumbnail = staff.display_avatar
+            else:
+              embed_thumbnail = custom['thumbnail']
+
+
+            if custom['author_icon'] == "{author.avatar}":
+              authoricon = ctx.author.display_avatar
+            else:
+              authoricon = custom['author_icon']     
+
+            if embed_thumbnail == "None":
+              embed_thumbnail = None
+
+            if authoricon == "None":
+              authoricon = None   
+
+            embed = discord.Embed(title=embed_title,  description=embed_description, color=int(custom['color'], 16))
+
+            embed.set_thumbnail(url=embed_thumbnail)
+            print(str(embed_author))
+
+            if str(embed_author) == "None":
+              embed.set_author(name="", icon_url="")   
+            else:
+               embed.set_author(name=embed_author, icon_url=authoricon)  
+            if custom['image']:
+              embed.set_image(url=custom['image'])
+             
+
+        else:
+              
+         embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description=f"* **User:** {staff.mention}\n* **Updated Rank:** {new.mention}\n* **Reason:** {reason}")
+         embed.set_thumbnail(url=staff.display_avatar)
+         embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
 
 
         guild_id = ctx.guild.id
@@ -86,7 +133,7 @@ class promo(commands.Cog):
              await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**")
              await channel.send(f"{staff.mention}", embed=embed)
             except discord.Forbidden: 
-             await ctx.send(f"{no} I don't have permission to view that channel.")        
+             await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to view that channel.")        
              return       
             if consent_data['PromotionAlerts'] == "Enabled":
                 await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
@@ -96,6 +143,15 @@ class promo(commands.Cog):
             await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:
           await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
+
+    async def replace_variables(self, message, replacements):
+     for placeholder, value in replacements.items():
+        if value is not None:
+            message = str(message).replace(placeholder, str(value))
+        else:
+            message = str(message).replace(placeholder, "")  
+     return message
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(promo(client))            

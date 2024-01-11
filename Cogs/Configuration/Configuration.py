@@ -58,7 +58,8 @@ from Cogs.Configuration.Views.suggestionview import ToggleSuggestions
 
 from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
 
-
+from Cogs.Configuration.Views.Customationview import CustomEmbeds
+from Cogs.Configuration.Views.Customationview import ResetEmbeds
 quota = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
 dbq = quota['quotab']
 message_quota_collection = dbq["message_quota"]
@@ -149,7 +150,8 @@ class Config(discord.ui.Select):
         options = [
             discord.SelectOption(label="Basic Settings", value="Basic Settings", emoji="<:Setting:1154092651193323661>"),                   
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),            
-            discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),            
+            discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
+            discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),            
             discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
             discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
@@ -480,6 +482,11 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
 
+        elif color == 'Customisation':
+            embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds", color=discord.Color.dark_embed())
+            view = CustomisatiomModule(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)              
 
         await interaction.response.edit_message(embed=embed, view=view)
             
@@ -594,6 +601,13 @@ class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
         super().__init__()
         self.add_item(ToggleConnectionRoles(author))         
+        self.add_item(Config(author)) 
+
+class CustomisatiomModule(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(CustomEmbeds(author))     
+        self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
 class ConfigCog(commands.Cog):

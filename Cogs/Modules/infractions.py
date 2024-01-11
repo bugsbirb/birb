@@ -11,6 +11,7 @@ from discord.ext import commands
 import datetime
 from discord import app_commands
 import Paginator
+import re
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
@@ -27,7 +28,7 @@ appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 consent = db['consent']
 modules = db['Modules']
-
+Customisation = db['Customisation']
 
 
 
@@ -59,14 +60,60 @@ class Infractions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.")
          return
 
+        custom = Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Infractions'})
         random_string = ''.join(random.choices(string.digits, k=8))
-        if notes:
-         embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Notes:** {notes}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+        if custom:
+           replacements = {
+            '{staff.mention}': staff.mention,
+            '{staff.name}': staff.display_name,
+            '{author.mention}': ctx.author.mention,
+            '{author.name}': ctx.author.display_name,
+            '{action}': action,
+            '{reason}': reason,
+            '{notes}': notes
+
+           }
+           embed_title = await self.replace_variables(custom['title'], replacements)
+           embed_description = await self.replace_variables(custom['description'], replacements)
+    
+           embed_author = await self.replace_variables(custom['author'], replacements)
+           if custom['thumbnail'] == "{staff.avatar}":
+              embed_thumbnail = staff.display_avatar
+           else:
+              embed_thumbnail = custom['thumbnail']
+
+
+           if custom['author_icon'] == "{author.avatar}":
+              authoricon = ctx.author.display_avatar
+           else:
+              authoricon = custom['author_icon']
+
+           if embed_thumbnail == "None":
+              embed_thumbnail = None
+
+           if authoricon == "None":
+              authoricon = None   
+ 
+           if embed_author == None:
+              embed_author = ""
+           embed = discord.Embed(title=embed_title, description=embed_description , color=int(custom['color'], 16))
+
+           embed.set_thumbnail(url=embed_thumbnail)
+           embed.set_author(name=embed_author, icon_url=authoricon)
+           embed.set_footer(text=f"Infraction ID | {random_string}")
+           if custom['image']:
+              embed.set_image(url=custom['image'])
+       
+
         else:
-         embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
-        embed.set_thumbnail(url=staff.display_avatar)
-        embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
-        embed.set_footer(text=f"Infraction ID | {random_string}")
+              
+         if notes:
+          embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Notes:** {notes}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+         else:
+          embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+         embed.set_thumbnail(url=staff.display_avatar)
+         embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
+         embed.set_footer(text=f"Infraction ID | {random_string}")
         infract_data = {
             'management': ctx.author.id,
             'staff': staff.id,
@@ -96,7 +143,7 @@ class Infractions(commands.Cog):
              await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
              collection.insert_one(infract_data)
             except discord.Forbidden: 
-             await ctx.send(f"{no} I don't have permission to view that channel.")             
+             await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view that channel.")             
              return
             if consent_data['infractionalert'] == "Enabled":
              try:
@@ -109,6 +156,15 @@ class Infractions(commands.Cog):
             await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
         else:
           await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
+
+    async def replace_variables(self, message, replacements):
+     for placeholder, value in replacements.items():
+        if value is not None:
+            message = str(message).replace(placeholder, str(value))
+        else:
+            message = str(message).replace(placeholder, "")  
+     return message
+
 
     @commands.hybrid_command(description="View a staff members infractions")
     async def infractions(self, ctx, staff: discord.Member):

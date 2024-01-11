@@ -25,7 +25,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 LOARole = db['LOA Role']
 modules = db['Modules']
-from permissions import *
+from permissions import has_admin_role, has_staff_role
 class loamodule(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
