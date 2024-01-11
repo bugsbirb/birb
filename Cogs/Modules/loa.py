@@ -208,7 +208,7 @@ class Confirm(discord.ui.View):
         super().__init__(timeout=None)
 
 
-    async def has_admin_role(interaction):
+    async def has_admin_role(self, interaction):
      filter = {
         'guild_id': interaction.guild.id
     }
