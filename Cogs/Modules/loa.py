@@ -208,19 +208,21 @@ class Confirm(discord.ui.View):
         super().__init__(timeout=None)
 
 
-    async def has_admin_role(self, interaction):
-        filter = {
-            'guild_id': interaction.guild.id
-        }
-        admin_data = arole.find_one(filter)
+    async def has_admin_role(interaction):
+     filter = {
+        'guild_id': interaction.guild.id
+    }
+     staff_data = arole.find_one(filter)
 
-        if admin_data and 'adminrole' in admin_data:
-            admin_role_id = admin_data['adminrole']
-            admin_role = discord.utils.get(interaction.guild.roles, id=admin_role_id)
-            if admin_role in interaction.user.roles:
-                return True
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+        staff_role = discord.utils.get(interaction.guild.roles, id=staff_role_ids)
+        if not isinstance(staff_role_ids, list):
+          staff_role_ids = [staff_role_ids]     
+        if any(role.id in staff_role_ids for role in interaction.user.roles):
+            return True
 
-        return False     
+     return False
 
 
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji=f"{tick}")
