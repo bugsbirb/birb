@@ -165,113 +165,7 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
                 pass
 
 
-class DemotedToRole(discord.ui.RoleSelect):
-    def __init__(self, user, guild, author):
-        super().__init__(placeholder='Removed Rank')
-        self.user = user
-        self.guild = guild
-        self.author = author        
 
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        selected_role_id = self.values[0].id 
-        role = discord.utils.get(interaction.guild.roles, id=selected_role_id)
-        
-        if role is None:
-            embed = discord.Embed(description=f"Role with ID {selected_role_id} not found.",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        if interaction.user.top_role <= role:
-            await interaction.response.edit_message(
-                content=f"{no} **{interaction.user.display_name}**, you are below the role `{role.name}` and do not have the authority to promote this member.",
-                view=Return(self.user, self.guild, self.author),
-                embed=None
-            )
-            return
-
-        await interaction.response.send_modal(DemotionReason(self.user, self.guild, self.author, selected_role_id)) 
-
-
-class DemotionReason(discord.ui.Modal, title='Reason'):
-    def __init__(self, user, guild, author, role):
-        super().__init__()
-        self.user = user
-        self.guild = guild
-        self.author = author
-        self.role = role
-
-
-
-    Reason = discord.ui.TextInput(
-        label='reason?',
-        placeholder='Demotion reason?',
-    )
-
-
-    async def on_submit(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)          
-
-        reason = self.Reason.value
-        role = discord.utils.get(interaction.guild.roles, id=self.role)
-
-
-        random_string = ''.join(random.choices(string.digits, k=8))
-        reason = self.Reason.value 
-        embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** Demotion\n* **Reason:** {reason}", color=discord.Color.dark_embed())
-        embed.set_thumbnail(url=self.user.display_avatar)
-        embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
-        embed.set_footer(text=f"Infraction ID | {random_string}")
-        infract_data = {
-            'management': self.author.id,
-            'staff': self.user.id,
-            'action': "Demotion",
-            'reason': reason,
-            'notes': "`N/A`",
-            'random_string': random_string,
-            'guild_id': interaction.guild.id
-        }
-
-        guild_id = interaction.guild.id
-        data = infchannel.find_one({'guild_id': guild_id})
-        appeal_data = appealable.find_one({'guild_id': str(interaction.guild.id)})
-
-        if appeal_data is not None:
-         appeal_enabled = appeal_data.get('enabled', False)
-        else:
-          appeal_enabled = False
-        if data:
-         channel_id = data['channel_id']
-         channel = interaction.guild.get_channel(channel_id)
-
-         if channel:
-            try:
-                 await self.user.remove_roles(role)
-            except discord.Forbidden:
-                 await interaction.response.edit_message(content=f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to remove roles.",                         embed=None,
-                        view=Return(self.user, self.guild, self.author))
-                 return               
-            
-            try:
-             await channel.send(f"{self.user.mention}", embed=embed)
-            except discord.Forbidden: 
-             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=Return(self.user, self.guild, self.author), embed=None)             
-             return
-            await interaction.response.edit_message(content=f"{tick} **{self.author.display_name}**, I've demoted **@{self.user.display_name}**", embed=None, view=Return(self.user, self.guild, self.author))
-            collection.insert_one(infract_data)
-            try:
-                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed)
-            except discord.Forbidden:
-                pass
-        else:
-          await interaction.response.edit_message(content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`", embed=None, view=Return(self.user, self.guild, self.author))
 
 
 
@@ -335,7 +229,14 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
         placeholder='Whats the reason for the promotion?',
     )
 
-
+    async def replace_variables(self, message, replacements):
+     for placeholder, value in replacements.items():
+        if value is not None:
+            message = str(message).replace(placeholder, str(value))
+        else:
+            message = str(message).replace(placeholder, "")  
+     return message
+    
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
@@ -349,13 +250,57 @@ class PromotionReason(discord.ui.Modal, title='Reason'):
         if consent_data is None:
             consent.insert_one({"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
             consent_data = {"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
-        embed = discord.Embed(
-            title="Staff Promotion",
-            color=0x2b2d31,
-            description=f"* **User:** {user_mention}\n* **Updated Rank:** {role.mention}\n* **Reason:** {reason}"
-        )
-        embed.set_thumbnail(url=self.user.display_avatar)
-        embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar.url)
+        custom = Customisation.find_one({'guild_id': interaction.guild.id, 'type': 'Promotions'})
+        if custom:
+            replacements = {
+            '{staff.mention}': self.user.mention,
+            '{staff.name}': self.user.display_name,
+            '{author.mention}': self.author.mention,
+            '{author.name}': self.author.display_name,
+            '{reason}': reason,
+            '{newrank}': role.mention
+
+           }
+            embed_title = await self.replace_variables(custom['title'], replacements)
+            embed_description = await self.replace_variables(custom['description'], replacements)
+
+            embed_author = await self.replace_variables(custom['author'], replacements)
+            if custom['thumbnail'] == "{staff.avatar}":
+              embed_thumbnail = self.user.display_avatar
+            else:
+              embed_thumbnail = custom['thumbnail']
+
+
+            if custom['author_icon'] == "{author.avatar}":
+              authoricon = self.author.display_avatar
+            else:
+              authoricon = custom['author_icon']     
+
+            if embed_thumbnail == "None":
+              embed_thumbnail = None
+
+            if authoricon == "None":
+              authoricon = None   
+
+            embed = discord.Embed(title=embed_title,  description=embed_description, color=int(custom['color'], 16))
+
+            embed.set_thumbnail(url=embed_thumbnail)
+            print(str(embed_author))
+
+            if str(embed_author) == "None":
+              embed.set_author(name="", icon_url="")   
+            else:
+               embed.set_author(name=embed_author, icon_url=authoricon)  
+            if custom['image']:
+              embed.set_image(url=custom['image'])
+             
+
+        else:
+              
+         embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description=f"* **User:** {self.user.mention}\n* **Updated Rank:** {role.mention}\n* **Reason:** {reason}")
+         embed.set_thumbnail(url=self.user.display_avatar)
+         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar.url)
+
 
         guild_id = interaction.guild.id
         data = promochannel.find_one({'guild_id': guild_id})
@@ -419,7 +364,14 @@ class Reason(discord.ui.Modal, title='Reason'):
         placeholder='Whats the reason for the infraction?',
     )
 
-
+    async def replace_variables(self, message, replacements):
+     for placeholder, value in replacements.items():
+        if value is not None:
+            message = str(message).replace(placeholder, str(value))
+        else:
+            message = str(message).replace(placeholder, "")  
+     return message
+    
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
@@ -431,10 +383,57 @@ class Reason(discord.ui.Modal, title='Reason'):
             consent_data = {"user_id": self.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}            
         random_string = ''.join(random.choices(string.digits, k=8))
         reason = self.Reason.value 
-        embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** {self.option}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
-        embed.set_thumbnail(url=self.user.display_avatar)
-        embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
-        embed.set_footer(text=f"Infraction ID | {random_string}")
+        custom = Customisation.find_one({'guild_id': interaction.guild.id, 'type': 'Infractions'})
+        if custom:
+           replacements = {
+            '{staff.mention}': self.user.mention,
+            '{staff.name}': self.user.display_name,
+            '{author.mention}': self.author.mention,
+            '{author.name}': self.author.display_name,
+            '{action}': self.option,
+            '{reason}': reason
+
+
+           }
+           embed_title = await self.replace_variables(custom['title'], replacements)
+           embed_description = await self.replace_variables(custom['description'], replacements)
+    
+           embed_author = await self.replace_variables(custom['author'], replacements)
+           if custom['thumbnail'] == "{staff.avatar}":
+              embed_thumbnail = self.user.display_avatar
+           else:
+              embed_thumbnail = custom['thumbnail']
+
+
+           if custom['author_icon'] == "{author.avatar}":
+              authoricon = self.author.display_avatar
+           else:
+              authoricon = custom['author_icon']
+
+           if embed_thumbnail == "None":
+              embed_thumbnail = None
+
+           if authoricon == "None":
+              authoricon = None   
+ 
+           if embed_author == None:
+              embed_author = ""
+           embed = discord.Embed(title=embed_title, description=embed_description , color=int(custom['color'], 16))
+
+           embed.set_thumbnail(url=embed_thumbnail)
+           embed.set_author(name=embed_author, icon_url=authoricon)
+           embed.set_footer(text=f"Infraction ID | {random_string}")
+           if custom['image']:
+              embed.set_image(url=custom['image'])
+       
+
+        else:
+              
+
+         embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** {self.option}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+         embed.set_thumbnail(url=self.user.display_avatar)
+         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
+         embed.set_footer(text=f"Infraction ID | {random_string}")
         infract_data = {
             'management': self.author.id,
             'staff': self.user.id,
@@ -523,13 +522,7 @@ class LOACreation(discord.ui.View):
         self.author = author        
         self.add_item(LOA(self.user, self.guild, self.author))
 
-class DemotionRoleView(discord.ui.View):
-    def __init__(self, user, guild, author):
-        super().__init__()
-        self.user = user
-        self.guild = guild
-        self.author = author        
-        self.add_item(DemotedToRole(self.user, self.guild, self.author))
+
 
 class AdminPanelCog(commands.Cog):
     def __init__(self, client):
