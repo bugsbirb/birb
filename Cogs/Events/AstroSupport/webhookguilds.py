@@ -1,18 +1,14 @@
 import discord
 from discord.ext import commands, tasks
-import asyncio
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Optional
-import pytz
-from discord import app_commands
-from pymongo import MongoClient
 from emojis import *
-import typing
-import Paginator
 import os
 from dotenv import load_dotenv
-
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+MONGO_URL = os.getenv('MONGO_URL')
+client = AsyncIOMotorClient(MONGO_URL)
+db = client['astro']
+blacklists = db['blacklists']
 
 class webGuildJoins(commands.Cog):
     def __init__(self, client):
@@ -21,6 +17,9 @@ class webGuildJoins(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
+        blacklist = await blacklists.find_one({'user': guild.owner.id})
+        if blacklist:
+            return
         channel_id = 1178362100737916988 
         channel = self.client.get_channel(channel_id)
         if channel:
