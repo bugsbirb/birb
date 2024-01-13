@@ -80,7 +80,8 @@ class client(commands.AutoShardedBot):
         'Cogs.Events.on_thread_create',
         'Cogs.Events.connectionrolesevent',
         'Cogs.Modules.connectionroles',
-        'Cogs.Events.AstroSupport.blacklist'
+        'Cogs.Events.AstroSupport.blacklist',
+        'Cogs.Events.AstroSupport.topgg'
         
         ]
 
