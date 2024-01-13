@@ -1,20 +1,10 @@
 import discord
-from discord import ui
-import time
-import sys
-import discord.ext
 from discord.ext import commands
-from urllib.parse import quote_plus
 from discord import app_commands
-import discord
-import datetime
-from discord.ext import commands, tasks
-from jishaku import Jishaku
+from discord.ext import commands
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
-from typing import Optional
-import sqlite3
 from emojis import *
 from Cogs.Configuration.Views.infractionsview import InfractionChannel
 
@@ -60,14 +50,15 @@ from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
 
 from Cogs.Configuration.Views.Customationview import CustomEmbeds
 from Cogs.Configuration.Views.Customationview import ResetEmbeds
-quota = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+MONGO_URL = os.getenv('MONGO_URL')
+
+mongo = MongoClient(MONGO_URL)
+quota = MongoClient(MONGO_URL)
 dbq = quota['quotab']
 message_quota_collection = dbq["message_quota"]
 
 
-MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 scollection = db['staffrole']
 arole = db['adminrole']

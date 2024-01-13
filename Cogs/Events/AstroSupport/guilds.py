@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import os
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient

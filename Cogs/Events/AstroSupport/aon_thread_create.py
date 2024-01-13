@@ -1,16 +1,7 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import asyncio
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Optional
-import pytz
-from discord import app_commands
-from pymongo import MongoClient
 from emojis import *
-import typing
-import Paginator
-import os
 from dotenv import load_dotenv
 
 
