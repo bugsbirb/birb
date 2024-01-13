@@ -1,16 +1,9 @@
 import discord
 import discord
 from discord.ext import commands
-from typing import Literal
-import datetime
-from datetime import timedelta
-import asyncio
-from discord import app_commands
-from discord.ext import commands, tasks
-import pytz
+from discord.ext import commands
 from pymongo import MongoClient
 from discord.ui import View, button
-import platform
 import os
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)

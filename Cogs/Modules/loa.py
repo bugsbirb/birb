@@ -1,17 +1,14 @@
 import discord
-import sqlite3
 import discord
 from discord.ext import commands
 from typing import Literal
 import datetime
 from datetime import timedelta
-import asyncio
 from discord import app_commands
 from discord.ext import commands, tasks
-import pytz
+
 from pymongo import MongoClient
 from emojis import * 
-import time
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -25,6 +22,94 @@ scollection = db['staffrole']
 arole = db['adminrole']
 LOARole = db['LOA Role']
 modules = db['Modules']
+
+
+class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
+    def __init__(self, user, guild, author):
+        super().__init__()
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+
+
+    Duration = discord.ui.TextInput(
+        label='Duration',
+        placeholder='e.g 1w (m/h/d/w)',
+    )
+
+    reason = discord.ui.TextInput(
+        label = 'Reason',
+        placeholder='Reason for their loa'
+    )
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        duration = self.Duration.value        
+        reason = self.reason.value     
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        duration_value = int(duration[:-1])
+        duration_unit = duration[-1]
+        duration_seconds = duration_value
+
+        if duration_unit == 'm':
+            duration_seconds *= 60
+        elif duration_unit == 'h':
+            duration_seconds *= 3600
+        elif duration_unit == 'd':
+            duration_seconds *= 86400
+        elif duration_unit == 'w':    
+            duration_seconds *= 604800
+
+        start_time = datetime.now()
+        end_time = start_time + timedelta(seconds=duration_seconds)
+
+        data = loachannel.find_one({'guild_id': interaction.guild.id})
+        if data:
+          channel_id = data['channel_id']
+          channel = interaction.guild.get_channel(channel_id)
+
+          if channel:
+           embed = discord.Embed(title=f"LOA Created", description=f"* **User:** {self.user.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {self.reason}", color=discord.Color.dark_embed())
+           embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
+           embed.set_thumbnail(url=self.user.display_avatar)
+           loadata = {'guild_id': interaction.guild.id,
+           'user': self.user.id,
+           'start_time': start_time,
+           'end_time': end_time,
+           'reason': reason,
+           'active': True
+                  }        
+           loarole_data = LOARole.find_one({'guild_id': interaction.guild.id})
+           if loarole_data:
+             loarole = loarole_data['staffrole']
+             if loarole:
+              role = discord.utils.get(interaction.guild.roles, id=loarole)
+              if role:
+                try:
+                 await self.user.add_roles(role)                   
+                except discord.Forbidden:  
+                 await interaction.response.edit_message(content=f"{no} I don't have permission to add roles.")             
+                 return     
+
+
+           await interaction.response.edit_message(content=f"{tick} Created LOA for **@{self.user.display_name}**", embed=embed, view=None)
+           loa_collection.insert_one(loadata)                
+           try:      
+              await channel.send(f"<:Add:1163095623600447558> LOA was created by **@{interaction.user.display_name}**", embed=embed)  
+           except discord.Forbidden:  
+             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.")             
+             return                
+           try:
+                await self.user.send(f"<:Add:1163095623600447558> A LOA was created for you **@{interaction.guild.name}**", embed=embed)
+           except discord.Forbidden:    
+                pass
+
+
 from permissions import has_admin_role, has_staff_role
 class loamodule(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -92,10 +177,47 @@ class loamodule(commands.Cog):
 
     @loa.command(description="Manage someone leave of Absence")
     async def manage(self, ctx, user: discord.Member):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
      if not await has_admin_role(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
-         return            
-     await ctx.send(f"<:LOA:1164969910238203995> **Hey,** loa manage has been moved over to `/admin panel`!")
+         return   
+
+     loa = loa_collection.find_one({"user": user.id, "guild_id": ctx.guild.id, 'active': True})
+     loainactive = loa_collection.find({"user": user.id, "guild_id": ctx.guild.id, 'active': False})
+     view = None
+
+     if loa is None:
+            description = []
+            for request in loainactive:
+                start_time = request['start_time']
+                end_time = request['end_time']
+                reason = request['reason']
+                description.append(f"<:LOA:1164969910238203995> **Previous LOA**\n<:arrow:1166529434493386823><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
+
+            embed = discord.Embed(title="Leave Of Absense", description=f"\n".join(description), color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=user.display_avatar)
+            embed.set_author(icon_url=user.display_avatar, name=user.display_name)
+            view = LOACreate(user, ctx.guild, ctx.author)
+
+     else:
+            start_time = loa['start_time']
+            end_time = loa['end_time']
+            reason = loa['reason']
+
+            embed = discord.Embed(
+                title=f"Leave Of Absence",
+                color=discord.Color.dark_embed(),
+                description=f"<:LOA:1164969910238203995> **Active LOA**\n<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}"
+            )
+            embed.set_thumbnail(url=user.display_avatar)
+            embed.set_author(icon_url=user.display_avatar, name=user.display_name)
+
+            view = LOAPanel(user, ctx.guild, ctx.author)              
+
+     await ctx.send(embed=embed, view=view)
+
 
 
 
@@ -277,13 +399,17 @@ class Confirm(discord.ui.View):
         print(f"LOA Request @{interaction.guild.name} denied") 
 
 
-class LOAManage(discord.ui.View):
+   
+
+class LOAPanel(discord.ui.View):
     def __init__(self, user, guild, author):
         super().__init__(timeout=None)
         self.user = user
         self.guild = guild
         self.author = author
-    @discord.ui.button(label='End', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Exterminate:1164970632262451231>")
+
+
+    @discord.ui.button(label='Void LOA', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Exterminate:1164970632262451231>")
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user
         author = self.author.id
@@ -291,20 +417,42 @@ class LOAManage(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        loadata = {'user': user.id, 'guild_id': interaction.guild.id}    
-        loa_collection.delete_one(loadata)
-        await interaction.response.edit_message(embed=None, content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA", view=None)
-        try:
-         await user.send(f"{tick} Your LOA **@{self.guild.name}** has been manually ended.")
-        except discord.Forbidden:
-                pass 
+        loa = loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id, 'active': True})
         loarole_data = LOARole.find_one({'guild_id': interaction.guild.id})
         if loarole_data:
          loarole = loarole_data['staffrole']
          if loarole:
           role = discord.utils.get(interaction.guild.roles, id=loarole)
           if role:
-            await user.remove_roles(role)         
+            try:
+             await user.remove_roles(role)         
+            except discord.Forbidden: 
+                await interaction.response.edit_message(content=f"{no} I don't have permission to remove roles.")
+                return
+        try:    
+         await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")  
+        except discord.Forbidden:
+                pass              
+            
+
+        loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': False}})
+
+        await interaction.response.edit_message(embed=None, content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA", view=None)
+
+class LOACreate(discord.ui.View):
+    def __init__(self, user, guild, author):
+        super().__init__(timeout=None)
+        self.user = user
+        self.guild = guild
+        self.author = author
+
+    @discord.ui.button(label='Create Leave Of Absence', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel', emoji="<:Add:1163095623600447558>")
+    async def CreateLOA(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.send_modal(LOA(self.user, self.guild, self.author))
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(loamodule(client))             

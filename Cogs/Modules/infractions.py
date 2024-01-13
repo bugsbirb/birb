@@ -1,17 +1,13 @@
-import sqlite3
+
 import discord
 from discord.ext import commands
 from typing import Literal
 import random
 import string
-import asyncio
-from typing import Union, Optional
+from typing import Optional
 import sqlite3
 from discord.ext import commands
-import datetime
-from discord import app_commands
-import Paginator
-import re
+
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv

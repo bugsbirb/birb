@@ -7,12 +7,9 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 from discord import app_commands
 import discord
-import datetime
 from discord.ext import commands, tasks
 from typing import Optional
-import Paginator
 import sentry_sdk
-import asyncio
 from Cogs.Modules.loa import *
 import os
 from dotenv import load_dotenv

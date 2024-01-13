@@ -1,16 +1,12 @@
 import discord
-import sqlite3
 from discord.ext import commands
 from typing import Literal
 import datetime 
 from datetime import timedelta
-import asyncio
 from discord import app_commands
 from discord.ext import commands, tasks
-import pytz
 from pymongo import MongoClient
 from emojis import *
-import time
 import os
 from dotenv import load_dotenv
 from Cogs.Modules.infractions import *

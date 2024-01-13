@@ -1,10 +1,5 @@
 import discord
-from discord.ext import commands, tasks
-import asyncio
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Optional
-import pytz
+from discord.ext import commands
 from discord import app_commands
 from typing import Literal
 from typing import Optional

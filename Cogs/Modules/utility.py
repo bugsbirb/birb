@@ -1,15 +1,12 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import Context, clean_content
-import random
+
+
 from datetime import datetime
-from typing import Union, Optional
-from typing import Literal
+from typing import Optional
 from pymongo import MongoClient
 import requests
-import typing
 import os
-import dotenv
 from dotenv import load_dotenv
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')

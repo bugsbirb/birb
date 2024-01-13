@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from typing import Literal
-from datetime import timedelta
 from discord.ext import commands
 from pymongo import MongoClient
 from emojis import * 

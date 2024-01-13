@@ -1,19 +1,11 @@
 
 import discord
 from discord.ext import commands, tasks
-import asyncio
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Optional
-import pytz
-from discord import app_commands
 from pymongo import MongoClient
 from emojis import *
-import typing
 from typing import Literal
 import os
 from dotenv import load_dotenv
-import Paginator
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']

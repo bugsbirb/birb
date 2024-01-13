@@ -5,9 +5,7 @@ import os
 import discord
 from discord.ext import commands
 from pymongo import MongoClient
-from typing import Optional
 from emojis import *
-import typing
 from permissions import *
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)

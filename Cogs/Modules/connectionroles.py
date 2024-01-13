@@ -1,15 +1,9 @@
 import discord
 import discord
 from discord.ext import commands
-from typing import Literal
-import datetime
-from datetime import timedelta
-import asyncio
 from discord import app_commands
-from discord.ext import commands, tasks
-import pytz
+from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
-import platform
 import os
 from dotenv import load_dotenv
 from emojis import * 
