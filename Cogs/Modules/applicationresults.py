@@ -117,11 +117,11 @@ class ApplicationResults(commands.Cog):
                         
             else:           
                 await ctx.send(
-                    f"{no} {ctx.author.display_name}, the specified channel doesn't exist."
+                    f"{no} **{ctx.author.display_name}**, the specified channel doesn't exist."
                 )
         else:
             await ctx.send(
-                f"{no} {ctx.author.display_name}, this channel isn't configured. Please do `/config`."
+                f"{no} **{ctx.author.display_name}**, this channel isn't configured. Please do `/config`."
             )
 class JumpUrl(discord.ui.View):
     def __init__(self, jumpurl):

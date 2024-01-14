@@ -30,7 +30,7 @@ class Modmailevnt(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-
+        
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
             modmail_data = modmail.find_one({'user_id': user_id})
@@ -79,7 +79,7 @@ class Modmailevnt(commands.Cog):
                     return
                 except ValueError:
                     await message.author.send(f"{no} Invalid server number. Please enter a valid number.")
-
+                    return
                 category_id = modmailcategory.find_one({'guild_id': selected_server.id})['category_id']
 
                 category = self.client.get_channel(category_id)
@@ -143,6 +143,8 @@ class Modmailevnt(commands.Cog):
                     embed.set_thumbnail(url=message.author.display_avatar)
                     await channel.send(embed=embed)
 
+    
+
     async def close_modmail(self, user, channel_id):
         channel = self.client.get_channel(channel_id)
         if channel:
@@ -153,6 +155,6 @@ class Modmailevnt(commands.Cog):
 
         else:
             await user.send(f"<:dnd:1162074644023627889> There was an issue closing the modmail conversation. Please contact server admins.")
-
+    
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Modmailevnt(client))       

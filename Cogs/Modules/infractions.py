@@ -139,7 +139,7 @@ class Infractions(commands.Cog):
              await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
              collection.insert_one(infract_data)
             except discord.Forbidden: 
-             await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view that channel.")             
+             await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.")             
              return
             if consent_data['infractionalert'] == "Enabled":
              try:
@@ -149,7 +149,7 @@ class Infractions(commands.Cog):
             else:
                 pass
          else:
-            await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
+            await ctx.send(f"{Warning} **{ctx.author.display_name}**, I don't have permission to view that channel.")
         else:
           await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
 

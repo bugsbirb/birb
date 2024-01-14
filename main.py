@@ -78,7 +78,8 @@ class client(commands.AutoShardedBot):
         'Cogs.Events.connectionrolesevent',
         'Cogs.Modules.connectionroles',
         'Cogs.Events.AstroSupport.blacklist',
-        'Cogs.Events.AstroSupport.topgg'
+        'Cogs.Events.AstroSupport.topgg',
+        'Cogs.Events.AstroSupport.analytics'
         
         ]
 

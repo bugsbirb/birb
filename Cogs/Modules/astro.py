@@ -17,8 +17,12 @@ MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
+analytics = db['analytics']
+scollection = db['staffrole']
+arole = db['adminrole']
+blacklists = db['blacklists']
 
-
+modules = db['Modules']
 class HelpdeskDropdown(discord.ui.Select):
     def __init__(self):
         options = [
@@ -94,7 +98,96 @@ class management(commands.Cog):
         await ctx.send(embeds=(banner, main), view=view)
 
 
+    @commands.command()
+    @commands.is_owner()
+    async def analytics(self, ctx):
+     result = analytics.find({})
 
+     description = ""
+     for x in result:
+        for key, value in x.items():
+            if key != '_id':
+                description += f"**{key}:** `{value}`\n"
+        description += ""
+
+     embed = discord.Embed(title="Command Analytics", description=description, color=discord.Color.dark_embed())
+     embed.set_thumbnail(url=ctx.guild.icon)
+     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+     await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def guildinfo(self, ctx, guildid: int):
+        await ctx.defer()  
+        guild = await self.client.fetch_guild(guildid)
+        if guild is None:
+            await ctx.send(f"{no} Guild not found!")
+            return
+        staffroleresult = scollection.find_one({'guild_id': guild.id})
+        adminroleresult = arole.find_one({'guild_id': guild.id})
+
+        if adminroleresult:
+            admin_roles_ids = adminroleresult.get('staffrole', [])
+            if not isinstance(admin_roles_ids, list):
+                admin_roles_ids = [admin_roles_ids]
+            admin_roles_mentions = [discord.utils.get(guild.roles, id=role_id).name
+                                    for role_id in admin_roles_ids if discord.utils.get(guild.roles, id=role_id) is not None]
+            if not admin_roles_mentions:
+                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+            else:
+                adminrolemessage = ", ".join(admin_roles_mentions)
+        
+        if staffroleresult:
+            staff_roles_ids = staffroleresult.get('staffrole', [])
+            if not isinstance(staff_roles_ids, list):
+                staff_roles_ids = [staff_roles_ids]
+            staff_roles_mentions = [discord.utils.get(guild.roles, id=role_id).name
+                                    for role_id in staff_roles_ids if discord.utils.get(guild.roles, id=role_id) is not None]
+            if not staff_roles_mentions:
+                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+            else:
+                staffrolemessage = ", ".join(staff_roles_mentions)       
+
+        all_servers_data = modules.find_one({'guild_id': guildid})
+        print(all_servers_data)
+    
+
+        modules_info = ""
+    
+        if all_servers_data:
+         modules_info = ""
+         for module, enabled in all_servers_data.items():
+          if module != '_id' and module != 'guild_id':
+            modules_info += f"**{module}:** {f'{tick}' if enabled else f'{no}'}\n"
+        else:
+          modules_info = "No document found in the collection."
+
+
+        if guild.owner is None:
+            owner = "Unknown"
+        else:
+            owner = guild.owner.display_name
+        embed = discord.Embed(title=f"{guild.name}", description=f"**Owner:** {owner}\n**Guild ID:** {guild.id}\n**Roles:** {len(guild.roles)}\n**Created:** <t:{guild.created_at.timestamp():.0f}:D>", color=discord.Color.dark_embed())
+        embed.set_thumbnail(url=guild.icon)
+        if guild.banner:
+         embed.set_image(url=guild.banner)
+        embed.add_field(name=f"{Settings} Basic Settings", value=f"**Admin Roles:** {adminrolemessage}\n**Staff Roles:** {staffrolemessage}")
+        if modules_info:
+         embed.add_field(name=f"Modules", value=modules_info, inline=False)
+        embed.set_author(name=guild.name, icon_url=guild.icon)
+
+         
+     
+        await ctx.send(embed=embed)
+
+        
+
+
+        
+        
+      
+        
+        
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(management(client))     

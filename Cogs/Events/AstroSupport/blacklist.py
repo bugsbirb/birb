@@ -25,9 +25,8 @@ class blacklist(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def blacklist(self, ctx, user: discord.Member):
-        user = self.client.fetch_user(user.id)
-        await blacklists.insert_one({'user': user.id})
+    async def blacklist(self, ctx, id: int):
+        await blacklists.insert_one({'user': id})
 
 
 

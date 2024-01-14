@@ -172,7 +172,7 @@ class Suspensions(commands.Cog):
         view = SuspensionPanel(staff, ctx.author)
         await ctx.send(embed=embed, view=view)
      else:
-        await ctx.send(f"{no} No suspensions found for this user.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.")
 
     
 
