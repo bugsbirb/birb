@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 from emojis import * 
 import typing
+import Paginator
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
@@ -97,26 +98,59 @@ class ConnectionRoles(commands.Cog):
     async def connectionrole_list(self, ctx):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return            
+         return
+
         roleresult = await connectionroles.find({"guild": ctx.guild.id}).to_list(length=100000)
         if len(roleresult) == 0:
             await ctx.send(f"{no} **{ctx.author.display_name}**, There are no connection roles.")
-            return  
+            return
+
+        MAX_FIELDS_PER_PAGE = 9
+        embeds = []
+        current_embed = None
+        MAX_FIELDS_PER_PAGE = 9
+        embeds = []
+        current_embed = None
+
+        for idx, role in enumerate(roleresult):
+            if idx % MAX_FIELDS_PER_PAGE == 0:
+                if current_embed:
+                    embeds.append(current_embed)
+
+                current_embed = discord.Embed(title="Connection Roles", color=discord.Color.dark_embed())
+                current_embed.set_thumbnail(url=ctx.guild.icon)
+                current_embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+
+            current_embed.add_field(
+                name=f"{role['name']}",
+                value=f"**Parent:** <@&{role['parent']}>\n**Child:** <@&{role['child']}>",
+                inline=False
+            )
+
+        if current_embed:
+            embeds.append(current_embed)
+
+        PreviousButton = discord.ui.Button(label="<")
+        NextButton = discord.ui.Button(label=">")
+        FirstPageButton = discord.ui.Button(label="<<")
+        LastPageButton = discord.ui.Button(label=">>")
+        InitialPage = 0
+        timeout = 42069
+
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+
+        await paginator.start(ctx, pages=embeds)
+
         
 
-        embed = discord.Embed(
-            title="Connection Roles",
-            description="",
-            color=discord.Color.dark_embed()
-        )
-        embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
 
-        for role in roleresult:
-            embed.add_field(name=f"{role['name']}", value=f"**Parent:** <@&{role['parent']}>\n**Child:** <@&{role['child']}>", inline=False)
-
-
-        await ctx.send(embed=embed)
     
     @connectionrole_add.error
     @connectionrole_remove.error
