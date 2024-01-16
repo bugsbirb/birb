@@ -36,7 +36,9 @@ class promo(commands.Cog):
     @app_commands.describe(
     staff='What staff member are you promoting?',
     new='What the role you are awarding them with?',
-    reason='What makes them deserve the promotion?') 
+    reason='What makes them deserve the promotion?',
+    autorole='Do you want to give them the role automatically?'
+    ) 
     async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str, autorole: Optional[Literal['False']]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
