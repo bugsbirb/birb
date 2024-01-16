@@ -7,7 +7,7 @@ import string
 from typing import Optional
 import sqlite3
 from discord.ext import commands
-
+import typing
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
@@ -25,7 +25,7 @@ appealschannel = db['Appeals Channel']
 consent = db['consent']
 modules = db['Modules']
 Customisation = db['Customisation']
-
+infractiontypes = db['infractiontypes']
 
 
 class Infractions(commands.Cog):
@@ -42,8 +42,35 @@ class Infractions(commands.Cog):
         return True
 
      
+    async def infractiontypes(
+    self,
+    interaction: discord.Interaction,
+    current: str
+) -> typing.List[app_commands.Choice[str]]:
+     filter = {
+        'guild_id': interaction.guild_id 
+    }
+
+     try:
+        tag_names = infractiontypes.distinct("types", filter)
+     except Exception as e:
+        print(f"Error fetching distinct values: {e}")
+        tag_names = None
+
+     if tag_names is None or not tag_names:
+        tag_names = ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']
+
+     filtered_names = [name for name in tag_names if current.lower() in name.lower()]
+     try:
+      choices = [app_commands.Choice(name=name, value=name) for name in filtered_names]
+     except Exception as e:
+      print(f"Error creating choices: {e}")
+     return choices
+ 
+
     @commands.hybrid_command(description="Infract staff members")
-    async def infract(self, ctx, staff: discord.Member, reason: str, action: Literal['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination'], notes: Optional[str]):
+    @app_commands.autocomplete(action=infractiontypes)
+    async def infract(self, ctx, staff: discord.Member, reason: str, action, notes: Optional[str]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return    

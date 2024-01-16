@@ -50,6 +50,7 @@ from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
 
 from Cogs.Configuration.Views.Customationview import CustomEmbeds
 from Cogs.Configuration.Views.Customationview import ResetEmbeds
+from Cogs.Configuration.Views.infractionsview import InfractionTypes
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -74,6 +75,7 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipch = db['Partnerships Channel']
 modules = db['Modules']
+nfractiontypes = db['infractiontypes']
 
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
@@ -501,7 +503,8 @@ class InfractModule(discord.ui.View):
         super().__init__()
         self.author = author
         self.add_item(InfractionChannel(author))
-        self.add_item(ToggleInfractionsDropdown(author))        
+        self.add_item(ToggleInfractionsDropdown(author))     
+        self.add_item(InfractionTypes(author))   
         self.add_item(Config(author))        
 
 class UtilsModule(discord.ui.View):
@@ -609,6 +612,10 @@ class ConfigCog(commands.Cog):
     @commands.has_guild_permissions(administrator=True)
     async def config(self, ctx):
         staffroleresult = scollection.find_one({'guild_id': ctx.guild.id})
+        types = nfractiontypes.find_one({'guild_id': ctx.guild.id})
+        if types is None:
+            nfractiontypes.insert_one({"guild_id": ctx.guild.id, "types": ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']})
+
         adminroleresult = arole.find_one({'guild_id': ctx.guild.id})
         modulesdata = modules.find_one({'guild_id': ctx.guild.id})
         if modulesdata is None:

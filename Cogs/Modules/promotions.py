@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from emojis import *
+from typing import Literal, Optional
 from permissions import has_admin_role, has_staff_role
 MONGO_URL = os.getenv('MONGO_URL')
 
@@ -36,7 +37,7 @@ class promo(commands.Cog):
     staff='What staff member are you promoting?',
     new='What the role you are awarding them with?',
     reason='What makes them deserve the promotion?') 
-    async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str):
+    async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str, autorole: Optional[Literal['False']]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
@@ -51,10 +52,13 @@ class promo(commands.Cog):
         if ctx.author.top_role <= new:
             await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True)
             return
+        if autorole == "False":
 
-        try:
+         pass
+        else:
+         try:
             await staff.add_roles(new)
-        except discord.Forbidden:
+         except discord.Forbidden:
             await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True)
             return
 
