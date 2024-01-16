@@ -83,6 +83,8 @@ class Infractions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.")
          return
         types = infractiontypes.distinct("types", {'guild_id': ctx.guild.id})
+        if types is None:
+           types = ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']
     
         if action not in types:
          await ctx.send(f"{no} **{ctx.author.display_name}**, `{action}` is not a valid infraction type.")
