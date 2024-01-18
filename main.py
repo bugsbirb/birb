@@ -21,7 +21,6 @@ from Cogs.Modules.reports import ActionsPanel
 from Cogs.Modules.suggestions import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
-import axiom
 from Cogs.Modules.loa import Confirm
 load_dotenv()
 
