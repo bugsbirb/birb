@@ -126,7 +126,8 @@ class management(commands.Cog):
             return
         staffroleresult = scollection.find_one({'guild_id': guild.id})
         adminroleresult = arole.find_one({'guild_id': guild.id})
-
+        staffrolemessage = "Not Configured"
+        adminrolemessage = "Not Configured"
         if adminroleresult:
             admin_roles_ids = adminroleresult.get('staffrole', [])
             if not isinstance(admin_roles_ids, list):
