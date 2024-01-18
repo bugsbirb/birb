@@ -7,5 +7,4 @@ pymongo
 python-dotenv
 sentry_sdk
 motor
-axiom-py
 topggpy
