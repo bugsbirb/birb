@@ -19,7 +19,6 @@ from dotenv import load_dotenv
 from jishaku import Jishaku
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
-import axiom
 from pymongo import MongoClient
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = MongoClient(MONGO_URL)
