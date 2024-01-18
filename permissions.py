@@ -29,23 +29,37 @@ scollection = db['staffrole']
 arole = db['adminrole']
 
 async def has_staff_role(ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
+    filter = {'guild_id': ctx.guild.id}
+    staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
+    if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
+        staff_role_ids = staff_role_ids if isinstance(staff_role_ids, list) else [staff_role_ids]
+
+
+        admin_data = arole.find_one(filter)
+
+
+        if not admin_data:
+
+            pass
+        else:
+            if 'staffrole' in admin_data:
+                admin_role_ids = admin_data['staffrole']
+                admin_role_ids = admin_role_ids if isinstance(admin_role_ids, list) else [admin_role_ids]
+
+                if any(role.id in staff_role_ids + admin_role_ids for role in ctx.author.roles):
+                    return True
+
+
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
+    return False
 
-     return False
 
 
-async def has_admin_role(ctx):
+
+async def has_admin_role(ctx):   
      filter = {
         'guild_id': ctx.guild.id
     }
@@ -63,6 +77,8 @@ async def has_admin_role(ctx):
 
 
 async def has_moderator_role(ctx):
+     if ctx.author.guild_permissions.administrator:
+        return True     
      filter = {
         'guild_id': ctx.guild.id
     }
