@@ -40,7 +40,7 @@ class Suspensions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
         if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
             return
 
 

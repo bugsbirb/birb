@@ -126,7 +126,7 @@ class quota(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return   
      if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
             return                      
      mccollection = db["messages"]
      message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
@@ -162,7 +162,7 @@ class quota(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
         if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
             return  
             
         mccollection = dbq["messages"]
@@ -182,7 +182,7 @@ class quota(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                    
      if not await has_staff_role(ctx):
-        await ctx.send(f"**{ctx.author.display_name}**, you don't have permission to use this command.")
+        await ctx.send(f"**{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
         return        
      message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
      if staff.id:
@@ -210,7 +210,7 @@ class quota(commands.Cog):
          return                    
      await ctx.defer()
      if not await has_staff_role(ctx):
-        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
         return
 
      filter = {

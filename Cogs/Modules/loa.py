@@ -181,7 +181,7 @@ class loamodule(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
      if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
          return   
 
      loa = loa_collection.find_one({"user": user.id, "guild_id": ctx.guild.id, 'active': True})
@@ -228,7 +228,7 @@ class loamodule(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
      if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
          return             
          
      current_time = datetime.now()
@@ -267,7 +267,7 @@ class loamodule(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
         if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return    
         if not re.match(r'^\d+[mhdw]$', duration):
          await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
@@ -350,7 +350,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', emoji=f"{tick}")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):   
         if not await self.has_admin_role(interaction):
-            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.", view=None)
+            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`", view=None)
             return                
         loa_data = loa_collection.find_one({'messageid': interaction.message.id}) 
         if loa_data:
@@ -380,7 +380,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel', emoji=f"{no}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.has_admin_role(interaction):
-            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.", view=None)
+            await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`", view=None)
             return           
         loa_data = loa_collection.find_one({'messageid': interaction.message.id}) 
         if loa_data:

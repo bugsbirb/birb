@@ -56,7 +56,7 @@ class Feedback(commands.Cog):
     @feedback.command(description="Remove feedback from a staff member")
     async def remove(self, ctx, id: int):
        if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
          return          
        result = stafffeedback.find_one({'feedbackid': id, 'guild_id': ctx.guild.id})
        if result is None:
