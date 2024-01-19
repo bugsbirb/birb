@@ -697,7 +697,7 @@ class AdminPanel(discord.ui.View):
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not await self.LOAModuleCheck(interaction):
-         await interaction.response.send_message(f"{no} **{interaction.author.display_name}**, this module is currently disabled.", ephemeral=True)
+         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, this module is currently disabled.", ephemeral=True)
          return        
         loa = loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id, 'active': True})
         loainactive = loa_collection.find({"user": self.user.id, "guild_id": interaction.guild.id, 'active': False})
