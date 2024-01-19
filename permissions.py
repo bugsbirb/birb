@@ -7,12 +7,8 @@ from discord.ext import commands
 from urllib.parse import quote_plus
 from discord import app_commands
 import discord
-import datetime
 from discord.ext import commands, tasks
-from typing import Optional
-import Paginator
-import sentry_sdk
-import asyncio
+
 from Cogs.Modules.loa import *
 import os
 from dotenv import load_dotenv
@@ -53,8 +49,16 @@ async def has_staff_role(ctx):
 
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
-    return False
+    else:
+         if ctx.author.guild_permissions.administrator:
+            
 
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role isn't set please run </config:1140463441136586784>")
+         else:
+              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.") 
+         return
+
+    return False
 
 
 
@@ -71,7 +75,14 @@ async def has_admin_role(ctx):
           staff_role_ids = [staff_role_ids]     
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
+     else:
+         if ctx.author.guild_permissions.administrator:
+            
 
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role isn't set please run </config:1140463441136586784>")
+         else:
+              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.") 
+         return
      return False
 
 
@@ -90,5 +101,12 @@ async def has_moderator_role(ctx):
           staff_role_ids = [staff_role_ids]   
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
+     else:
+         if ctx.author.guild_permissions.administrator:
+            
 
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role isn't set please run </config:1140463441136586784>")
+         else:
+              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.") 
+         return
      return False
