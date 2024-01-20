@@ -13,8 +13,11 @@ from permissions import has_admin_role, has_staff_role
 client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
+lcollection = db['LOA Role']
 arole = db['adminrole']
 modules = db['Modules']
+
+
 class SetMessages(discord.ui.Modal, title='Set Message Count'):
     def __init__(self, user_id):
         super().__init__()
@@ -73,7 +76,7 @@ class StaffManage(discord.ui.View):
 dbq = mongo['quotab']
 mccollection = dbq["messages"]
 message_quota_collection = dbq["message_quota"]
-lcollection = dbq['loarole']
+
 
 
 class quota(commands.Cog):
@@ -241,7 +244,7 @@ class quota(commands.Cog):
                 message_quota = 100
 
             if loa_role_data:
-                    loa_role_id = loa_role_data.get('loarole')
+                    loa_role_id = loa_role_data.get('staffrole')
                     has_loa_role = discord.utils.get(member.roles, id=loa_role_id) is not None
             else:
                     has_loa_role = False
