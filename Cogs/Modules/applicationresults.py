@@ -57,7 +57,6 @@ class ApplicationResults(commands.Cog):
          return    
 
         if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
          return           
 
 

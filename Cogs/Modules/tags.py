@@ -88,7 +88,6 @@ class Tags(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
         if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
          return               
 
         data = {
@@ -107,7 +106,6 @@ class Tags(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
      if not await has_staff_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
             return               
      filter = {
         'guild_id': ctx.guild.id
@@ -138,7 +136,6 @@ class Tags(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
         if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
             return
 
         filter = {
@@ -166,7 +163,6 @@ class Tags(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
         if not await has_staff_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
             return        
         filter = {
             'guild_id': ctx.guild.id,
@@ -190,7 +186,6 @@ class Tags(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
         if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
             return        
         filter = {
             'guild_id': ctx.guild.id,

@@ -62,7 +62,6 @@ class Modmail(commands.Cog):
     @modmail.command(description="Reply to a modmail")
     async def reply(self, ctx, *, content):
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return             
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id
@@ -97,7 +96,6 @@ class Modmail(commands.Cog):
     @modmail.command(description="Close a modmail channel.")
     async def close(self, ctx):
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return             
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id

@@ -76,7 +76,7 @@ class Infractions(commands.Cog):
          return    
 
         if not await has_admin_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
+   
          return           
 
         if ctx.author == staff:
@@ -197,7 +197,6 @@ class Infractions(commands.Cog):
          return    
 
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return               
 
      print(f"Searching infractions for staff ID: {staff.id} in guild ID: {ctx.guild.id}")
@@ -254,7 +253,6 @@ class Infractions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return         
      if not await has_admin_role(ctx):
-        await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
         return
 
      filter = {

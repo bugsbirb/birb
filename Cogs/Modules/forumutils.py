@@ -257,7 +257,7 @@ class Forums(commands.Cog):
     @forums.command(description="Lock a forum thread")        
     async def lock(self, ctx):
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
+        
          return              
      if isinstance(ctx.channel, discord.Thread):        
         await ctx.channel.edit(locked=True, reason=f"{ctx.author.display_name}, locked the forum")
@@ -268,7 +268,6 @@ class Forums(commands.Cog):
     @forums.command(description="Unlock a forum thread")        
     async def unlock(self, ctx):
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return              
      if isinstance(ctx.channel, discord.Thread):        
         await ctx.channel.edit(locked=False, reason=f"{ctx.author.display_name}, unlocked the forum")
@@ -279,7 +278,6 @@ class Forums(commands.Cog):
     @forums.command(description="Archive a forum thread")        
     async def archive(self, ctx):
      if not await has_staff_role(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
          return            
      if isinstance(ctx.channel, discord.Thread):        
         await ctx.send(f"{tick} Forum **Archived.**")
