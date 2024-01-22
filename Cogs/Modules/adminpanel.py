@@ -33,10 +33,11 @@ appealschannel = db['Appeals Channel']
 loa_collection = db['loa']
 loachannel = db['LOA Channel']
 scollection = db['staffrole']
+partnerships = db['Partnerships']
 arole = db['adminrole']
 promochannel = db['promo channel']
 LOARole = db['LOA Role']
-
+suspensions = db['Suspensions']
 class VoidInf(discord.ui.Modal, title='Void Infraction'):
     def __init__(self, user, guild, author):
         super().__init__()
@@ -561,6 +562,50 @@ class AdminPanelCog(commands.Cog):
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
 
+    async def acheck(self, ctx, staff):
+     filter = {
+        'guild_id': ctx.guild.id
+    }
+     staff_data = arole.find_one(filter)
+
+     if staff_data and 'staffrole' in staff_data:
+        staff_role_ids = staff_data['staffrole']
+
+        if not isinstance(staff_role_ids, list):
+            staff_role_ids = [staff_role_ids]
+
+        staff_roles = [role.id for role in staff.roles]
+        if any(role_id in staff_roles for role_id in staff_role_ids):
+            return True
+
+     return False
+
+
+    @admin.command(description="View an admins stats")
+    async def stats(self, ctx, user : discord.Member = None):
+        await ctx.defer()
+        if not await has_admin_role(ctx):
+         return
+        if user is None:
+            user = ctx.author
+        has_a_role = await self.acheck(ctx, user)
+        if not has_a_role:
+            await ctx.send(f"{no} **{ctx.author.display_name},** **@{user.display_name}** is not a admin.", ephemeral=True)
+            return
+        partnershipscount = partnerships.count_documents({"admin": user.id, "guild_id": ctx.guild.id})
+        infractioncount = collection.count_documents({"staff": user.id, "guild_id": ctx.guild.id})
+        demotioncount = collection.count_documents({"staff": user.id, "guild_id": ctx.guild.id, "action": "Demotion"})
+        suspensioncount = suspensions.count_documents({"management": user.id, "guild_id": ctx.guild.id})
+       
+        
+        embed = discord.Embed(title=f"<:stats:1199023533938970827> {ctx.author.display_name}'s Stats", description=f"", color=discord.Color.dark_embed())
+        embed.add_field(name="<:Infraction:1162134605885870180> Punishments", value=f">>> **Infractions Logged:** {infractioncount}\n**Demotions Logged:** {demotioncount}\n**Suspensions Logged:** {suspensioncount}", inline=False)
+        embed.add_field(name="<:Partner:1162135285031772300> Partnerships", value=f">>> **Partnerships Logged:** {partnershipscount}", inline=False)
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.set_thumbnail(url=user.display_avatar)
+        await ctx.send(embed=embed)
+
+        
 
 
 class AdminPanel(discord.ui.View):
