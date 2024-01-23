@@ -2,6 +2,7 @@ import discord
 import os
 from pymongo import MongoClient
 from emojis import *
+
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
