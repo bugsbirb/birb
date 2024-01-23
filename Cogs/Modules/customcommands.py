@@ -93,8 +93,8 @@ class CustomCommands(commands.Cog):
         '{guild.owner.name}': ctx.guild.owner.display_name if ctx.guild else '',
         '{guild.owner.id}': str(ctx.guild.owner.id) if ctx.guild else '',
         }
-        content = await self.replace_variables(command_data['content'], replacements)
-        if content == "" or None:
+        content = await self.replace_variables(command_data.get('content', ''), replacements)
+        if content == "":
            content = ""
         if 'embed' in command_data and command_data['embed']:
 
