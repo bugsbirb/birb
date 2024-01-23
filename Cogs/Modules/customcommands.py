@@ -11,6 +11,7 @@ import typing
 import re
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
+from permissions import has_admin_role
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
@@ -55,6 +56,9 @@ class CustomCommands(commands.Cog):
     @command.command(description="Run one of your servers custom commands.")
     @app_commands.autocomplete(command=commands_auto_complete)
     async def run(self, ctx, command, channel: discord.TextChannel = None):
+        if not await has_admin_role(ctx):
+            return
+
         command_data  = await custom_commands.find_one({'name': command, 'guild_id': ctx.guild.id})
         if command is None:
             return await ctx.send(f'{no} **{ctx.author.display_name},** That command does not exist.')
