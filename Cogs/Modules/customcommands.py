@@ -81,18 +81,19 @@ class CustomCommands(commands.Cog):
 
         timestamp = datetime.utcnow().timestamp()
         timestampformat = f"<t:{int(timestamp)}:F>"        
-        replacements = {
 
-        '{author.mention}': ctx.author.mention,
-        '{author.name}': ctx.author.display_name,
-        '{author.id}': str(ctx.author.id),
-        '{timestamp}': timestampformat,
-        '{guild.name}': ctx.guild.name if ctx.guild else '',
-        '{guild.id}': str(ctx.guild.id) if ctx.guild else '',
-        '{guild.owner.mention}': ctx.guild.owner.mention if ctx.guild else '',
-        '{guild.owner.name}': ctx.guild.owner.display_name if ctx.guild else '',
-        '{guild.owner.id}': str(ctx.guild.owner.id) if ctx.guild else '',
-        }
+
+        replacements = {
+    '{author.mention}': ctx.author.mention,
+    '{author.name}': ctx.author.display_name,
+    '{author.id}': str(ctx.author.id),
+    '{timestamp}': timestampformat,
+    '{guild.name}': ctx.guild.name if ctx.guild else '',
+    '{guild.id}': str(ctx.guild.id) if ctx.guild else '',
+    '{guild.owner.mention}': ctx.guild.owner.mention if ctx.guild and ctx.guild.owner else '',
+    '{guild.owner.name}': ctx.guild.owner.display_name if ctx.guild and ctx.guild.owner else '',
+    '{guild.owner.id}': str(ctx.guild.owner.id) if ctx.guild and ctx.guild.owner else '',
+}
         content = await self.replace_variables(command_data.get('content', ''), replacements)
         if content == "":
            content = ""
