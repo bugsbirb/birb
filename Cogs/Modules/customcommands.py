@@ -130,7 +130,7 @@ class CustomCommands(commands.Cog):
 
          if channel:
             try:
-             if content or embed:
+             if content or embed or view:
               msg = await channel.send(content, embed=embed, view=view)
              else:
               await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
@@ -138,18 +138,18 @@ class CustomCommands(commands.Cog):
             except discord.Forbidden:
                await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
                return 
-            await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True)
+            await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
 
          else:
             try:
-             if content or embed:             
+             if content or embed or view:             
               msg = await ctx.channel.send(content, embed=embed, view=view)
               await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
               return                
             except discord.Forbidden:
                   await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
                   return                     
-            await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True)
+            await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
 
         else:
             if content is None:
@@ -157,7 +157,7 @@ class CustomCommands(commands.Cog):
                 return
             if channel:
                 try:
-                 if content:
+                 if content or view:
                   msg = await channel.send(content, view=view)
                  else:
                   await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
@@ -165,11 +165,11 @@ class CustomCommands(commands.Cog):
                 except discord.Forbidden:
                   await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
                   return                  
-                await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True)
+                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
 
             else:
                 try:
-                 if content:
+                 if content or view:
                   msg = await ctx.channel.send(content, view=view) 
                  else: 
                   await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
