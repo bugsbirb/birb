@@ -1,3 +1,4 @@
+from typing import Optional
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -51,6 +52,9 @@ from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
 from Cogs.Configuration.Views.Customationview import CustomEmbeds
 from Cogs.Configuration.Views.Customationview import ResetEmbeds
 from Cogs.Configuration.Views.infractionsview import InfractionTypes
+
+from Cogs.Configuration.Views.CustomCommandsView  import CreateButtons
+from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -87,6 +91,7 @@ message_quota_collection = db2["message_quota"]
 arole2 = db2['adminrole']
 srole = db2['staffrole']
 suggestschannel = db["suggestion channel"]
+customcommands = db['Custom Commands']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -144,7 +149,8 @@ class Config(discord.ui.Select):
             discord.SelectOption(label="Basic Settings", value="Basic Settings", emoji="<:Setting:1154092651193323661>"),                   
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),            
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
-            discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),            
+            discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),     
+            discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"),                    
             discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
             discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
@@ -479,8 +485,18 @@ class Config(discord.ui.Select):
             embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds", color=discord.Color.dark_embed())
             view = CustomisatiomModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)              
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
 
+        elif color == 'Custom Commands':
+            commands = customcommands.find({'guild_id': interaction.guild.id})
+            
+            amount = customcommands.count_documents({'guild_id': interaction.guild.id})
+            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/30)", description="", color=discord.Color.dark_embed())
+            for result in commands:
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>", inline=False)
+               
+            view = CustomCommands(self.author)
+            
         await interaction.response.edit_message(embed=embed, view=view)
             
 
@@ -497,6 +513,18 @@ class SuggestionModule(discord.ui.View):
         self.add_item(SuggestionsChannel(author))
         self.add_item(ToggleSuggestions(author))
         self.add_item(Config(author))
+
+class CustomCommands(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(ToggleCommands(author))
+        self.add_item(CreateButtons(author))
+        self.add_item(Config(author))
+
+
+
+
+
 
 class InfractModule(discord.ui.View):
     def __init__(self, author):

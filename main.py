@@ -22,6 +22,7 @@ from Cogs.Modules.suggestions import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import time
 from Cogs.Modules.loa import Confirm
+from Cogs.Modules.customcommands import Voting
 load_dotenv()
 
 PREFIX = os.getenv('PREFIX')
@@ -65,6 +66,7 @@ class client(commands.AutoShardedBot):
         'Cogs.Modules.consent',
         'Cogs.Modules.applicationresults',
         'Cogs.Modules.adminpanel',
+        'Cogs.Modules.customcommands',
         'Cogs.Configuration.Configuration',
         'Cogs.Events.AstroSupport.aon_thread_create',
         'Cogs.Events.AstroSupport.guilds',
@@ -96,6 +98,7 @@ class client(commands.AutoShardedBot):
         self.add_view(SuggestionView())
         self.add_view(ReportPanel())
         self.add_view(Confirm())
+        self.add_view(Voting())
 
 
 

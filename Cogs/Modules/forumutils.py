@@ -193,7 +193,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
         embed = interaction.message.embeds[0]
         if result:
          embed = discord.Embed()
-         embed.title = f"{redx} that already exists."
+         embed.title = f"{redx} That already exists."
          embed.color = discord.Color.brand_red()
          embed.description=f"Please try again."
          await interaction.response.edit_message(embed=embed, view=None)
