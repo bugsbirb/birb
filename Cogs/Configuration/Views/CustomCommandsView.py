@@ -249,7 +249,7 @@ class Description(discord.ui.Modal, title='Description'):
         label='Description',
         placeholder='What is the description?',
         style=discord.TextStyle.long,
-        max_length=4096,
+        max_length=4000,
     )
 
 
