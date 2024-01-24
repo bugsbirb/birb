@@ -228,6 +228,7 @@ class Title(discord.ui.Modal, title='Title'):
     Titles = discord.ui.TextInput(
         label='title',
         placeholder='What is the title?',
+        required=False
     )
 
 
@@ -236,7 +237,10 @@ class Title(discord.ui.Modal, title='Title'):
     async def on_submit(self, interaction: discord.Interaction):
         embed = interaction.message.embeds[0]
         embed.title = self.Titles.value
-        await interaction.response.edit_message(embed=embed)
+        try:
+         await interaction.response.edit_message(embed=embed)
+        except discord.HTTPException():
+            return await interaction.response.send_message(f"{no} {interaction.user.display_name}, had an error adding the title please try again.", ephemeral=True)
 
 
 class Description(discord.ui.Modal, title='Description'):
@@ -250,6 +254,7 @@ class Description(discord.ui.Modal, title='Description'):
         placeholder='What is the description?',
         style=discord.TextStyle.long,
         max_length=4000,
+        required=False
     )
 
 
@@ -344,6 +349,7 @@ class Image(discord.ui.Modal, title='Image'):
     Thumbnaile = discord.ui.TextInput(
         label='Image',
         placeholder='Whats the image URL?',
+        required=False
     )
 
 
@@ -416,7 +422,7 @@ class NoEmbeds(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
-        embed = discord.Embed(title="Untitled Embed")
+        embed = discord.Embed(title="Untitled Embed", color=discord.Colour.dark_embed())
         view = Embeds(interaction.user, self.name)
         await interaction.response.edit_message(embed=embed, view=view)
      

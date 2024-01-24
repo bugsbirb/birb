@@ -108,7 +108,7 @@ class CustomCommands(commands.Cog):
             if embed_description in ["None", None]:
                 embed_description = ""
             color_value = command_data.get('color', None)
-            colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.default()
+            colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.dark_embed()
 
             embed = discord.Embed(
                 title=embed_title,
@@ -211,7 +211,17 @@ class Voting(discord.ui.View):
 
 
         if interaction.user.id in voting.get('Voters', []):
-         await interaction.response.send_message(f"{no} **{interaction.user.display_name},** You have already voted.", ephemeral=True)
+         CustomVoting.update_one(
+        {"message_id": message_id},
+        {
+            "$inc": {"votes": -1},
+            "$pull": {"Voters": interaction.user.id},
+        },
+         )
+         new_label = str(voting.get('votes', 0) - 1)
+         button.label = new_label
+         await interaction.message.edit(view=self)
+         await interaction.response.send_message(f"{tick} **{interaction.user.display_name},** You have successfully unvoted.", ephemeral=True)
          return
 
         CustomVoting.update_one(
@@ -228,12 +238,15 @@ class Voting(discord.ui.View):
 
         await interaction.message.edit(view=self)
  
-    @discord.ui.button(label="View List", style=discord.ButtonStyle.blurple, emoji=f"{folder}", custom_id="viewlist")
+    @discord.ui.button(label="Voters", style=discord.ButtonStyle.blurple, emoji=f"{folder}", custom_id="viewlist")
     async def list(self, interaction: discord.Interaction, button: discord.ui.Button):
         voting = await CustomVoting.find_one({"message_id": interaction.message.id})
         voters = voting.get('Voters', [])
-        voters_str = "\n".join([f"<@{voter}> ({voter})" for voter in voters])
-
+        if not voters: 
+         voters_str = f"**{interaction.user.display_name},** there are no voters!"
+        else:
+         voters_str = "\n".join([f"<@{voter}> ({voter})" for voter in voters])
+ 
 
         embed_description = str(voters_str)[:4096]
         embed = discord.Embed(title="Voters", description=embed_description, color=discord.Color.dark_embed())
