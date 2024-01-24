@@ -2,7 +2,7 @@ import discord
 import os
 from pymongo import MongoClient
 from emojis import *
-
+import validators
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -106,7 +106,7 @@ class ButtonURLView(discord.ui.Modal, title='Button URL'):
 
     name = discord.ui.TextInput(
         label='URL',
-        placeholder='Whats the url you wanna use?',
+        placeholder='Whats the url you wanna use? (https://example.com)',
     )
 
     label = discord.ui.TextInput(
@@ -117,6 +117,9 @@ class ButtonURLView(discord.ui.Modal, title='Button URL'):
 
     async def on_submit(self, interaction: discord.Interaction):
         url = self.name.value
+        if not validators.url(url):
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** that is not a valid website url.", ephemeral=True)
+            return
         customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'url': url, 'buttons': 'Link Button', 'button_label': self.label.value}})
         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the buttons to URL with the link `{self.name.value}`.")
 
@@ -627,6 +630,6 @@ class Embeds(discord.ui.View):
         customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Created"
-        embed.description = f"Start by using /command run and selecting `{self.name}`"
+        embed.description = f"Start by using </command run:1199462063202902077> and selecting `{self.name}`"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
