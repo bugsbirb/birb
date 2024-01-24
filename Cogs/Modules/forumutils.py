@@ -43,6 +43,8 @@ class Description(discord.ui.Modal, title='Description'):
     description = discord.ui.TextInput(
         label='Description',
         placeholder='What is the description?',
+        style=discord.TextStyle.long,
+        max_length=4096,
     )
 
 
@@ -183,6 +185,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
     name = discord.ui.TextInput(
         label='Name',
         placeholder='What do you want the name to be?',
+        
     )
 
 

@@ -91,6 +91,7 @@ class CustomCommands(commands.Cog):
             '{guild.owner.mention}': ctx.guild.owner.mention if ctx.guild and ctx.guild.owner else '',
             '{guild.owner.name}': ctx.guild.owner.display_name if ctx.guild and ctx.guild.owner else '',
             '{guild.owner.id}': str(ctx.guild.owner.id) if ctx.guild and ctx.guild.owner else '',
+            '\n': "\n"
         }
 
         content = await self.replace_variables(command_data.get('content', ''), replacements)

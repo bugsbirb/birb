@@ -248,6 +248,8 @@ class Description(discord.ui.Modal, title='Description'):
     description = discord.ui.TextInput(
         label='Description',
         placeholder='What is the description?',
+        style=discord.TextStyle.long,
+        max_length=4096,
     )
 
 
@@ -294,7 +296,10 @@ class Context(discord.ui.Modal, title='Content'):
     color = discord.ui.TextInput(
         label='Content',
         placeholder='What do you want the content to be?',
-        required=False
+        
+        required=False,
+        style=discord.TextStyle.long,
+        max_length=2000,
     )
 
 
