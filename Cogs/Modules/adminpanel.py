@@ -603,9 +603,98 @@ class AdminPanelCog(commands.Cog):
         embed.add_field(name="<:Partner:1162135285031772300> Partnerships", value=f">>> **Partnerships Logged:** {partnershipscount}", inline=False)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         embed.set_thumbnail(url=user.display_avatar)
-        await ctx.send(embed=embed)
+        view = IssuedInfraction(user, ctx.author, ctx)
+        await ctx.send(embed=embed, view=view)
 
-        
+class IssuedInfraction(discord.ui.View):
+    def __init__(self, user, author, ctx):
+        super().__init__()
+        self.user = user
+        self.author = author
+        self.ctx = ctx
+
+    async def InfractionModuleCheck(self, ctx): 
+        modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+        if modulesdata is None:
+            return False
+        elif modulesdata['infractions'] == True:   
+            return True
+    
+    @discord.ui.button(label='View Issued Infractions', style=discord.ButtonStyle.grey, emoji="<:infractionssearch:1200479190118576158>")
+    async def InfractionsView(self, interaction: discord.Interaction, button: discord.ui.Button):   
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        if not await self.InfractionModuleCheck(interaction):
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, this module is currently disabled.", ephemeral=True)
+            return
+
+        filter = {
+            'guild_id': interaction.guild.id,
+            'management': self.user.id,
+        }
+
+        infractions = collection.find(filter)
+        embeds = []
+        infraction_list = []
+
+        for infraction in infractions:
+            infraction_info = {
+                'id': infraction['random_string'],
+                'action': infraction['action'],
+                'reason': infraction['reason'],
+                'notes': infraction['notes'],
+                'staff': infraction['staff']
+            }
+            
+            infraction_list.append(infraction_info)
+
+        if not infraction_list:
+            await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, there are no infractions issued by this user.", ephemeral=True)
+            return
+
+        for idx, infraction_info in enumerate(infraction_list):
+            if idx % 9 == 0:
+                embed = discord.Embed(
+                    title=f"{self.user.name}'s Issued Infractions",
+                    description=f"* **User:** {self.user.mention}\n* **User ID:** {self.user.id}",
+                    color=discord.Color.dark_embed()
+                )
+                embed.set_thumbnail(url=self.user.display_avatar)
+                embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
+
+
+
+            embed.add_field(
+                name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+                value=f"<:arrow:1166529434493386823>**Infracted User:** <@{infraction_info['staff']}>\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+                inline=False
+            )
+
+            if (idx + 1) % 9 == 0 or idx == len(infraction_list) - 1:
+                embeds.append(embed)
+
+        PreviousButton = discord.ui.Button(label="<")
+        NextButton = discord.ui.Button(label=">")
+        FirstPageButton = discord.ui.Button(label="<<")
+        LastPageButton = discord.ui.Button(label=">>")
+        InitialPage = 0
+        timeout = 42069
+
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+
+        await paginator.start(self.ctx, pages=embeds)
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
 
 
 class AdminPanel(discord.ui.View):
