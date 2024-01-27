@@ -9,3 +9,4 @@ sentry_sdk
 motor
 topggpy
 validators
+aiohttp

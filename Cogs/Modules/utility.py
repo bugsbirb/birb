@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Optional
 from pymongo import MongoClient
 import requests
+import aiohttp
 import os
 from dotenv import load_dotenv
 from emojis import *
@@ -297,19 +298,25 @@ class Utility(commands.Cog):
         embed.add_field(name="**Roles**", value=user_roles, inline=False)        
         await ctx.send(embed=embed)
 
+    async def fetch_birb_image(self):
+        birb_api_url = "https://birbapi.astrobirb.dev/birb"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(birb_api_url) as response:
+                response.raise_for_status()
+                data = await response.json()
+                return data["image_url"]
+
     @commands.hybrid_command(description="Get silly birb photo")
     async def birb(self, ctx):
         try:
-         api_url = "https://birbapi.astrobirb.dev/birb"
-         response = requests.get(api_url)
-         response.raise_for_status() 
-         data = response.json()
-         birb_image_url = data["image_url"]
-         embed = discord.Embed(color=discord.Color.dark_embed())
-         embed.set_image(url=birb_image_url)
-         await ctx.send(embed=embed)
-        except requests.exceptions.RequestException:
-            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Status Code:** `{response.status_code}`")
+            birb_image_url = await self.fetch_birb_image()
+
+            embed = discord.Embed(color=discord.Color.dark_embed())
+            embed.set_image(url=birb_image_url)
+            await ctx.send(embed=embed)
+
+        except aiohttp.ClientError as e:
+            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`")
 
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):
