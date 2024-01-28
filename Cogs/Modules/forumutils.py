@@ -23,6 +23,7 @@ class Title(discord.ui.Modal, title='Title'):
     Titles = discord.ui.TextInput(
         label='title',
         placeholder='What is the title?',
+        required=False
     )
 
 
@@ -45,6 +46,7 @@ class Description(discord.ui.Modal, title='Description'):
         placeholder='What is the description?',
         style=discord.TextStyle.long,
         max_length=4000,
+        required=False
     )
 
 
@@ -90,7 +92,7 @@ class Roleping(discord.ui.Modal, title='Role Ping'):
 
     role = discord.ui.TextInput(
         label='Role ID',
-        placeholder='What is the role id?',
+        placeholder='What is the role id? (Has to be role ID)',
     )
 
 
@@ -108,6 +110,7 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
     Thumbnaile = discord.ui.TextInput(
         label='Thumbnail',
         placeholder='Whats the thumbnail URL?',
+        required=False
     )
 
 
@@ -123,7 +126,30 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
            return
  
 
+class Image(discord.ui.Modal, title='Image'):
+    def __init__(self):
+        super().__init__()
 
+
+
+    Thumbnaile = discord.ui.TextInput(
+        label='Image',
+        placeholder='Whats the image URL?',
+        required=False
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        try:
+         embed.set_image(url=self.Thumbnaile.value)
+         await interaction.response.edit_message(embed=embed)
+        except:
+           await interaction.response.send_message(f"{no} Please provide a valid url.", ephemeral=True)
+           return
+ 
 
 
 class ForumView(discord.ui.View):
@@ -386,6 +412,15 @@ class Embed(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Thumbnail())
 
+    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    async def Images(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_modal(Image())
+
     @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
@@ -423,6 +458,7 @@ class Embed(discord.ui.View):
             "description": embed.description,
             "color": color_hex,
             "thumbnail": embed.thumbnail.url if embed.thumbnail else None,
+            "image": embed.image.url if embed.image else None,
             "guild_id": interaction.guild.id,
             "channel_id": self.channel.id,
             "role": message,
