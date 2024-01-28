@@ -46,7 +46,7 @@ class ForumCreaton(commands.Cog):
           role = discord.utils.get(thread.guild.roles, id=role_id)
 
 
-          mention = role.mention if role else ""
+          mention = f"<@&{role_id}>" if role else ""
           msg = await thread.send(content=f"{mention}", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
           await msg.pin()
 

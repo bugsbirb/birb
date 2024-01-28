@@ -321,13 +321,16 @@ class Forums(commands.Cog):
        embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
        for result in forumsconfig.find({"guild_id": ctx.guild.id}):
         role = result['role']
-        role = discord.utils.get(ctx.guild.roles, id=role)
-        if role is None:
+        
+        
+        if role == "" or None:
            role = None
-        else:
-           role = role.mention
+           rolemention = f"None"
+
+        else:   
+            rolemention = f"<@&{role}>"
               
-        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=f"<:arrow:1166529434493386823>**Channel:** <#{result['channel_id']}>\n<:arrow:1166529434493386823>**Role:** {role}\n<:arrow:1166529434493386823>**Title:** {result['title']}\n<:arrow:1166529434493386823>**Description:** {result['description']}\n<:arrow:1166529434493386823>**Thumbnail:** {result['thumbnail']}", inline=False)
+        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=f"<:arrow:1166529434493386823>**Channel:** <#{result['channel_id']}>\n<:arrow:1166529434493386823>**Role:** {rolemention}\n<:arrow:1166529434493386823>**Title:** {result['title']}\n<:arrow:1166529434493386823>**Description:** {result['description']}\n<:arrow:1166529434493386823>**Thumbnail:** {result['thumbnail']}", inline=False)
        embed.set_thumbnail(url=ctx.guild.icon.url)
        embed.set_author(name=f"{ctx.author.display_name}", icon_url=ctx.author.display_avatar)
        view = ForumsManage(ctx.author)
