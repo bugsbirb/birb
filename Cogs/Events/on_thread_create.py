@@ -34,11 +34,13 @@ class ForumCreaton(commands.Cog):
           color = discord.Color(int(color_str, 16))
           embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=color)
           thumbnail_url = config_data['thumbnail']
-          image_urll = config_data['image']
+          
           if thumbnail_url:
                 embed.set_thumbnail(url=thumbnail_url)
-          if image_urll:
-                embed.set_image(url=image_urll)
+          image_url = config_data.get('image', None)
+          if image_url:
+                embed.set_image(url=image_url)
+   
 
           role_ids = config_data['role']
           role_id = int(role_ids) if role_ids else None
