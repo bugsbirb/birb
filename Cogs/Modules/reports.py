@@ -17,7 +17,8 @@ repchannel = db['report channel']
 modules = db['Modules']
 reports = db['Reports']
 ReportModeratorRole = db['Report Moderator Role']
-
+scollection = db['staffrole']
+arole = db['adminrole']
 
 class MuteReason(discord.ui.Modal, title='Reason'):
     def __init__(self, embed, messageid, message):
@@ -328,6 +329,8 @@ class ReportPanel(discord.ui.View):
         super().__init__(timeout=None)
 
     async def has_moderator_role(self, interaction):
+
+
      filter = {
         'guild_id': interaction.guild.id
     }
@@ -335,11 +338,31 @@ class ReportPanel(discord.ui.View):
 
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(interaction.guild.roles, id=staff_role_ids)
         if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in interaction.user.roles):
+            staff_role_ids = [staff_role_ids]
+
+
+        admin_data = arole.find_one(filter)
+
+        if not admin_data:
+            pass
+        else:
+            if 'staffrole' in admin_data:
+                admin_role_ids = admin_data['staffrole']
+                admin_role_ids = admin_role_ids if isinstance(admin_role_ids, list) else [admin_role_ids]
+
+                if any(role.id in staff_role_ids + admin_role_ids for role in interaction.user.roles):
+                    return True
+
+        if any(role.id in staff_role_ids for role in interaction.author.roles):
             return True
+
+     else:
+        if interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, the reports moderator role isn't set. Please run </config:1140463441136586784>", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"{no} **{self.user .display_name}**, the reports moderator role isn't set up. Please tell an admin to run </config:1140463441136586784> to fix it.", ephemeral=True)
+        return False
 
      return False
 

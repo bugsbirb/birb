@@ -72,7 +72,10 @@ async def has_admin_role(ctx):
         staff_role_ids = staff_data['staffrole']
         staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
         if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
+          staff_role_ids = [staff_role_ids] 
+
+          
+             
         if any(role.id in staff_role_ids for role in ctx.author.roles):
             return True
      else:
@@ -87,30 +90,7 @@ async def has_admin_role(ctx):
      return False
 
 
-async def has_moderator_role(ctx):
-     if ctx.author.guild_permissions.administrator:
-        return True     
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = ReportModeratorRole.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-     else:
-         if ctx.author.guild_permissions.administrator:
-            
-
-          await ctx.send(f"{no} **{ctx.author.display_name}**, the reports moderator role isn't set please run </config:1140463441136586784>", view=PermissionsButtons())
-         else:
-              await ctx.send(f"{no} **{ctx.author.display_name}**, the reports moderator role isn't setup please tell an admin to run </config:1140463441136586784> to fix it.", view=PermissionsButtons())
-         return
-     return False
 
 
 class PermissionsButtons(discord.ui.View):
