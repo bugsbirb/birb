@@ -19,7 +19,7 @@ class welcome(commands.Cog):
 
             if channel:
                 member_count = guild_on_join.member_count
-                message = f"Welcome {member.mention} to **Astro Systems**! 👋"
+                message = f"Welcome {member.mention} to **Astro Birb**! 👋"
                 view = Welcome(member_count, member)
                 await channel.send(message, view=view)
 
