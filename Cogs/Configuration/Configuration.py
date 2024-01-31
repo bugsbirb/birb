@@ -55,6 +55,9 @@ from Cogs.Configuration.Views.infractionsview import InfractionTypes
 
 from Cogs.Configuration.Views.CustomCommandsView  import CreateButtons
 from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
+from Cogs.Configuration.Views.modmailview import ModmailCategory
+
+from Cogs.Configuration.Views.modmailview import TranscriptChannel
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -92,6 +95,8 @@ arole2 = db2['adminrole']
 srole = db2['staffrole']
 suggestschannel = db["suggestion channel"]
 customcommands = db['Custom Commands']
+modmailcategory = db['modmailcategory']
+transcriptchannel = db['transcriptschannel']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -150,13 +155,13 @@ class Config(discord.ui.Select):
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),            
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),     
-            discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"),                    
+            discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"),   
+            discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"),                 
             discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
             discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
             discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
-            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
-            discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),            
+            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"),  
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
             discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
@@ -437,17 +442,6 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = AppResultModule(self.author)
-        elif color == 'Staff List':         # 
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
-            modulemsg = "True"
-            if moduleddata:
-                modulemsg = moduleddata.get('StaffList', 'False')
-            else:
-                modulemsg = 'False'        
-            embed = discord.Embed(title="<:List:1179470251860185159> StaffList Module", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
-            embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = ListModule(self.author)
 
         elif color == 'Connection Roles':         # 
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
@@ -497,6 +491,19 @@ class Config(discord.ui.Select):
                
             view = CustomCommands(self.author)
             
+        elif color =='Modmail':
+            transcriptschannelresult = transcriptchannel.find_one({'guild_id': interaction.guild.id})
+            modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
+            transcriptschannels = "Not Configured"
+            modmailcategorys = "Not Configured"
+            if transcriptschannelresult:
+                transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
+            if modmailcategoryresult:
+                modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            view = Modmail(interaction.user)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
         await interaction.response.edit_message(embed=embed, view=view)
             
 
@@ -521,7 +528,12 @@ class CustomCommands(discord.ui.View):
         self.add_item(CreateButtons(author))
         self.add_item(Config(author))
 
-
+class Modmail(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(ModmailCategory(author))
+        self.add_item(TranscriptChannel(author))
+        self.add_item(Config(author))
 
 
 

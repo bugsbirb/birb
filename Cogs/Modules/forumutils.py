@@ -171,7 +171,7 @@ class ForumView(discord.ui.View):
 
 class ForumChannel(discord.ui.ChannelSelect):
     def __init__(self, author, name):
-        super().__init__(placeholder='Forum Channel')
+        super().__init__(placeholder='Forum Channel', channel_types=[discord.ChannelType.forum])
         self.author = author
         self.name = name
     async def callback(self, interaction: discord.Interaction):

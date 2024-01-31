@@ -5,6 +5,11 @@ from pymongo import MongoClient
 from emojis import *
 from typing import Literal
 import os
+from discord import Button
+import random
+import logging
+from datetime import datetime
+
 from dotenv import load_dotenv
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
@@ -12,7 +17,9 @@ db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 modmail = db['modmail']
+transcripts = db['transcripts']
 modmailcategory = db['modmailcategory']
+transcriptschannel = db['transcriptschannel']
 from permissions import has_admin_role, has_staff_role
 class Modmail(commands.Cog):
     def __init__(self, client):
@@ -64,6 +71,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Close a modmail channel.")
     async def close(self, ctx):
+     await ctx.defer()
      if not await has_staff_role(ctx):
          return             
      if isinstance(ctx.channel, discord.TextChannel):
@@ -75,15 +83,62 @@ class Modmail(commands.Cog):
             selected_server = discord.utils.get(self.client.guilds, id=selected_server_id)
 
             if selected_server:
+
+
+                modmail.delete_one({'channel_id': channel_id}) 
+                channel = ctx.guild.get_channel(modmail_data.get('channel_id'))
+                print(channel)
+                channelcreated = f"{channel.created_at.strftime('%d/%m/%Y')}"
+                
+
+                transcriptid = random.randint(100, 5000)
+                transcriptresult = transcripts.find_one({'guild_id': ctx.guild.id, 'transcriptid': transcriptid})
+                if transcriptresult:
+                    transcriptid = random.randint(100, 5000)
+
+                messages = [] 
+                async for message in channel.history(limit=None, oldest_first=True):
+                  
+                 for embed in message.embeds:
+ 
+                        embed_title = embed.title.replace('```', '').replace('**', '').replace('\n', '')
+                        embed_description = embed.description.replace('```', '').replace('**', '').replace('\n', '')
+
+                        messages.append(f"{embed_title}: {embed_description}\n")  
+                        
+
+                     
+                try:       
+                 await ctx.send(f"{tick} Modmail channel has been closed.")      
+                 await ctx.channel.delete() 
+                except discord.Forbidden:
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.")
+                    return                               
+ 
                 user_id = modmail_data.get('user_id')
                 if user_id:
                     user = await self.client.fetch_user(user_id)
                     if user:
-                        await user.send(f"{tick} Your modmail channel has been closed.")
-                await ctx.send(f"{tick} Modmail channel has been closed.")                
-                await ctx.channel.delete() 
-                modmail.delete_one({'channel_id': channel_id}) 
-                
+                        try:
+                         await user.send(f"{tick} Your modmail channel has been closed.") 
+                        except discord.Forbidden:
+                            
+                            pass
+
+
+                transcripts.insert_one({'guild_id': ctx.guild.id ,'channel_id': channel_id, 'messages': messages, 'transcriptid': transcriptid, 'user': user_id, 'userthumbnail': user.display_avatar.url, 'closedby': ctx.author.display_name,'closedbythumbnail': ctx.author.display_avatar.url,  'created': channelcreated, 'closed': datetime.utcnow().strftime('%d-%m-%Y')})
+
+
+          
+                transcriptchannelid = transcriptschannel.find_one({'guild_id': ctx.guild.id})
+                if transcriptchannelid:
+                    transcriptchannelid = transcriptchannelid.get('channel_id')
+                    transcriptchannel = ctx.guild.get_channel(transcriptchannelid)
+                    if transcriptchannel:
+                     embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{user_id}>\n> **Closed By:** {ctx.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
+                     embed.set_thumbnail(url=user.display_avatar.url)
+                     view = TranscriptChannel(f'https://modmail.astrobirb.dev/transcripts/{ctx.guild.id}/{transcriptid}')
+                     await transcriptchannel.send(embed=embed, view=view)
             else:
                 await ctx.send(f"{Warning} Selected server not found.")
         else:
@@ -93,33 +148,11 @@ class Modmail(commands.Cog):
         
 
 
-    @modmail.command(name="config" ,description="Set up modmail configuration")
-    @commands.has_guild_permissions(administrator=True)
-    async def config(self, ctx, category: discord.CategoryChannel = None, data: Literal['Reset Data'] = None):
-     if not category and not data:
-        await ctx.send(f"{no} Please specify either a category or 'Reset Data' to configure modmail.")
 
-     if data and data.lower() == "reset data":
-        modmailcategory.delete_one({'guild_id': ctx.guild.id})
-        await ctx.send(f"{tick} Modmail configuration data has been reset.")
-
-     if category:
-        if ctx.guild.me.guild_permissions.manage_channels:
-            try:
-                modmailcategory.update_one({'guild_id': ctx.guild.id}, {'$set': {'category_id': category.id}}, upsert=True)
-                embed = discord.Embed(title=f"{tick} Configuration Updated",description=f"* **Modmail Category:** **`{category.name}`**", color=discord.Color.dark_embed())
-                embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar)
-                await ctx.send(embed=embed)
-            except Exception as e:
-                await ctx.send(f"An error occurred: {str(e)}")
-        else:
-            await ctx.send(f"{no} I don't have permission to create channels. Please give me `manage channels` permissions.")
-
-            
-    @config.error
-    async def permissionerror(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions): 
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
+class TranscriptChannel(discord.ui.View):
+    def __init__(self, url):
+        super().__init__()
+        self.add_item(discord.ui.Button(label='Transcript', url=url, style=discord.ButtonStyle.blurple))
 
 
 async def setup(client: commands.Bot) -> None:

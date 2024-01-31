@@ -14,29 +14,33 @@ from typing import Literal
 import os
 from dotenv import load_dotenv
 import Paginator
+import random
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 modmail = db['modmail']
+modules = db['Modules']
 modmailcategory = db['modmailcategory']
-
+transcripts = db['transcripts']
+transcriptschannel = db['transcriptschannel']
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
-        
+
+         
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
             modmail_data = modmail.find_one({'user_id': user_id})
-            if message.content.lower().strip() == '!closemodmail':
-                    await self.close_modmail(message.author, modmail_data['channel_id'])
-                    return
+
             if not modmail_data:
                 if message.content.isdigit():
                     return
@@ -115,7 +119,8 @@ class Modmailevnt(commands.Cog):
                         }
 
                         modmail.insert_one(modmail_data)
-                        await message.author.send(f"{tick} Conversation started.\n<:ArrowDropDown:1163171628050563153> Use !closemodmail to end your own modmail.")
+        
+                        await message.author.send(f"{tick} Conversation started.")
                         await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.")
                         embed = discord.Embed(
                             color=discord.Color.dark_embed(),
@@ -133,6 +138,7 @@ class Modmailevnt(commands.Cog):
             else:
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
+                           
                 if channel:
                     embed = discord.Embed(
                         color=discord.Color.dark_embed(),
@@ -145,16 +151,9 @@ class Modmailevnt(commands.Cog):
 
     
 
-    async def close_modmail(self, user, channel_id):
-        channel = self.client.get_channel(channel_id)
-        if channel:
-            await channel.send(f"<:Messages:1148610048151523339> Modmail conversation closed by {user.display_name}.")
-            await user.send("<:Messages:1148610048151523339> You've closed your modmail conversation.")
-            modmail.delete_one({'user_id': user.id, 'channel_id': channel.id})
-            await channel.delete()
 
-        else:
-            await user.send(f"<:dnd:1162074644023627889> There was an issue closing the modmail conversation. Please contact server admins.")
-    
+
+
+
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Modmailevnt(client))       

@@ -15,14 +15,7 @@ class StaffList(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
-     if modulesdata is None:
-        return False
-     elif modulesdata.get('StaffList', False) == True: 
-        return True
-     else:   
-        return False
+
 
 
 
@@ -30,9 +23,7 @@ class StaffList(commands.Cog):
     async def stafflist(self, ctx, display: Optional[Literal['True', 'False']]):
         guild_id = ctx.guild.id
         guild = self.client.get_guild(guild_id)
-        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return    
+
 
         if not await has_staff_role(ctx):
     

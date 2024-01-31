@@ -145,7 +145,7 @@ class HelpMenu(discord.ui.Select):
         if category == 'Modmail':
             embed.title = "Modmail Module"
             embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
-            embed.add_field(name="Commands", value="* /modmail reply\n* /modmail close\n* /modmail config")
+            embed.add_field(name="Commands", value="* /modmail reply\n* /modmail close")
         elif category == 'Forums':
             embed.title = "Forums Utils Module"
             embed.description = "This module provides commands for managing forums within your server & on forum creation embeds."
