@@ -14,7 +14,9 @@ from typing import Literal
 import os
 from dotenv import load_dotenv
 import Paginator
+import chat_exporter
 import random
+import io
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
@@ -24,7 +26,9 @@ modmail = db['modmail']
 modules = db['Modules']
 modmailcategory = db['modmailcategory']
 transcripts = db['transcripts']
+modmailblacklists = db['modmailblacklists']
 transcriptschannel = db['transcriptschannel']
+modmailalerts = db['modmailalerts']
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -36,10 +40,45 @@ class Modmailevnt(commands.Cog):
         if message.author.bot:
             return
 
-         
+        
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
             modmail_data = modmail.find_one({'user_id': user_id})
+            if message.content == f"!close":
+                if not modmail_data:
+                    await message.author.send(f"{no} You are not in a modmail conversation.")
+                    return
+                channel_id = modmail_data['channel_id']
+                channel = self.client.get_channel(channel_id)
+                channelcreated = f"{channel.created_at.strftime('%d/%m/%Y')}"
+                
+                
+                transcriptid = random.randint(100, 5000)
+                transcript = await chat_exporter.export(channel)    
+                transcript_file = discord.File(
+                io.BytesIO(transcript.encode()),
+                filename=f"transcript-{channel.name}.html")           
+                if channel:
+                    await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has closed the modmail conversation.")
+                    await channel.delete()
+                    modmail.delete_many({'user_id': user_id})
+                    await message.author.send(f"{tick} Conversation closed.")
+                    transcriptschannelresult = transcriptschannel.find_one({'guild_id': channel.guild.id})
+                    if transcriptschannelresult:
+                     transcriptchannelid = transcriptschannelresult.get('channel_id')
+                     transcriptchannel = self.client.get_channel(transcriptchannelid)
+                     if transcriptchannel:
+                      embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{message.author.id}>\n> **Closed By:** {message.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
+                      embed.set_thumbnail(url=message.author.display_avatar.url)
+                      message = await transcriptchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                      link = await chat_exporter.link(message)
+                      print(link)
+                      view = TranscriptChannel(link)
+                      await transcriptchannel.send(embed=embed, view=view)
+                else:
+                    await message.author.send(f"{no} Modmail channel not found.")
+                return
+             
 
             if not modmail_data:
                 if message.content.isdigit():
@@ -78,6 +117,11 @@ class Modmailevnt(commands.Cog):
                 try:
                     response = await self.client.wait_for('message', check=check, timeout=10)
                     selected_server = mutual_servers[int(response.content) - 1]
+                    blacklist = modmailblacklists.find_one({'guild_id': selected_server.id})
+                    if blacklist:
+                        if user_id in blacklist['blacklist']:
+                            await message.author.send(f"{no} **{message.author.display_name},** You are blacklisted from using modmail in **{selected_server.name}**.")
+                            return
                 except asyncio.TimeoutError:
                     await message.author.send(f"{no} Server selection expired.")
                     return
@@ -120,7 +164,7 @@ class Modmailevnt(commands.Cog):
 
                         modmail.insert_one(modmail_data)
         
-                        await message.author.send(f"{tick} Conversation started.")
+                        await message.author.send(f"{tick} Conversation started.\n{dropdown} Use `!close` to close the conversation.")
                         await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.")
                         embed = discord.Embed(
                             color=discord.Color.dark_embed(),
@@ -138,8 +182,17 @@ class Modmailevnt(commands.Cog):
             else:
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
-                           
+                mention = ""
                 if channel:
+                    modmailalertsresult = modmailalerts.find_one({'channel_id': channel.id})
+                    if modmailalertsresult:
+                        mention = modmailalertsresult.get('alert')
+                        print2 = modmailalerts.delete_one({'channel_id': channel.id, 'alert': mention})                         
+                        if mention:
+                            mention = f"<@{mention}>"
+
+   
+                        
                     embed = discord.Embed(
                         color=discord.Color.dark_embed(),
                         title=message.author,
@@ -147,10 +200,13 @@ class Modmailevnt(commands.Cog):
                     )
                     embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                     embed.set_thumbnail(url=message.author.display_avatar)
-                    await channel.send(embed=embed)
+                    await channel.send(mention, embed=embed)
 
-    
 
+class TranscriptChannel(discord.ui.View):
+    def __init__(self, url):
+        super().__init__()
+        self.add_item(discord.ui.Button(label='Transcript', url=url, style=discord.ButtonStyle.blurple))
 
 
 

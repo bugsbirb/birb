@@ -9,14 +9,18 @@ from discord import Button
 import random
 import logging
 from datetime import datetime
-
+import chat_exporter
+import typing
 from dotenv import load_dotenv
+import io   
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 modmail = db['modmail']
+modmailalerts = db['modmailalerts']
+modmailblacklists = db['modmailblacklists']
 transcripts = db['transcripts']
 modmailcategory = db['modmailcategory']
 transcriptschannel = db['transcriptschannel']
@@ -32,8 +36,36 @@ class Modmail(commands.Cog):
         return
     
 
+    @modmail.command(description="Pings you for the next message")
+    async def alert(self, ctx):
+        if not await has_staff_role(ctx):
+            return
+        await ctx.send(f"{tick} **{ctx.author.display_name},** you will be alerted for the next message.", ephemeral=True)
+        modmailalerts.update_one({'channel_id': ctx.channel.id}, {'$set': {'alert': ctx.author.id}}, upsert=True)     
 
-
+    @modmail.command(description="Blacklist someone from using modmail")
+    async def blacklist(self, ctx, member: discord.Member):
+        if not await has_admin_role(ctx):
+            return
+        blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
+        if blacklist:
+            if member.id in blacklist['blacklist']:
+                await ctx.send(f"{no} **{member.display_name}** is already blacklisted.")
+                return
+        modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$push': {'blacklist': member.id}}, upsert=True)
+        await ctx.send(f"{tick} **{member.display_name}** has been blacklisted from using modmail.")
+       
+    @modmail.command(description="Unblacklist someone from using modmail")
+    async def unblacklist(self, ctx, member: discord.Member):
+        if not await has_admin_role(ctx):
+            return
+        blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
+        if blacklist:
+            if member.id not in blacklist['blacklist']:
+                await ctx.send(f"{no} **{member.display_name}** is not blacklisted.")
+                return
+        modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$pull': {'blacklist': member.id}}, upsert=True)
+        await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.")
 
     @modmail.command(description="Reply to a modmail")
     async def reply(self, ctx, *, content):
@@ -84,7 +116,6 @@ class Modmail(commands.Cog):
 
             if selected_server:
 
-
                 modmail.delete_one({'channel_id': channel_id}) 
                 channel = ctx.guild.get_channel(modmail_data.get('channel_id'))
                 print(channel)
@@ -95,22 +126,15 @@ class Modmail(commands.Cog):
                 transcriptresult = transcripts.find_one({'guild_id': ctx.guild.id, 'transcriptid': transcriptid})
                 if transcriptresult:
                     transcriptid = random.randint(100, 5000)
+                transcript = await chat_exporter.export(ctx.channel)    
+                transcript_file = discord.File(
+                io.BytesIO(transcript.encode()),
+                filename=f"transcript-{ctx.channel.name}.html",
+    )     
+                try:   
+                 await ctx.channel.send(f"{tick} Modmail channel has been closed.")    
+                 await channel.delete()
 
-                messages = [] 
-                async for message in channel.history(limit=None, oldest_first=True):
-                  
-                 for embed in message.embeds:
- 
-                        embed_title = embed.title.replace('```', '').replace('**', '').replace('\n', '')
-                        embed_description = embed.description.replace('```', '').replace('**', '').replace('\n', '')
-
-                        messages.append(f"{embed_title}: {embed_description}\n")  
-                        
-
-                     
-                try:       
-                 await ctx.send(f"{tick} Modmail channel has been closed.")      
-                 await ctx.channel.delete() 
                 except discord.Forbidden:
                     await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.")
                     return                               
@@ -123,21 +147,17 @@ class Modmail(commands.Cog):
                          await user.send(f"{tick} Your modmail channel has been closed.") 
                         except discord.Forbidden:
                             
-                            pass
-
-
-                transcripts.insert_one({'guild_id': ctx.guild.id ,'channel_id': channel_id, 'messages': messages, 'transcriptid': transcriptid, 'user': user_id, 'userthumbnail': user.display_avatar.url, 'closedby': ctx.author.display_name,'closedbythumbnail': ctx.author.display_avatar.url,  'created': channelcreated, 'closed': datetime.utcnow().strftime('%d-%m-%Y')})
-
-
-          
+                            pass     
                 transcriptchannelid = transcriptschannel.find_one({'guild_id': ctx.guild.id})
                 if transcriptchannelid:
-                    transcriptchannelid = transcriptchannelid.get('channel_id')
                     transcriptchannel = ctx.guild.get_channel(transcriptchannelid)
                     if transcriptchannel:
                      embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{user_id}>\n> **Closed By:** {ctx.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
                      embed.set_thumbnail(url=user.display_avatar.url)
-                     view = TranscriptChannel(f'https://modmail.astrobirb.dev/transcripts/{ctx.guild.id}/{transcriptid}')
+                     message = await transcriptchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                     link = await chat_exporter.link(message)
+                     print(link)
+                     view = TranscriptChannel(link)
                      await transcriptchannel.send(embed=embed, view=view)
             else:
                 await ctx.send(f"{Warning} Selected server not found.")
