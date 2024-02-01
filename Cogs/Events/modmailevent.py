@@ -50,6 +50,11 @@ class Modmailevnt(commands.Cog):
                     return
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
+                if channel is None:
+                    modmail.delete_many({'user_id': user_id})
+                    await message.author.send(f"{tick} Conversation closed.")
+                    return
+
                 channelcreated = f"{channel.created_at.strftime('%d/%m/%Y')}"
                 
                 
@@ -70,7 +75,8 @@ class Modmailevnt(commands.Cog):
                      if transcriptchannel:
                       embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{message.author.id}>\n> **Closed By:** {message.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
                       embed.set_thumbnail(url=message.author.display_avatar.url)
-                      message = await transcriptchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                      testchannel = self.client.get_channel(1202756318897774632)
+                      message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
                       link = await chat_exporter.link(message)
                       print(link)
                       view = TranscriptChannel(link)
