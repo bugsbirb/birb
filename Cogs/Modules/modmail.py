@@ -148,8 +148,9 @@ class Modmail(commands.Cog):
                         except discord.Forbidden:
                             
                             pass     
-                transcriptchannelid = transcriptschannel.find_one({'guild_id': ctx.guild.id})
-                if transcriptchannelid:
+                transcriptchannelresult = transcriptschannel.find_one({'guild_id': ctx.guild.id})
+                if transcriptchannelresult:
+                    transcriptchannelid = transcriptchannelresult['channel_id']
                     transcriptchannel = ctx.guild.get_channel(transcriptchannelid)
                     if transcriptchannel:
                      embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{user_id}>\n> **Closed By:** {ctx.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
