@@ -10,3 +10,4 @@ motor
 topggpy
 validators
 aiohttp
+chat_exporter
