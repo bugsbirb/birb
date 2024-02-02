@@ -32,11 +32,13 @@ modmailalerts = db['modmailalerts']
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.user_last_selection = {}
 
 
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        
         if message.author.bot:
             return
 
@@ -90,6 +92,15 @@ class Modmailevnt(commands.Cog):
                 if message.content.isdigit():
                     return
 
+                last_selection_time = self.user_last_selection.get(user_id, datetime.utcnow() - timedelta(seconds=20))
+                time_remaining = timedelta(seconds=20) - (datetime.utcnow() - last_selection_time)
+                seconds_remaining = int(time_remaining.total_seconds())
+                if seconds_remaining > 0 and seconds_remaining <= 20:
+                 await message.author.send(f"{no} **{message.author.display_name},** please wait **{seconds_remaining} seconds** before opening another server list.", delete_after=seconds_remaining)
+                 return
+                go = self.user_last_selection[user_id] = datetime.utcnow()
+                print(last_selection_time)
+                print(go)
                 mutual_servers = [
                     guild for guild in self.client.guilds
                     if discord.utils.get(guild.members, id=user_id)
@@ -103,6 +114,7 @@ class Modmailevnt(commands.Cog):
                 server_list = "\n".join([f"`{i+1}`. **{server.name}**" for i, server in enumerate(mutual_servers)])
                 server_list += "\n\nPlease enter the number of the server you want to communicate with."
 
+                self.user_last_selection[user_id] = datetime.utcnow()
                 embed = discord.Embed(
                     title="Server List",
                     description=server_list,
@@ -120,6 +132,8 @@ class Modmailevnt(commands.Cog):
                         and 1 <= int(response.content) <= len(mutual_servers)
                     )
 
+
+                    
                 try:
                     response = await self.client.wait_for('message', check=check, timeout=10)
                     selected_server = mutual_servers[int(response.content) - 1]
