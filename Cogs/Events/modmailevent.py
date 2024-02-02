@@ -192,6 +192,7 @@ class Modmailevnt(commands.Cog):
                         await message.author.send(f"{tick} Conversation started.\n{dropdown} Use `!close` to close the conversation.")
                         user = await selected_server.fetch_member(user_id)
                         user_roles = " ".join([role.mention for role in user.roles if role != selected_server.default_role][:20])
+                        rolecount = len(user.roles) - 1 if selected_server.default_role in user.roles else len(user.roles)
 
                         
                         modmailpingresult = modmailping.find_one({'guild_id': selected_server.id})
@@ -201,7 +202,7 @@ class Modmailevnt(commands.Cog):
                             modmailroles = ", ".join(filter(None, modmailroles))
                         info = discord.Embed(title=f"Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
                         if user_roles:
-                            info.add_field(name="Roles", value=user_roles, inline=False)
+                            info.add_field(name=f"Roles [{rolecount}]", value=user_roles, inline=False)
                         info.set_author(name=message.author, icon_url=message.author.display_avatar)
                         info.set_thumbnail(url=message.author.display_avatar)
                         info.set_footer(text=f"ID: {message.author.id}")
