@@ -102,7 +102,7 @@ class Modmail(commands.Cog):
 
 
     @modmail.command(description="Close a modmail channel.")
-    async def close(self, ctx):
+    async def close(self, ctx, *, reason = None):
      await ctx.defer()
      if not await has_staff_role(ctx):
          return             
@@ -144,7 +144,16 @@ class Modmail(commands.Cog):
                     user = await self.client.fetch_user(user_id)
                     if user:
                         try:
-                         await user.send(f"{tick} Your modmail channel has been closed.") 
+                         if reason is None:
+                            reason = "No reason provided."
+                         embed = discord.Embed(title="Modmail Closed", description=f"", color=discord.Color.dark_embed())
+                         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                         embed.add_field(name="<:Document:1191926049857097748> ID", value=transcriptid, inline=True)
+                         embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
+                         embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=ctx.author.mention, inline=True)
+                         embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
+                         embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
+                         await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
                         except discord.Forbidden:
                             
                             pass     
@@ -153,8 +162,13 @@ class Modmail(commands.Cog):
                     transcriptchannelid = transcriptchannelresult['channel_id']
                     transcriptchannel = ctx.guild.get_channel(transcriptchannelid)
                     if transcriptchannel:
-                     embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{user_id}>\n> **Closed By:** {ctx.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
-                     embed.set_thumbnail(url=user.display_avatar.url)
+                     embed = discord.Embed(title="Modmail Closed", description=f"", color=discord.Color.dark_embed())
+                     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                     embed.add_field(name="<:Document:1191926049857097748> ID", value=transcriptid, inline=True)
+                     embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
+                     embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=ctx.author.mention, inline=True)
+                     embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
+                     embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
                      testchannel = self.client.get_channel(1202756318897774632)
                      message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
                      link = await chat_exporter.link(message)

@@ -75,8 +75,14 @@ class Modmailevnt(commands.Cog):
                      transcriptchannelid = transcriptschannelresult.get('channel_id')
                      transcriptchannel = self.client.get_channel(transcriptchannelid)
                      if transcriptchannel:
-                      embed = discord.Embed(title=f"Modmail #{transcriptid}", description=f"**Modmail Info**\n> **User:** <@{message.author.id}>\n> **Closed By:** {message.author.mention}\n> **Created:** {channelcreated}\n> **Closed:** {datetime.utcnow().strftime('%d/%m/%Y')}", color=discord.Color.dark_embed())
-                      embed.set_thumbnail(url=message.author.display_avatar.url)
+                      embed = discord.Embed(title="Modmail Closed", description=f"", color=discord.Color.dark_embed())
+                      embed.set_author(name=channel.guild.name, icon_url=channel.guild.icon)
+                      embed.add_field(name="<:Document:1191926049857097748> ID", value=transcriptid, inline=True)
+                      embed.add_field(name="<:Add:1163095623600447558> Opened", value=message.author.mention, inline=True)
+                      embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=message.author.mention, inline=True)
+                      embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
+                      embed.add_field(name="<:reason:1202773873095868476> Reason", value="Closed by modmail author.", inline=True)
+                      await message.author.send(embed=embed)
                       testchannel = self.client.get_channel(1202756318897774632)
                       message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
                       link = await chat_exporter.link(message)
@@ -108,7 +114,7 @@ class Modmailevnt(commands.Cog):
                 ]
 
                 if not mutual_servers:
-                    await message.author.send(f"{no} You are not a member of any server with modmail enabled.")
+                    await message.author.send(f"{no} **{message.author.name},** you are not a member of any server with modmail enabled.")
                     return
 
                 server_list = "\n".join([f"`{i+1}`. **{server.name}**" for i, server in enumerate(mutual_servers)])
@@ -143,10 +149,10 @@ class Modmailevnt(commands.Cog):
                             await message.author.send(f"{no} **{message.author.display_name},** You are blacklisted from using modmail in **{selected_server.name}**.")
                             return
                 except asyncio.TimeoutError:
-                    await message.author.send(f"{no} Server selection expired.")
+                    await message.author.send(f"{no} **{message.author.name},** the server selection expired.")
                     return
                 except ValueError:
-                    await message.author.send(f"{no} Invalid server number. Please enter a valid number.")
+                    await message.author.send(f"{no} **{message.author.name},** That isn't a valid number.")
                     return
                 category_id = modmailcategory.find_one({'guild_id': selected_server.id})['category_id']
 
@@ -168,13 +174,13 @@ class Modmailevnt(commands.Cog):
                             try:
                              await channel.send(embed=embed)
                             except discord.Forbidden:
-                             await message.reply(f"{no} Please contact server admins I can't see the modmail channel.")                                    
+                             await message.reply(f"{no} **{message.author.name},** Please contact server admins I can't see the modmail channel.")                                    
                              return
                     else:
                         try:
                          channel = await category.create_text_channel(f'modmail-{message.author.name}')
                         except discord.Forbidden: 
-                            await message.reply(f"{no} Please contact the server admins I can't create a channel.")
+                            await message.reply(f"{no} **{message.author.name},** please contact the server admins I can't create a channel.")
                             return
                         modmail_data = {
                             'user_id': user_id,
@@ -196,9 +202,9 @@ class Modmailevnt(commands.Cog):
                         try:
                          await channel.send(embed=embed)
                         except discord.Forbidden: 
-                            await message.reply(f"{no} I can't see the modmail channel contact a server admin.")
+                            await message.reply(f"{no} **{message.author.name}**, I can't see the modmail channel contact a server admin.")
                 else:
-                    await message.author.send("Selected category not found.")
+                    await message.author.send(f"{no} **{message.author.name},** the servers modmail category is not found.")
             else:
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
