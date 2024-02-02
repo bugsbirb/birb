@@ -80,6 +80,7 @@ class client(commands.AutoShardedBot):
         'Cogs.Events.AstroSupport.blacklist',
         'Cogs.Events.AstroSupport.topgg',
         'Cogs.Events.AstroSupport.analytics'
+
         
         ]
 
@@ -154,7 +155,11 @@ async def update_channel_name():
     channel_id = 1131245978704420964 
     channel = client.get_channel(channel_id)
     if channel:
-        await channel.edit(name=f'{guild_count} Guilds | {len(client.users)} Users')
+        try:
+         await channel.edit(name=f'{guild_count} Guilds | {len(client.users)} Users')
+        except discord.HTTPException:
+            print("Failed to update channel name.")
+             
 
     else:
         print(f'Channel with ID {channel_id} not found.')

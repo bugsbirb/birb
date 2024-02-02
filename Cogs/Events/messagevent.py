@@ -33,24 +33,26 @@ class messageevent(commands.Cog):
         if message.author.bot:
             return
 
-        staff_data = await scollection2.find_one({'guild_id': message.guild.id})
-        if staff_data is None:
+        if message.guild is None:
             return
 
-        if 'staffrole' in staff_data:
-            staff_role_ids = staff_data['staffrole']
-            if not isinstance(staff_role_ids, list):
-                staff_role_ids = [staff_role_ids]
+        staff_data = await scollection2.find_one({'guild_id': message.guild.id})
+        if staff_data is None or 'staffrole' not in staff_data:
+            return
 
-            if any(role.id in staff_role_ids for role in message.author.roles):
-                guild_id = message.guild.id
-                author_id = message.author.id
+        staff_role_ids = staff_data['staffrole']
+        if not isinstance(staff_role_ids, list):
+            staff_role_ids = [staff_role_ids]
 
-                await mccollection.update_one(
-                    {'guild_id': guild_id, 'user_id': author_id},
-                    {'$inc': {'message_count': 1}},
-                    upsert=True
-                )
+        if any(role.id in staff_role_ids for role in message.author.roles):
+            guild_id = message.guild.id
+            author_id = message.author.id
+
+            await mccollection.update_one(
+                {'guild_id': guild_id, 'user_id': author_id},
+                {'$inc': {'message_count': 1}},
+                upsert=True
+            )
 
         
 

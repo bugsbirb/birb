@@ -21,6 +21,7 @@ loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 modmailcategory = db['modmailcategory']
+modmailping = db['modmailping']
 transcriptschannel = db['transcriptschannel']
 class ModmailCategory(discord.ui.ChannelSelect):
     def __init__(self, author):
@@ -94,4 +95,24 @@ class TranscriptChannel(discord.ui.ChannelSelect):
 
    
 
+class ModmailPing(discord.ui.RoleSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Modmail Ping', max_values=25)
+        self.author = author
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+  
+        data = {
+            'guild_id': interaction.guild.id,
+            'modmailping': [selected_role_ids]
+        }
+
+
+        modmailping.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=None)
     

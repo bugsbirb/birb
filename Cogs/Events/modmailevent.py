@@ -28,6 +28,7 @@ modmailcategory = db['modmailcategory']
 transcripts = db['transcripts']
 modmailblacklists = db['modmailblacklists']
 transcriptschannel = db['transcriptschannel']
+modmailping = db['modmailping']
 modmailalerts = db['modmailalerts']
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
@@ -105,8 +106,6 @@ class Modmailevnt(commands.Cog):
                  await message.author.send(f"{no} **{message.author.display_name},** please wait **{seconds_remaining} seconds** before opening another server list.", delete_after=seconds_remaining)
                  return
                 go = self.user_last_selection[user_id] = datetime.utcnow()
-                print(last_selection_time)
-                print(go)
                 mutual_servers = [
                     guild for guild in self.client.guilds
                     if discord.utils.get(guild.members, id=user_id)
@@ -191,16 +190,47 @@ class Modmailevnt(commands.Cog):
                         modmail.insert_one(modmail_data)
         
                         await message.author.send(f"{tick} Conversation started.\n{dropdown} Use `!close` to close the conversation.")
-                        await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.")
+                        user = await selected_server.fetch_member(user_id)
+                        user_roles = " ".join([role.mention for role in user.roles if role != selected_server.default_role][:20])
+
+                        
+                        modmailpingresult = modmailping.find_one({'guild_id': selected_server.id})
+                        modmailroles = ""
+                        if modmailpingresult:
+                            modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if selected_server.get_role(roleid) is not None]
+                            modmailroles = ", ".join(filter(None, modmailroles))
+                        info = discord.Embed(title=f"Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
+                        if user_roles:
+                            info.add_field(name="Roles", value=user_roles, inline=False)
+                        info.set_author(name=message.author, icon_url=message.author.display_avatar)
+                        info.set_thumbnail(url=message.author.display_avatar)
+                        info.set_footer(text=f"ID: {message.author.id}")
+                        await channel.send(f"{modmailroles}\n<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.", embed=info)
                         embed = discord.Embed(
-                            color=discord.Color.dark_embed(),
-                            title=message.author,
-                            description=f"```{message.content}```"
-                        )
+                                    color=discord.Color.dark_embed(),
+                                    title=message.author,
+                                    description=f"```{message.content}```"
+                                )                     
                         embed.set_author(name=message.author, icon_url=message.author.display_avatar)
-                        embed.set_thumbnail(url=message.author.display_avatar)
+                        embed.set_thumbnail(url=message.author.display_avatar)   
+                        if message.attachments:
+                            files = [await file.to_file() for file in message.attachments]
+                            if message.content:
+                                embed = discord.Embed(
+                                    color=discord.Color.dark_embed(),
+                                    title=message.author,
+                                    description=f"```{message.content}```"
+                                )
+                                embed.set_author(name=message.author, icon_url=message.author.display_avatar)
+                                embed.set_thumbnail(url=message.author.display_avatar)
+                                msg = await channel.send(embed=embed)
+                                await msg.reply("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                                return
+                            else:
+                                await channel.send(f"<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                                return
                         try:
-                         await channel.send(embed=embed)
+                            await channel.send(embed=embed)
                         except discord.Forbidden: 
                             await message.reply(f"{no} **{message.author.name}**, I can't see the modmail channel contact a server admin.")
                 else:
@@ -213,12 +243,30 @@ class Modmailevnt(commands.Cog):
                     modmailalertsresult = modmailalerts.find_one({'channel_id': channel.id})
                     if modmailalertsresult:
                         mention = modmailalertsresult.get('alert')
-                        print2 = modmailalerts.delete_one({'channel_id': channel.id, 'alert': mention})                         
+                        modmailalerts.delete_one({'channel_id': channel.id, 'alert': mention})                         
                         if mention:
                             mention = f"<@{mention}>"
 
    
-                        
+                    if message.attachments:
+                      
+
+                     files = [await file.to_file() for file in message.attachments]
+                     if message.content:
+                      embed = discord.Embed(
+                      color=discord.Color.dark_embed(),
+                      title=message.author,
+                      description=f"```{message.content}```")
+    
+                      embed.set_author(name=message.author, icon_url=message.author.display_avatar)
+                      embed.set_thumbnail(url=message.author.display_avatar)
+                      msg = await channel.send(mention, embed=embed)
+                      await msg.reply("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                      return
+                     else:
+                      
+                      await channel.send(f"{mention}\n<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                      return
                     embed = discord.Embed(
                         color=discord.Color.dark_embed(),
                         title=message.author,
@@ -228,6 +276,11 @@ class Modmailevnt(commands.Cog):
                     embed.set_thumbnail(url=message.author.display_avatar)
                     await channel.send(mention, embed=embed)
 
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        if isinstance(ctx.channel, discord.DMChannel):
+            await ctx.send(f"{no} **{ctx.author.display_name},** I can't execute commands in DMs. Please use the bot in a server.")
+            return
 
 class TranscriptChannel(discord.ui.View):
     def __init__(self, url):

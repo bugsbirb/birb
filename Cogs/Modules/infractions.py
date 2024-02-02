@@ -11,6 +11,7 @@ import typing
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
+
 from emojis import *
 from permissions import *
 MONGO_URL = os.getenv('MONGO_URL')
@@ -70,7 +71,7 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
-    async def infract(self, ctx, staff: discord.Member, reason: str, action, notes: Optional[str]):
+    async def infract(self, ctx, staff: discord.Member,  action, reason: str, notes: Optional[str]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return    
@@ -132,21 +133,13 @@ class Infractions(commands.Cog):
         else:
               
          if notes:
-          embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Notes:** {notes}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+          embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}\n* **Notes:** {notes}", color=discord.Color.dark_embed())
          else:
           embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
          embed.set_thumbnail(url=staff.display_avatar)
          embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
          embed.set_footer(text=f"Infraction ID | {random_string}")
-        infract_data = {
-            'management': ctx.author.id,
-            'staff': staff.id,
-            'action': action,
-            'reason': reason,
-            'notes': notes,
-            'random_string': random_string,
-            'guild_id': ctx.guild.id
-        }
+
 
         guild_id = ctx.guild.id
         data = infchannel.find_one({'guild_id': guild_id})
@@ -163,8 +156,20 @@ class Infractions(commands.Cog):
          if channel:      
 
             try:
-             await channel.send(f"{staff.mention}", embed=embed)
+             msg = await channel.send(f"{staff.mention}", embed=embed)
              await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
+             infract_data = {
+            'management': ctx.author.id,
+            'staff': staff.id,
+            'action': action,
+            'reason': reason,
+            'notes': notes,
+            'random_string': random_string,
+            'guild_id': ctx.guild.id,
+            'jump_url': msg.jump_url,
+            'msg_id': msg.id,
+            'timestamp': datetime.utcnow()
+        }             
              collection.insert_one(infract_data)
             except discord.Forbidden: 
              await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.")             
@@ -192,6 +197,7 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="View a staff members infractions")
     async def infractions(self, ctx, staff: discord.Member):
+     await ctx.defer()
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return    
@@ -216,16 +222,18 @@ class Infractions(commands.Cog):
             'action': infraction['action'],
             'reason': infraction['reason'],
             'notes': infraction['notes'],
-            'management': infraction['management']
+            'management': infraction['management'],
+            'jump_url': infraction['jump_url'] if 'jump_url' in infraction else 'N/A'
         }
         infraction_list.append(infraction_info)
 
      if not infraction_list:
         await ctx.send(f"{no} **{ctx.author.display_name}**, there is no infractions found for **@{staff.display_name}**.")
         return
-
+     
      print(f"Found {len(infraction_list)} infractions for {staff.display_name}")
 
+     
      embed = discord.Embed(
         title=f"{staff.name}'s Infractions",
         description=f"* **User:** {staff.mention}\n* **User ID:** {staff.id}",
@@ -234,10 +242,15 @@ class Infractions(commands.Cog):
      embed.set_thumbnail(url=staff.display_avatar)
      embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)
      for infraction_info in infraction_list:
+        if infraction_info['jump_url'] == 'N/A':
+         jump_url = ""
+        else:
+         jump_url = f"<:arrow:1166529434493386823>**[Jump to Infraction]({infraction_info['jump_url']})**"
+        
         management = await self.client.fetch_user(infraction_info['management'])        
         embed.add_field(
             name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}\n{jump_url}",
             inline=False
         )
 
@@ -265,12 +278,121 @@ class Infractions(commands.Cog):
      if infraction is None:
         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.")
         return
-
      collection.delete_one(filter)
  
      await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.")
      
+    @infraction.command(description="Edit an existing infraction")
+    @app_commands.autocomplete(action=infractiontypes)
+    async def edit(self, ctx, id: str, action, reason: str, notes: Optional[str]):
+      if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return         
+      if not await has_admin_role(ctx):
+         return
+      error = ""
+      filter = {
+         'guild_id': ctx.guild.id,
+         'random_string': id
+      }
 
+      infraction = collection.find_one(filter)
+
+      if infraction is None:
+         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.")
+         return
+      infchannelresult = infchannel.find_one({'guild_id': ctx.guild.id})
+      if infchannelresult is None:
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction channel is not setup please run `/config`")
+         return
+      
+      staff = await self.client.fetch_user(infraction['staff']) 
+      manager = await self.client.fetch_user(infraction['management'])
+      channel_id = infchannelresult['channel_id']
+      channel = self.client.get_channel(channel_id)
+      
+      if infraction.get('msg_id')is None:
+       collection.update_one(filter, {'$set': {'action': action, 'reason': reason, 'notes': notes}})
+       await ctx.send(f"{tick} **{ctx.author.display_name}**, I've successfully edited the infraction data with ID `{id}` in this guild. However, I couldn't edit the message.\n{dropdown} Please note that issued infractions before **02/02/2024** cannot have their embeds edited.")
+       return
+      custom = Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Infractions'})
+      if custom:
+         if channel:
+            msg = await channel.fetch_message(infraction['msg_id'])
+            if msg is not None:
+               staff = await self.client.fetch_user(infraction['staff'])
+               replacements = {
+            '{staff.mention}': staff.mention,
+            '{staff.name}': staff.display_name,
+            '{author.mention}': manager.mention,
+            '{author.name}': manager.display_name,
+            '{action}': action,
+            '{reason}': reason,
+            '{notes}': notes
+
+           }
+               embed_title = await self.replace_variables(custom['title'], replacements)
+               embed_description = await self.replace_variables(custom['description'], replacements)
+    
+               embed_author = await self.replace_variables(custom['author'], replacements)
+               if custom['thumbnail'] == "{staff.avatar}":
+                 embed_thumbnail = staff.display_avatar
+               else:
+                 embed_thumbnail = custom['thumbnail']
+
+
+               if custom['author_icon'] == "{author.avatar}":
+                 authoricon = manager.display_avatar
+               else:
+                 authoricon = custom['author_icon']
+
+               if embed_thumbnail == "None":
+                 embed_thumbnail = None
+
+               if authoricon == "None":
+                 authoricon = None   
+ 
+               if embed_author == None:
+                 embed_author = ""
+               embed = discord.Embed(title=embed_title, description=embed_description , color=int(custom['color'], 16))
+
+               embed.set_thumbnail(url=embed_thumbnail)
+               embed.set_author(name=embed_author, icon_url=authoricon)
+               embed.set_footer(text=f"Infraction ID | {id}")
+               if custom['image']:
+                 embed.set_image(url=custom['image'])
+
+               try:
+                  await msg.edit(embed=embed)
+               except discord.HTTPException or discord.NotFound:
+                  error = f"<:Crisis:1190412318648062113> I couldn't edit the infraction embed."
+            else:
+               pass      
+      else:
+         msg = await channel.fetch_message(infraction['msg_id'])
+         
+         if msg is not None:  
+            staff = await self.client.fetch_user(infraction['staff'])         
+            if notes is None:
+               notes = infraction['notes']
+            if notes == 'None' or notes is None:   
+               embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
+            else:
+               embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}\n* **Notes:** {notes}", color=discord.Color.dark_embed())
+            manager = await self.client.fetch_user(infraction['management'])  
+            embed.set_thumbnail(url=staff.display_avatar)
+            embed.set_author(name=f"Signed, {manager.display_name}", icon_url=manager.display_avatar)
+            embed.set_footer(text=f"Infraction ID | {id}")                
+            try:
+               await msg.edit(embed=embed)
+               print(f"Edited the infraction embed for ID: {id}")
+            except discord.HTTPException or discord.NotFound:
+                  error = f"<:Crisis:1190412318648062113> I couldn't edit the infraction embed."      
+         else:
+            pass                   
+      collection.update_one(filter, {'$set': {'action': action, 'reason': reason, 'notes': notes}})
+
+      await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the infraction with ID `{id}` in this guild.\n{error}")
 
 
 async def setup(client: commands.Bot) -> None:

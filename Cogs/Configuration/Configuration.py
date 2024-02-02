@@ -56,7 +56,7 @@ from Cogs.Configuration.Views.infractionsview import InfractionTypes
 from Cogs.Configuration.Views.CustomCommandsView  import CreateButtons
 from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
 from Cogs.Configuration.Views.modmailview import ModmailCategory
-
+from Cogs.Configuration.Views.modmailview import ModmailPing
 from Cogs.Configuration.Views.modmailview import TranscriptChannel
 MONGO_URL = os.getenv('MONGO_URL')
 
@@ -97,6 +97,7 @@ suggestschannel = db["suggestion channel"]
 customcommands = db['Custom Commands']
 modmailcategory = db['modmailcategory']
 transcriptchannel = db['transcriptschannel']
+modmailping = db['modmailping']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -496,11 +497,19 @@ class Config(discord.ui.Select):
             modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
             transcriptschannels = "Not Configured"
             modmailcategorys = "Not Configured"
+            modmailpingresult = modmailping.find_one({'guild_id': interaction.guild.id})
+            modmailroles = "Not Configured"
+            if modmailpingresult:
+                modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if interaction.guild.get_role(roleid) is not None]
+                if not modmailroles:
+                    modmailroles = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                modmailroles = ", ".join(filter(None, modmailroles))
+
             if transcriptschannelresult:
                 transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
             if modmailcategoryresult:
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
-            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
             view = Modmail(interaction.user)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -532,6 +541,7 @@ class Modmail(discord.ui.View):
     def __init__(self, author):
         super().__init__()
         self.add_item(ModmailCategory(author))
+        self.add_item(ModmailPing(author))
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
 
