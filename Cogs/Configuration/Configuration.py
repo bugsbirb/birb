@@ -58,6 +58,7 @@ from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
 from Cogs.Configuration.Views.modmailview import ModmailCategory
 from Cogs.Configuration.Views.modmailview import ModmailPing
 from Cogs.Configuration.Views.modmailview import TranscriptChannel
+
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -148,60 +149,60 @@ class Adminrole(discord.ui.RoleSelect):
         await interaction.response.edit_message(content=None)
         print(f"Select Roles {selected_role_ids}")
 
+
+
+                
+
 class Config(discord.ui.Select):
     def __init__(self, author):
         self.author = author
-        options = [
-            discord.SelectOption(label="Basic Settings", value="Basic Settings", emoji="<:Setting:1154092651193323661>"),                   
-            discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),            
-            discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
-            discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),     
-            discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"),   
-            discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"),                 
-            discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
-            discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),                     
-            discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>"),
-            discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
-            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"),  
-            discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
-            discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
-            discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
-            discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
-            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>"),                
-            discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>"),                
-            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>")          
 
         
-            
-        ]
+        options = [
+        discord.SelectOption(label="Settings", value="Settings", emoji="<:Setting:1154092651193323661>", description=self.permissionsconfig(author)),
+        discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'infractions': True}) else "Disabled"),
+        discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
+        discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Customisation': True}) else "Disabled"),
+        discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
+        discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
+        discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
+        discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
+        discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
+        discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
+        discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
+        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
+        discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
+        discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
+        discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
+        discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
+        discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
+        discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
+]
+
         super().__init__(placeholder='Config Menu', min_values=1, max_values=1, options=options)
 
+    def permissionsconfig(self, author):
+     actionrequired = None
+    
+     if not scollection.find_one({'guild_id': author.guild.id}):
+        actionrequired = "Action Required: Staff Role"
+     if not arole.find_one({'guild_id': author.guild.id}):
+        if actionrequired:
+            actionrequired += " and Admin Role"
+        else:
+            actionrequired = "Action Required: Admin Role"       
+
+     return actionrequired        
+
+
     async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
         color = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        if color == 'Infractions':    #infractionss
-            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
-            modulemsg = ""
-            infchannelmsg = ""
-            if moduleddata:
-                modulemsg = f"{moduleddata['infractions']}"
-            if infractionchannelresult:    
-                channelid = infractionchannelresult['channel_id']
-                channel = interaction.guild.get_channel(channelid)
-                if channel is None:
-                    infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
-                else:    
-                 infchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}", color=discord.Color.dark_embed())
-            view = InfractModule(self.author)
-            embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
-
-        elif color == 'Basic Settings':  # basic
+        if color == 'Settings':  # basic
             staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
             adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
             staffrolemessage = "Not Configured"
@@ -228,12 +229,35 @@ class Config(discord.ui.Select):
                 staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
              else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
-             embed = discord.Embed(title="<:Setting:1154092651193323661> Settings",
+            embed = discord.Embed(title="<:Setting:1154092651193323661> Settings",
                                   description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}",
                                   color=discord.Color.dark_embed())
-             embed.set_thumbnail(url=interaction.guild.icon)
-             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-             view = ConfigViewMain(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            view = ConfigViewMain(self.author)        
+
+
+        elif color == 'Infractions':    #infractionss
+            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            infchannelmsg = ""
+            if moduleddata:
+                modulemsg = f"{moduleddata['infractions']}"
+            if infractionchannelresult:    
+                channelid = infractionchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 infchannelmsg = channel.mention                
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}", color=discord.Color.dark_embed())
+            view = InfractModule(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
+
+
+
         elif color == 'Utility':         # Utility
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
             modulemsg = "True"
@@ -513,8 +537,9 @@ class Config(discord.ui.Select):
             view = Modmail(interaction.user)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
-        await interaction.response.edit_message(embed=embed, view=view)
-            
+        await interaction.edit_original_response(embed=embed, view=view)
+
+     
 
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
@@ -654,6 +679,9 @@ class CustomisatiomModule(discord.ui.View):
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
+
+  
+
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -661,6 +689,7 @@ class ConfigCog(commands.Cog):
     @commands.hybrid_command(description="Configure the bot for your servers needs")
     @commands.has_guild_permissions(administrator=True)
     async def config(self, ctx):
+        await ctx.defer()
         staffroleresult = scollection.find_one({'guild_id': ctx.guild.id})
         types = nfractiontypes.find_one({'guild_id': ctx.guild.id})
         if types is None:
