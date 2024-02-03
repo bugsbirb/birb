@@ -120,11 +120,13 @@ class CreateInfractionModal(discord.ui.Modal):
         self.type_input = discord.ui.TextInput(
             label='Type',
             placeholder='What is the infraction type?',
+            max_length=30,
         )
 
         self.add_item(self.type_input)
 
     async def on_submit(self, interaction: discord.Interaction):
+        
         type_value = self.type_input.value   
         filterm = {
             'guild_id': interaction.guild.id,
@@ -132,6 +134,11 @@ class CreateInfractionModal(discord.ui.Modal):
         }
 
         types = nfractiontypes.find_one(filterm)
+        infractiontypesresult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
+
+        infractiontypescount = len(infractiontypesresult['types'])
+        if infractiontypescount >= 15:
+            return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, You have reached the maximum amount of infraction types (15)", ephemeral=True)
         if types:
             return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, Infraction type already exists", ephemeral=True)
 
@@ -177,7 +184,7 @@ class DeleteInfractionModal(discord.ui.Modal):
 
 
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type deleted successfully", ephemeral=True)
-
+        await refreshembed(self, interaction)
 async def refreshembed(self, interaction):
             infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
@@ -198,8 +205,8 @@ async def refreshembed(self, interaction):
                     infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  infchannelmsg = channel.mention          
-
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types** {infractiontypess}", color=discord.Color.dark_embed())
+            infractiontypescount = len(infractiontyperesult['types'])
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types [{infractiontypescount}/15]** {infractiontypess}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
 
