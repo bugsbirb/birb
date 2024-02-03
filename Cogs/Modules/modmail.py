@@ -24,10 +24,20 @@ modmailblacklists = db['modmailblacklists']
 transcripts = db['transcripts']
 modmailcategory = db['modmailcategory']
 transcriptschannel = db['transcriptschannel']
+modules = db['Modules']
 from permissions import has_admin_role, has_staff_role
 class Modmail(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    async def modulecheck(self, ctx): 
+     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     if modulesdata is None:
+        return False
+     elif modulesdata.get('Modmail', False) == True: 
+        return True
+     else:   
+        return False
 
 
 
@@ -38,6 +48,9 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Pings you for the next message")
     async def alert(self, ctx):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return         
         if not await has_staff_role(ctx):
             return
         await ctx.send(f"{tick} **{ctx.author.display_name},** you will be alerted for the next message.", ephemeral=True)
@@ -45,6 +58,9 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Blacklist someone from using modmail")
     async def blacklist(self, ctx, member: discord.Member):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await has_admin_role(ctx):
             return
         blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
@@ -57,6 +73,9 @@ class Modmail(commands.Cog):
        
     @modmail.command(description="Unblacklist someone from using modmail")
     async def unblacklist(self, ctx, member: discord.Member):
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
         if not await has_admin_role(ctx):
             return
         blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
@@ -69,6 +88,9 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Reply to a modmail")
     async def reply(self, ctx, *, content):
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return              
      if not await has_staff_role(ctx):
          return             
      if isinstance(ctx.channel, discord.TextChannel):
@@ -104,6 +126,9 @@ class Modmail(commands.Cog):
     @modmail.command(description="Close a modmail channel.")
     async def close(self, ctx, *, reason = None):
      await ctx.defer()
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return              
      if not await has_staff_role(ctx):
          return             
      if isinstance(ctx.channel, discord.TextChannel):

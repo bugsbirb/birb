@@ -105,11 +105,12 @@ class Modmailevnt(commands.Cog):
                 if seconds_remaining > 0 and seconds_remaining <= 20:
                  await message.author.send(f"{no} **{message.author.display_name},** please wait **{seconds_remaining} seconds** before opening another server list.", delete_after=seconds_remaining)
                  return
-                go = self.user_last_selection[user_id] = datetime.utcnow()
+                self.user_last_selection[user_id] = datetime.utcnow()
                 mutual_servers = [
                     guild for guild in self.client.guilds
                     if discord.utils.get(guild.members, id=user_id)
                     and modmailcategory.find_one({'guild_id': guild.id})
+                    and modules.find_one({'guild_id': guild.id, 'Modmail': True})
                 ]
 
                 if not mutual_servers:
@@ -140,6 +141,7 @@ class Modmailevnt(commands.Cog):
 
                     
                 try:
+
                     response = await self.client.wait_for('message', check=check, timeout=10)
                     selected_server = mutual_servers[int(response.content) - 1]
                     blacklist = modmailblacklists.find_one({'guild_id': selected_server.id})

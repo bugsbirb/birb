@@ -58,7 +58,7 @@ from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
 from Cogs.Configuration.Views.modmailview import ModmailCategory
 from Cogs.Configuration.Views.modmailview import ModmailPing
 from Cogs.Configuration.Views.modmailview import TranscriptChannel
-
+from Cogs.Configuration.Views.modmailview import ModmailToggle
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -166,7 +166,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
         discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
-        discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"),
+        discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
         discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
         discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
@@ -531,6 +531,11 @@ class Config(discord.ui.Select):
             modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
             transcriptschannels = "Not Configured"
             modmailcategorys = "Not Configured"
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            suggestionchannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = moduleddata.get('Modmail', 'False')            
             modmailpingresult = modmailping.find_one({'guild_id': interaction.guild.id})
             modmailroles = "Not Configured"
             if modmailpingresult:
@@ -543,7 +548,7 @@ class Config(discord.ui.Select):
                 transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
             if modmailcategoryresult:
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
-            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Enabled:** {modulemsg}\n**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
             view = Modmail(interaction.user)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -575,6 +580,7 @@ class CustomCommands(discord.ui.View):
 class Modmail(discord.ui.View):
     def __init__(self, author):
         super().__init__()
+        self.add_item(ModmailToggle(author))
         self.add_item(ModmailCategory(author))
         self.add_item(ModmailPing(author))
         self.add_item(TranscriptChannel(author))

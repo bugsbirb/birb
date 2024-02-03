@@ -93,7 +93,35 @@ class TranscriptChannel(discord.ui.ChannelSelect):
 
         print(f"Channel ID: {channelid.id}")          
 
-   
+class ModmailToggle(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Enable"),
+            discord.SelectOption(label="Disable"),
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='Module Toggle', min_values=1, max_values=1, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        color = self.values[0]
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+
+        if color == 'Enable':    
+            await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': True}}, upsert=True)  
+            await refreshembed(interaction)
+        if color == 'Disable':    
+            await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': False}}, upsert=True) 
+            await refreshembed(interaction)   
 
 class ModmailPing(discord.ui.RoleSelect):
     def __init__(self, author):
@@ -114,6 +142,7 @@ class ModmailPing(discord.ui.RoleSelect):
 
 
         modmailping.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=None)
         await refreshembed(interaction)
     
 async def refreshembed(interaction):
@@ -121,6 +150,10 @@ async def refreshembed(interaction):
             modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
             transcriptschannels = "Not Configured"
             modmailcategorys = "Not Configured"
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            if moduleddata:
+                modulemsg = moduleddata.get('Modmail', 'False')            
             modmailpingresult = modmailping.find_one({'guild_id': interaction.guild.id})
             modmailroles = "Not Configured"
             if modmailpingresult:
@@ -133,7 +166,7 @@ async def refreshembed(interaction):
                 transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
             if modmailcategoryresult:
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
-            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Enabled:** {modulemsg}\n**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)     
             await interaction.message.edit(embed=embed)
