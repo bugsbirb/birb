@@ -1082,7 +1082,7 @@ class RevokeInfraction(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 
-
+   
 
 
 async def setup(client: commands.Bot) -> None:
