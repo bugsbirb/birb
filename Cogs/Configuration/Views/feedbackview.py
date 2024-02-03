@@ -50,8 +50,8 @@ class FeedbackChannel(discord.ui.ChannelSelect):
                 feedbackch.update_one(filter, {'$set': data})
             else:
                 feedbackch.insert_one(data)
-
             await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -81,7 +81,29 @@ class ToggleFeedback(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': True}}, upsert=True)  
-
+            await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': False}}, upsert=True)
+            await refreshembed(interaction)
+
+
+async def refreshembed(interaction):
+            feedbackchannelresult = feedbackch.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            feedbackchannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Feedback']}"
+            if feedbackchannelresult:    
+                channelid = feedbackchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    feedbackchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 feedbackchannelmsg = channel.mention                
+            embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", description=f"**Enabled:** {modulemsg}\n**Feedback Channel:** {feedbackchannelmsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)  
+            await interaction.message.edit(embed=embed)
+                  

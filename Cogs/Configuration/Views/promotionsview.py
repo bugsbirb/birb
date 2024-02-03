@@ -51,6 +51,7 @@ class Promotionchannel(discord.ui.ChannelSelect):
             else:
                 promochannel.insert_one(data)
 
+            await refreshembed(interaction) 
             await interaction.response.edit_message(content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -79,11 +80,36 @@ class PromotionModuleToggle(discord.ui.Select):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
         if color == 'Enable':    
+            await refreshembed(interaction) 
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': True}}, upsert=True)  
+            await refreshembed(interaction)
 
+            
         if color == 'Disable':    
+             
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': False}}, upsert=True)            
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': False}}, upsert=True) 
+            await refreshembed(interaction)
+            
+                      
 
     
+async def refreshembed(interaction):
+            promochannelresult = promochannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            promochannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Promotions']}"
+            if promochannelresult:    
+                channelid = promochannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 promochannelmsg = channel.mention                          
+            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", description=f"**Enabled:** {modulemsg}\n**Promotion Channel:** {promochannelmsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.message.edit(embed=embed)

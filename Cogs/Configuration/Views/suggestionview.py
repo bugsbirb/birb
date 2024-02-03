@@ -50,7 +50,7 @@ class SuggestionsChannel(discord.ui.ChannelSelect):
                 suggestschannel.update_one(filter, {'$set': data})
             else:
                 suggestschannel.insert_one(data)
-
+            await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -81,7 +81,28 @@ class ToggleSuggestions(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': True}}, upsert=True)  
-
+            await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': False}}, upsert=True)
+            await refreshembed(interaction)
+
+
+async def refreshembed(interaction):
+            suschannelresult = suggestschannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            suggestionchannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = moduleddata.get('Suggestions', 'False')
+            if suschannelresult:    
+                channelid = suschannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 suggestionchannelmsg = channel.mention                
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Suggestions Module", description=f"**Enabled:** {modulemsg}\n**Suggestion Channel:** {suggestionchannelmsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)  
+            await interaction.message.edit(embed=embed)             

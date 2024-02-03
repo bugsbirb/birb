@@ -54,6 +54,8 @@ class LOAChannel(discord.ui.ChannelSelect):
             else:
                 loachannel.insert_one(data)
             await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
+
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -85,8 +87,8 @@ class LOARoled(discord.ui.RoleSelect):
                 LOARole.update_one(filter, {'$set': data})
             else:
                 LOARole.insert_one(data)
-
-            await interaction.response.edit_message( content=None)
+            await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -116,7 +118,39 @@ class ToggleLOADropdown(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': True}}, upsert=True)  
-
+            await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': False}}, upsert=True) 
+            await refreshembed(interaction)
+
+
+async def refreshembed(interaction):
+            loachannelresult = loachannel.find_one({'guild_id': interaction.guild.id})
+            loaroleresult = LOARole.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            loarolemsg = "Not Configured"
+            loachannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = f"{moduleddata['LOA']}"
+            if loaroleresult:    
+                roleid = loaroleresult['staffrole']
+                role = discord.utils.get(interaction.guild.roles, id=roleid)
+                if role is None:
+                 loarolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                else: 
+                 loarolemsg = f"{role.mention}"
+
+            if loachannelresult:     
+                channelid = loachannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 loachannelmsg = channel.mention       
+            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", description=f"**Enabled:** {modulemsg}\n**LOA Channel:** {loachannelmsg}\n**LOA Role:** {loarolemsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)     
+            await interaction.message.edit(embed=embed)   
+     

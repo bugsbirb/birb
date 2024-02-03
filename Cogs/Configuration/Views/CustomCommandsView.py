@@ -184,10 +184,21 @@ class ToggleCommands(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': True}}, upsert=True)    
-
+            await refreshembed(interaction)  
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)      
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)   
+            await refreshembed(interaction)   
+
+async def refreshembed(interaction):
+            commands = customcommands.find({'guild_id': interaction.guild.id})
+            
+            amount = customcommands.count_documents({'guild_id': interaction.guild.id})
+            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/30)", description="", color=discord.Color.dark_embed())
+            for result in commands:
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>", inline=False)
+            await interaction.message.edit(embed=embed)
+
 
 class CreateButtons(discord.ui.Select):
     def __init__(self, author):

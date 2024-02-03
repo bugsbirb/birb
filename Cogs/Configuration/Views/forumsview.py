@@ -47,9 +47,18 @@ class ToggleForums(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Forums': True}}, upsert=True)    
-
+            await refreshembed(interaction)  
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Forums': False}}, upsert=True)            
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Forums': False}}, upsert=True)    
+            await refreshembed(interaction)        
 
-    
+async def refreshembed(interaction):
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            modulemsg = "True"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Forums']}"            
+            embed = discord.Embed(title="<:forum:1162134180218556497> Forum Utilites", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
+            await interaction.message.edit(embed=embed)  

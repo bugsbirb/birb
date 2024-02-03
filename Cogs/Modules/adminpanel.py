@@ -38,6 +38,7 @@ arole = db['adminrole']
 promochannel = db['promo channel']
 LOARole = db['LOA Role']
 suspensions = db['Suspensions']
+infractiontypes = db['infractiontypes']
 class VoidInf(discord.ui.Modal, title='Void Infraction'):
     def __init__(self, user, guild, author):
         super().__init__()
@@ -482,19 +483,33 @@ class InfractionOption(discord.ui.Select):
     def __init__(self, user, guild, author):
         self.user = user
         self.guild = guild
-        self.author = author        
-        options = [
-            discord.SelectOption(label='Activity Notice'),
-            discord.SelectOption(label='Verbal Warning'),                
-            discord.SelectOption(label='Warning'),            
-            discord.SelectOption(label='Strike'),                
-            discord.SelectOption(label='Demotion'), 
-            discord.SelectOption(label='Termination'),            
-
-        
-            
-        ]
+        self.author = author
+        options = self.get_infraction_types_from_db(guild) 
         super().__init__(placeholder='Action', min_values=1, max_values=1, options=options)
+
+    def get_infraction_types_from_db(self, guild):
+        infraction_types = [
+            discord.SelectOption(label='Activity Notice'),
+            discord.SelectOption(label='Verbal Warning'),
+            discord.SelectOption(label='Warning'),
+            discord.SelectOption(label='Strike'),
+            discord.SelectOption(label='Demotion'),
+            discord.SelectOption(label='Termination'),
+        ]
+
+        existing_types = set(option.label for option in infraction_types)
+        additional_types = []
+        
+        typeresult = infractiontypes.find_one({"guild_id": guild.id})
+        if typeresult:
+            additional_types = typeresult['types']
+        
+
+        for infraction_type in additional_types:
+            if infraction_type not in existing_types:
+                infraction_types.append(discord.SelectOption(label=infraction_type))
+
+        return infraction_types
 
     async def callback(self, interaction: discord.Interaction):
         option = self.values[0]
@@ -783,11 +798,15 @@ class AdminPanel(discord.ui.View):
 
         for infraction in infractions:
             infraction_info = {
-                'id': infraction['random_string'],
-                'action': infraction['action'],
-                'reason': infraction['reason'],
-                'notes': infraction['notes'],
-                'management': infraction['management']
+            'id': infraction['random_string'],
+            'action': infraction['action'],
+            'reason': infraction['reason'],
+            'notes': infraction['notes'],
+            'management': infraction['management'],
+            'jump_url': infraction['jump_url'] if 'jump_url' in infraction else 'N/A',
+            'expiration': infraction['expiration'] if 'expiration' in infraction else 'N/A',
+            'expired': infraction['expired'] if 'expired' in infraction else 'N/A',
+            'voided': infraction['voided'] if 'voided' in infraction else 'N/A'
 
             }
             
@@ -808,16 +827,28 @@ class AdminPanel(discord.ui.View):
         embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
         
         for infraction_info in infraction_list:
-            management = interaction.guild.get_member(infraction_info['management'])
-            if management is None:
-               management = "Left Guild"
-            else:
-               management = management.mention
-            embed.add_field(
+
+
+
+         if infraction_info['jump_url'] == 'N/A':
+          jump_url = ""
+         else:
+          jump_url = f"<:arrow:1166529434493386823>**[Jump to Infraction]({infraction_info['jump_url']})**"
+         
+         if infraction_info['expiration'] == 'N/A':
+          expiration = ""
+         else:
+          expiration = f"<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
+          if infraction_info['expiration'] < datetime.now():
+            expiration = f"<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
+            management = f"<@{infraction_info['management']}>"    
+         embed.add_field(
             name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-            value=f"<:arrow:1166529434493386823>**Infracted By:** {management}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}\n{expiration}\n{jump_url}",
             inline=False
-            )
+        )
+
+
         view = RevokeInfraction(self.user, interaction.guild, self.author)
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 

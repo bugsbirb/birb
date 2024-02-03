@@ -48,7 +48,7 @@ class PartnershipChannel(discord.ui.ChannelSelect):
                 partnershipsch.update_one(filter, {'$set': data})
             else:
                 partnershipsch.insert_one(data)
-
+            await refreshembed(interaction) 
             await interaction.response.edit_message(content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -79,9 +79,28 @@ class TogglePartnerships(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Partnerships': True}}, upsert=True)  
-
+            await refreshembed(interaction) 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Partnerships': False}}, upsert=True)            
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Partnerships': False}}, upsert=True) 
+            await refreshembed(interaction)           
 
     
+async def refreshembed(interaction):
+            partnershipchannelresult = partnershipsch.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            partnershipchannelmsg = "Not Configured"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Partnerships']}"
+            if partnershipchannelresult:    
+                channelid = partnershipchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel:
+                 partnershipchannelmsg = f"{channel.mention}"                     
+                else:
+                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+            embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
+            await interaction.message.edit(embed=embed)   

@@ -50,10 +50,12 @@ class QuotaToggle(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': True}}, upsert=True)  
+            await refreshembed(interaction)
 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': False}}, upsert=True) 
+            await refreshembed(interaction)
 
 
 class QuotaAmount(discord.ui.Select):
@@ -83,7 +85,7 @@ class QuotaAmount(discord.ui.Select):
             {'$set': {'quota': color}},
             upsert=True  
         )            
-         await interaction.response.edit_message(content=None)
+         await refreshembed(interaction)
 
 class MessageQuota(discord.ui.Modal, title='Quota Amount'):
 
@@ -107,4 +109,23 @@ class MessageQuota(discord.ui.Modal, title='Quota Amount'):
             {'$set': {'quota': quota_value}},
             upsert=True  
         )
-        await interaction.response.send_message(content=f"{tick} Succesfully updated message quota.", ephemeral=True)
+        await refreshembed(interaction)
+        await interaction.followup.send(content=f"{tick} Succesfully updated message quota.", ephemeral=True)
+
+        
+
+
+async def refreshembed(interaction):
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            messagequotdata = message_quota_collection.find_one({'guild_id': interaction.guild.id})
+            messagecountmsg = "Not Configured"
+            if messagequotdata:
+                messagecountmsg = f"{messagequotdata['quota']}"
+            modulemsg = "True"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Quota']}"            
+            embed = discord.Embed(title="<:Messages:1148610048151523339> Message Quota Module", description=f"**Enabled:** {modulemsg}\n**Quota:** {messagecountmsg}", color=discord.Color.dark_embed())    
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)          
+            await interaction.message.edit(embed=embed)
+           

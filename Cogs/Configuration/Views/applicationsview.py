@@ -46,11 +46,13 @@ class ToggleApplications(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': True}}, upsert=True)    
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': True}}, upsert=True) 
+            await refreshembed(interaction)   
 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)            
+            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)    
+            await refreshembed(interaction)        
 
 class ApplicationChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
@@ -82,6 +84,7 @@ class ApplicationChannel(discord.ui.ChannelSelect):
                 ApplicationsChannel.insert_one(data)
 
             await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -107,4 +110,46 @@ class ApplicationsRoles(discord.ui.RoleSelect):
 
         ApplicationsRolesDB.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=None)
+        await refreshembed(interaction)
         print(f"Select Application Roles: {selected_role_ids}")
+
+
+async def refreshembed(interaction):
+            applicationchannelresult = ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            staffroleresult = ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+
+            approlemsg = "Not Configured"
+            appchannelmsg = "Not Configured"
+
+            if moduleddata:
+                modulemsg = moduleddata.get('Applications', 'False')
+            else:
+                modulemsg = 'False'
+
+            if staffroleresult:
+                staff_roles_ids = staffroleresult.get('applicationroles', [])
+                if not isinstance(staff_roles_ids, list):
+                    staff_roles_ids = [staff_roles_ids]
+                staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
+                                        for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
+                if not staff_roles_mentions:
+                    approlemsg = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                else:
+                    approlemsg = ", ".join(staff_roles_mentions)
+
+
+            if applicationchannelresult:
+                channelid = applicationchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    appchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:
+                    appchannelmsg = channel.mention
+
+            embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Result Module",
+                                   description=f"**Enabled:** {modulemsg}\n**Results Channel:** {appchannelmsg}\n**Application Roles:** {approlemsg}",
+                                   color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.message.edit(embed=embed)

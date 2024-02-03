@@ -42,7 +42,7 @@ from Cogs.Configuration.Views.applicationsview import ApplicationChannel
 from Cogs.Configuration.Views.applicationsview import ApplicationsRoles
 from Cogs.Configuration.Views.applicationsview import ToggleApplications
 
-from Cogs.Configuration.Views.stafflist import ToggleList
+
 
 from Cogs.Configuration.Views.suggestionview import SuggestionsChannel
 from Cogs.Configuration.Views.suggestionview import ToggleSuggestions
@@ -242,6 +242,12 @@ class Config(discord.ui.Select):
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             infchannelmsg = ""
+            infractiontypess = "Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination"
+            infractiontyperesult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
+            if infractiontyperesult:
+                infractiontypess = infractiontyperesult['types']
+                infractiontypess = ', '.join(infractiontypess)
+                
             if moduleddata:
                 modulemsg = f"{moduleddata['infractions']}"
             if infractionchannelresult:    
@@ -250,8 +256,9 @@ class Config(discord.ui.Select):
                 if channel is None:
                     infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
-                 infchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}", color=discord.Color.dark_embed())
+                 infchannelmsg = channel.mention          
+
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types** {infractiontypess}", color=discord.Color.dark_embed())
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
@@ -660,11 +667,7 @@ class AppResultModule(discord.ui.View):
         self.add_item(ToggleApplications(author))                          
         self.add_item(Config(author)) 
 
-class ListModule(discord.ui.View):
-    def __init__(self, author):
-        super().__init__()
-        self.add_item(ToggleList(author))         
-        self.add_item(Config(author)) 
+
 
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):

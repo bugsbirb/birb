@@ -51,8 +51,8 @@ class ModmailCategory(discord.ui.ChannelSelect):
                 modmailcategory.update_one(filter, {'$set': data})
             else:
                 modmailcategory.insert_one(data)
-
             await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)        
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -86,8 +86,8 @@ class TranscriptChannel(discord.ui.ChannelSelect):
                 transcriptschannel.update_one(filter, {'$set': data})
             else:
                 transcriptschannel.insert_one(data)
-
             await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -114,5 +114,27 @@ class ModmailPing(discord.ui.RoleSelect):
 
 
         modmailping.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
-        await interaction.response.edit_message(content=None)
+        await refreshembed(interaction)
     
+async def refreshembed(interaction):
+            transcriptschannelresult = transcriptschannel.find_one({'guild_id': interaction.guild.id})
+            modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
+            transcriptschannels = "Not Configured"
+            modmailcategorys = "Not Configured"
+            modmailpingresult = modmailping.find_one({'guild_id': interaction.guild.id})
+            modmailroles = "Not Configured"
+            if modmailpingresult:
+                modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if interaction.guild.get_role(roleid) is not None]
+                if not modmailroles:
+                    modmailroles = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                modmailroles = ", ".join(filter(None, modmailroles))
+
+            if transcriptschannelresult:
+                transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
+            if modmailcategoryresult:
+                modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)     
+            await interaction.message.edit(embed=embed)
+                 

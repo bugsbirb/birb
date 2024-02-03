@@ -51,7 +51,7 @@ class InfractionChannel(discord.ui.ChannelSelect):
                 infchannel.update_one(filter, {'$set': data})
             else:
                 infchannel.insert_one(data)
-
+            await refreshembed(self, interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -82,11 +82,11 @@ class ToggleInfractionsDropdown(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': True}}, upsert=True)  
-
+            await refreshembed(self, interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': False}}, upsert=True)            
-
+            await refreshembed(self, interaction)
 class InfractionTypes(discord.ui.Select):
     def __init__(self, author):
         self.author = author
@@ -142,9 +142,9 @@ class CreateInfractionModal(discord.ui.Modal):
     {'$addToSet': {'types': type_value}},
     upsert=True
 )
-
+        await refreshembed(self, interaction)
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type created successfully", ephemeral=True)
-
+        
 
 class DeleteInfractionModal(discord.ui.Modal):
     def __init__(self, author):
@@ -177,3 +177,30 @@ class DeleteInfractionModal(discord.ui.Modal):
 
 
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type deleted successfully", ephemeral=True)
+
+async def refreshembed(self, interaction):
+            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            infchannelmsg = ""
+            infractiontypess = "Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination"
+            infractiontyperesult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
+            if infractiontyperesult:
+                infractiontypess = infractiontyperesult['types']
+                infractiontypess = ', '.join(infractiontypess)
+                
+            if moduleddata:
+                modulemsg = f"{moduleddata['infractions']}"
+            if infractionchannelresult:    
+                channelid = infractionchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 infchannelmsg = channel.mention          
+
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types** {infractiontypess}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+
+            await interaction.message.edit(embed=embed)

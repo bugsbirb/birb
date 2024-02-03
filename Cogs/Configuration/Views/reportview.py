@@ -51,7 +51,7 @@ class ReportChannel(discord.ui.ChannelSelect):
                 repchannel.update_one(filter, {'$set': data})
             else:
                 repchannel.insert_one(data)
-
+            await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -84,7 +84,7 @@ class ReportsModeratorRole(discord.ui.RoleSelect):
                 ReportModeratorRole.update_one(filter, {'$set': data})
             else:
                 ReportModeratorRole.insert_one(data)
-
+            await refreshembed(interaction)
             await interaction.response.edit_message( content=None)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
@@ -115,9 +115,37 @@ class ToggleReportsDropdown(discord.ui.Select):
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': True}}, upsert=True)  
+            await refreshembed(interaction)
 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': False}}, upsert=True)            
+            await refreshembed(interaction)
+async def refreshembed(interaction):
+            partnershipchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})
+            reportsmoderatorresult = ReportModeratorRole.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            partnershipchannelmsg = "Not Configured"
+            reprolemsg = "Not Configured"
+            if moduleddata:
+                modulemsg = f"{moduleddata['Reports']}"
+            if partnershipchannelresult:    
+                channelid = partnershipchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 partnershipchannelmsg = channel.mention    
 
-    
+            if reportsmoderatorresult:    
+                roleid = reportsmoderatorresult['staffrole']
+                role = discord.utils.get(interaction.guild.roles, id=roleid)
+                if role is None:
+                 reprolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                else: 
+                 reprolemsg = f"{role.mention}"
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Reports Channel:** {partnershipchannelmsg}\n**Reports Moderator Role:** {reprolemsg}", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+            await interaction.message.edit(embed=embed)
