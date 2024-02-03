@@ -107,11 +107,13 @@ class ButtonURLView(discord.ui.Modal, title='Button URL'):
     name = discord.ui.TextInput(
         label='URL',
         placeholder='Whats the url you wanna use? (https://example.com)',
+        max_length=200
     )
 
     label = discord.ui.TextInput(
         label='Button Name',
         placeholder='What text should be on the button?',
+        max_length=80
     )
 
 
