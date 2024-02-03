@@ -320,8 +320,18 @@ class Infractions(commands.Cog):
         infraction_list.append(infraction_info)
 
      if not infraction_list:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, there is no infractions found for **@{staff.display_name}**.")
-        return
+        if scope == 'Voided':
+         await ctx.send(f"{no} **{ctx.author.display_name}**, there is no voided infractions found for **@{staff.display_name}**.")
+         return
+        elif scope == 'All':
+         await ctx.send(f"{no} **{ctx.author.display_name}**, there is no infractions found for **@{staff.display_name}**.")
+         return
+        elif scope == 'Expired':
+         await ctx.send(f"{no} **{ctx.author.display_name}**, there is no expired infractions found for **@{staff.display_name}**.")
+         return
+        else:
+         await ctx.send(f"{no} **{ctx.author.display_name}**, there is no infractions found for **@{staff.display_name}**.")
+         return
      
      print(f"Found {len(infraction_list)} infractions for {staff.display_name}")
 
