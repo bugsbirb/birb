@@ -84,7 +84,7 @@ class CustomEmbeds(discord.ui.Select):
          embed.set_footer(text=f"Infraction ID | Test")
          view = Infraction(interaction.user, color)
          await interaction.response.edit_message(embed=embed, view=view)
-         embed = discord.Embed(title="Embed Variables", description="**Infractions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**Notes:** {notes}\n**Action:** {action}\n**Reason:** {reason}\n\n**Promotions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**New Rank:** {newrank}", color=discord.Color.dark_embed())
+         embed = discord.Embed(title="Embed Variables", description="**Infractions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**Notes:** {notes}\n**Action:** {action}\n**Reason:** {reason}\n\n**Promotions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**New Rank:** {newrank}\n**Expiration:** {expiration}", color=discord.Color.dark_embed())
          await interaction.followup.send(embed=embed, ephemeral=True)
 
 
