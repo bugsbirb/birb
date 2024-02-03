@@ -260,7 +260,8 @@ class Config(discord.ui.Select):
                 else:    
                  infchannelmsg = channel.mention          
 
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types** {infractiontypess}", color=discord.Color.dark_embed())
+            infractiontypescount = len(infractiontyperesult['types'])
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types [{infractiontypescount}/15]** {infractiontypess}", color=discord.Color.dark_embed())
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
