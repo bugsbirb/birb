@@ -359,18 +359,18 @@ class Infractions(commands.Cog):
         if infraction_info['jump_url'] == 'N/A':
          jump_url = ""
         else:
-         jump_url = f"<:arrow:1166529434493386823>**[Jump to Infraction]({infraction_info['jump_url']})**"
+         jump_url = f"\n<:arrow:1166529434493386823>**[Jump to Infraction]({infraction_info['jump_url']})**"
          
         if infraction_info['expiration'] == 'N/A':
          expiration = ""
         else:
-         expiration = f"<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
+         expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
          if infraction_info['expiration'] < datetime.now():
-            expiration = f"<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
+            expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
         management = await self.client.fetch_user(infraction_info['management'])        
         embed.add_field(
             name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']} {voided}",
-            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}\n{expiration}\n{jump_url}",
+            value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
             inline=False
         )
 

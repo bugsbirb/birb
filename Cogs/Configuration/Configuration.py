@@ -662,7 +662,7 @@ class ForumUtilsModule(discord.ui.View):
 
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__()     
         self.add_item(ReportChannel(author))         
         self.add_item(ReportsModeratorRole(author))
         self.add_item(ToggleReportsDropdown(author))                          
