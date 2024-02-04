@@ -23,6 +23,7 @@ astro = AsyncIOMotorClient(MONGO_URL)
 db = astro['astro']
 modules = db['Modules']
 scollection2 = db['staffrole']
+arole = db['adminrole']
 
 class messageevent(commands.Cog):
     def __init__(self, client):
@@ -37,14 +38,19 @@ class messageevent(commands.Cog):
             return
 
         staff_data = await scollection2.find_one({'guild_id': message.guild.id})
+        admin_data = await arole.find_one({'guild_id': message.guild.id})
         if staff_data is None or 'staffrole' not in staff_data:
+            return
+        if admin_data is None or 'staffrole' not in admin_data:
             return
 
         staff_role_ids = staff_data['staffrole']
+        admin_role_ids = admin_data['staffrole']
         if not isinstance(staff_role_ids, list):
             staff_role_ids = [staff_role_ids]
 
         if any(role.id in staff_role_ids for role in message.author.roles):
+             
             guild_id = message.guild.id
             author_id = message.author.id
 
@@ -53,7 +59,16 @@ class messageevent(commands.Cog):
                 {'$inc': {'message_count': 1}},
                 upsert=True
             )
+        else:
+           if any(role.id in admin_role_ids for role in message.author.roles):    
+            guild_id = message.guild.id
+            author_id = message.author.id
 
+            await mccollection.update_one(
+                {'guild_id': guild_id, 'user_id': author_id},
+                {'$inc': {'message_count': 1}},
+                upsert=True
+            )
         
 
 async def setup(client: commands.Bot) -> None:

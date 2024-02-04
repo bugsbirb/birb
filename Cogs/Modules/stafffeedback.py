@@ -73,6 +73,9 @@ class Feedback(commands.Cog):
     @feedback.command(description="Rate a staff member", name="give")
     async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
+       if staff is None:
+        await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.")
+        return       
        if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return          
@@ -128,6 +131,9 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="View a staff members rating")
     async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
+     if staff is None:
+        await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.")
+        return
      if scope == "global":
         staff_ratings = list(stafffeedback.find({'staff': staff.id}))
      elif scope == "server":

@@ -90,6 +90,9 @@ class Infractions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.")
          return
 
+        if staff.bot:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract a bot.")
+            return
 
         custom = Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Infractions'})
         random_string = ''.join(random.choices(string.digits, k=8))
