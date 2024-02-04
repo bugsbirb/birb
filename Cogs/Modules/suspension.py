@@ -344,12 +344,9 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
 
 
-        appeal_data = appealable.find_one({'guild_id': str(interaction.guild.id)})
 
-        if appeal_data is not None:
-         appeal_enabled = appeal_data.get('enabled', False)
-        else:
-          appeal_enabled = False
+
+
 
         data = infchannel.find_one({'guild_id': interaction.guild.id})       
         if data:
@@ -366,12 +363,13 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
              await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None)             
              return
 
+
+            suspensions.insert_one(infract_data)
+            await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None)        
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
             except discord.Forbidden:
-                pass
-            suspensions.insert_one(infract_data)
-            await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None)            
+                pass                
          else:
             await interaction.response.edit_message(content=f"{no} {interaction.user.display_name}, I don't have permission to view this channel.", view=None, embed=None)
         else:
