@@ -109,8 +109,9 @@ class MessageQuota(discord.ui.Modal, title='Quota Amount'):
             {'$set': {'quota': quota_value}},
             upsert=True  
         )
+        await interaction.response.send_message(content=f"{tick} Succesfully updated message quota.", ephemeral=True)
         await refreshembed(interaction)
-        await interaction.followup.send(content=f"{tick} Succesfully updated message quota.", ephemeral=True)
+        
 
         
 

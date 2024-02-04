@@ -131,9 +131,7 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="View a staff members rating")
     async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
-     if staff is None:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.")
-        return
+     
      if scope == "global":
         staff_ratings = list(stafffeedback.find({'staff': staff.id}))
      elif scope == "server":
