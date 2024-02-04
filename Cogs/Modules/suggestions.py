@@ -41,6 +41,7 @@ class suggestions(commands.Cog):
             "downvotes": 0,
             "upvoters": [],
             "downvoters": [],
+            'guild_id': ctx.guild.id
         }
         result = suggestions_collection.insert_one(suggestion_data)
         suggestion_id = result.inserted_id
@@ -99,6 +100,9 @@ class SuggestionView(discord.ui.View):
     async def Yes(self, interaction, button):
         message_id = interaction.message.id
         suggestion_data = suggestions_collection.find_one({"message_id": message_id})
+        if suggestion_data is None:
+            await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
+            return
         upvoters = suggestion_data.get("upvoters", [])
         downvoters = suggestion_data.get("downvoters", [])
 
@@ -141,6 +145,9 @@ class SuggestionView(discord.ui.View):
     async def No(self, interaction, button):
         message_id = interaction.message.id
         suggestion_data = suggestions_collection.find_one({"message_id": message_id})
+        if suggestion_data is None:
+            await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
+            return        
         upvoters = suggestion_data.get("upvoters", [])
         downvoters = suggestion_data.get("downvoters", [])
 

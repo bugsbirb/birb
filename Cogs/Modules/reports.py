@@ -34,7 +34,7 @@ class MuteReason(discord.ui.Modal, title='Reason'):
 
     Reason = discord.ui.TextInput(
         label='Reason?',
-        placeholder='Whats the reason for the kick?',
+        placeholder='Whats the reason for the mute?',
     )
 
     Duration = discord.ui.TextInput(
@@ -373,6 +373,10 @@ class ReportPanel(discord.ui.View):
          return   
        
        reportsresult = reports.find_one({'message_id': interaction.message.id})
+       if reportsresult is None:
+              await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, there was no report data found.", ephemeral=True)
+              return
+          
        if reportsresult:
         reporteduser = interaction.guild.get_member(reportsresult['reporteduser'])   
         if reporteduser is None:
@@ -388,7 +392,10 @@ class ReportPanel(discord.ui.View):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
          return 
-   
+       reportsresult = reports.find_one({'message_id': interaction.message.id})
+       if reportsresult is None:
+              await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, there was no report data found.", ephemeral=True)
+              return   
        embed = interaction.message.embeds[0]
        
        embed.title = f"{redx} Report Ignored"
