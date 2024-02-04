@@ -251,7 +251,7 @@ class Infractions(discord.ui.View):
             
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
-        infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination']}}, upsert=True)
+        infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']}}, upsert=True)
         await interaction.followup.send("<:greencheck:1190814894463930480> Infractions types have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Infraction Configuration", style=discord.ButtonStyle.red, row=2)
