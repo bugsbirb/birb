@@ -125,6 +125,7 @@ class DataSelector(discord.ui.Select):
 
         elif data_type == 'Quota':
             view = Quota(interaction.user)
+            view.add_item(DataSelector(interaction.user))
             embed = discord.Embed(title="Quota Data", description="**Erase Message Count:** This will the servers leaderboard.\n**Erase Quota Configuration:** Will reset the configuration for this module.", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -191,6 +192,14 @@ class DataSelector(discord.ui.Select):
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.response.edit_message(embed=embed, view=view)    
 
+        elif data_type == 'Promotions':
+            view = Promotions(interaction.user)
+            view.add_item(DataSelector(interaction.user))
+            embed = discord.Embed(title="Promotions Data", description="**Erase Promotions Configuration:** This will erase the configuration for this module.", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.response.edit_message(embed=embed, view=view)    
+
 
 
 class datamanage(commands.Cog):
@@ -231,7 +240,7 @@ class Infractions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await infractions.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("Infractions have been erased.", ephemeral=True)
+        await interaction.followup.send("<:greencheck:1190814894463930480> Infractions have been erased.", ephemeral=True)
 
 
     @discord.ui.button(label="Reset Infraction Types", style=discord.ButtonStyle.red, row=1)
@@ -614,6 +623,25 @@ class Applications(discord.ui.View):
         await ApplicationsRolesDB.delete_many({'guild_id': int(interaction.guild.id)})
         await interaction.followup.send("<:greencheck:1190814894463930480> Applications Configuration Reset", ephemeral=True)
 
+class Promotions(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+
+
+    @discord.ui.button(label="Erase Promotions Configuration", style=discord.ButtonStyle.red, row=0)
+    async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        try:
+         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Promotions': False}})
+        except:
+            pass
+        await promochannel.delete_many({'guild_id': int(interaction.guild.id)})
+        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions Configuration Reset", ephemeral=True)    
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(datamanage(client))     
