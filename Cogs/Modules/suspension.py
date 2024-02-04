@@ -44,7 +44,9 @@ class Suspensions(commands.Cog):
          return            
         if not await has_admin_role(ctx):
             return
-
+        if not re.match(r'^\d+[mhdw]$', length):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+         return
 
         if ctx.author == staff:
          await ctx.send(f"{no} You can't suspend yourself.")
