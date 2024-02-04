@@ -243,7 +243,7 @@ class Config(discord.ui.Select):
             infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            infchannelmsg = ""
+            infchannelmsg = "Not Configured"
             infractiontypess = "Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination"
             infractiontyperesult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
             if infractiontyperesult:
@@ -261,6 +261,8 @@ class Config(discord.ui.Select):
                  infchannelmsg = channel.mention          
 
             infractiontypescount = len(infractiontyperesult['types'])
+            if infractiontypescount == None:
+                infractiontypess = "0"
             embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types [{infractiontypescount}/15]** {infractiontypess}", color=discord.Color.dark_embed())
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
