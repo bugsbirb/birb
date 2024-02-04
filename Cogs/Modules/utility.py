@@ -276,6 +276,8 @@ class Utility(commands.Cog):
             await ctx.send(embed=embed)
         
 
+        
+
     @commands.hybrid_command()
     async def user(self, ctx, user: Optional[discord.Member] = None):
         """Displays users information"""        
@@ -331,6 +333,28 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed)        
         
 
+ 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def divider(self, ctx, * ,rolename):
+        guild = ctx.guild
+        if len(rolename) > 100:
+            await ctx.send("Role name is too long. Please provide a name with 100 characters or fewer.")
+            return
+
+        rolewidth = 19
+        divider_text = "\u200b" + "​ " * ((rolewidth - len(rolename)) // 2) + rolename + "​ " * ((rolewidth - len(rolename)) // 2) + "\u200b"
+        try:
+            role = await guild.create_role(name=divider_text)
+            await ctx.send(f"Role divider created: {role.name}")
+        except discord.HTTPException as e:
+            await ctx.send(f"Failed to create role divider: {e}")
+
+
+
+    
+        
+      
 
     @commands.hybrid_command(description="Displays all the commands.")
     async def help(self, ctx):         
