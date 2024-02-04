@@ -90,7 +90,7 @@ class DataSelector(discord.ui.Select):
         if data_type == 'Infractions':
             view = Infractions(interaction.user)
             view.add_item(DataSelector(interaction.user))
-            embed = discord.Embed(title="Infraction Data", description="**Erase Partnerships:** This will erase all infractions. This will not removed already posted infractions messages.\n**Erase Infraction Config:** This will erase the configuration for this module.", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="Infraction Data", description="**Erase Infractions:** This will erase all infractions. This will not removed already posted infractions messages.\n**Erase Infraction Types:** Reset the infraction types back to default.\n**Erase Infraction Config:** This will erase the configuration for this module.", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.response.edit_message(embed=embed, view=view)
@@ -234,7 +234,7 @@ class Infractions(discord.ui.View):
         await interaction.followup.send("Infractions have been erased.", ephemeral=True)
 
 
-    @discord.ui.button(label="Reset Infractions Types", style=discord.ButtonStyle.red, row=1)
+    @discord.ui.button(label="Reset Infraction Types", style=discord.ButtonStyle.red, row=1)
     async def erasetypes(self, interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
