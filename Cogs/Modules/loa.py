@@ -426,16 +426,17 @@ class LOAPanel(discord.ui.View):
             except discord.Forbidden: 
                 await interaction.response.edit_message(content=f"{no} I don't have permission to remove roles.")
                 return
-        try:    
-         await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")  
-        except discord.Forbidden:
-                pass              
+          
             
 
         loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': False}})
 
         await interaction.response.edit_message(embed=None, content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA", view=None)
-
+        try:    
+         await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")  
+        except discord.Forbidden:
+                pass    
+        
 class LOACreate(discord.ui.View):
     def __init__(self, user, guild, author):
         super().__init__(timeout=None)
