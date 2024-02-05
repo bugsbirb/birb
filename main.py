@@ -83,6 +83,7 @@ class client(commands.AutoShardedBot):
 
     async def setup_hook(self):
         self.loop.create_task(self.load_jishaku()) 
+        update_channel_name.start()
         self.add_view(Helpdesk())
         self.add_view(SuggestionView())
         self.add_view(ReportPanel())
@@ -104,7 +105,7 @@ class client(commands.AutoShardedBot):
         print(prfx + " Discord Version " +  discord.__version__)
         print(prfx + " Python Version " + str(platform.python_version()))
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
-        update_channel_name.start()
+
 
     async def on_connect(self):
         activity2 = discord.CustomActivity(name=f"{STATUS}")
@@ -113,8 +114,9 @@ class client(commands.AutoShardedBot):
 
         else:
             print("STATUS not defined in .env, bot will not set a custom status.")
-    async def on_socket_response(self, msg):
-     print(f"WebSocket Response: {msg}")
+
+
+
         
 
     async def on_disconnect(self):
@@ -152,5 +154,7 @@ async def update_channel_name():
 
 
 
+if __name__ == "__main__": 
+ client.run(TOKEN)
 
-client.run(TOKEN)
+

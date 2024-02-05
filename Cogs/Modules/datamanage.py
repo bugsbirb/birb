@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord.ext import commands
-import platform
 from dotenv import load_dotenv
 from emojis import *
 import os
