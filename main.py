@@ -2,24 +2,13 @@ import discord
 import platform
 import sys
 sys.dont_write_bytecode = True
-import discord.ext
-from discord.ext import commands
-from urllib.parse import quote_plus
-from discord import app_commands
-import discord
 from discord.ext import commands, tasks
-from typing import Optional
 import sentry_sdk
-from Cogs.Modules.loa import *
 import os
 from dotenv import load_dotenv
-from jishaku import Jishaku
-import jishaku
-from Cogs.Modules.astro import * 
+from Cogs.Modules.astro import Helpdesk
 from Cogs.Modules.reports import ReportPanel
-from Cogs.Modules.reports import ActionsPanel
-from Cogs.Modules.suggestions import *
-from motor.motor_asyncio import AsyncIOMotorClient
+from Cogs.Modules.suggestions import SuggestionView
 import time
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
@@ -29,11 +18,10 @@ PREFIX = os.getenv('PREFIX')
 TOKEN = os.getenv('TOKEN')
 STATUS = os.getenv('STATUS')
 MONGO_URL = os.getenv('MONGO_URL')
-SENTRY_URL = os.getenv('SENTRY_URL')
 
 
 sentry_sdk.init(
-    dsn=SENTRY_URL,
+    dsn=os.getenv('SENTRY_URL'),
 
     traces_sample_rate=1.0,
 
@@ -82,7 +70,6 @@ class client(commands.AutoShardedBot):
         'Cogs.Events.AstroSupport.analytics',
         'Cogs.Modules.datamanage',
 
-        
         ]
 
 
@@ -116,10 +103,7 @@ class client(commands.AutoShardedBot):
         print(prfx + " Bot ID " + str(self.user.id))
         print(prfx + " Discord Version " +  discord.__version__)
         print(prfx + " Python Version " + str(platform.python_version()))
-        synced = await self.tree.sync()
-        print(prfx + " Slash CMDs Synced " + str(len(synced)) + " Commands")
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
-
         update_channel_name.start()
 
     async def on_connect(self):
