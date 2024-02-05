@@ -113,7 +113,8 @@ class client(commands.AutoShardedBot):
 
         else:
             print("STATUS not defined in .env, bot will not set a custom status.")
-
+    async def on_socket_response(self, msg):
+     print(f"WebSocket Response: {msg}")
         
 
     async def on_disconnect(self):
