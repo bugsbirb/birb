@@ -15,11 +15,10 @@ from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 from emojis import *
-from Cogs.Modules.infractions import *
 from datetime import datetime
 
 from datetime import timedelta
-
+from permissions import has_admin_role, has_staff_role
 MONGO_URL = os.getenv('MONGO_URL')
 client = MongoClient(MONGO_URL)
 db = client['astro']
@@ -39,6 +38,11 @@ promochannel = db['promo channel']
 LOARole = db['LOA Role']
 suspensions = db['Suspensions']
 infractiontypes = db['infractiontypes']
+consent = db['consent']
+modules = db['modules']
+Customisation = db['Customisation']
+
+
 class VoidInf(discord.ui.Modal, title='Void Infraction'):
     def __init__(self, user, guild, author):
         super().__init__()
