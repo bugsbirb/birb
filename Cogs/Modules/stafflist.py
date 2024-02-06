@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import os
-from pymongo import MongoClient
 from emojis import *
 from typing import Literal, Optional
 from permissions import *

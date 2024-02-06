@@ -1,13 +1,10 @@
 import discord
 import discord
 from discord.ext import commands
-from typing import Literal
 import datetime
 from datetime import timedelta
 from discord import app_commands
 from discord.ext import commands, tasks
-
-from pymongo import MongoClient
 from emojis import * 
 import os
 from dotenv import load_dotenv

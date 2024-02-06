@@ -1,16 +1,11 @@
 
 import discord
-from discord.ext import commands, tasks
-from pymongo import MongoClient
+from discord.ext import commands
 from emojis import *
-from typing import Literal
 import os
-from discord import Button
 import random
-import logging
 from datetime import datetime
 import chat_exporter
-import typing
 from dotenv import load_dotenv
 import io   
 from motor.motor_asyncio import AsyncIOMotorClient
