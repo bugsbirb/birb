@@ -323,7 +323,7 @@ class Infractions(commands.Cog):
             else:
                 voided = "**(Voided)**"
 
-            if infraction('jump_url', 'N/A') == 'N/A':
+            if infraction.get('jump_url', 'N/A') == 'N/A':
                 jump_url = ""
             else:
                 jump_url = f"\n<:arrow:1166529434493386823>**[Jump to Infraction]({infraction['jump_url']})**"
