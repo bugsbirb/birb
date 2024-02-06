@@ -51,14 +51,12 @@ class ApplicationResults(commands.Cog):
         *,
         feedback,
     ):
-
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return    
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            return
 
         if not await has_admin_role(ctx):
-         return           
-
+            return
 
         if result == "Passed":
             if not feedback:
@@ -81,8 +79,8 @@ class ApplicationResults(commands.Cog):
             name=f"Reviewed by {ctx.author.display_name.capitalize()}",
             icon_url=ctx.author.display_avatar,
         )
-        
-        channeldata = ApplicationsChannel.find_one({"guild_id": ctx.guild.id})
+
+        channeldata = await ApplicationsChannel.find_one({"guild_id": ctx.guild.id})
         if channeldata:
             channelid = channeldata["channel_id"]
             channel = self.client.get_channel(channelid)
@@ -93,40 +91,42 @@ class ApplicationResults(commands.Cog):
                 except discord.Forbidden:
                     await ctx.send(
                         f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in {channel.mention}."
-                    )        
-                    return            
+                    )
+                    return
                 view = JumpUrl(msg.jump_url)
                 try:
-                 await applicant.send(f"<:ApplicationFeedback:1178754449125167254> **{applicant.display_name}**, you application has been reviewed.", view=view)
+                    await applicant.send(f"<:ApplicationFeedback:1178754449125167254> **{applicant.display_name}**, you application has been reviewed.", view=view)
                 except discord.Forbidden:
-                  pass
+                    pass
                 if result == 'Passed':
-                     roles_data = ApplicationsRolesDB.find_one({"guild_id": ctx.guild.id})
-                     if roles_data:
-                      application_roles = roles_data.get("applicationroles", [])
-                      member = ctx.guild.get_member(applicant.id)
-                      roles_to_add = [discord.utils.get(ctx.guild.roles, id=role_id) for role_id in application_roles]
-                      if roles_to_add and None not in roles_to_add:
+                    roles_data = await ApplicationsRolesDB.find_one({"guild_id": ctx.guild.id})
+                    if roles_data:
+                        application_roles = roles_data.get("applicationroles", [])
+                        member = ctx.guild.get_member(applicant.id)
+                        roles_to_add = [discord.utils.get(ctx.guild.roles, id=role_id) for role_id in application_roles]
+                        if roles_to_add and None not in roles_to_add:
                             try:
                                 await member.add_roles(*roles_to_add)
                             except discord.Forbidden as e:
-                             await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.")
-                             return
-
-                        
-            else:           
-                await ctx.send(
-                    f"{no} **{ctx.author.display_name}**, the specified channel doesn't exist."
-                )
+                                await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.")
+                                return
+                else:
+                    await ctx.send(
+                        f"{no} **{ctx.author.display_name}**, the specified channel doesn't exist."
+                    )
         else:
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, this channel isn't configured. Please do `/config`."
             )
+
+
 class JumpUrl(discord.ui.View):
     def __init__(self, jumpurl):
         super().__init__()
         url = jumpurl
         self.add_item(discord.ui.Button(label='Results', url=url, style=discord.ButtonStyle.blurple))
+
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ApplicationResults(client))        

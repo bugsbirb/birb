@@ -2,15 +2,16 @@ import discord
 from discord.ext import commands
 from typing import Literal
 from discord.ext import commands
-from pymongo import MongoClient
 from emojis import * 
 from datetime import datetime
 import os
 from dotenv import load_dotenv
 import Paginator
 from permissions import *
+
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 stafffeedback = db['feedback']
 feedbackch = db['Staff Feedback Channel']
@@ -26,7 +27,7 @@ class Feedback(commands.Cog):
      filter = {
         'guild_id': ctx.guild.id
     }
-     staff_data = scollection.find_one(filter)
+     staff_data = await scollection.find_one(filter)
 
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
@@ -41,7 +42,7 @@ class Feedback(commands.Cog):
      return False
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Feedback'] == True:   
@@ -58,12 +59,12 @@ class Feedback(commands.Cog):
        if not await has_admin_role(ctx):
         
          return          
-       result = stafffeedback.find_one({'feedbackid': id, 'guild_id': ctx.guild.id})
+       result = await stafffeedback.find_one({'feedbackid': id, 'guild_id': ctx.guild.id})
        if result is None:
         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find any feedback with that ID.")
         return
        
-       stafffeedback.delete_one({'feedbackid': id, 'guild_id': ctx.guild.id})
+       await stafffeedback.delete_one({'feedbackid': id, 'guild_id': ctx.guild.id})
        await ctx.send(f"{tick} **{ctx.author.display_name}**, I have removed the feedback.")
 
 
@@ -72,7 +73,7 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="Rate a staff member", name="give")
     async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
-       existing_feedback = stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
+       existing_feedback = await stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        if staff is None:
         await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.")
         return       
@@ -82,7 +83,7 @@ class Feedback(commands.Cog):
        if staff == ctx.author:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.")
             return
-       staff_role_data = scollection.find_one({'guild_id': ctx.guild.id})
+       staff_role_data = await scollection.find_one({'guild_id': ctx.guild.id})
        staff_role_id = staff_role_data['staffrole']  
 
 
@@ -108,7 +109,7 @@ class Feedback(commands.Cog):
         'date': datetime.now().timestamp(),
         'feedbackid': feedbackid
        }
-       stafffeedback.insert_one(feedbackdata)
+       await stafffeedback.insert_one(feedbackdata)
        await ctx.send(f"{tick} You've rated **@{staff.display_name}** {rating}!")
        data = feedbackch.find_one({'guild_id': ctx.guild.id})
        if data:

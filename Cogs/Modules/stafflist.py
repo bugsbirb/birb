@@ -5,8 +5,9 @@ from pymongo import MongoClient
 from emojis import *
 from typing import Literal, Optional
 from permissions import *
+
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -29,8 +30,8 @@ class StaffList(commands.Cog):
     
          return        
         if guild:
-            staff_role_ids = self.get_role_ids(guild, "staffrole")
-            admin_role_ids = self.get_role_ids(guild, "adminrole")
+            staff_role_ids = await self.get_role_ids(guild, "staffrole")
+            admin_role_ids = await self.get_role_ids(guild, "adminrole")
 
             embed = discord.Embed(title="<:List:1179470251860185159> Staff List", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=guild.icon)
@@ -40,7 +41,7 @@ class StaffList(commands.Cog):
 
             for role in hoisted_roles:
                 if role.id in staff_role_ids or role.id in admin_role_ids:
-                    members = self.get_members_with_top_role(guild, [role.id])
+                    members = await self.get_members_with_top_role(guild, [role.id])
                     if members:
                         role_mentions = set()
                         for member in members:
@@ -66,11 +67,11 @@ class StaffList(commands.Cog):
             else:
                 await ctx.send(embed=embed)
 
-    def get_role_ids(self, guild, role_type):
+    async def get_role_ids(self, guild, role_type):
         filter = {
             'guild_id': guild.id
         }
-        role_data = db[role_type].find_one(filter)
+        role_data = await db[role_type].find_one(filter)
 
         if role_data and 'staffrole' in role_data:
             role_ids = role_data['staffrole']
@@ -82,7 +83,7 @@ class StaffList(commands.Cog):
 
         return []
 
-    def get_members_with_top_role(self, guild, role_ids):
+    async def get_members_with_top_role(self, guild, role_ids):
         members = set()
         for role_id in role_ids:
             role = discord.utils.get(guild.roles, id=role_id)

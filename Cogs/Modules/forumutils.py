@@ -4,11 +4,11 @@ from discord.ext import commands
 import os
 import discord
 from discord.ext import commands
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 from permissions import *
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 forumsconfig = db['Forum Configuration']
@@ -218,7 +218,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-        result = forumsconfig.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+        result = await forumsconfig.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         embed = interaction.message.embeds[0]
         if result:
          embed = discord.Embed()
@@ -249,14 +249,14 @@ class DeleteForum(discord.ui.Modal, title='Delete Forum'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-       result = forumsconfig.find_one({"name": self.name.value})
+       result = await forumsconfig.find_one({"name": self.name.value})
        embed = interaction.message.embeds[0]
        if result is None:
         embed.title = f"{redx} I could not find that."
         embed.color = discord.Color.brand_red()
         await interaction.response.edit_message(embed=embed)
         return
-       forumsconfig.delete_one({"name": self.name.value})
+       await forumsconfig.delete_one({"name": self.name.value})
        embed = discord.Embed(description="Succesfully deleted the Forum message.")
        embed.title = f"{greencheck} Forum Deleted"
        embed.color = discord.Color.brand_green()
@@ -330,7 +330,7 @@ class Forums(commands.Cog):
     @commands.has_guild_permissions(administrator=True)
     async def manage(self, ctx):   
        embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
-       for result in forumsconfig.find({"guild_id": ctx.guild.id}):
+       async for result in forumsconfig.find({"guild_id": ctx.guild.id}):
         role = result['role']
         
         
@@ -478,7 +478,7 @@ class Embed(discord.ui.View):
             "role": message,
             "name": self.name
             }
-        forumsconfig.insert_one(embed_data)
+        await forumsconfig.insert_one(embed_data)
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Created"
         embed.description = f"Start by trying to create forum in <#{self.channel.id}>!"

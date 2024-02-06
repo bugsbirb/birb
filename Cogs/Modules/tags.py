@@ -1,58 +1,27 @@
 import discord
 from discord.ext import commands, tasks
 from discord import app_commands
-from pymongo import MongoClient
 from emojis import *
 import typing
 import os
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
 tags = db['tags']
 modules = db['Modules']
-from permissions import *
+from permissions import has_admin_role, has_staff_role
 class Tags(commands.Cog):
     def __init__(self, client):
         self.client = client
  
-    async def has_staff_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = scollection.find_one(filter)
 
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]   
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
-
-
-    async def has_admin_role(self, ctx):
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     staff_data = arole.find_one(filter)
-
-     if staff_data and 'staffrole' in staff_data:
-        staff_role_ids = staff_data['staffrole']
-        staff_role = discord.utils.get(ctx.guild.roles, id=staff_role_ids)
-        if not isinstance(staff_role_ids, list):
-          staff_role_ids = [staff_role_ids]     
-        if any(role.id in staff_role_ids for role in ctx.author.roles):
-            return True
-
-     return False
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Tags'] == True:   
@@ -69,7 +38,7 @@ class Tags(commands.Cog):
             'guild_id': interaction.guild_id 
         }
 
-        tag_names = tags.distinct("name", filter)
+        tag_names = await tags.distinct("name", filter)
 
         filtered_names = [name for name in tag_names if current.lower() in name.lower()]
 
@@ -96,12 +65,13 @@ class Tags(commands.Cog):
             'content': content,
             'guild_id': ctx.guild.id
         }
-        tags.insert_one(data)
+        await tags.insert_one(data)
         await ctx.send(f"{tick} **`{name}`** created.")
 
 
     @tags.command(description="List all available tags")
     async def all(self, ctx):
+     await ctx.defer()
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
@@ -119,7 +89,7 @@ class Tags(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
 
-        for tag in tag_data:
+        async for tag in tag_data:
             name = tag['name']
             content = tag['content']
 
@@ -132,6 +102,7 @@ class Tags(commands.Cog):
     @tags.command(description="Information about a tag")
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def info(self, ctx, name):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
@@ -143,7 +114,7 @@ class Tags(commands.Cog):
             'name': name
         }
 
-        tag_data = tags.find_one(filter)
+        tag_data = await tags.find_one(filter)
 
         if tag_data:
             created_by = tag_data['management']
@@ -159,6 +130,7 @@ class Tags(commands.Cog):
     @tags.command(description="Send a existing tag to this channel.")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def send(self, ctx, name):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
@@ -169,7 +141,7 @@ class Tags(commands.Cog):
             'name': name
         }
 
-        tag_data = tags.find_one(filter) 
+        tag_data = await tags.find_one(filter) 
 
         if tag_data:
             content = tag_data.get('content')
@@ -182,6 +154,7 @@ class Tags(commands.Cog):
     @tags.command(description="Delete a existing tag")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def delete(self, ctx, name):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 
@@ -191,11 +164,11 @@ class Tags(commands.Cog):
             'guild_id': ctx.guild.id,
             'name': name
         }        
-        tagsz = tags.find_one(filter)
+        tagsz = await tags.find_one(filter)
         if tagsz is None:
          await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the tag **`{name}`**.")
          return
-        tags.delete_one(filter)        
+        await tags.delete_one(filter)        
         await ctx.send(f"{tick} Tag **`{name}`** has been deleted.")
 
 

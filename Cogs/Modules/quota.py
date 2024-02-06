@@ -2,15 +2,16 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import pymongo
-from pymongo import MongoClient
 import Paginator
 from emojis import *
 import os
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 
 from permissions import has_admin_role, has_staff_role
-client = MongoClient(MONGO_URL)
+
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 lcollection = db['LOA Role']
@@ -39,7 +40,7 @@ class SetMessages(discord.ui.Modal, title='Set Message Count'):
 
         filter = {'guild_id': guild_id, 'user_id': self.user_id}
         update_data = {'$set': {'message_count': message_count_value}}
-        mccollection.update_one(filter, update_data, upsert=True)
+        await mccollection.update_one(filter, update_data, upsert=True)
         await interaction.response.edit_message(content=f'{tick} **{interaction.user.display_name}**, I have set the users message count as `{message_count_value}`.', embed=None, view=None)
 
 class StaffManage(discord.ui.View):
@@ -58,9 +59,9 @@ class StaffManage(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)                 
        filter = {'guild_id': interaction.guild.id, 'user_id': staff_id}
        update = {'$set': {'message_count': 0}}
-       mccollection.update_one(filter, update)
+       await mccollection.update_one(filter, update)
 
-       await interaction.response.edit_message(content=f'**{tick} {interaction.user.display_name}**, I have resetted the Staffs membercount.', embed=None, view=None)
+       await interaction.response.edit_message(content=f'**{tick} {interaction.user.display_name}**, I have resetted the staffs message count.', embed=None, view=None)
 
 
     @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.grey)
@@ -90,7 +91,7 @@ class quota(commands.Cog):
 
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Quota'] == True:   
@@ -130,8 +131,8 @@ class quota(commands.Cog):
          return   
      if not await has_admin_role(ctx):
             return                      
-     mccollection = db["messages"]
-     message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
+     mccollection = dbq["messages"]
+     message_data = await mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
     
      if message_data:
         message_count = message_data.get('message_count', 0)
@@ -168,7 +169,7 @@ class quota(commands.Cog):
             return  
             
         mccollection = dbq["messages"]
-        mccollection.delete_many({'guild_id': ctx.guild.id})
+        await mccollection.delete_many({'guild_id': ctx.guild.id})
         await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
         try:
                 owner = ctx.guild.owner
@@ -185,7 +186,7 @@ class quota(commands.Cog):
          return                    
      if not await has_staff_role(ctx):
         return        
-     message_data = mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
+     message_data = await mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
      if staff.id:
 
       if message_data:
@@ -205,101 +206,94 @@ class quota(commands.Cog):
 
     @staff.command(description="View the staff message leaderboard to see if anyone has passed their quota")
     async def leaderboard(self, ctx):
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            return
 
-     if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return                    
-     await ctx.defer()
-     if not await has_staff_role(ctx):
-        return
+        await ctx.defer()
+        if not await has_staff_role(ctx):
+            return
 
-     filter = {
-        'guild_id': ctx.guild.id
-    }
-     cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(50)
+        filter = {'guild_id': ctx.guild.id}
+        cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(400)
 
-     user_data_list = list(cursor)
+        user_data_list = await cursor.to_list(length=400)
 
+        pages = []
+        rank = 1
+        leaderboard_description = ""
 
+        for user_data in user_data_list:
+            user_id = user_data['user_id']
+            message_count = user_data['message_count']
+            member = ctx.guild.get_member(user_id)
+            loa_role_data = await lcollection.find_one({'guild_id': ctx.guild.id})
 
-     pages = []
-     rank = 1
-     leaderboard_description = ""
+            if member:
+                message_quota_result = await message_quota_collection.find_one({'guild_id': ctx.guild.id})
 
-     for user_data in user_data_list:
-        user_id = user_data['user_id']
-        message_count = user_data['message_count']
-        member = ctx.guild.get_member(user_id)
-        loa_role_data = lcollection.find_one({'guild_id': ctx.guild.id})
-       
-        if member:
-            message_quotaresult = message_quota_collection.find_one({'guild_id': ctx.guild.id})
+                if message_quota_result:
+                    message_quota = message_quota_result.get('message_quota', 100)
+                else:
+                    message_quota = 100
 
-            if message_quotaresult:
-                message_quota = message_quotaresult.get('message_quota', 100)
-            else:
-                message_quota = 100
-
-            if loa_role_data:
+                if loa_role_data:
                     loa_role_id = loa_role_data.get('staffrole')
-                    has_loa_role = discord.utils.get(member.roles, id=loa_role_id) is not None
-            else:
+                    has_loa_role = any(role.id == loa_role_id for role in member.roles)
+                else:
                     has_loa_role = False
 
-            if message_count >= message_quota:
+                if message_count >= message_quota:
                     emoji = "`LOA`" if has_loa_role else "<:Confirmed:1122636234255253545>"
-            else:
+                else:
                     emoji = "`LOA`" if has_loa_role else "<:Cancelled:1122637466353008810>"
 
-            leaderboard_description += f"* `{rank}` • {member.display_name} • {message_count} messages\n> **Passed:** {emoji}\n\n"
-            rank += 1
+                leaderboard_description += f"* `{rank}` • {member.display_name} • {message_count} messages\n> **Passed:** {emoji}\n\n"
+                rank += 1
 
-            if rank % 10 == 0:
-                embed = discord.Embed(
-                    title="Staff Leaderboard".format(rank // 10),
-                    description=leaderboard_description,
-                    color=discord.Color.dark_embed()
-                )
-                embed.set_thumbnail(url=ctx.guild.icon)
-                embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-                pages.append(embed)
-                leaderboard_description = ""  
+                if rank % 10 == 0:
+                    embed = discord.Embed(
+                        title=f"Staff Leaderboard",
+                        description=leaderboard_description,
+                        color=discord.Color.dark_embed()
+                    )
+                    embed.set_thumbnail(url=ctx.guild.icon)
+                    embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                    pages.append(embed)
+                    leaderboard_description = ""
 
-     if rank == 1:
-        leaderboard_description += "No message data."
+        if rank == 1:
+            leaderboard_description += "No message data."
 
-     if leaderboard_description:
-        embed = discord.Embed(
-            title="Staff Leaderboard".format(rank // 10 + 1),
-            description=leaderboard_description,
-            color=discord.Color.dark_embed()
+        if leaderboard_description:
+            embed = discord.Embed(
+                title=f"Staff Leaderboard",
+                description=leaderboard_description,
+                color=discord.Color.dark_embed()
+            )
+            embed.set_thumbnail(url=ctx.guild.icon)
+            embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+            pages.append(embed)
+
+        if not pages:
+            pages.append(discord.Embed(title="Staff Leaderboard", description="No message data.", color=discord.Color.dark_embed()))
+
+        PreviousButton = discord.ui.Button(label="<")
+        NextButton = discord.ui.Button(label=">")
+        FirstPageButton = discord.ui.Button(label="<<")
+        LastPageButton = discord.ui.Button(label=">>")
+        InitialPage = 0
+        timeout = 42069
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
         )
-        embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-        pages.append(embed)
 
-     if not pages:
-        pages.append(discord.Embed(title="Staff Leaderboard", description="No message data.", color=discord.Color.dark_embed()))
-
-     PreviousButton = discord.ui.Button(label="<")
-     NextButton = discord.ui.Button(label=">")
-     FirstPageButton = discord.ui.Button(label="<<")
-     LastPageButton = discord.ui.Button(label=">>")
-     InitialPage = 0
-     timeout = 42069
-     paginator = Paginator.Simple(
-        PreviousButton=PreviousButton,
-        NextButton=NextButton,
-        FirstEmbedButton=FirstPageButton,
-        LastEmbedButton=LastPageButton,
-        InitialPage=InitialPage,
-        timeout=timeout
-    )
-
-     await paginator.start(ctx, pages=pages)
-
-
-
+        await paginator.start(ctx, pages=pages)
 
 
 

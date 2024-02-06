@@ -1,11 +1,11 @@
+from permissions import *
 import discord
 from discord.ext import commands
-from typing import Literal
 import datetime 
 from datetime import timedelta
 from discord import app_commands
 from discord.ext import commands, tasks
-from pymongo import MongoClient
+
 from emojis import *
 import os
 from dotenv import load_dotenv
@@ -13,12 +13,13 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+from motor.motor_asyncio import AsyncIOMotorClient
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 suspensions = db['Suspensions']
 infchannel = db['infraction channel']
-appealable = db['Appeal Toggle']
-from permissions import *
+modules = db['Modules']
+
 
 class Suspensions(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -30,7 +31,7 @@ class Suspensions(commands.Cog):
 
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Suspensions'] == True:   
@@ -61,7 +62,7 @@ class Suspensions(commands.Cog):
             return
  
         filter = {'guild_id': ctx.guild.id, 'staff': staff.id, 'active': True}
-        existing_suspensions = suspensions.find_one(filter)
+        existing_suspensions = await suspensions.find_one(filter)
 
         if existing_suspensions:
          await ctx.send(f"{no} **{staff.display_name}** is already suspended.", ephemeral=True)
@@ -100,7 +101,7 @@ class Suspensions(commands.Cog):
 
      filter = {'guild_id': ctx.guild.id, 'active': True}
 
-     loa_requests = list(suspensions.find(filter))
+     loa_requests = await suspensions.find(filter).to_list(length=None)
 
      if len(loa_requests) == 0:
         await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.")
@@ -139,7 +140,7 @@ class Suspensions(commands.Cog):
 
      suspension_records = []
 
-     for request in suspension_requests:
+     async for request in suspension_requests:
         end_time = request['end_time']
         start_time = request['start_time']
         user_id = request['staff']
@@ -185,31 +186,28 @@ class Suspensions(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def check_suspensions(self):
+     print("Checking suspensions")
      current_time = datetime.now()
      filter = {'end_time': {'$lte': current_time}, 'action': 'Suspension'}
 
      suspension_requests = suspensions.find(filter)
 
-     for request in suspension_requests:
+     async for request in suspension_requests:
         end_time = request['end_time']
         user_id = request['staff']
         guild_id = request['guild_id']
         guild = self.client.get_guild(guild_id)
         user = self.client.get_user(user_id)
         if current_time >= end_time:
-                if user:
-                 try:   
-                  await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
-                 except discord.Forbidden: 
-                    pass
-                 delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
-                 suspensions.delete_one(delete_filter)
 
-                try:
-                    roles_removed = request['roles_removed']
-                    roles_to_return = [discord.utils.get(guild.roles, id=role_id) for role_id in roles_removed if guild.get_member(user_id)]
+                 delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
+                 await suspensions.delete_one(delete_filter)
+
+                 roles_removed = request.get('roles_removed', None)
+                 if roles_removed:
+                  roles_to_return = [discord.utils.get(guild.roles, id=role_id) for role_id in roles_removed if guild.get_member(user_id)]
                     
-                    if roles_to_return:
+                  if roles_to_return:
                         try:
                           member = guild.get_member(user_id)
                         except discord.Forbidden:
@@ -217,9 +215,14 @@ class Suspensions(commands.Cog):
                         try:                        
                          await member.add_roles(*roles_to_return)
                         except discord.Forbidden:
-                            pass                         
-                except KeyError:
-                    pass
+                            await self.check_suspensions.restart()          
+                            
+                 if user:
+                     try:
+                        await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
+                     except discord.Forbidden:
+                        await self.check_suspensions.restart()      
+
 
 
 
@@ -263,7 +266,7 @@ class Suspension(discord.ui.RoleSelect):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
 
-        data = infchannel.find_one({'guild_id': interaction.guild.id})
+        data = await infchannel.find_one({'guild_id': interaction.guild.id})
         if data:
             channel_id = data['channel_id']
             channel = interaction.guild.get_channel(channel_id)
@@ -298,7 +301,7 @@ class Suspension(discord.ui.RoleSelect):
                  pass
 
 
-                suspensions.insert_one(infract_data)
+                await suspensions.insert_one(infract_data)
                 await interaction.response.edit_message(
                     content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**",
                     view=None,
@@ -352,7 +355,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
 
 
 
-        data = infchannel.find_one({'guild_id': interaction.guild.id})       
+        data = await infchannel.find_one({'guild_id': interaction.guild.id})       
         if data:
          channel_id = data['channel_id']
          channel = interaction.guild.get_channel(channel_id)
@@ -368,7 +371,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
              return
 
 
-            suspensions.insert_one(infract_data)
+            await suspensions.insert_one(infract_data)
             await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None)        
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
@@ -403,7 +406,7 @@ class SuspensionPanel(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.mention},** this is not your view.", color=discord.Colour.dark_grey())
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
-        suspension_record = suspensions.find_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
+        suspension_record = await suspensions.find_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
         if suspension_record:
          roles_removed = suspension_record.get('roles_removed', [])
          if roles_removed:
@@ -419,14 +422,14 @@ class SuspensionPanel(discord.ui.View):
                 try:
                     await member.add_roles(*roles_to_return)
                     await interaction.edit_original_response(content=f"{tick} Suspension has been voided. Roles have been restored.", view=None, embed=None)
-                    suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})                    
+                    await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})                    
                     await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
                 except discord.Forbidden:
                     await interaction.edit_original_response(content=f"{no} Failed to restore roles due to insufficient permissions.", ephemeral=True)
 
          else:
             member = interaction.guild.get_member(self.user.id)
-            suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
+            await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
             await interaction.response.edit_message(content=f"{tick} Suspension has been voided.", embed=None, view=None)
             try:
              await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")

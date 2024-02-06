@@ -13,14 +13,16 @@ import platform
 import os
 from dotenv import load_dotenv
 from emojis import * 
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
 analytics = db['analytics']
 scollection = db['staffrole']
 arole = db['adminrole']
 blacklists = db['blacklists']
+modules = db['Modules']
 
 modules = db['Modules']
 class HelpdeskDropdown(discord.ui.Select):
@@ -66,13 +68,13 @@ class management(commands.Cog):
         self.client = client
 
     @commands.command()
-    @commands.is_owner()    
+    @commands.is_owner()
     async def addbadge(self, ctx, user: discord.Member, *, badge):
         badge = {
             'user_id': user.id,
             'badge': badge
         }
-        badges.insert_one(badge)  
+        await badges.insert_one(badge)
         await ctx.send(f"{tick} added **`{badge}`** to **@{user.display_name}**")
 
     @commands.command()
@@ -82,50 +84,54 @@ class management(commands.Cog):
             'user_id': user.id,
             'badge': badge
         }
-        badges.delete_one(badge)  
+        await badges.delete_one(badge)
         await ctx.send(f"{tick} removed **`{badge}`** to **@{user.display_name}**")
-  
+
     @commands.command()
     @commands.is_owner()
     async def helpdesk(self, ctx):
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
         banner.set_image(url="https://cdn.discordapp.com/attachments/1176591593797582848/1176595220511588382/ASTRO.png?ex=656f70b0&is=655cfbb0&hm=b126ffe5b3f45209b51660e90bc96a819fcfaeabd4bae92bcc6e3127645779c6&")
 
-        main = discord.Embed(color=discord.Color.dark_embed(), title="<:forum:1162134180218556497> Astro Support", description="Welcome to the support server for Astro Birb! Here, you can find answers to your inquiries. If you can't find what you need on the helpdesk, feel free to head to <#1101807246079442944> for further assistance!")
-        main.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
-        main.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+        main = discord.Embed(color=discord.Color.dark_embed(),
+                             title="<:forum:1162134180218556497> Astro Support",
+                             description="Welcome to the support server for Astro Birb! Here, you can find answers to your inquiries. If you can't find what you need on the helpdesk, feel free to head to <#1101807246079442944> for further assistance!")
+        main.set_thumbnail(
+            url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
+        main.set_image(
+            url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         view = Helpdesk()
         await ctx.send(embeds=(banner, main), view=view)
-
 
     @commands.command()
     @commands.is_owner()
     async def analytics(self, ctx):
-     result = analytics.find({})
+        result = await analytics.find({}).to_list(length=None)
 
-     description = ""
-     for x in result:
-        for key, value in x.items():
-            if key != '_id':
-                description += f"**{key}:** `{value}`\n"
-        description += ""
+        description = ""
+        for x in result:
+            for key, value in x.items():
+                if key != '_id':
+                    description += f"**{key}:** `{value}`\n"
+            description += ""
 
-     embed = discord.Embed(title="Command Analytics", description=description, color=discord.Color.dark_embed())
-     embed.set_thumbnail(url=ctx.guild.icon)
-     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-     embed.set_footer(text=f"Analytics started on 14th December 2024", icon_url="https://media.discordapp.net/ephemeral-attachments/1114281227579559998/1197680763341111377/1158064756104630294.png?ex=65bc2621&is=65a9b121&hm=9e278e5e96573663fb42396dd52e56ece56ba6af59e53f9720873ca484fabf19&=&format=webp&quality=lossless")
-     await ctx.send(embed=embed)
+        embed = discord.Embed(title="Command Analytics", description=description, color=discord.Color.dark_embed())
+        embed.set_thumbnail(url=ctx.guild.icon)
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.set_footer(text=f"Analytics started on 14th December 2024",
+                         icon_url="https://media.discordapp.net/ephemeral-attachments/1114281227579559998/1197680763341111377/1158064756104630294.png?ex=65bc2621&is=65a9b121&hm=9e278e5e96573663fb42396dd52e56ece56ba6af59e53f9720873ca484fabf19&=&format=webp&quality=lossless")
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.is_owner()
     async def guildinfo(self, ctx, guildid: int):
-        await ctx.defer()  
+        await ctx.defer()
         guild = await self.client.fetch_guild(guildid)
         if guild is None:
             await ctx.send(f"{no} Guild not found!")
             return
-        staffroleresult = scollection.find_one({'guild_id': guild.id})
-        adminroleresult = arole.find_one({'guild_id': guild.id})
+        staffroleresult = await scollection.find_one({'guild_id': guild.id})
+        adminroleresult = await arole.find_one({'guild_id': guild.id})
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         if adminroleresult:
@@ -138,7 +144,7 @@ class management(commands.Cog):
                 adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
-        
+
         if staffroleresult:
             staff_roles_ids = staffroleresult.get('staffrole', [])
             if not isinstance(staff_roles_ids, list):
@@ -148,39 +154,38 @@ class management(commands.Cog):
             if not staff_roles_mentions:
                 staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
             else:
-                staffrolemessage = ", ".join(staff_roles_mentions)       
+                staffrolemessage = ", ".join(staff_roles_mentions)
 
-        all_servers_data = modules.find_one({'guild_id': guildid})
+        all_servers_data = await modules.find_one({'guild_id': guildid})
         print(all_servers_data)
-    
 
         modules_info = ""
-    
-        if all_servers_data:
-         modules_info = ""
-         for module, enabled in all_servers_data.items():
-          if module != '_id' and module != 'guild_id':
-            modules_info += f"**{module}:** {f'{tick}' if enabled else f'{no}'}\n"
-        else:
-          modules_info = "No document found in the collection."
 
+        if all_servers_data:
+            modules_info = ""
+            for module, enabled in all_servers_data.items():
+                if module != '_id' and module != 'guild_id':
+                    modules_info += f"**{module}:** {f'{tick}' if enabled else f'{no}'}\n"
+        else:
+            modules_info = "No document found in the collection."
 
         if guild.owner is None:
             owner = "Unknown"
         else:
             owner = guild.owner.display_name
-        embed = discord.Embed(title=f"{guild.name}", description=f"**Owner:** {owner}\n**Guild ID:** {guild.id}\n**Roles:** {len(guild.roles)}\n**Created:** <t:{guild.created_at.timestamp():.0f}:D>", color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"{guild.name}", description=f"**Owner:** {owner}\n**Guild ID:** {guild.id}\n**Roles:** {len(guild.roles)}\n**Created:** <t:{guild.created_at.timestamp():.0f}:D>",
+                              color=discord.Color.dark_embed())
         embed.set_thumbnail(url=guild.icon)
         if guild.banner:
-         embed.set_image(url=guild.banner)
-        embed.add_field(name=f"{Settings} Basic Settings", value=f"**Admin Roles:** {adminrolemessage}\n**Staff Roles:** {staffrolemessage}")
+            embed.set_image(url=guild.banner)
+        embed.add_field(name=f"{Settings} Basic Settings",
+                        value=f"**Admin Roles:** {adminrolemessage}\n**Staff Roles:** {staffrolemessage}")
         if modules_info:
-         embed.add_field(name=f"Modules", value=modules_info, inline=False)
+            embed.add_field(name=f"Modules", value=modules_info, inline=False)
         embed.set_author(name=guild.name, icon_url=guild.icon)
 
-         
-     
         await ctx.send(embed=embed)
+
 
         
 

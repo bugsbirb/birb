@@ -1,16 +1,15 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from typing import Literal
-from typing import Optional
-from pymongo import MongoClient
 from emojis import *
 import typing
 import os
 from dotenv import load_dotenv
 import Paginator
+from motor.motor_asyncio import AsyncIOMotorClient
+
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -36,7 +35,7 @@ class Partnerships(commands.Cog):
             'guild_id': interaction.guild_id 
         }
 
-        tag_names = partnerships.distinct("server", filter)
+        tag_names = await partnerships.distinct("server", filter)
 
         filtered_names = [name for name in tag_names if current.lower() in name.lower()]
 
@@ -49,7 +48,7 @@ class Partnerships(commands.Cog):
         pass
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Partnerships'] == True:   
@@ -57,6 +56,10 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Log a partnership")
     async def log(self, ctx, owner: discord.Member, server: str, invite: str):
+        result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
+        if result:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, that server is already in the partnerships database.")
+            return
 
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
@@ -68,10 +71,10 @@ class Partnerships(commands.Cog):
         try:
          invited = await self.client.fetch_invite(url=invite)
         except discord.NotFound:
-          await ctx.send(f"{no} {ctx.author.mention}, that invite is invalid.")
+          await ctx.send(f"{no} **{ctx.author.display_name}**, that invite is invalid.")
           return
 
-        data = partnershipsch.find_one({'guild_id': ctx.guild.id})
+        data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -97,7 +100,7 @@ class Partnerships(commands.Cog):
           try:
            await channel.send(embed=embed)
            await ctx.send(f"{tick} **Partnership** logged.")  
-           partnerships.insert_one(partnershipdata)
+           await partnerships.insert_one(partnershipdata)
           except discord.Forbidden: 
             await ctx.send(f"{no} I don't have permission to view that channel.")
         else:  
@@ -114,7 +117,7 @@ class Partnerships(commands.Cog):
          return              
 
 
-        partnership_data = partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
+        partnership_data = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if partnership_data is None:   
             await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find that partnership.")
             return
@@ -125,7 +128,7 @@ class Partnerships(commands.Cog):
             invite = partnership_data['invite']            
             owner = await self.client.fetch_user(ownerid)
             admin = await self.client.fetch_user(adminid)
-        data = partnershipsch.find_one({'guild_id': ctx.guild.id})
+        data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -146,12 +149,13 @@ class Partnerships(commands.Cog):
           except discord.Forbidden: 
             await ctx.send(f"{no} I don't have permission to view that channel.")     
             return      
-          partnerships.delete_one({'guild_id': ctx.guild.id, 'server': server})
+          await partnerships.delete_one({'guild_id': ctx.guild.id, 'server': server})
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")        
 
     @partnership.command(description="View all Partnerships in this server.")
     async def all(self, ctx):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return            
@@ -165,7 +169,7 @@ class Partnerships(commands.Cog):
 
         embeds = []
 
-        for partnership in partnership_data:
+        async for partnership in partnership_data:
          server = partnership['server']
          owner_id = partnership['owner']
          invite = partnership['invite']
@@ -200,10 +204,6 @@ class Partnerships(commands.Cog):
          embeds.append(embed)
 
 
-
-        if not embeds:
-            await ctx.send(f"No active partnerships on this server.")
-            return
 
         PreviousButton = discord.ui.Button(label="<")
         NextButton = discord.ui.Button(label=">")

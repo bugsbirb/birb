@@ -9,9 +9,9 @@ import os
 from dotenv import load_dotenv
 from emojis import *
 from datetime import datetime, timedelta
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 repchannel = db['report channel']
 modules = db['Modules']
@@ -27,11 +27,6 @@ class MuteReason(discord.ui.Modal, title='Reason'):
         self.messageid = messageid
         self.message = message
 
-
-
-
-
-
     Reason = discord.ui.TextInput(
         label='Reason?',
         placeholder='Whats the reason for the mute?',
@@ -43,8 +38,6 @@ class MuteReason(discord.ui.Modal, title='Reason'):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-
-
         duration_value = int(self.Duration.value[:-1])
         duration_unit = self.Duration.value[-1]
 
@@ -54,13 +47,13 @@ class MuteReason(discord.ui.Modal, title='Reason'):
             duration = timedelta(hours=duration_value)
         elif duration_unit == 'd':
             duration = timedelta(days=duration_value)
-        elif duration_unit == 'w':    
+        elif duration_unit == 'w':
             duration = timedelta(weeks=duration_value)
         else:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, Invalid duration unit. Use 'm' for minutes, 'h' for hours, 'd' for days, and 'w' for weeks.", ephemeral=True)
             return
 
-        reportsresult = reports.find_one({'message_id': self.messageid})
+        reportsresult = await reports.find_one({'message_id': self.messageid})
         reporteduserid = reportsresult['reporteduser']
 
         reporteduser = interaction.guild.get_member(reporteduserid)
@@ -70,9 +63,10 @@ class MuteReason(discord.ui.Modal, title='Reason'):
 
         try:
             await reporteduser.timeout(duration, reason=f"Muted By {interaction.user.display_name} | {self.Reason.value}")
-        except discord.Forbidden:
+        except Exception as e:
+            print(e)
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to mute this user!", ephemeral=True)
-            return 
+            return
 
         self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
@@ -81,10 +75,10 @@ class MuteReason(discord.ui.Modal, title='Reason'):
         self.embed.add_field(name="Mute Duration", value=self.Duration.value, inline=True)
         message = self.message
         try:
-         await reporteduser.send(f"<:Infraction:1162134605885870180> You have been muted from **{interaction.guild.name}** for `{self.Duration.value}`| {self.Reason.value}")
+            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been muted from **{interaction.guild.name}** for `{self.Duration.value}`| {self.Reason.value}")
         except discord.Forbidden:
-          pass         
-        try: 
+            pass
+        try:
             await message.edit(embed=self.embed, view=None)
             await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully muted **@{reporteduser}** for `{self.Duration.value}`.", ephemeral=True)
         except discord.Forbidden:
@@ -99,21 +93,13 @@ class KickReason(discord.ui.Modal, title='Reason'):
         self.messageid = messageid
         self.message = message
 
-
-
-
-
-
     Reason = discord.ui.TextInput(
         label='Reason?',
         placeholder='Whats the reason for the kick?',
     )
 
-
     async def on_submit(self, interaction: discord.Interaction):
-
-
-        reportsresult = reports.find_one({'message_id': self.messageid})
+        reportsresult = await reports.find_one({'message_id': self.messageid})
         reporteduserid = reportsresult['reporteduser']
 
         reporteduser = interaction.guild.get_member(reporteduserid)
@@ -121,26 +107,26 @@ class KickReason(discord.ui.Modal, title='Reason'):
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I could not find this user!", ephemeral=True)
             return
         try:
-         await reporteduser.kick(reason=f"Kicked By {interaction.user.display_name} | {self.Reason.value}")
+            await reporteduser.kick(reason=f"Kicked By {interaction.user.display_name} | {self.Reason.value}")
         except discord.Forbidden:
-         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to kick this user!", ephemeral=True)
-         return 
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to kick this user!", ephemeral=True)
+            return
         self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
         self.embed.set_footer(text=f"Kicked By {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
         self.embed.add_field(name="Kick Reason", value=self.Reason.value, inline=False)
         message = self.message
         try:
-         await reporteduser.send(f"<:Infraction:1162134605885870180> You have been kicked from **{interaction.guild.name}** | {self.Reason.value}")
+            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been kicked from **{interaction.guild.name}** | {self.Reason.value}")
         except discord.Forbidden:
-          pass         
-        try: 
-         await message.edit(embed=self.embed, view=None)
-         await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully kicked **@{reporteduser}**.", ephemeral=True)
+            pass
+        try:
+            await message.edit(embed=self.embed, view=None)
+            await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully kicked **@{reporteduser}**.", ephemeral=True)
         except discord.Forbidden:
-           await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I can't to edit this message", ephemeral=True)
-           return
-        
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I can't to edit this message", ephemeral=True)
+            return
+
 
 class BanReason(discord.ui.Modal, title='Reason'):
     def __init__(self, embed, messageid, message):
@@ -149,21 +135,13 @@ class BanReason(discord.ui.Modal, title='Reason'):
         self.messageid = messageid
         self.message = message
 
-
-
-
-
-
     Reason = discord.ui.TextInput(
         label='Reason?',
         placeholder='Whats the reason for the ban?',
     )
 
-
     async def on_submit(self, interaction: discord.Interaction):
-
-
-        reportsresult = reports.find_one({'message_id': self.messageid})
+        reportsresult = await reports.find_one({'message_id': self.messageid})
         reporteduserid = reportsresult['reporteduser']
 
         reporteduser = interaction.guild.get_member(reporteduserid)
@@ -171,27 +149,26 @@ class BanReason(discord.ui.Modal, title='Reason'):
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I could not find this user!", ephemeral=True)
             return
         try:
-         await reporteduser.ban(reason=f"Banned By {interaction.user.display_name} | {self.Reason.value}")
+            await reporteduser.guild.ban(reason=f"Banned By {interaction.user.display_name} | {self.Reason.value}")
         except discord.Forbidden:
-         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to ban this user!", ephemeral=True)
-         return 
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to ban this user!", ephemeral=True)
+            return
         self.embed.title = f"{greencheck} Report Resolved"
         self.embed.color = discord.Colour.brand_green()
         self.embed.set_footer(text=f"Banned By {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
         self.embed.add_field(name="Ban Reason", value=self.Reason.value, inline=False)
         message = self.message
         try:
-         await reporteduser.send(f"<:Infraction:1162134605885870180> You have been banned from **{interaction.guild.name}** | {self.Reason.value}")
+            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been banned from **{interaction.guild.name}** | {self.Reason.value}")
         except discord.Forbidden:
-          pass 
-        try: 
-         await message.edit(embed=self.embed, view=None)
-         await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully kicked **@{reporteduser}**.", ephemeral=True)
-
-
+            pass
+        try:
+            await message.edit(embed=self.embed, view=None)
+            await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully kicked **@{reporteduser}**.", ephemeral=True)
         except discord.Forbidden:
-           await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I can't to edit this message", ephemeral=True)
-           return
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I can't to edit this message", ephemeral=True)
+            return
+
 
         
 
@@ -204,7 +181,7 @@ class Reports(commands.Cog):
         reported_at_format = f"<t:{int(reported_at)}:F>"
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Reports'] == True:   
@@ -219,6 +196,7 @@ class Reports(commands.Cog):
         reason='What is the reason for reporting this user',
         message_link='Do you have proof of this person doing this?')
     async def report(self, ctx, member: discord.User, *, reason: str, message_link: Optional[str] = None, proof: discord.Attachment, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return         
@@ -258,42 +236,35 @@ class Reports(commands.Cog):
         else:
             embed.add_field(name=f"Report Information", value=f"* **Reported By:** {ctx.author.mention}\n* **Reason:** {reason}\n* **Reported At:** {reported_at_format}", inline=False)
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False) 
-          
+                   
 
+        
+        guild_id = ctx.guild.id
+        data = await repchannel.find_one({'guild_id': guild_id})
 
-        view = Confirm()
-        await ctx.send(embed=embed, view=view, ephemeral=True)            
-
-            
-        await view.wait()
-        if view.value:
-            guild_id = ctx.guild.id
-            data = repchannel.find_one({'guild_id': guild_id})
-
-            if data:
+        if data:
                 channel_id = data['channel_id']
                 channel = self.client.get_channel(channel_id)
 
                 if channel:
-                    view = ReportPanel()
+                    
                     try:
+                     view = ReportPanel()
                      msg = await channel.send(embed=embed, view=view)
+                     await ctx.send(f"{tick} **{ctx.author.display_name}**, your report has been submitted.", ephemeral=True)
 
-                     reports.insert_one({'guild_id': ctx.guild.id, 'channel_id': channel_id, 'reportedby': ctx.author.id, 'reporteduser': member.id, 'reason': reason, 'message_link': message_link, 'proof': proof_message, 'reported_at': reported_at_format, 'message_id': msg.id})
+                     await reports.insert_one({'guild_id': ctx.guild.id, 'channel_id': channel_id, 'reportedby': ctx.author.id, 'reporteduser': member.id, 'reason': reason, 'message_link': message_link, 'proof': proof_message, 'reported_at': reported_at_format, 'message_id': msg.id})
                     except discord.Forbidden:
                        await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view the channel please contact **administrators**.")
                        return
                 else:
                     await ctx.send(f"**{ctx.author.display_name}**, I don't have permission to view this channel.")
-            else:
+        else:
                 await ctx.send(f"**{ctx.author.display_name}**, the channel is not setup please run `/config`")
-        elif view.cancel:
-            await ctx.send("Report cancelled.")     
+ 
          
 
 
-        elif view.cancel: 
-         await channel.send(None)             
 
 
 class ActionsPanel(discord.ui.View):
@@ -334,7 +305,7 @@ class ReportPanel(discord.ui.View):
      filter = {
         'guild_id': interaction.guild.id
     }
-     staff_data = ReportModeratorRole.find_one(filter)
+     staff_data = await ReportModeratorRole.find_one(filter)
 
      if staff_data and 'staffrole' in staff_data:
         staff_role_ids = staff_data['staffrole']
@@ -342,7 +313,7 @@ class ReportPanel(discord.ui.View):
             staff_role_ids = [staff_role_ids]
 
 
-        admin_data = arole.find_one(filter)
+        admin_data = await arole.find_one(filter)
 
         if not admin_data:
             pass
@@ -372,7 +343,7 @@ class ReportPanel(discord.ui.View):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
          return   
        
-       reportsresult = reports.find_one({'message_id': interaction.message.id})
+       reportsresult = await reports.find_one({'message_id': interaction.message.id})
        if reportsresult is None:
               await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, there was no report data found.", ephemeral=True)
               return
@@ -392,7 +363,7 @@ class ReportPanel(discord.ui.View):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
          return 
-       reportsresult = reports.find_one({'message_id': interaction.message.id})
+       reportsresult = await reports.find_one({'message_id': interaction.message.id})
        if reportsresult is None:
               await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, there was no report data found.", ephemeral=True)
               return   
@@ -405,24 +376,7 @@ class ReportPanel(discord.ui.View):
 
 
 
-class Confirm(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.value = None
 
-    @discord.ui.button(label='Send', style=discord.ButtonStyle.green)
-    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
-        
-        self.value = True
-        await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **{interaction.user.display_name}**, I've logged the report.", view=None)
-        self.stop()
-
-
-    @discord.ui.button(label='Discard', style=discord.ButtonStyle.red)
-    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.edit_message(content=f"<:Tick:1140286044114268242> **Cancelled.**", view=None, embed=None)    
-        self.value = False
-        self.stop()                       
 
               
 

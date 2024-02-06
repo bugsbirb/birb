@@ -13,8 +13,9 @@ import chat_exporter
 import typing
 from dotenv import load_dotenv
 import io   
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -31,7 +32,7 @@ class Modmail(commands.Cog):
         self.client = client
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata.get('Modmail', False) == True: 
@@ -54,7 +55,7 @@ class Modmail(commands.Cog):
         if not await has_staff_role(ctx):
             return
         await ctx.send(f"{tick} **{ctx.author.display_name},** you will be alerted for the next message.", ephemeral=True)
-        modmailalerts.update_one({'channel_id': ctx.channel.id}, {'$set': {'alert': ctx.author.id}}, upsert=True)     
+        await modmailalerts.update_one({'channel_id': ctx.channel.id}, {'$set': {'alert': ctx.author.id}}, upsert=True)     
 
     @modmail.command(description="Blacklist someone from using modmail")
     async def blacklist(self, ctx, member: discord.Member):
@@ -63,12 +64,12 @@ class Modmail(commands.Cog):
          return                 
         if not await has_admin_role(ctx):
             return
-        blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
+        blacklist = await modmailblacklists.find_one({'guild_id': ctx.guild.id})
         if blacklist:
             if member.id in blacklist['blacklist']:
                 await ctx.send(f"{no} **{member.display_name}** is already blacklisted.")
                 return
-        modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$push': {'blacklist': member.id}}, upsert=True)
+        await modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$push': {'blacklist': member.id}}, upsert=True)
         await ctx.send(f"{tick} **{member.display_name}** has been blacklisted from using modmail.")
        
     @modmail.command(description="Unblacklist someone from using modmail")
@@ -78,12 +79,12 @@ class Modmail(commands.Cog):
          return                 
         if not await has_admin_role(ctx):
             return
-        blacklist = modmailblacklists.find_one({'guild_id': ctx.guild.id})
+        blacklist = await modmailblacklists.find_one({'guild_id': ctx.guild.id})
         if blacklist:
             if member.id not in blacklist['blacklist']:
                 await ctx.send(f"{no} **{member.display_name}** is not blacklisted.")
                 return
-        modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$pull': {'blacklist': member.id}}, upsert=True)
+        await modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$pull': {'blacklist': member.id}}, upsert=True)
         await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.")
 
     @modmail.command(description="Reply to a modmail")
@@ -95,7 +96,7 @@ class Modmail(commands.Cog):
          return             
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id
-        modmail_data = modmail.find_one({'channel_id': channel_id})
+        modmail_data = await modmail.find_one({'channel_id': channel_id})
 
         if modmail_data:
             user_id = modmail_data.get('user_id')
@@ -133,7 +134,7 @@ class Modmail(commands.Cog):
          return             
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id
-        modmail_data = modmail.find_one({'channel_id': channel_id})
+        modmail_data = await modmail.find_one({'channel_id': channel_id})
 
         if modmail_data:
             selected_server_id = modmail_data.get('guild_id')
@@ -141,14 +142,14 @@ class Modmail(commands.Cog):
 
             if selected_server:
 
-                modmail.delete_one({'channel_id': channel_id}) 
+                await modmail.delete_one({'channel_id': channel_id}) 
                 channel = ctx.guild.get_channel(modmail_data.get('channel_id'))
                 print(channel)
                 channelcreated = f"{channel.created_at.strftime('%d/%m/%Y')}"
                 
 
                 transcriptid = random.randint(100, 5000)
-                transcriptresult = transcripts.find_one({'guild_id': ctx.guild.id, 'transcriptid': transcriptid})
+                transcriptresult = await transcripts.find_one({'guild_id': ctx.guild.id, 'transcriptid': transcriptid})
                 if transcriptresult:
                     transcriptid = random.randint(100, 5000)
                 transcript = await chat_exporter.export(ctx.channel)    
@@ -182,7 +183,7 @@ class Modmail(commands.Cog):
                         except discord.Forbidden:
                             
                             pass     
-                transcriptchannelresult = transcriptschannel.find_one({'guild_id': ctx.guild.id})
+                transcriptchannelresult = await transcriptschannel.find_one({'guild_id': ctx.guild.id})
                 if transcriptchannelresult:
                     transcriptchannelid = transcriptchannelresult['channel_id']
                     transcriptchannel = ctx.guild.get_channel(transcriptchannelid)

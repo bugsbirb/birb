@@ -1,24 +1,21 @@
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import asyncio
-import sqlite3
 from datetime import datetime, timedelta
-from typing import Optional
-import pytz
+
+
 from discord import app_commands
 from pymongo import MongoClient
 from emojis import *
-import typing
-from typing import Literal
 import os
 from dotenv import load_dotenv
-import Paginator
 import chat_exporter
 import random
 import io
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -46,7 +43,7 @@ class Modmailevnt(commands.Cog):
         
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
-            modmail_data = modmail.find_one({'user_id': user_id})
+            modmail_data = await modmail.find_one({'user_id': user_id})
             if message.content == f"!close":
                 if not modmail_data:
                     await message.author.send(f"{no} You are not in a modmail conversation.")
@@ -54,7 +51,7 @@ class Modmailevnt(commands.Cog):
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
                 if channel is None:
-                    modmail.delete_many({'user_id': user_id})
+                    await modmail.delete_many({'user_id': user_id})
                     await message.author.send(f"{tick} Conversation closed.")
                     return
 
@@ -69,9 +66,9 @@ class Modmailevnt(commands.Cog):
                 if channel:
                     await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has closed the modmail conversation.")
                     await channel.delete()
-                    modmail.delete_many({'user_id': user_id})
+                    await modmail.delete_many({'user_id': user_id})
                     await message.author.send(f"{tick} Conversation closed.")
-                    transcriptschannelresult = transcriptschannel.find_one({'guild_id': channel.guild.id})
+                    transcriptschannelresult = await transcriptschannel.find_one({'guild_id': channel.guild.id})
                     if transcriptschannelresult:
                      transcriptchannelid = transcriptschannelresult.get('channel_id')
                      transcriptchannel = self.client.get_channel(transcriptchannelid)
@@ -109,8 +106,8 @@ class Modmailevnt(commands.Cog):
                 mutual_servers = [
                     guild for guild in self.client.guilds
                     if discord.utils.get(guild.members, id=user_id)
-                    and modmailcategory.find_one({'guild_id': guild.id})
-                    and modules.find_one({'guild_id': guild.id, 'Modmail': True})
+                    and await modmailcategory.find_one({'guild_id': guild.id})
+                    and await modules.find_one({'guild_id': guild.id, 'Modmail': True})
                 ]
 
                 if not mutual_servers:
@@ -144,7 +141,7 @@ class Modmailevnt(commands.Cog):
 
                     response = await self.client.wait_for('message', check=check, timeout=10)
                     selected_server = mutual_servers[int(response.content) - 1]
-                    blacklist = modmailblacklists.find_one({'guild_id': selected_server.id})
+                    blacklist = await modmailblacklists.find_one({'guild_id': selected_server.id})
                     if blacklist:
                         if user_id in blacklist['blacklist']:
                             await message.author.send(f"{no} **{message.author.display_name},** You are blacklisted from using modmail in **{selected_server.name}**.")
@@ -155,11 +152,12 @@ class Modmailevnt(commands.Cog):
                 except ValueError:
                     await message.author.send(f"{no} **{message.author.name},** That isn't a valid number.")
                     return
-                category_id = modmailcategory.find_one({'guild_id': selected_server.id})['category_id']
+                category_idresult = await modmailcategory.find_one({'guild_id': selected_server.id})
+                category_id = category_idresult['category_id']
 
                 category = self.client.get_channel(category_id)
                 if category and isinstance(category, discord.CategoryChannel):
-                    existing_modmail_data = modmail.find_one({'user_id': user_id, 'guild_id': selected_server.id})
+                    existing_modmail_data = await modmail.find_one({'user_id': user_id, 'guild_id': selected_server.id})
                     if existing_modmail_data:
                         channel_id = existing_modmail_data['channel_id']
                         channel = self.client.get_channel(channel_id)
@@ -197,7 +195,7 @@ class Modmailevnt(commands.Cog):
                         rolecount = len(user.roles) - 1 if selected_server.default_role in user.roles else len(user.roles)
 
                         
-                        modmailpingresult = modmailping.find_one({'guild_id': selected_server.id})
+                        modmailpingresult = await modmailping.find_one({'guild_id': selected_server.id})
                         modmailroles = ""
                         if modmailpingresult:
                             modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if selected_server.get_role(roleid) is not None]
@@ -243,7 +241,7 @@ class Modmailevnt(commands.Cog):
                 channel = self.client.get_channel(channel_id)
                 mention = ""
                 if channel:
-                    modmailalertsresult = modmailalerts.find_one({'channel_id': channel.id})
+                    modmailalertsresult = await modmailalerts.find_one({'channel_id': channel.id})
                     if modmailalertsresult:
                         mention = modmailalertsresult.get('alert')
                         modmailalerts.delete_one({'channel_id': channel.id, 'alert': mention})                         

@@ -4,14 +4,13 @@ from discord.ext import commands
 
 from datetime import datetime
 from typing import Optional
-from pymongo import MongoClient
-import requests
+from motor.motor_asyncio import AsyncIOMotorClient
 import aiohttp
 import os
 from dotenv import load_dotenv
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
 modules = db['Modules']
@@ -234,7 +233,7 @@ class Utility(commands.Cog):
         self.client.help_command = None
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return True
      if modulesdata['Utility'] == True:   
@@ -243,10 +242,10 @@ class Utility(commands.Cog):
         return False
 
 
-    def check_database_connection(self):
+    async def check_database_connection(self):
         try:
 
-            db.command("ping")
+            await db.command("ping")
             return "Connected"
         except Exception as e:
             print(f"Error interacting with the database: {e}")
@@ -289,7 +288,7 @@ class Utility(commands.Cog):
             user = ctx.author
         user_badges = badges.find({'user_id': user.id})            
         badge_values = ""
-        for badge_data in user_badges:
+        async for badge_data in user_badges:
          badge = badge_data['badge']
          badge_values += f"{badge}\n"
       
@@ -326,7 +325,7 @@ class Utility(commands.Cog):
         server_icon = "https://cdn.discordapp.com/icons/1092976553752789054/2dc2c537051eb6af1fb82fae74f59b96.png?size=1024"
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
-        database_status = self.check_database_connection()
+        database_status = await self.check_database_connection()
         embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/2dc2c537051eb6af1fb82fae74f59b96.png?size=1024")

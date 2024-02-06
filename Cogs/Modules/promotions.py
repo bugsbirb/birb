@@ -5,13 +5,12 @@ from discord import app_commands
 from discord.ext import commands, tasks
 import os
 from dotenv import load_dotenv
-from pymongo import MongoClient
 from emojis import *
 from typing import Literal, Optional
 from permissions import has_admin_role, has_staff_role
 MONGO_URL = os.getenv('MONGO_URL')
-
-client = MongoClient(MONGO_URL)
+from motor.motor_asyncio import AsyncIOMotorClient
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -24,7 +23,7 @@ class promo(commands.Cog):
         self.client = client
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Promotions'] == True:   
@@ -46,6 +45,7 @@ class promo(commands.Cog):
         if not await has_admin_role(ctx):
          return             
          
+   
         if ctx.author == staff:
          await ctx.send(f"{no} You can't promote yourself.")
          return
@@ -64,7 +64,7 @@ class promo(commands.Cog):
             return
 
 
-        custom = Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Promotions'})
+        custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Promotions'})
         if custom:
             replacements = {
             '{staff.mention}': staff.mention,
@@ -117,10 +117,10 @@ class promo(commands.Cog):
 
 
         guild_id = ctx.guild.id
-        data = promochannel.find_one({'guild_id': guild_id})
-        consent_data = consent.find_one({"user_id": staff.id})
+        data = await promochannel.find_one({'guild_id': guild_id})
+        consent_data = await consent.find_one({"user_id": staff.id})
         if consent_data is None:
-            consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
+            await consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
             consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}            
         if data:
          channel_id = data['channel_id']

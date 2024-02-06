@@ -2,11 +2,11 @@ import discord
 import discord
 from discord.ext import commands
 from discord.ext import commands
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from discord.ui import View, button
 import os
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 arole = db['adminrole']
@@ -19,7 +19,7 @@ class suggestions(commands.Cog):
         self.client = client
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata.get('Suggestions', False) == True: 
@@ -43,7 +43,7 @@ class suggestions(commands.Cog):
             "downvoters": [],
             'guild_id': ctx.guild.id
         }
-        result = suggestions_collection.insert_one(suggestion_data)
+        result = await suggestions_collection.insert_one(suggestion_data)
         suggestion_id = result.inserted_id
 
         embed = discord.Embed(title="", description=f"**Submitter**\n {ctx.author.mention} \n\n**Suggestion**\n{suggestion}", color=discord.Color.dark_embed())
@@ -52,7 +52,7 @@ class suggestions(commands.Cog):
         embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
         embed.set_footer(text=f"0 Upvotes | 0 Downvotes")
         view = SuggestionView()
-        channeldata = suggestschannel.find_one({"guild_id": ctx.guild.id})
+        channeldata = await suggestschannel.find_one({"guild_id": ctx.guild.id})
         if channeldata:
          channel_id = channeldata['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -60,7 +60,7 @@ class suggestions(commands.Cog):
           try:  
            msg = await channel.send(embed=embed, view=view)
            await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.")
-           suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})           
+           await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})           
           except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")              
              return
@@ -74,16 +74,9 @@ class suggestions(commands.Cog):
 
 
 
-    async def on_timeout(self):
-        self.clear_items()
+
     async def update_embed(self, interaction: discord.Interaction):
-        suggestion_data = suggestions_collection.find_one({"_id": self.suggestion_id})
-        embed = interaction.message.embeds[0]
-        upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
-        embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")
-        await interaction.message.edit(embed=embed)
-    async def update_embed(self, interaction: discord.Interaction):
-        suggestion_data = suggestions_collection.find_one({"_id": self.suggestion_id})
+        suggestion_data = await suggestions_collection.find_one({"_id": self.suggestion_id})
         embed = interaction.message.embeds[0]
         upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
         embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")
@@ -99,7 +92,7 @@ class SuggestionView(discord.ui.View):
     @button(label='Upvote', style=discord.ButtonStyle.green, custom_id="upvote_button", emoji="<:UpVote:1183063056834646066>")
     async def Yes(self, interaction, button):
         message_id = interaction.message.id
-        suggestion_data = suggestions_collection.find_one({"message_id": message_id})
+        suggestion_data = await suggestions_collection.find_one({"message_id": message_id})
         if suggestion_data is None:
             await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
             return
@@ -107,18 +100,18 @@ class SuggestionView(discord.ui.View):
         downvoters = suggestion_data.get("downvoters", [])
 
         if interaction.user.id in upvoters:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"upvotes": -1},
                     "$pull": {"upvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id})  
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Unvoted.", ephemeral=True)
         elif interaction.user.id in downvoters:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"upvotes": 1, "downvotes": -1},
@@ -126,25 +119,25 @@ class SuggestionView(discord.ui.View):
                     "$push": {"upvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id})  
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Switched to upvote.", ephemeral=True)
         else:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"upvotes": 1},
                     "$push": {"upvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id})  
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Upvoted.", ephemeral=True)
 
     @button(label='Downvote', style=discord.ButtonStyle.red, custom_id="downvote_button", emoji="<:DownVote:1183063097477451797>")
     async def No(self, interaction, button):
         message_id = interaction.message.id
-        suggestion_data = suggestions_collection.find_one({"message_id": message_id})
+        suggestion_data = await suggestions_collection.find_one({"message_id": message_id})
         if suggestion_data is None:
             await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
             return        
@@ -152,18 +145,18 @@ class SuggestionView(discord.ui.View):
         downvoters = suggestion_data.get("downvoters", [])
 
         if interaction.user.id in downvoters:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"downvotes": -1},
                     "$pull": {"downvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id})  
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Unvoted.", ephemeral=True)
         elif interaction.user.id in upvoters:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"upvotes": -1, "downvotes": 1},
@@ -171,18 +164,18 @@ class SuggestionView(discord.ui.View):
                     "$push": {"downvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id}) 
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id}) 
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Switched to downvote.", ephemeral=True)
         else:
-            suggestions_collection.update_one(
+            await suggestions_collection.update_one(
                 {"message_id": message_id},
                 {
                     "$inc": {"downvotes": 1},
                     "$push": {"downvoters": interaction.user.id},
                 },
             )
-            suggestion_data = suggestions_collection.find_one({"message_id": message_id})  
+            suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
             await interaction.response.send_message("Downvoted.", ephemeral=True)
 
@@ -199,7 +192,7 @@ class SuggestionView(discord.ui.View):
     @button(label='Voters List', style=discord.ButtonStyle.gray, custom_id="view_voters_button", emoji="<:List:1179470251860185159>")
     async def view_voters(self, interaction, button):
         message_id = interaction.message.id
-        suggestion_data = suggestions_collection.find_one({"message_id": message_id})
+        suggestion_data = await suggestions_collection.find_one({"message_id": message_id})
 
         upvoters = suggestion_data.get("upvoters", [])
         downvoters = suggestion_data.get("downvoters", [])
