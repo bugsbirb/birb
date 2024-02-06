@@ -134,9 +134,9 @@ class Feedback(commands.Cog):
     async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
      
      if scope == "global":
-        staff_ratings = list(stafffeedback.find({'staff': staff.id}))
+        staff_ratings = stafffeedback.find({'staff': staff.id}).to_list(length=None)
      elif scope == "server":
-        staff_ratings = list(stafffeedback.find({'guild_id': ctx.guild.id, 'staff': staff.id}))
+        staff_ratings = stafffeedback.find({'guild_id': ctx.guild.id, 'staff': staff.id}).to_list(length=None)
      else:
         await ctx.send(f"{no} Invalid scope. Please use 'global' or 'server'.")
         return
@@ -184,9 +184,9 @@ class ViewRatings(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         if self.scope == "global":
-            staff_ratings = list(stafffeedback.find({'staff': self.staff.id}))
+            staff_ratings = stafffeedback.find({'staff': self.staff.id}).to_list(length=None)
         elif self.scope == "server":
-            staff_ratings = list(stafffeedback.find({'guild_id': interaction.guild.id, 'staff': self.staff.id}))
+            staff_ratings = stafffeedback.find({'guild_id': interaction.guild.id, 'staff': self.staff.id}).to_list(length=None)
         embeds = []
         for idx, rating in enumerate(staff_ratings):
             if idx % 9 == 0: 
