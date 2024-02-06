@@ -39,7 +39,8 @@ LOARole = db['LOA Role']
 suspensions = db['Suspensions']
 infractiontypes = db['infractiontypes']
 consent = db['consent']
-modules = db['modules']
+modules = db['Modules']
+collection = db['infractions']
 Customisation = db['Customisation']
 
 
