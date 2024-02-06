@@ -96,9 +96,9 @@ class Feedback(commands.Cog):
        if existing_feedback:
         await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.")
         return
-
+       
        rating_value = rating.split("/")[0]
-       feedbackid = stafffeedback.count_documents({}) + 1
+       feedbackid = await stafffeedback.count_documents({}) + 1
        feedbackdata = {
         'guild_id': ctx.guild.id,
         'rating': rating_value,
@@ -111,7 +111,7 @@ class Feedback(commands.Cog):
        }
        await stafffeedback.insert_one(feedbackdata)
        await ctx.send(f"{tick} You've rated **@{staff.display_name}** {rating}!")
-       data = feedbackch.find_one({'guild_id': ctx.guild.id})
+       data = await feedbackch.find_one({'guild_id': ctx.guild.id})
        if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
