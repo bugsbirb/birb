@@ -135,18 +135,19 @@ class Feedback(commands.Cog):
      
      if scope == "global":
         staff_ratings = stafffeedback.find({'staff': staff.id}).to_list(length=None)
+        total_ratings = await stafffeedback.count_documents({'staff': staff.id})
      elif scope == "server":
         staff_ratings = stafffeedback.find({'guild_id': ctx.guild.id, 'staff': staff.id}).to_list(length=None)
+        total_ratings = await stafffeedback.count_documents({'guild_id': ctx.guild.id, 'staff': staff.id})
      else:
         await ctx.send(f"{no} Invalid scope. Please use 'global' or 'server'.")
         return
 
-     total_ratings = len(staff_ratings)
-
+     
      if total_ratings == 0:
         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find any rating for this user.")
         return
-
+     staff_ratings = await staff_ratings
      sum_ratings = sum(int(rating['rating'].split('/')[0]) for rating in staff_ratings)
      average_rating = int(sum_ratings / total_ratings) 
 
@@ -188,6 +189,7 @@ class ViewRatings(discord.ui.View):
         elif self.scope == "server":
             staff_ratings = stafffeedback.find({'guild_id': interaction.guild.id, 'staff': self.staff.id}).to_list(length=None)
         embeds = []
+        staff_ratings = await staff_ratings
         for idx, rating in enumerate(staff_ratings):
             if idx % 9 == 0: 
                 embed = discord.Embed(title="Staff Ratings", color=discord.Color.dark_theme())
