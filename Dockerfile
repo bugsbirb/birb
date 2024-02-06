@@ -1,8 +1,11 @@
-FROM python:3.11
+FROM python:3.12.1
 
 RUN apt-get update && apt-get install -y git
 
 WORKDIR /app
+ENV VIRTUAL_ENV "/venv"
+RUN python -m venv $VIRTUAL_ENV
+ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 
 COPY requirements.txt /app/
 
