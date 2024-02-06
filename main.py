@@ -6,7 +6,6 @@ from discord.ext import commands, tasks
 import sentry_sdk
 import os
 from dotenv import load_dotenv
-from dateutil.relativedelta import relativedelta
 from Cogs.Modules.astro import Helpdesk
 from Cogs.Modules.reports import ReportPanel
 from Cogs.Modules.suggestions import SuggestionView
