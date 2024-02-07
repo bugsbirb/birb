@@ -98,8 +98,7 @@ class client(commands.AutoShardedBot):
         print(prfx + " Discord Version " + discord.__version__)
         print(prfx + " Python Version " + str(platform.python_version()))
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
-        with open('botlogo.gif', 'rb') as avatar:
-            await client.user.edit(avatar=avatar.read())
+
 
 
     async def on_connect(self):
