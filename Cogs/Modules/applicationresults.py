@@ -14,8 +14,9 @@ from typing import Literal, Optional
 import os
 from permissions import *
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 
 db = client['astro']
 scollection = db['staffrole']
@@ -31,7 +32,7 @@ class ApplicationResults(commands.Cog):
 
 
     async def modulecheck(self, ctx): 
-     modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
+     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Applications'] == True:   
