@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from emojis import *
-from dotenv import load_dotenv
 
 
 class welcome(commands.Cog):

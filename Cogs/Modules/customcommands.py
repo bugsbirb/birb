@@ -1,14 +1,10 @@
 import discord
 from discord.ext import commands
 from discord.ext import commands
-import platform
-from dotenv import load_dotenv
 from emojis import *
 from discord import app_commands
 import os
-from typing import  Literal
 import typing
-import re
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from permissions import has_admin_role

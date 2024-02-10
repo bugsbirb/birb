@@ -6,7 +6,6 @@ import datetime
 import pytz
 from discord import app_commands
 import os
-from dotenv import load_dotenv
 from emojis import *
 from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient

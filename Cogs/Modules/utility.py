@@ -7,7 +7,6 @@ from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 import aiohttp
 import os
-from dotenv import load_dotenv
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
@@ -322,13 +321,13 @@ class Utility(commands.Cog):
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):
         server_name = "Astro Birb"
-        server_icon = "https://cdn.discordapp.com/icons/1092976553752789054/2dc2c537051eb6af1fb82fae74f59b96.png?size=1024"
+        server_icon = self.client.user.display_avatar
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
         embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         embed.set_author(name=server_name, icon_url=server_icon)
-        embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/2dc2c537051eb6af1fb82fae74f59b96.png?size=1024")
+        embed.set_thumbnail(url=server_icon)
         await ctx.send(embed=embed)        
         
 

@@ -70,8 +70,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.blacklist",
             "Cogs.Events.AstroSupport.topgg",
             "Cogs.Events.AstroSupport.analytics",
-            "Cogs.Modules.datamanage",
-            'Cogs.Events.AstroSupport.alerts'
+            "Cogs.Modules.datamanage"
         ]
 
     async def load_jishaku(self):

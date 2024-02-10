@@ -4,9 +4,7 @@ from discord.ext import commands
 from emojis import *
 import os
 import random
-from datetime import datetime
 import chat_exporter
-from dotenv import load_dotenv
 import io   
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')

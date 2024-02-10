@@ -1,24 +1,17 @@
-import sqlite3
 import discord
 from discord.ext import commands
-from typing import Literal
 import random
 import string
-import asyncio
-from typing import Union, Optional
-import sqlite3
 from discord.ext import commands
 import datetime
-from discord import app_commands
 import Paginator
 from pymongo import MongoClient
 import os
-from dotenv import load_dotenv
 from emojis import *
 from datetime import datetime
 
 from datetime import timedelta
-from permissions import has_admin_role, has_staff_role
+from permissions import has_admin_role
 
 MONGO_URL = os.getenv("MONGO_URL")
 client = MongoClient(MONGO_URL)

@@ -8,7 +8,6 @@ from discord.ext import commands, tasks
 
 from emojis import *
 import os
-from dotenv import load_dotenv
 
 from datetime import datetime
 

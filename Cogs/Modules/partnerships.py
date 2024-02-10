@@ -4,7 +4,6 @@ from discord import app_commands
 from emojis import *
 import typing
 import os
-from dotenv import load_dotenv
 import Paginator
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -16,7 +15,7 @@ arole = db['adminrole']
 partnerships = db['Partnerships']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
-from permissions import has_admin_role, has_staff_role
+from permissions import has_admin_role
 
 
 

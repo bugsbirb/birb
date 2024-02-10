@@ -1,8 +1,4 @@
-import discord
 from discord.ext import commands, tasks
-from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
 from emojis import *
 import topgg
 

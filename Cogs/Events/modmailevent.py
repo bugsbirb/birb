@@ -5,11 +5,8 @@ import asyncio
 from datetime import datetime, timedelta
 
 
-from discord import app_commands
-from pymongo import MongoClient
 from emojis import *
 import os
-from dotenv import load_dotenv
 import chat_exporter
 import random
 import io

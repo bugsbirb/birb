@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import asyncio
 from emojis import *
-from dotenv import load_dotenv
 
 
 class AForumCreaton(commands.Cog):

@@ -4,7 +4,6 @@ sys.dont_write_bytecode = True
 import discord
 from Cogs.Modules.loa import *
 import os
-from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
 MONGO_URL = os.getenv('MONGO_URL')

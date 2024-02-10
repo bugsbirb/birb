@@ -5,7 +5,6 @@ from discord.ext import commands
 from emojis import * 
 from datetime import datetime
 import os
-from dotenv import load_dotenv
 import Paginator
 from permissions import *
 

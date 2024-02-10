@@ -2,12 +2,11 @@ import discord
 import discord
 from discord.ext import commands
 from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import commands
 import os
-from dotenv import load_dotenv
 from emojis import *
 from typing import Literal, Optional
-from permissions import has_admin_role, has_staff_role
+from permissions import has_admin_role
 MONGO_URL = os.getenv('MONGO_URL')
 from motor.motor_asyncio import AsyncIOMotorClient
 client = AsyncIOMotorClient(MONGO_URL)

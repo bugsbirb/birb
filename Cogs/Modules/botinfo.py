@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord.ext import commands
 import platform
-from dotenv import load_dotenv
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')

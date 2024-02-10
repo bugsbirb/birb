@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -7,7 +6,7 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 analytics = db['analytics']
 import time
-import time
+
 
 class analyticss(commands.Cog):
     def __init__(self, client: commands.Bot):

@@ -1,19 +1,9 @@
 import discord
-from discord.ext import commands, tasks
-import asyncio
-import sqlite3
-from datetime import datetime, timedelta
-from typing import Optional
-import pytz
-from discord import app_commands
-from pymongo import MongoClient
+from discord.ext import commands
 from emojis import *
-import typing
-import Paginator
-from typing import Literal, Optional
+from typing import Literal
 import os
 from permissions import *
-from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)

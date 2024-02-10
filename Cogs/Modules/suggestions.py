@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
-from discord.ui import View, button
+from discord.ui import button
 import os
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)

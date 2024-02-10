@@ -1,11 +1,8 @@
-from typing import Optional
 import discord
 from discord.ext import commands
-from discord import app_commands
 from discord.ext import commands
 from pymongo import MongoClient
 import os
-from dotenv import load_dotenv
 from emojis import *
 from Cogs.Configuration.Views.infractionsview import InfractionChannel
 

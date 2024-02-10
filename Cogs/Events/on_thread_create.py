@@ -4,7 +4,6 @@ import asyncio
 from emojis import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
-from dotenv import load_dotenv
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
