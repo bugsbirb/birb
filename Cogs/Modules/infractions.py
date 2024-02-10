@@ -180,8 +180,8 @@ class Infractions(commands.Cog):
             if annoymous == True:
                 embed.remove_author()
             else:
-                embed.set_author(name=f"Signed, {staff.display_name}", icon_url=staff.display_avatar)
-
+                embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.display_avatar)
+            
             embed.set_footer(text=f"Infraction ID | {random_string}")
             if expiration:
                 embed.description = f"{embed.description}\n* **Expiration:** <t:{int(end_time.timestamp())}:D>"
