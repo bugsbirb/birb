@@ -26,7 +26,7 @@ modules = db['Modules']
 
 class LOAChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='LOA Channel')
+        super().__init__(placeholder='LOA Channel', channel_types=[discord.ChannelType.text])
         self.author = author
 
     async def callback(self, interaction: discord.Interaction):

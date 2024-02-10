@@ -25,7 +25,7 @@ ReportModeratorRole = db['Report Moderator Role']
 
 class ReportChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Report Channel')
+        super().__init__(placeholder='Report Channel',  channel_types=[discord.ChannelType.text])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

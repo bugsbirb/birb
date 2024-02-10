@@ -22,7 +22,7 @@ partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 class PartnershipChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Partnership Channel')
+        super().__init__(placeholder='Partnership Channel',  channel_types=[discord.ChannelType.text])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

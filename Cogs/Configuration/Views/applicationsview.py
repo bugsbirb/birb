@@ -56,7 +56,7 @@ class ToggleApplications(discord.ui.Select):
 
 class ApplicationChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Application Channel')
+        super().__init__(placeholder='Application Channel',  channel_types=[discord.ChannelType.text])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

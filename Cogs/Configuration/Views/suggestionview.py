@@ -24,7 +24,7 @@ modules = db['Modules']
 suggestschannel = db["suggestion channel"]
 class SuggestionsChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Suggestion Channel')
+        super().__init__(placeholder='Suggestion Channel',   channel_types=[discord.ChannelType.text])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
