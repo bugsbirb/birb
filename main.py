@@ -12,7 +12,7 @@ from Cogs.Modules.suggestions import SuggestionView
 import time
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
-
+from Cogs.Modules.astro import CustomRoleButtons
 load_dotenv()
 
 PREFIX = os.getenv("PREFIX")
@@ -86,6 +86,7 @@ class client(commands.AutoShardedBot):
         self.add_view(ReportPanel())
         self.add_view(Confirm())
         self.add_view(Voting())
+        self.add_view(CustomRoleButtons())
 
         for ext in self.cogslist:
             await self.load_extension(ext)

@@ -14,7 +14,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 blacklists = db['blacklists']
 modules = db['Modules']
-
+customroles = db['customroles']
 modules = db['Modules']
 class HelpdeskDropdown(discord.ui.Select):
     def __init__(self):
@@ -49,15 +49,94 @@ class HelpdeskDropdown(discord.ui.Select):
         await interaction.response.send_message(embed=embed, ephemeral=True)
             
 
+            
+class CreateCustomRole(discord.ui.Modal, title='Create your speciailised role!'):
+
+    rolename = discord.ui.TextInput(
+        label='Rolename',
+        placeholder='Enter a rolename',
+        style=discord.TextStyle.short,
+        required=True
+    )
+    color = discord.ui.TextInput(
+        label='Color',
+        placeholder='Enter a color (hex)',
+        style=discord.TextStyle.short,
+        required=True
+    )
+    
+
+    async def on_submit(self, interaction: discord.Interaction):
+        result = await customroles.find_one({'user': interaction.user.id})
+        if result:
+            embed = discord.Embed(title="", description="You already have a custom role!", color=discord.Color.dark_embed())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        role2 = discord.utils.get(interaction.guild.roles, name="​      Supporters        ​")
+        position = role2.position + 1
+
+
+
+        role = await interaction.guild.create_role(name=self.rolename.value, color=discord.Color(int(self.color.value.lstrip('#'), 16)))
+        await customroles.insert_one({'user': interaction.user.id, 'rolename': self.rolename.value, 'roleid': role.id})
+        await interaction.user.add_roles(role)
+        await role.edit(position=position)
+        await interaction.response.send_message(content=f"{tick} Your role has been created!\n> If you want a role icon contact someone from the Operators team.", ephemeral=True)
+
+    
+
+class CustomRoleButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Create", style=discord.ButtonStyle.success, custom_id="create") 
+    async def create(self, interaction: discord.Interaction,  button: discord.ui.Button):
+        result = await customroles.find_one({'user': interaction.user.id})
+        if result:
+            embed = discord.Embed(title="", description="You already have a custom role!", color=discord.Color.dark_embed())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+        await interaction.response.send_modal(CreateCustomRole())            
+
+    @discord.ui.button(label="Delete", style=discord.ButtonStyle.red, custom_id="Delete") 
+    async def Delete(self, interaction: discord.Interaction,  button: discord.ui.Button):
+        result = await customroles.find_one({'user': interaction.user.id})
+        if not result:
+            embed = discord.Embed(title="", description="You don't have a custom role!", color=discord.Color.dark_embed())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+        try:
+         result = await customroles.find_one({'user': interaction.user.id})
+         role = interaction.guild.get_role(result['roleid'])
+         if role is None:
+                await customroles.delete_one({'user': interaction.user.id})
+                embed = discord.Embed(title="", description="Your role was not found please make a new one.", color=discord.Color.dark_embed())
+                await interaction.response.send_message(embed=embed, ephemeral=True)
+                return
+         await interaction.user.remove_roles(role)
+         await customroles.delete_one({'user': interaction.user.id})
+         await role.delete()
+        except discord.HTTPException or discord.Forbidden:
+            await interaction.response.send_message(f"{no} An error occured while deleting your role.\n> Contact admins", ephemeral=True)
+            return 
+        await interaction.response.send_message(content=f"{tick} Your role has been deleted!", ephemeral=True)
+
+
+
+
 class Helpdesk(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
         self.add_item(HelpdeskDropdown())
 
+
+
+
 class management(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
-
+ 
     @commands.command()
     @commands.is_owner()
     async def addbadge(self, ctx, user: discord.Member, *, badge):
@@ -94,6 +173,18 @@ class management(commands.Cog):
         view = Helpdesk()
         await ctx.send(embeds=(banner, main), view=view)
 
+    @commands.command()
+    @commands.is_owner()
+    async def customroles(self, ctx):
+        embed = discord.Embed(title=f"Supporters Custom Roles", description="Thank you for being a supporter of **Astro Birb**! You can get 1 Custom Role!",color=discord.Color.dark_embed())
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.set_thumbnail(url=ctx.guild.icon)
+        embed.set_footer(text=f"Supporters Custom Roles", icon_url=ctx.guild.icon)
+        view = CustomRoleButtons()
+        await ctx.send(embed=embed, view=view)
+
+
+    
     @commands.command()
     @commands.is_owner()
     async def analytics(self, ctx):
@@ -182,7 +273,28 @@ class management(commands.Cog):
 
 
         
-        
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        if isinstance(before, discord.Member) and isinstance(after, discord.Member):
+            custom_role = await customroles.find_one({'user': after.id})
+
+            if custom_role:
+
+                target_role_id = 1160541890035339264  
+                removed_roles = set(before.roles) - set(after.roles)
+                for role in removed_roles:
+                    if role.id == target_role_id and custom_role['roleid'] == role.id:
+                        try:
+                            guild = after.guild
+                            custom_role_obj = guild.get_role(custom_role['roleid'])
+                            await custom_role_obj.delete()
+                            await customroles.delete_one({'user': after.id})
+                            print(f"Custom role deleted for {after.name} ({after.id}).")
+                        except discord.HTTPException:
+                            print(f"Failed to delete the custom role for {after.name} ({after.id}).")
+
+
+
       
         
         
