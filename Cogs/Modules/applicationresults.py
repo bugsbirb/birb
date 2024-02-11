@@ -84,11 +84,7 @@ class ApplicationResults(commands.Cog):
                         f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in {channel.mention}."
                     )
                     return
-                view = JumpUrl(msg.jump_url)
-                try:
-                    await applicant.send(f"<:ApplicationFeedback:1178754449125167254> **{applicant.display_name}**, you application has been reviewed.", view=view)
-                except discord.Forbidden:
-                    pass
+
                 if result == 'Passed':
                     roles_data = await ApplicationsRolesDB.find_one({"guild_id": ctx.guild.id})
                     if roles_data:
@@ -111,11 +107,7 @@ class ApplicationResults(commands.Cog):
             )
 
 
-class JumpUrl(discord.ui.View):
-    def __init__(self, jumpurl):
-        super().__init__()
-        url = jumpurl
-        self.add_item(discord.ui.Button(label='Results', url=url, style=discord.ButtonStyle.blurple))
+
 
 
 
