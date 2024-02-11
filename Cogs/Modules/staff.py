@@ -450,7 +450,7 @@ class quota(commands.Cog):
              if content in ["None", None]:
                 content = ""     
              await ctx.channel.send(content, embed=embed, view=view)
-             await ctx.send(f"**{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
              return   
             
             else:
@@ -458,7 +458,7 @@ class quota(commands.Cog):
              embed.set_thumbnail(url=ctx.guild.icon)
              embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
              view = Staffview()
-             await ctx.send(f"**{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
              try:
               await ctx.channel.send(embed=embed, view=view)
              except discord.errors.HTTPException or discord.errors.Forbidden:
