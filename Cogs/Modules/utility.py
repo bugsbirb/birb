@@ -283,7 +283,7 @@ class Utility(commands.Cog):
         
 
     @commands.hybrid_command()
-    async def user(self, ctx, user: Optional[discord.Member] = None):
+    async def user(self, ctx, user: Optional[discord.User] = None):
         """Displays users information"""        
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
@@ -296,7 +296,17 @@ class Utility(commands.Cog):
         async for badge_data in user_badges:
          badge = badge_data['badge']
          badge_values += f"{badge}\n"
-      
+        try:
+         member = await ctx.guild.fetch_member(user.id)
+        except discord.HTTPException:
+            member = None 
+         
+        if not member:
+            embed = discord.Embed(title=f"@{user.display_name}", description=f"## <:Scaredbirb:1178005514584596580> Not inside of server ", color=0x2b2d31)
+            embed.set_thumbnail(url=user.display_avatar.url)    
+            embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
+            await ctx.send(embed=embed)
+            return
         embed = discord.Embed(title=f"@{user.display_name}", description=f"{badge_values}", color=0x2b2d31)
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
