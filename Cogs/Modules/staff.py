@@ -559,7 +559,7 @@ class StaffPanel(discord.ui.Select):
 
     async def update_options(self, interaction: discord.Interaction):
         try: 
-         results = self.collection.find({'guild_id': interaction.guild.id}).limit(24)
+         results = self.collection.find({'guild_id': interaction.guild.id}).limit(23)
          options = [discord.SelectOption(label='Reload', description='Reload the staff panel', emoji='<:staticload:1206248311280111616>')]
          if self.collection.count_documents({'guild_id': interaction.guild.id}) > 1:
             options.append(discord.SelectOption(label='Load More', description='Load more staff members', emoji='<:select:1206247978050916423>'))
