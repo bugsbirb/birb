@@ -421,7 +421,7 @@ class quota(commands.Cog):
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:
-            if custom['embed'] == True:
+            if custom.get('embed') == True:
              embed_title = custom.get('title', None)
              embed_description = custom.get('description', None)
              embed_author = custom.get('author', None)
@@ -452,6 +452,16 @@ class quota(commands.Cog):
              await ctx.channel.send(content, embed=embed, view=view)
              await ctx.send(f"**{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
              return   
+            
+            else:
+             embed = discord.Embed(title="Staff Panel", description="Select a staff member to view their information.", color=discord.Color.dark_embed())
+             embed.set_thumbnail(url=ctx.guild.icon)
+             embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+             view = Staffview()
+             await ctx.send(f"**{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             await ctx.channel.send(embed=embed, view=view)
+             return   
+
         else:
             embed = discord.Embed(title="Staff Panel", description="Select a staff member to view their information.", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=ctx.guild.icon)
