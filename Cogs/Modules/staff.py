@@ -487,6 +487,7 @@ class StaffPanel(discord.ui.Select):
                 return
 
             result = self.collection.find_one({'name': value, 'guild_id': interaction.guild.id})
+            print(f"{result} + Guild = {interaction.guild.name}")
             if value == 'Load More':
                 results = self.collection.find({'guild_id': interaction.guild.id})
                 staff_names = [result['name'] for result in results]
@@ -541,7 +542,7 @@ class StaffPanel(discord.ui.Select):
             options.append(discord.SelectOption(label='Load More', description='Load more staff members', emoji='<:select:1206247978050916423>'))
          for result in results:
             staff_id = result['staff_id']
-            staff = interaction.guild.get_member(staff_id)
+            staff = await interaction.guild.fetch_member(staff_id)
             if staff:
 
                 if result.get('rolename', None) is not None:
@@ -549,7 +550,7 @@ class StaffPanel(discord.ui.Select):
                 else:
                     description = ''    
 
-                options.append(discord.SelectOption(label=staff.display_name, emoji='<:staff:1206248655359840326>', description=description))
+                options.append(discord.SelectOption(label=result['name'], emoji='<:staff:1206248655359840326>', description=description))
         except Exception as e:
             print(e)
         self.options = options
