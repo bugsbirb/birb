@@ -503,6 +503,7 @@ class StaffPanel(discord.ui.Select):
         super().__init__(placeholder='Staff', min_values=1, max_values=1, options=options, custom_id='persistent:staffpanel')
 
     async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
         try:
             value = self.values[0]
             if value in ('Reload', 'Load'):
@@ -521,7 +522,7 @@ class StaffPanel(discord.ui.Select):
                 embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
                 embed.set_thumbnail(url=interaction.guild.icon)
                 view = StaffButton()
-                await interaction.response.send_message(embed=embed, view=view, ephemeral=True  )
+                await interaction.followup.send(embed=embed, view=view, ephemeral=True  )
                 return
        
             if result:
@@ -530,7 +531,7 @@ class StaffPanel(discord.ui.Select):
                     if staff is None:
                         staff = await interaction.guild.fetch_member(staff_id)
                         if staff is None:
-                            await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
+                            await interaction.followup.send(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
                             return
                     if staff:
                         timezone = ""
@@ -547,10 +548,10 @@ class StaffPanel(discord.ui.Select):
                         )
                         embed.set_thumbnail(url=staff.display_avatar)
                         embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)
-                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                        await interaction.followup.send(embed=embed, ephemeral=True)
                         print('3')
                     else:
-                        await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
+                        await interaction.followup.send(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
 
                         
         except Exception as e:
@@ -577,7 +578,7 @@ class StaffPanel(discord.ui.Select):
         except Exception as e:
             print(e)
         self.options = options
-        await interaction.response.edit_message(view=self.view)
+        await interaction.edit_original_response(view=self.view)
         
 
 class StaffButton(discord.ui.View):
