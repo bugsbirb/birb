@@ -503,6 +503,11 @@ class StaffPanel(discord.ui.Select):
             if result:
                     staff_id = result['staff_id']
                     staff = interaction.guild.get_member(staff_id)
+                    if staff is None:
+                        staff = await interaction.guild.fetch_member(staff_id)
+                        if staff is None:
+                            await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
+                            return
                     if staff:
                         timezone = ""
                         introduction = ""
@@ -516,12 +521,14 @@ class StaffPanel(discord.ui.Select):
                             description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rank']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                             color=discord.Color.dark_embed()
                         )
-                        embed.set_thumbnail(url=staff.avatar.url)
-                        embed.set_author(name=staff.display_name, icon_url=staff.avatar.url)
+                        embed.set_thumbnail(url=staff.display_avatar)
+                        embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)
                         await interaction.response.send_message(embed=embed, ephemeral=True)
                         print('3')
                     else:
                         await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
+
+                        
         except Exception as e:
             print(e)
             

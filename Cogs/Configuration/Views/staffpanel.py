@@ -302,7 +302,6 @@ class NoEmbeds(discord.ui.View):
         
         if not message.embeds:
              embed_data = {
-            "name": self.name,
             "guild_id": interaction.guild.id,
             "content": message.content
 
@@ -423,7 +422,7 @@ class Embeds(discord.ui.View):
         
         if not message.embeds:
              embed_data = {
-            "name": self.name,
+            "name": "Staff Panel",
             "guild_id": interaction.guild.id,
             "content": message.content
 
@@ -436,6 +435,7 @@ class Embeds(discord.ui.View):
             "description": embed.description,
             "color": color_hex,
             'embed': True,
+            'name': "Staff Panel",
             "author": embed.author.name if embed.author else None,
             "author_icon": embed.author.icon_url if embed.author else None,
             "thumbnail": embed.thumbnail.url if embed.thumbnail else None,
