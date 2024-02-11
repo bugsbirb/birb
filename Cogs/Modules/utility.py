@@ -164,6 +164,11 @@ class HelpMenu(discord.ui.Select):
             embed.title = "Promotions Module"
             embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
             embed.add_field(name="Commands", value="* /promote\n* /admin panel")
+        elif category == 'Staff Database & Panel':
+            embed.title = "Staff Database & Panel"
+            embed.description = "The Staff Database & Panel is a comprehensive tool for managing your server's staff team. It provides a centralized database for storing staff information and a user-friendly panel for efficient staff management. With this module, you can easily add, remove, and view staff members, ensuring a well-organized and effective staff team."
+            embed.add_field(name="Commands", value="* /staff add\n* /staff remove\n*/staff introduction\n* /staff panel")
+    
         elif category == 'Configuration':
             embed.title = "Configuration"
             embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Permissions, and Channels to tailor the bot's behavior to your server's requirements."
