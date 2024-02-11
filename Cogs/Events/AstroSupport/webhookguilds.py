@@ -36,16 +36,6 @@ class Support(discord.ui.View):
         self.add_item(discord.ui.Button(label='Support Server', url=url1, style=discord.ButtonStyle.blurple))
         self.add_item(discord.ui.Button(label='Documentation', url="https://docs.astrobirb.dev/overview", style=discord.ButtonStyle.blurple))
 
-    
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild):
-        channel_id = 1178362100737916988 
-        channel = self.client.get_channel(channel_id)
-        if channel:
-            webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
-
-            await webhook.send(f"<:leave:1140670848664096789> Farewell, **@{guild.name}.** I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
-        
 
 
 async def setup(client: commands.Bot) -> None:

@@ -13,6 +13,7 @@ import time
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.astro import CustomRoleButtons
+from Cogs.Modules.staff import Staffview
 load_dotenv()
 
 PREFIX = os.getenv("PREFIX")
@@ -47,7 +48,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Modules.stafflist",
             "Cogs.Modules.stafffeedback",
             "Cogs.Modules.reports",
-            "Cogs.Modules.quota",
+            "Cogs.Modules.staff",
             "Cogs.Modules.promotions",
             "Cogs.Modules.infractions",
             "Cogs.Modules.partnerships",
@@ -87,6 +88,7 @@ class client(commands.AutoShardedBot):
         self.add_view(Confirm())
         self.add_view(Voting())
         self.add_view(CustomRoleButtons())
+        self.add_view(Staffview())
 
         for ext in self.cogslist:
             await self.load_extension(ext)

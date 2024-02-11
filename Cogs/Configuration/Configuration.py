@@ -56,6 +56,9 @@ from Cogs.Configuration.Views.modmailview import ModmailCategory
 from Cogs.Configuration.Views.modmailview import ModmailPing
 from Cogs.Configuration.Views.modmailview import TranscriptChannel
 from Cogs.Configuration.Views.modmailview import ModmailToggle
+
+from Cogs.Configuration.Views.staffpanel import StaffData
+from Cogs.Configuration.Views.staffpanel import StaffCustomise
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -163,6 +166,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
         discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
+        discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
         discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
@@ -551,9 +555,23 @@ class Config(discord.ui.Select):
             view = Modmail(interaction.user)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+        elif color == 'Staff Database & Panel':
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            if moduleddata:
+                modulemsg = moduleddata.get('Staff Database', 'False')     
+            embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())
+            view = StaffDB(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
         await interaction.edit_original_response(embed=embed, view=view)
 
      
+class StaffDB(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.add_item(StaffData(author))
+        self.add_item(StaffCustomise(author))
+        self.add_item(Config(author))
 
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
