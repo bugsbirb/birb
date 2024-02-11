@@ -119,6 +119,7 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
             discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
+            discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
             discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),                   
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
             discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"),                        
