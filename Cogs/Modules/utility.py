@@ -168,7 +168,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Staff Database & Panel':
             embed.title = "Staff Database & Panel"
             embed.description = "The Staff Database & Panel is a comprehensive tool for managing your server's staff team. It provides a centralized database for storing staff information and a user-friendly panel for efficient staff management. With this module, you can easily add, remove, and view staff members, ensuring a well-organized and effective staff team."
-            embed.add_field(name="Commands", value="* /staff add\n* /staff remove\n*/staff introduction\n* /staff panel")
+            embed.add_field(name="Commands", value="* /staff add\n* /staff remove\n* /staff introduction\n* /staff panel")
     
         elif category == 'Configuration':
             embed.title = "Configuration"

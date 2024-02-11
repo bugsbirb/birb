@@ -459,7 +459,11 @@ class quota(commands.Cog):
              embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
              view = Staffview()
              await ctx.send(f"**{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
-             await ctx.channel.send(embed=embed, view=view)
+             try:
+              await ctx.channel.send(embed=embed, view=view)
+             except discord.errors.HTTPException or discord.errors.Forbidden:
+                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
+                return
              return   
 
         else:
