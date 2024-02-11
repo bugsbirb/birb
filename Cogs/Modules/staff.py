@@ -449,8 +449,12 @@ class quota(commands.Cog):
              content = custom.get('content', None)
              if content in ["None", None]:
                 content = ""     
-             await ctx.channel.send(content, embed=embed, view=view)
-             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             try:
+              await ctx.channel.send(content, embed=embed, view=view)
+              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             except discord.errors.HTTPException or discord.errors.Forbidden:
+                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
+                return              
              return   
             
             else:
@@ -458,9 +462,10 @@ class quota(commands.Cog):
              embed.set_thumbnail(url=ctx.guild.icon)
              embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
              view = Staffview()
-             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             
              try:
               await ctx.channel.send(embed=embed, view=view)
+              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
              except discord.errors.HTTPException or discord.errors.Forbidden:
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
                 return
