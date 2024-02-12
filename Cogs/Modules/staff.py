@@ -361,7 +361,7 @@ class quota(commands.Cog):
         if not await staffdb.find_one({'guild_id': ctx.guild.id, 'staff_id': staff.id}):
             return await ctx.send(f"{no} **{ctx.author.display_name}**, this user has not been added to the staff team.")
         try:
-            await staffdb.update_one({'guild_id': ctx.guild.id, 'staff_id': staff.id}, {'$set': {'rank': rank, 'timezone': timezone or None, 'introduction': introduction or None}})
+            await staffdb.update_one({'guild_id': ctx.guild.id, 'staff_id': staff.id}, {'$set': {'rolename': rank, 'timezone': timezone or None, 'introduction': introduction or None}})
         except Exception as e:
             print(e)
         await ctx.send(f'{tick} **{ctx.author.display_name},** staff member edited successfully.')
@@ -587,6 +587,7 @@ class StaffButton(discord.ui.View):
 
     @discord.ui.button(label='Search Staff', style=discord.ButtonStyle.secondary, custom_id='load_more_button')
     async def load_more_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+     
      await interaction.response.send_modal(StaffModal())
 
                 
