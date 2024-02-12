@@ -388,7 +388,7 @@ class quota(commands.Cog):
         if result:
             embed = discord.Embed(
                 title=staff.display_name,
-                description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rank']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rolename']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                 color=discord.Color.dark_embed()
             )
             embed.set_thumbnail(url=staff.display_avatar)
@@ -543,7 +543,7 @@ class StaffPanel(discord.ui.Select):
 
                         embed = discord.Embed(
                             title=staff.display_name,
-                            description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rank']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                            description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rolename']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                             color=discord.Color.dark_embed()
                         )
                         embed.set_thumbnail(url=staff.display_avatar)
@@ -618,7 +618,7 @@ class StaffModal(discord.ui.Modal, title='Search Staff'):
 
                         embed = discord.Embed(
                             title=staff.display_name,
-                            description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rank']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                            description=f"<:arrow:1166529434493386823> **Staff:** <@{staff.id}>\n<:arrow:1166529434493386823> **Rank:** {result['rolename']}{timezone}\n<:arrow:1166529434493386823> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                             color=discord.Color.dark_embed()
                         )
                         embed.set_thumbnail(url=staff.avatar.url)
