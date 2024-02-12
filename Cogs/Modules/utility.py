@@ -386,8 +386,13 @@ class Utility(commands.Cog):
     async def support(self, ctx):
         view = Support()
         bot_user = self.client.user
-        embed = discord.Embed(title="Support Server", description="Having bot issues? Join our support server and our team will help you.", color=0x2b2d31)
+        embed = discord.Embed(
+        title="🚀 Astro Support",
+        description="Encountering issues with Astro Birb? Our support team is here to help! Join our official support server using the link below.",
+        color=0x2b2d31
+    )
         embed.set_thumbnail(url=bot_user.avatar.url)
+        embed.set_author(name=bot_user.display_name, icon_url=bot_user.display_avatar)
         await ctx.send(embed=embed, view=view)
 
     @commands.command(aliases=["joinme", "join", "botinvite"])
@@ -436,18 +441,35 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed)
         exit(0)
 
+    @commands.hybrid_command()
+    async def vote(self, ctx):
+        embed = discord.Embed(title="🚀 Support Astro Birb", description="Hi there! If you enjoy using **Astro Birb**, consider upvoting it on the following platforms to help us grow and reach more servers. Your support means a lot! 🌟", color=discord.Color.dark_embed())
+        button = discord.ui.Button(label="Upvote", url="https://top.gg/bot/1113245569490616400/vote", emoji="<:topgg:1206665848408776795>", style=discord.ButtonStyle.blurple)
+        button2 = discord.ui.Button(label="Upvote", url="https://wumpus.store/bot/1113245569490616400/vote", emoji="<:wumpus_store:1206665807011258409>", style=discord.ButtonStyle.blurple)
+        button3 = discord.ui.Button(label="Upvote", url="https://discords.com/bots/bot/1113245569490616400/vote", emoji="<:Discords_noBG:1206666304107446352>", style=discord.ButtonStyle.blurple)
+        embed.set_thumbnail(url=self.client.user.display_avatar)
+        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
+        view = discord.ui.View()
+        view.add_item(button)
+        view.add_item(button2)
+        view.add_item(button3)
+        await ctx.send(embed=embed
+                       , view=view)
+   
 class invite(discord.ui.View):
     def __init__(self):
         super().__init__()
         url = f'https://discord.com/api/oauth2/authorize?client_id=1113245569490616400&permissions=1632557853697&scope=bot%20applications.commands'
-        self.add_item(discord.ui.Button(label='Invite', url=url, style=discord.ButtonStyle.blurple))
+        self.add_item(discord.ui.Button(label='Invite', url=url, style=discord.ButtonStyle.blurple, emoji="<:link:1206670134064717904>"))
+
 
        
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()
         url = f'https://discord.gg/DhWdgfh3hN'
-        self.add_item(discord.ui.Button(label='Join', url=url, style=discord.ButtonStyle.blurple))
+        self.add_item(discord.ui.Button(label='Join', url=url, style=discord.ButtonStyle.blurple, emoji="<:link:1206670134064717904>"))
+        self.add_item(discord.ui.Button(label='Documentation', url="https://docs.astrobirb.dev", style=discord.ButtonStyle.blurple, emoji="📚"))
 
 
 async def setup(client: commands.Bot) -> None:
