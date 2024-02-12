@@ -288,7 +288,7 @@ class Infractions(commands.Cog):
                 'voided': {'$ne': True}
             }
 
-        infractions = await collection.find(filter).to_list(length=None)
+        infractions = await collection.find(filter).to_list(length=15)
 
         if not infractions:
             if scope == 'Voided':
@@ -316,7 +316,7 @@ class Infractions(commands.Cog):
             embed.title = f"{staff.name}'s Infractions"
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)
-        for infraction in infractions:
+        for infraction in infractions[:15]:
             if infraction.get('voided', 'N/A') == 'N/A':
                 voided = ""
             else:

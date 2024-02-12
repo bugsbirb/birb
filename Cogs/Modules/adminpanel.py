@@ -950,7 +950,7 @@ class AdminPanel(discord.ui.View):
 
         infraction_list = []
 
-        for infraction in infractions:
+        for infraction in infractions[:15]:
             infraction_info = {
                 "id": infraction["random_string"],
                 "action": infraction["action"],
