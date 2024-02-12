@@ -441,7 +441,7 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed)
         exit(0)
 
-    @commands.hybrid_command()
+    @commands.hybrid_command(description="❤️ Support Astro Birb!")
     async def vote(self, ctx):
         embed = discord.Embed(title="🚀 Support Astro Birb", description="Hi there! If you enjoy using **Astro Birb**, consider upvoting it on the following platforms to help us grow and reach more servers. Your support means a lot! 🌟", color=discord.Color.dark_embed())
         button = discord.ui.Button(label="Upvote", url="https://top.gg/bot/1113245569490616400/vote", emoji="<:topgg:1206665848408776795>", style=discord.ButtonStyle.blurple)
