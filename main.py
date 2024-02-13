@@ -29,6 +29,7 @@ sentry_sdk.init(
 )
 
 
+
 class client(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -140,5 +141,10 @@ async def update_channel_name():
         print(f"Channel with ID {channel_id} not found.")
 
 
+
+
+
+
 if __name__ == "__main__":
     client.run(TOKEN)
+    

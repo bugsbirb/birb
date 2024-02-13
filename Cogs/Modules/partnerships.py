@@ -129,8 +129,11 @@ class Partnerships(commands.Cog):
             admin = await self.client.fetch_user(adminid)
         data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
-         channel_id = data['channel_id']
-         channel = self.client.get_channel(channel_id)
+         channel_id = data.get('channel_id', None)
+         if channel_id is None:
+           channel = None
+         else:  
+          channel = self.client.get_channel(channel_id)
 
          if channel:
           await ctx.send(f"{tick} **Partnership** terminiated.")
