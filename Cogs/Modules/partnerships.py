@@ -55,6 +55,7 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Log a partnership")
     async def log(self, ctx, owner: discord.Member, server: str, invite: str):
+        await ctx.defer()
         result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if result:
             await ctx.send(f"{no} **{ctx.author.display_name}**, that server is already in the partnerships database.")
@@ -75,7 +76,10 @@ class Partnerships(commands.Cog):
 
         data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
-         channel_id = data['channel_id']
+         channel_id = data.get('channel_id', None)
+         if channel_id is None:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
+           return
          channel = self.client.get_channel(channel_id)
 
          if channel:
