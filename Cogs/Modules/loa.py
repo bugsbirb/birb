@@ -125,41 +125,48 @@ class loamodule(commands.Cog):
     @tasks.loop(minutes=10)
     async def check_loa_status(self):
         print("Checking LOA Status")
-        try: 
-         current_time = datetime.now()
+        try:
+            current_time = datetime.now()
 
-         filter = {'end_time': {'$lte': current_time}}
+            filter = {'end_time': {'$lte': current_time}}
 
-         loa_requests = await loa_collection.find(filter).to_list(length=None)
+            loa_requests = await loa_collection.find(filter).to_list(length=None)
 
-         for request in loa_requests:
-            end_time = request['end_time']
-            user_id = request['user']
-            guild_id = request['guild_id']
-            guild = self.client.get_guild(guild_id)
-            user = await self.client.fetch_user(user_id)
-            active = request['active']
-            if guild is None:
-                await loa_collection.delete_one({'guild_id': guild_id, 'user': user_id, 'end_time': end_time})
-                return
-            if user is None:
-                await loa_collection.delete_one({'guild_id': guild_id, 'user': user_id, 'end_time': end_time})
-                return
-            if active == True:
-                if current_time >= end_time:
-                    if user:
+            for request in loa_requests:
+                end_time = request['end_time']
+                user_id = request['user']
+                guild_id = request['guild_id']
+                guild = self.client.get_guild(guild_id)
+                user = await self.client.fetch_user(user_id)
+                active = request['active']
+
+                if guild is None or user is None:
+                    await loa_collection.delete_one({'guild_id': guild_id, 'user': user_id, 'end_time': end_time})
+                    continue
+
+                if active and current_time >= end_time:
+                    try:
                         await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
-                        print(f"End Time: {end_time}")
-                        print(f"Current Time: {current_time}")
-                        await loa_collection.update_many({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
-                        loarole_data = await LOARole.find_one({'guild_id': guild.id})
-                        if loarole_data:
+                    except discord.Forbidden:
+                        print(f"Failed to send a DM to user {user_id}. Continuing...")
+                    
+                    print(f"End Time: {end_time}")
+                    print(f"Current Time: {current_time}")
+                    await loa_collection.update_many({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
+                    
+                    loarole_data = await LOARole.find_one({'guild_id': guild.id})
+                    if loarole_data:
                             loarole = loarole_data['staffrole']
                             if loarole:
                                 role = discord.utils.get(guild.roles, id=loarole)
+                                 
                                 if role:
                                     member = await self.client.fetch_user(user.id)
-                                    await member.remove_roles(role)
+                                    try:
+                                     await member.remove_roles(role)
+                                    except discord.Forbidden:
+                                        print(f"Failed to remove role from {user_id}. Continuing...")
+                                        continue 
             else:
                 pass
         except Exception as e:

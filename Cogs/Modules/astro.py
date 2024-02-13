@@ -292,6 +292,7 @@ class management(commands.Cog):
                             print(f"Custom role deleted for {after.name} ({after.id}).")
                         except discord.HTTPException:
                             print(f"Failed to delete the custom role for {after.name} ({after.id}).")
+                            continue
 
 
 

@@ -26,46 +26,43 @@ class Suspensions(commands.Cog):
         self.check_suspensions.start()
         print("Suspension loop started")
 
-
-
-
     async def modulecheck(self, ctx): 
-     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
-     if modulesdata is None:
-        return False
-     elif modulesdata['Suspensions'] == True:   
-        return True
+        modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
+        if modulesdata is None:
+            return False
+        elif modulesdata['Suspensions'] == True:   
+            return True
 
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
     async def suspend(self, ctx, staff: discord.Member, length: str, reason: str):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return            
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            return            
         if not await has_admin_role(ctx):
             return
         if staff.bot:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you can't suspend a bot.")
             return
-           
+
         if not re.match(r'^\d+[mhdw]$', length):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
-         return
+            await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+            return
 
         if ctx.author == staff:
-         await ctx.send(f"{no} You can't suspend yourself.")
-         return
+            await ctx.send(f"{no} You can't suspend yourself.")
+            return
 
         if ctx.author.top_role <= staff.top_role:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.", ephemeral=True)
             return
- 
+
         filter = {'guild_id': ctx.guild.id, 'staff': staff.id, 'active': True}
         existing_suspensions = await suspensions.find_one(filter)
 
         if existing_suspensions:
-         await ctx.send(f"{no} **{staff.display_name}** is already suspended.", ephemeral=True)
-         return
+            await ctx.send(f"{no} **{staff.display_name}** is already suspended.", ephemeral=True)
+            return
 
         duration_value = int(length[:-1])
         duration_unit = length[-1]
@@ -92,137 +89,146 @@ class Suspensions(commands.Cog):
 
     @suspension.command(description="View all active suspension")
     async def active(self, ctx):
-     if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return            
-     if not await has_admin_role(ctx):
-         return             
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            return            
+        if not await has_admin_role(ctx):
+            return             
 
-     filter = {'guild_id': ctx.guild.id, 'active': True}
+        filter = {'guild_id': ctx.guild.id, 'active': True}
 
-     loa_requests = await suspensions.find(filter).to_list(length=None)
+        loa_requests = await suspensions.find(filter).to_list(length=None)
 
-     if len(loa_requests) == 0:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.")
-     else:
-        embed = discord.Embed(
+        if len(loa_requests) == 0:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.")
+        else:
+            embed = discord.Embed(
             title="Active Suspensions",
             color=discord.Color.dark_embed()
         )
-        embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_author(icon_url=ctx.guild.icon , name=ctx.guild.name)
-        for request in loa_requests:
-            user = self.client.get_user(request['staff'])
-            start_time = request['start_time']
-            end_time = request['end_time']
-            start_time = request['start_time']
-            reason = request['reason']
+            embed.set_thumbnail(url=ctx.guild.icon)
+            embed.set_author(icon_url=ctx.guild.icon , name=ctx.guild.name)
+            for request in loa_requests:
+                user = self.client.get_user(request['staff'])
+                start_time = request['start_time']
+                end_time = request['end_time']
+                start_time = request['start_time']
+                reason = request['reason']
 
-            embed.add_field(
+                embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
                 value=f"<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
                 inline=False
             )
 
-        await ctx.send(embed=embed)    
+            await ctx.send(embed=embed)    
 
     @suspension.command(description="Manage suspensions on a user")
 
     async def manage(self, ctx, staff: discord.Member):
-     if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
-         return              
-     if not await has_admin_role(ctx):
-         return   
-     filter = {'guild_id': ctx.guild.id, 'staff': staff.id}
-     suspension_requests = suspensions.find(filter)
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            return              
+        if not await has_admin_role(ctx):
+            return   
+        filter = {'guild_id': ctx.guild.id, 'staff': staff.id}
+        suspension_requests = suspensions.find(filter)
 
-     suspension_records = []
+        suspension_records = []
 
-     async for request in suspension_requests:
-        end_time = request['end_time']
-        start_time = request['start_time']
-        user_id = request['staff']
-        guild_id = request['guild_id']
-        user = self.client.get_user(user_id)
-        reason = request['reason']
+        async for request in suspension_requests:
+            end_time = request['end_time']
+            start_time = request['start_time']
+            user_id = request['staff']
+            guild_id = request['guild_id']
+            user = self.client.get_user(user_id)
+            reason = request['reason']
 
-        suspension_records.append({
+            suspension_records.append({
             'user': user,
             'start_time': start_time,
             'end_time': end_time,
             'reason': reason,
         })
 
-     if suspension_records:
-        embed = discord.Embed(
+        if suspension_records:
+            embed = discord.Embed(
             title="Suspensions",
             color=discord.Color.dark_embed()
         )
 
-        for record in suspension_records:
-            user = record['user']
-            start_time = record['start_time']
-            end_time = record['end_time']
-            reason = record['reason']
+            for record in suspension_records:
+                user = record['user']
+                start_time = record['start_time']
+                end_time = record['end_time']
+                reason = record['reason']
 
-            embed.add_field(
+                embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
                 value=f"<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
                 inline=False
             )
 
-        embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
+            embed.set_thumbnail(url=ctx.guild.icon)
+            embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
 
-        view = SuspensionPanel(staff, ctx.author)
-        await ctx.send(embed=embed, view=view)
-     else:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.")
-
-    
-
+            view = SuspensionPanel(staff, ctx.author)
+            await ctx.send(embed=embed, view=view)
+        else:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.")
 
     @tasks.loop(minutes=10)
     async def check_suspensions(self):
-     print("Checking suspensions")
-     current_time = datetime.now()
-     filter = {'end_time': {'$lte': current_time}, 'action': 'Suspension'}
+        print("Checking suspensions")
+        current_time = datetime.now()
+        filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}
 
-     suspension_requests = suspensions.find(filter)
+        suspension_requests = suspensions.find(filter)
 
-     async for request in suspension_requests:
-        end_time = request['end_time']
-        user_id = request['staff']
-        guild_id = request['guild_id']
-        guild = self.client.get_guild(guild_id)
-        user = self.client.get_user(user_id)
-        if current_time >= end_time:
+        async for request in suspension_requests:
+            end_time = request["end_time"]
+            user_id = request["staff"]
+            guild_id = request["guild_id"]
+            guild = self.client.get_guild(guild_id)
+            user = self.client.get_user(user_id)
+            if current_time >= end_time:
 
-                 delete_filter = {'guild_id': guild_id, 'staff': user_id, 'action': 'Suspension'}
-                 await suspensions.delete_one(delete_filter)
+                delete_filter = {
+                    "guild_id": guild_id,
+                    "staff": user_id,
+                    "action": "Suspension",
+                }
+                await suspensions.delete_one(delete_filter)
 
-                 roles_removed = request.get('roles_removed', None)
-                 if roles_removed:
-                  roles_to_return = [discord.utils.get(guild.roles, id=role_id) for role_id in roles_removed if guild.get_member(user_id)]
-                    
-                  if roles_to_return:
+                roles_removed = request.get("roles_removed", None)
+                if roles_removed:
+                    roles_to_return = [
+                        discord.utils.get(guild.roles, id=role_id)
+                        for role_id in roles_removed
+                        if guild.get_member(user_id)
+                    ]
+
+                    if roles_to_return:
                         try:
-                          member = guild.get_member(user_id)
+                            member = guild.get_member(user_id)
                         except discord.Forbidden:
-                            pass
-                        try:                        
-                         await member.add_roles(*roles_to_return)
+                            print(f"Failed to get member {user.name} in {guild.name}")
+                            continue
+                        try:
+                            await member.add_roles(*roles_to_return)
                         except discord.Forbidden:
-                            await self.check_suspensions.restart()          
-                            
-                 if user:
-                     try:
-                        await user.send(f"{tick} Your suspension in **@{guild.name}** has ended.")
-                     except discord.Forbidden:
-                        await self.check_suspensions.restart()      
+                            print(
+                                f"Failed to restore roles to {member.name} in {guild.name}"
+                            )
 
-
+                if user:
+                    try:
+                        await user.send(
+                            f"{tick} Your suspension in **@{guild.name}** has ended."
+                        )
+                    except discord.Forbidden:
+                        print(f"Failed to send message to {user.name} in {guild.name}")
+                        continue
 
 
 class Suspension(discord.ui.RoleSelect):
@@ -436,9 +442,6 @@ class SuspensionPanel(discord.ui.View):
                 pass
         else:
           await interaction.response.send_message(f"{no} No suspension found.", ephemeral=True)
-
-
-
 
 
 async def setup(client: commands.Bot) -> None:
