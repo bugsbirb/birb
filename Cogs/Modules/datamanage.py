@@ -49,6 +49,7 @@ connectionroles = db['connectionroles']
 suspensions = db['Suspensions']
 forumsconfig = db['Forum Configuration']
 stafffeedback = db['feedback']
+staffdb = db['staff database']
 class DataView(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -66,6 +67,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
         discord.SelectOption(label="Quota", value="Quota", emoji="<:Messages:1148610048151523339>"), #
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),  #
+        discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
         discord.SelectOption(label="Forums Autopost + Utils", value="Forums Autopost + Utils", emoji="<:forum:1162134180218556497>"), #
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),  #
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), #
@@ -188,6 +190,13 @@ class DataSelector(discord.ui.Select):
                 view = Promotions(interaction.user)
                 view.add_item(DataSelector(interaction.user))
                 embed = discord.Embed(title="Promotions Data", description="**Erase Promotions Configuration:** This will erase the configuration for this module.", color=discord.Color.dark_embed())
+                embed.set_thumbnail(url=interaction.guild.icon)
+                embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+                await interaction.response.edit_message(embed=embed, view=view)
+        elif data_type == 'Staff Database & Panel':
+                view = StaffPanel(interaction.user)
+                view.add_item(DataSelector(interaction.user))
+                embed = discord.Embed(title="Staff Database & Panel Data", description="**Erase Staff Database:** This will erase the configuration for this module.\n**Erase Staff Database:** This will delete all staff members data.", color=discord.Color.dark_embed())
                 embed.set_thumbnail(url=interaction.guild.icon)
                 embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
                 await interaction.response.edit_message(embed=embed, view=view)
@@ -445,7 +454,7 @@ class Forums(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         try:
-         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Forums Utils': False}})
+         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Forums': False}})
         except:
             pass
 
@@ -559,7 +568,7 @@ class StaffFeedback(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         try:
-         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Staff Feedback': False}})
+         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Feedback': False}})
         except:
             pass
         await interaction.followup.send("<:greencheck:1190814894463930480> Staff Feedback Configuration Reset", ephemeral=True)        
@@ -634,6 +643,35 @@ class Promotions(discord.ui.View):
             pass
         await promochannel.delete_many({'guild_id': int(interaction.guild.id)})
         await interaction.followup.send("<:greencheck:1190814894463930480> Promotions Configuration Reset", ephemeral=True)    
+
+class StaffPanel(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+
+    @discord.ui.button(label="Erase Staff Database Configuration", style=discord.ButtonStyle.red, row=0)
+    async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        try:
+         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Staff Database': False}})
+        except Exception as e:
+            print(f"Failed to reset Staff Database Configuration: {e}")
+
+        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Database Configuration Reset", ephemeral=True)
+
+    @discord.ui.button(label="Erase Staff Database", style=discord.ButtonStyle.red, row=1)
+    async def erasestaff(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        await staffdb.delete_many({'guild_id': int(interaction.guild.id)})
+        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Database have been erased.", ephemeral=True)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(datamanage(client))     

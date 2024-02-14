@@ -189,7 +189,7 @@ async def refreshembed(self, interaction):
             infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            infchannelmsg = ""
+            infchannelmsg = "Not Configured"
             infractiontypess = "Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination"
             infractiontyperesult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
             if infractiontyperesult:
@@ -205,9 +205,13 @@ async def refreshembed(self, interaction):
                     infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  infchannelmsg = channel.mention          
+
             infractiontypescount = len(infractiontyperesult['types'])
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types [{infractiontypescount}/15]** {infractiontypess}", color=discord.Color.dark_embed())
+            if infractiontypescount == None:
+                infractiontypess = "0"
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module",  color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Infraction Channel:** {infchannelmsg}\n<:replybottom:1207366623913316363>**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
 
             await interaction.message.edit(embed=embed)

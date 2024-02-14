@@ -149,8 +149,9 @@ async def refreshembed(interaction):
                     loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  loachannelmsg = channel.mention       
-            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", description=f"**Enabled:** {modulemsg}\n**LOA Channel:** {loachannelmsg}\n**LOA Role:** {loarolemsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> LOA Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**LOA Channel:** {loachannelmsg}\n<:replybottom:1207366623913316363>**LOA Role:** {loarolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)     
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             await interaction.message.edit(embed=embed)   
      

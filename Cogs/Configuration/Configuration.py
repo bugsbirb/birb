@@ -40,7 +40,6 @@ from Cogs.Configuration.Views.applicationsview import ApplicationsRoles
 from Cogs.Configuration.Views.applicationsview import ToggleApplications
 
 
-
 from Cogs.Configuration.Views.suggestionview import SuggestionsChannel
 from Cogs.Configuration.Views.suggestionview import ToggleSuggestions
 
@@ -65,7 +64,6 @@ mongo = MongoClient(MONGO_URL)
 quota = MongoClient(MONGO_URL)
 dbq = quota['quotab']
 message_quota_collection = dbq["message_quota"]
-
 
 
 db = mongo['astro']
@@ -152,9 +150,6 @@ class Adminrole(discord.ui.RoleSelect):
         print(f"Select Roles {selected_role_ids}")
 
 
-
-                
-
 class Config(discord.ui.Select):
     def __init__(self, author):
         self.author = author
@@ -232,9 +227,12 @@ class Config(discord.ui.Select):
                 staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
              else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
-            embed = discord.Embed(title="<:Setting:1154092651193323661> Settings",
-                                  description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}",
-                                  color=discord.Color.dark_embed())
+            embed = discord.Embed(
+            title="<:Setting:1154092651193323661> Settings",
+            description=f"",
+            color=discord.Color.dark_embed(),
+        )
+            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = ConfigViewMain(self.author)        
@@ -264,7 +262,8 @@ class Config(discord.ui.Select):
             infractiontypescount = len(infractiontyperesult['types'])
             if infractiontypescount == None:
                 infractiontypess = "0"
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module", description=f"**Enabled:** {modulemsg}\n**Infraction Channel:** {infchannelmsg}\n**Infraction Types [{infractiontypescount}/15]** {infractiontypess}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module",  color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Infraction Channel:** {infchannelmsg}\n<:replybottom:1207366623913316363>**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
@@ -276,7 +275,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Utility']}"            
-            embed = discord.Embed(title="<:Pen:1126527802255085628> Utilties Module", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:Pen:1126527802255085628> Utilties Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = UtilsModule(self.author)
@@ -295,7 +294,8 @@ class Config(discord.ui.Select):
                  promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
-            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", description=f"**Enabled:** {modulemsg}\n**Promotion Channel:** {promochannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = PromotionModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                   
@@ -323,7 +323,8 @@ class Config(discord.ui.Select):
                     loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  loachannelmsg = channel.mention       
-            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", description=f"**Enabled:** {modulemsg}\n**LOA Channel:** {loachannelmsg}\n**LOA Role:** {loarolemsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> LOA Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**LOA Channel:** {loachannelmsg}\n<:replybottom:1207366623913316363>**LOA Role:** {loarolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = LOAModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
@@ -332,7 +333,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Tags']}"            
-            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = TagsModule(self.author)
@@ -346,7 +347,8 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Quota']}"            
-            embed = discord.Embed(title="<:Messages:1148610048151523339> Message Quota Module", description=f"**Enabled:** {modulemsg}\n**Quota:** {messagecountmsg}", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:Messages:1148610048151523339> Message Quota Module",  color=discord.Color.dark_embed())    
+            embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Quota:** {messagecountmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = QuotaModule(self.author)
@@ -365,7 +367,8 @@ class Config(discord.ui.Select):
                     feedbackchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  feedbackchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", description=f"**Enabled:** {modulemsg}\n**Feedback Channel:** {feedbackchannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Staff Feedback Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Feedback Channel:** {feedbackchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = FeedbackModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -375,7 +378,8 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Suspensions']}"            
-            embed = discord.Embed(title="<:Suspensions:1167093139845165229> Suspension Module", description=f"**Enabled:** {modulemsg}\n**Channel:** Same as the infraction channel", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:Suspensions:1167093139845165229> Suspension Module", color=discord.Color.dark_embed())   
+            embed.add_field(name="<:settings:1207368347931516928> Suspension Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Suspension Channel:** Infraction Channel\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False) 
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = SuspensionsModule(self.author)
@@ -397,7 +401,8 @@ class Config(discord.ui.Select):
                  partnershipchannelmsg = f"{channel.mention}"                     
                 else:
                  partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
-            embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", description=f"**Enabled:** {modulemsg}\n**Partnership Channel:** {partnershipchannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Partnership Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Partnership Channel:** {partnershipchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = PartnershipModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -406,7 +411,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Forums']}"            
-            embed = discord.Embed(title="<:forum:1162134180218556497> Forum Utilites", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:forum:1162134180218556497> Forum Utilites", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = ForumUtilsModule(self.author)
@@ -435,7 +440,8 @@ class Config(discord.ui.Select):
                  reprolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
                 else: 
                  reprolemsg = f"{role.mention}"
-            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", description=f"**Enabled:** {modulemsg}\n**Reports Channel:** {partnershipchannelmsg}\n**Reports Moderator Role:** {reprolemsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Reports Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Reports Channel:** {partnershipchannelmsg}\n<:replybottom:1207366623913316363>**Reports Moderator Role:** {reprolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -475,8 +481,11 @@ class Config(discord.ui.Select):
                     appchannelmsg = channel.mention
 
             embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Result Module",
-                                   description=f"**Enabled:** {modulemsg}\n**Results Channel:** {appchannelmsg}\n**Application Roles:** {approlemsg}",
+                                   description=f"",
                                    color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
+                            value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Results Channel:** {appchannelmsg}\n<:replybottom:1207366623913316363>**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = AppResultModule(self.author)
@@ -488,7 +497,7 @@ class Config(discord.ui.Select):
                 modulemsg = moduleddata.get('Connection', 'False')
             else:
                 modulemsg = 'False'        
-            embed = discord.Embed(title="<:Role:1162074735803387944> Connection Roles Module", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:Role:1162074735803387944> Connection Roles Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = ConnectionsModule(self.author)
@@ -508,13 +517,14 @@ class Config(discord.ui.Select):
                  suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
                  suggestionchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:Moderation:1163933000006893648> Suggestions Module", description=f"**Enabled:** {modulemsg}\n**Suggestion Channel:** {suggestionchannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Suggestion Channel:** {suggestionchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = SuggestionModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
 
         elif color == 'Customisation':
-            embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
             view = CustomisatiomModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
@@ -551,7 +561,8 @@ class Config(discord.ui.Select):
                 transcriptschannels = f"<#{transcriptschannelresult['channel_id']}>"
             if modmailcategoryresult:
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
-            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail", description=f"**Enabled:** {modulemsg}\n**Modmail Category:** {modmailcategorys}\n**Modmail Pings:** {modmailroles}\n**Transcript Channel:** {transcriptschannels}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail",  color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Modmail Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Modmail Category:** {modmailcategorys}\n<:replymiddle:1207366662916014100>**Modmail Pings:** {modmailroles}\n<:replybottom:1207366623913316363>**Transcript Channel:** {transcriptschannels}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             view = Modmail(interaction.user)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -559,13 +570,14 @@ class Config(discord.ui.Select):
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             if moduleddata:
                 modulemsg = moduleddata.get('Staff Database', 'False')     
-            embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+
             view = StaffDB(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
         await interaction.edit_original_response(embed=embed, view=view)
 
-     
+
 class StaffDB(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -602,8 +614,6 @@ class Modmail(discord.ui.View):
         self.add_item(ModmailPing(author))
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
-
-
 
 
 class InfractModule(discord.ui.View):
@@ -694,7 +704,6 @@ class AppResultModule(discord.ui.View):
         self.add_item(Config(author)) 
 
 
-
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -708,8 +717,6 @@ class CustomisatiomModule(discord.ui.View):
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
-
-  
 
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -741,7 +748,7 @@ class ConfigCog(commands.Cog):
                 adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
-        
+
         if staffroleresult:
             staff_roles_ids = staffroleresult.get('staffrole', [])
             if not isinstance(staff_roles_ids, list):
@@ -752,8 +759,13 @@ class ConfigCog(commands.Cog):
                 staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
             else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
-        
-        embed = discord.Embed(title="<:Setting:1154092651193323661> Settings", description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}", color=discord.Color.dark_embed())
+
+        embed = discord.Embed(
+            title="<:Setting:1154092651193323661> Settings",
+            description=f"",
+            color=discord.Color.dark_embed(),
+        )
+        embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         await ctx.send(embed=embed, view = ConfigViewMain(ctx.author))
@@ -790,14 +802,15 @@ async def refreshembed(interaction):
                 staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
              else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
-            embed = discord.Embed(title="<:Setting:1154092651193323661> Settings",
-                                  description=f"**Staff Role:** {staffrolemessage}\n**Admin Role:** {adminrolemessage}",
-                                  color=discord.Color.dark_embed())
+            embed = discord.Embed(
+            title="<:Setting:1154092651193323661> Settings",
+            description=f"",
+            color=discord.Color.dark_embed(),
+        )
+            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.message.edit(embed=embed)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConfigCog(client))     
-        
-        

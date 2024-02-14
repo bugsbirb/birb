@@ -108,7 +108,8 @@ async def refreshembed(interaction):
                  promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
-            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", description=f"**Enabled:** {modulemsg}\n**Promotion Channel:** {promochannelmsg}", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
             await interaction.message.edit(embed=embed)
