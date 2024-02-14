@@ -23,7 +23,8 @@ class Title(discord.ui.Modal, title='Title'):
     Titles = discord.ui.TextInput(
         label='title',
         placeholder='What is the title?',
-        required=False
+        required=False,
+        max_length=256
     )
 
 
@@ -66,6 +67,7 @@ class Colour(discord.ui.Modal, title='Colour'):
     color = discord.ui.TextInput(
         label='Colour',
         placeholder='Do not include the hashtag',
+        max_length=6
     )
 
 
@@ -93,6 +95,7 @@ class Roleping(discord.ui.Modal, title='Role Ping'):
     role = discord.ui.TextInput(
         label='Role ID',
         placeholder='What is the role id? (Has to be role ID)',
+        max_length=50
     )
 
 
@@ -110,7 +113,8 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
     Thumbnaile = discord.ui.TextInput(
         label='Thumbnail',
         placeholder='Whats the thumbnail URL?',
-        required=False
+        required=False,
+        max_length=2048
     )
 
 
@@ -135,7 +139,8 @@ class Image(discord.ui.Modal, title='Image'):
     Thumbnaile = discord.ui.TextInput(
         label='Image',
         placeholder='Whats the image URL?',
-        required=False
+        required=False,
+        max_length=2048
     )
 
 
@@ -211,6 +216,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
     name = discord.ui.TextInput(
         label='Name',
         placeholder='What do you want the name to be?',
+        max_length=30
         
     )
 
@@ -243,6 +249,7 @@ class DeleteForum(discord.ui.Modal, title='Delete Forum'):
     name = discord.ui.TextInput(
         label='Name',
         placeholder='Whats the name of the forum channel?',
+        max_length=30
     )
 
 

@@ -100,6 +100,7 @@ class Title(discord.ui.Modal, title='Title'):
     Titles = discord.ui.TextInput(
         label='title',
         placeholder='What is the title?',
+        max_length=256
     )
 
 
@@ -142,6 +143,7 @@ class Colour(discord.ui.Modal, title='Colour'):
     color = discord.ui.TextInput(
         label='Colour',
         placeholder='Do not include the hashtag',
+        max_length=6
     )
 
 
@@ -171,7 +173,8 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
     Thumbnaile = discord.ui.TextInput(
         label='Thumbnail',
         placeholder='Whats the thumbnail URL?',
-        required= False
+        required= False,
+        max_length=2048
     )
 
 
@@ -195,6 +198,7 @@ class Image(discord.ui.Modal, title='Image'):
     Thumbnaile = discord.ui.TextInput(
         label='Image',
         placeholder='Whats the image URL?',
+        max_length=2048
     )
 
 
@@ -216,13 +220,15 @@ class Author(discord.ui.Modal, title='Author'):
     authortext = discord.ui.TextInput(
         label='Author Name',
         placeholder='Whats the author name?',
-        required=False
+        required=False,
+        max_length=256
     )
 
     iconUrl = discord.ui.TextInput(
         label='Icon URL',
         placeholder='Whats the icon URL?',
-        required=False
+        required=False,
+        max_length=2048
     )
 
 

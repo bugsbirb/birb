@@ -33,6 +33,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
     name = discord.ui.TextInput(
         label='Name',
         placeholder='What do you want the name to be?',
+        max_length=30
     )
 
 
@@ -74,6 +75,7 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
     name = discord.ui.TextInput(
         label='Name',
         placeholder='Whats the name of the command?',
+        max_length=30
     )
 
 
@@ -107,7 +109,7 @@ class ButtonURLView(discord.ui.Modal, title='Button URL'):
     name = discord.ui.TextInput(
         label='URL',
         placeholder='Whats the url you wanna use? (https://example.com)',
-        max_length=200
+        max_length=2048
     )
 
     label = discord.ui.TextInput(
@@ -241,7 +243,8 @@ class Title(discord.ui.Modal, title='Title'):
     Titles = discord.ui.TextInput(
         label='title',
         placeholder='What is the title?',
-        required=False
+        required=False,
+        max_length=256
     )
 
 
@@ -287,6 +290,7 @@ class Colour(discord.ui.Modal, title='Colour'):
     color = discord.ui.TextInput(
         label='Colour',
         placeholder='Do not include the hashtag',
+        max_length=6,
     )
 
 
@@ -317,7 +321,7 @@ class Context(discord.ui.Modal, title='Content'):
         
         required=False,
         style=discord.TextStyle.long,
-        max_length=2000,
+        max_length=2000
     )
 
 
@@ -338,7 +342,8 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
     Thumbnaile = discord.ui.TextInput(
         label='Thumbnail',
         placeholder='Whats the thumbnail URL?',
-        required= False
+        required= False,
+        max_length=2048
     )
 
 
@@ -362,7 +367,8 @@ class Image(discord.ui.Modal, title='Image'):
     Thumbnaile = discord.ui.TextInput(
         label='Image',
         placeholder='Whats the image URL?',
-        required=False
+        required=False,
+        max_length=2048
     )
 
 
@@ -384,13 +390,15 @@ class Author(discord.ui.Modal, title='Author'):
     authortext = discord.ui.TextInput(
         label='Author Name',
         placeholder='Whats the author name?',
-        required=False
+        required=False,
+        max_length=256
     )
 
     iconUrl = discord.ui.TextInput(
         label='Icon URL',
         placeholder='Whats the icon URL?',
-        required=False
+        required=False,
+        max_length=2048
     )
 
 
