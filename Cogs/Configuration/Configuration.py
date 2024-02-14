@@ -616,17 +616,11 @@ class SuggestionModule(discord.ui.View):
 
 class CustomCommands(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleCommands(author))
         self.add_item(CreateButtons(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
@@ -828,17 +822,12 @@ class ConnectionsModule(discord.ui.View):
 
 class CustomisatiomModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(CustomEmbeds(author))     
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
