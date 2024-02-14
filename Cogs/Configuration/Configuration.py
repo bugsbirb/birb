@@ -575,7 +575,7 @@ class Config(discord.ui.Select):
             view = StaffDB(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
-        await interaction.edit_original_response(embed=embed, view=view)
+        view.message = await interaction.edit_original_response(embed=embed, view=view)
 
 
 class StaffDB(discord.ui.View):
@@ -587,10 +587,17 @@ class StaffDB(discord.ui.View):
 
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=3) 
         self.add_item(StaffRole(author))
         self.add_item(Adminrole(author))
         self.add_item(Config(author))
+
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")        
 
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
@@ -599,12 +606,27 @@ class SuggestionModule(discord.ui.View):
         self.add_item(ToggleSuggestions(author))
         self.add_item(Config(author))
 
+
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class CustomCommands(discord.ui.View):
     def __init__(self, author):
         super().__init__()
         self.add_item(ToggleCommands(author))
         self.add_item(CreateButtons(author))
         self.add_item(Config(author))
+
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
@@ -615,108 +637,208 @@ class Modmail(discord.ui.View):
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class InfractModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.author = author
         self.add_item(InfractionChannel(author))
         self.add_item(ToggleInfractionsDropdown(author))     
         self.add_item(InfractionTypes(author))   
         self.add_item(Config(author))        
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class UtilsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.author = author
         self.add_item(ToggleUtils(author))
         self.add_item(Config(author))        
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class PromotionModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.author = author
         self.add_item(Promotionchannel(author))
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Config(author))    
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class LOAModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(LOARoled(author))
         self.add_item(LOAChannel(author))        
         self.add_item(ToggleLOADropdown(author))              
         self.add_item(Config(author))    
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class TagsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ToggleTags(author))         
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class QuotaModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(QuotaAmount(author))          
         self.add_item(QuotaToggle(author))         
         self.add_item(Config(author)) 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class FeedbackModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(FeedbackChannel(author))          
         self.add_item(ToggleFeedback(author))         
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class SuspensionsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ToggleSuspensions(author))               
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class PartnershipModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(PartnershipChannel(author))            
         self.add_item(TogglePartnerships(author))               
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class ForumUtilsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ToggleForums(author))                          
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()     
+        super().__init__(timeout=360)     
         self.add_item(ReportChannel(author))         
         self.add_item(ReportsModeratorRole(author))
         self.add_item(ToggleReportsDropdown(author))                          
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ApplicationChannel(author))         
         self.add_item(ApplicationsRoles(author))             
         self.add_item(ToggleApplications(author))                          
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ToggleConnectionRoles(author))         
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+
 class CustomisatiomModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(CustomEmbeds(author))     
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+
+        for item in self.children:
+            item.disabled = True
+            
+        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -768,7 +890,8 @@ class ConfigCog(commands.Cog):
         embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-        await ctx.send(embed=embed, view = ConfigViewMain(ctx.author))
+        view = ConfigViewMain(ctx.author)
+        view.message = await ctx.send(embed=embed, view=view)
 
     @config.error
     async def permissionerror(self, ctx, error):
