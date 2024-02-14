@@ -575,7 +575,7 @@ class Config(discord.ui.Select):
             view = StaffDB(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
-        view.message = await interaction.edit_original_response(embed=embed, view=view)
+        await interaction.edit_original_response(embed=embed, view=view)
 
 
 class StaffDB(discord.ui.View):
@@ -592,12 +592,6 @@ class ConfigViewMain(discord.ui.View):
         self.add_item(Adminrole(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")        
 
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
@@ -607,12 +601,7 @@ class SuggestionModule(discord.ui.View):
         self.add_item(Config(author))
 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+ 
 
 class CustomCommands(discord.ui.View):
     def __init__(self, author):
@@ -631,12 +620,6 @@ class Modmail(discord.ui.View):
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class InfractModule(discord.ui.View):
     def __init__(self, author):
@@ -646,12 +629,7 @@ class InfractModule(discord.ui.View):
         self.add_item(ToggleInfractionsDropdown(author))     
         self.add_item(InfractionTypes(author))   
         self.add_item(Config(author))        
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class UtilsModule(discord.ui.View):
     def __init__(self, author):
@@ -660,12 +638,7 @@ class UtilsModule(discord.ui.View):
         self.add_item(ToggleUtils(author))
         self.add_item(Config(author))        
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class PromotionModule(discord.ui.View):
     def __init__(self, author):
@@ -675,12 +648,7 @@ class PromotionModule(discord.ui.View):
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Config(author))    
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class LOAModule(discord.ui.View):
     def __init__(self, author):
@@ -690,12 +658,6 @@ class LOAModule(discord.ui.View):
         self.add_item(ToggleLOADropdown(author))              
         self.add_item(Config(author))    
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class TagsModule(discord.ui.View):
     def __init__(self, author):
@@ -703,12 +665,7 @@ class TagsModule(discord.ui.View):
         self.add_item(ToggleTags(author))         
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+ 
 
 class QuotaModule(discord.ui.View):
     def __init__(self, author):
@@ -716,12 +673,7 @@ class QuotaModule(discord.ui.View):
         self.add_item(QuotaAmount(author))          
         self.add_item(QuotaToggle(author))         
         self.add_item(Config(author)) 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class FeedbackModule(discord.ui.View):
     def __init__(self, author):
@@ -730,12 +682,7 @@ class FeedbackModule(discord.ui.View):
         self.add_item(ToggleFeedback(author))         
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class SuspensionsModule(discord.ui.View):
     def __init__(self, author):
@@ -743,12 +690,7 @@ class SuspensionsModule(discord.ui.View):
         self.add_item(ToggleSuspensions(author))               
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+    
 
 class PartnershipModule(discord.ui.View):
     def __init__(self, author):
@@ -757,12 +699,7 @@ class PartnershipModule(discord.ui.View):
         self.add_item(TogglePartnerships(author))               
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class ForumUtilsModule(discord.ui.View):
     def __init__(self, author):
@@ -770,12 +707,6 @@ class ForumUtilsModule(discord.ui.View):
         self.add_item(ToggleForums(author))                          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
@@ -785,12 +716,7 @@ class ReportsModule(discord.ui.View):
         self.add_item(ToggleReportsDropdown(author))                          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
 
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
 
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
@@ -800,12 +726,7 @@ class AppResultModule(discord.ui.View):
         self.add_item(ToggleApplications(author))                          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+  
 
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
@@ -813,12 +734,7 @@ class ConnectionsModule(discord.ui.View):
         self.add_item(ToggleConnectionRoles(author))         
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-
-        for item in self.children:
-            item.disabled = True
-            
-        await self.message.edit(view=self, content=f"{no} This view has timed out.")    
+  
 
 class CustomisatiomModule(discord.ui.View):
     def __init__(self, author):
@@ -880,7 +796,7 @@ class ConfigCog(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         view = ConfigViewMain(ctx.author)
-        view.message = await ctx.send(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view)
 
     @config.error
     async def permissionerror(self, ctx, error):
