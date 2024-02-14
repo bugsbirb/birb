@@ -580,14 +580,14 @@ class Config(discord.ui.Select):
 
 class StaffDB(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(StaffData(author))
         self.add_item(StaffCustomise(author))
         self.add_item(Config(author))
 
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=3) 
+        super().__init__(timeout=360) 
         self.add_item(StaffRole(author))
         self.add_item(Adminrole(author))
         self.add_item(Config(author))
@@ -601,7 +601,7 @@ class ConfigViewMain(discord.ui.View):
 
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(SuggestionsChannel(author))
         self.add_item(ToggleSuggestions(author))
         self.add_item(Config(author))
@@ -616,7 +616,7 @@ class SuggestionModule(discord.ui.View):
 
 class CustomCommands(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ToggleCommands(author))
         self.add_item(CreateButtons(author))
         self.add_item(Config(author))
@@ -630,7 +630,7 @@ class CustomCommands(discord.ui.View):
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
-        super().__init__()
+        super().__init__(timeout=360)
         self.add_item(ModmailToggle(author))
         self.add_item(ModmailCategory(author))
         self.add_item(ModmailPing(author))
