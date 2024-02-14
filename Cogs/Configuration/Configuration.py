@@ -232,7 +232,7 @@ class Config(discord.ui.Select):
             description=f"",
             color=discord.Color.dark_embed(),
         )
-            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
+            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"<:replytop:1207366581735129118>**Staff Role:** {staffrolemessage}\n<:replybottom:1207366623913316363>**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = ConfigViewMain(self.author)        
