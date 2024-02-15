@@ -42,7 +42,7 @@ class ForumManage(discord.ui.View):
 
     @discord.ui.button(label="Mark Resolved", style=discord.ButtonStyle.success, custom_id="PERSISTENT:RESOLVE")    
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
-        requiredrole = discord.utils.get(interaction.guild.roles, id=1101807246079442944)
+        requiredrole = discord.utils.get(interaction.guild.roles, id=1160257124060893365)
         if requiredrole not in interaction.user.roles:
             return await interaction.response.send_message(f"{no} You do not have the required role to mark this thread as resolved.", ephemeral=True)        
         button.disabled = True
