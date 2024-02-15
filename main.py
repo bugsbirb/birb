@@ -14,6 +14,7 @@ from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.astro import CustomRoleButtons
 from Cogs.Modules.staff import Staffview
+from Cogs.Events.AstroSupport.aon_thread_create import ForumManage, Feedback
 load_dotenv()
 
 PREFIX = os.getenv("PREFIX")
@@ -34,6 +35,7 @@ class client(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
+        intents.message_content = True
         super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents
         )
@@ -90,6 +92,8 @@ class client(commands.AutoShardedBot):
         self.add_view(Voting())
         self.add_view(CustomRoleButtons())
         self.add_view(Staffview())
+        self.add_view(ForumManage())
+        self.add_view(Feedback())
 
         for ext in self.cogslist:
             await self.load_extension(ext)
@@ -139,8 +143,6 @@ async def update_channel_name():
 
     else:
         print(f"Channel with ID {channel_id} not found.")
-
-
 
 
 
