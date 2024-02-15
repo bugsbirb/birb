@@ -19,8 +19,7 @@ class AForumCreaton(commands.Cog):
         await asyncio.sleep(2)
         banner = discord.Embed(title="", color=discord.Color.dark_embed())
         applied_tags = [tag.name for tag in thread.applied_tags]
-        print(applied_tags)
-        
+
             
         
         banner.set_image(url="https://cdn.discordapp.com/attachments/1104358043598200882/1169328494044528710/006_2.png?ex=65550106&is=65428c06&hm=392ce6de8fa7f60763c87ac8f2ee9cbad49ed5603ea6555d6be6da36fc8ce6ea&")
@@ -43,7 +42,7 @@ class ForumManage(discord.ui.View):
 
     @discord.ui.button(label="Mark Resolved", style=discord.ButtonStyle.success, custom_id="PERSISTENT:RESOLVE")    
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
-        requiredrole = discord.utils.get(interaction.guild.roles, id=1160257124060893365)
+        requiredrole = discord.utils.get(interaction.guild.roles, id=1101807246079442944)
         if requiredrole not in interaction.user.roles:
             return await interaction.response.send_message(f"{no} You do not have the required role to mark this thread as resolved.", ephemeral=True)        
         button.disabled = True
