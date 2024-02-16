@@ -74,7 +74,6 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.topgg",
             "Cogs.Events.AstroSupport.analytics",
             "Cogs.Modules.datamanage",
-            "Cogs.Events.errorhandler",
         ]
 
     async def load_jishaku(self):
