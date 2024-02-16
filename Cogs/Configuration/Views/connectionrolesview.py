@@ -48,5 +48,8 @@ async def refreshembed(interaction):
                 modulemsg = 'False'        
             embed = discord.Embed(title="<:Role:1162074735803387944> Connection Roles Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)      
-            await interaction.message.edit(embed=embed)     
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)     
+            try: 
+             await interaction.message.edit(embed=embed)     
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.")              

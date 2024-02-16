@@ -213,5 +213,7 @@ async def refreshembed(self, interaction):
             embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Infraction Channel:** {infchannelmsg}\n<:replybottom:1207366623913316363>**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
-
-            await interaction.message.edit(embed=embed)
+            try:
+             await interaction.message.edit(embed=embed)
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.")              

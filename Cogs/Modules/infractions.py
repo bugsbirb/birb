@@ -234,7 +234,8 @@ class Infractions(commands.Cog):
                 if consent_data['infractionalert'] == "Enabled":
                     try:
                         await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed)
-                    except discord.Forbidden:
+                    except:
+                        print(f"Couldn't send infraction alert to {staff.display_name} in {ctx.guild.name}")
                         pass
                 else:
                     pass

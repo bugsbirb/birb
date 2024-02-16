@@ -47,4 +47,7 @@ async def refreshembed(interaction):
             embed = discord.Embed(title="<:Pen:1126527802255085628> Utilties Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-            await interaction.message.edit(embed=embed)   
+            try:
+             await interaction.message.edit(embed=embed)   
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.")              

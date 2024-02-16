@@ -133,7 +133,12 @@ class promo(commands.Cog):
              await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to view that channel.")        
              return       
             if consent_data['PromotionAlerts'] == "Enabled":
-                await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
+                try:
+                 await staff.send(f"🎉 You were promoted **@{ctx.guild.name}!**", embed=embed)
+                except:
+                 print(f"{staff.display_name} has DMs disabled")
+                 pass 
+
             else:    
                 pass
          else:

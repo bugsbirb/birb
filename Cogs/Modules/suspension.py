@@ -226,7 +226,7 @@ class Suspensions(commands.Cog):
                         await user.send(
                             f"{tick} Your suspension in **@{guild.name}** has ended."
                         )
-                    except discord.Forbidden:
+                    except:
                         print(f"Failed to send message to {user.name} in {guild.name}")
                         continue
 
@@ -302,7 +302,8 @@ class Suspension(discord.ui.RoleSelect):
   
                 try:
                  await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
-                except discord.Forbidden:
+                except:
+                 print('Failed to send suspension message to user')
                  pass
 
 
@@ -380,7 +381,8 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None)        
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
-            except discord.Forbidden:
+            except:
+                print('Failed to send suspension message to user')
                 pass                
          else:
             await interaction.response.edit_message(content=f"{no} {interaction.user.display_name}, I don't have permission to view this channel.", view=None, embed=None)
@@ -428,16 +430,22 @@ class SuspensionPanel(discord.ui.View):
                     await member.add_roles(*roles_to_return)
                     await interaction.edit_original_response(content=f"{tick} Suspension has been voided. Roles have been restored.", view=None, embed=None)
                     await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})                    
-                    await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
+                    
                 except discord.Forbidden:
                     await interaction.edit_original_response(content=f"{no} Failed to restore roles due to insufficient permissions.", ephemeral=True)
-
+                    return
+                try:
+                 await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
+                except discord.Forbidden: 
+                    print('Failed to send suspension message to user')
+                    pass 
          else:
             member = interaction.guild.get_member(self.user.id)
             await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
             await interaction.response.edit_message(content=f"{tick} Suspension has been voided.", embed=None, view=None)
             try:
              await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
+             print('Failed to send suspension message to user')
             except discord.Forbidden: 
                 pass
         else:

@@ -105,4 +105,7 @@ async def refreshembed(interaction):
 
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
-            await interaction.message.edit(embed=embed)   
+            try:
+             await interaction.message.edit(embed=embed)   
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.")              

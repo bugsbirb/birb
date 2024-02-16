@@ -170,6 +170,9 @@ async def refreshembed(interaction):
             embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Modmail Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Modmail Category:** {modmailcategorys}\n<:replymiddle:1207366662916014100>**Modmail Pings:** {modmailroles}\n<:replybottom:1207366623913316363>**Transcript Channel:** {transcriptschannels}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)      
-            await interaction.message.edit(embed=embed)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)  
+            try:    
+             await interaction.message.edit(embed=embed)
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.")              
                  

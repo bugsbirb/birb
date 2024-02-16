@@ -357,5 +357,4 @@ class Infraction(discord.ui.View):
             }
         Customisation.update_one(filter,  {"$set": embed_data}, upsert=True)
         embed = discord.Embed(title=f"{greencheck} Customisation Saved", description="Your embed has been saved." ,color=discord.Colour.brand_green())
-
         await interaction.response.edit_message(content=None, embed=embed, view=None)

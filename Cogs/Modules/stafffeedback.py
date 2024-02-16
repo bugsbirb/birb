@@ -82,8 +82,7 @@ class Feedback(commands.Cog):
        if staff == ctx.author:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.")
             return
-       staff_role_data = await scollection.find_one({'guild_id': ctx.guild.id})
-       staff_role_id = staff_role_data['staffrole']  
+
 
 
        has_staff_role = await self.staffcheck(ctx, staff)
