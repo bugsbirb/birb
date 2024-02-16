@@ -279,7 +279,7 @@ class NoEmbeds(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=view)
      
 
-    @discord.ui.button(label='Context', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
+    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
@@ -345,7 +345,7 @@ class Embeds(discord.ui.View):
         
         await interaction.response.edit_message(embed=None, view=NoEmbeds(interaction.user))        
 
-    @discord.ui.button(label='Context', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
+    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",

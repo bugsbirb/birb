@@ -30,6 +30,9 @@ class GuildJoins(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
+        if guild.owner.id is None:
+            print(f"Left guild {guild.name} owned by a user that is not in the cache")
+            return
         blacklist = await blacklists.find_one({'user': guild.owner.id})
         if blacklist:  
             blacklisted = {tick}

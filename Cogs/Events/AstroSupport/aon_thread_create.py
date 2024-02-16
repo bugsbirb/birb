@@ -26,15 +26,17 @@ class AForumCreaton(commands.Cog):
         embed = discord.Embed(title=f"<:forum:1162134180218556497> Astro Support", description="> Welcome to Astro Support please wait for a support representative to respond!", color=discord.Color.dark_embed())
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         embed.set_thumbnail(url="https://cdn.discordapp.com/icons/1092976553752789054/bf1e0138243c734664bbf9fbf8d5ae20.png?size=512")
+
         view = ForumManage()
         if 'Bugs' in applied_tags:
             embed.title = "🐛 Bug Report"
             embed.description ="> Welcome to Astro Support please wait for a developer to respond!\n\n<:Information:1115338749728002089> Please provide as much detail as possible to help us resolve the issue!"
-            await thread.send(content='<@&1092977919858593912>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True), view=view)
+            msg = await thread.send(content='<@&1092977919858593912>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True), view=view)
+            await msg.pin()
             return
         else: 
-         await thread.send(content='<@&1092977110412439583>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True), view=view) 
-
+         msg = await thread.send(content='<@&1092977110412439583>', embeds=(banner, embed), allowed_mentions=discord.AllowedMentions(roles=True), view=view) 
+         await msg.pin()
 class ForumManage(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
