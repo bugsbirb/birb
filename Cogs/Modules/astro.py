@@ -7,6 +7,7 @@ from emojis import *
 import requests
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
+deploy_URL = os.getenv('deploy_url')
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 badges = db['User Badges']
@@ -294,17 +295,17 @@ class management(commands.Cog):
                         except discord.HTTPException:
                             print(f"Failed to delete the custom role for {after.name} ({after.id}).")
                             continue
-    import requests
+
     @commands.command()
     @commands.is_owner()
     async def deploy(self ,ctx):
-        try:
-         requests.post('http://172.93.103.8:3000/api/deploy/55aebc9c0be53533e069fdaf6e790f22be44f4682370662d')
-         response = requests.get('http://172.93.103.8:3000/api/deploy/0fb0302c8b92e1c905027d01ae9364c5f3318944b21460af')
-         print(response.text)
-        except Exception as e:
-            print(e) 
-        await ctx.send("Deployed!")
+        response = requests.get(deploy_URL)
+        async with ctx.typing():
+         if response.status_code == 200:
+          print(response.text)
+          await ctx.send(f"{tick} **{ctx.author.display_name},** I've succesfully deploy Astro Birb!")
+         else:
+             print(response.text)
         
 
       
