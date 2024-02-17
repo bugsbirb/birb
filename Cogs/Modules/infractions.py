@@ -74,8 +74,8 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
-    @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", annoymous="Whether to send the infraction anonymously")
-    async def infract(self, ctx, staff: discord.Member,  action, reason: str, notes: Optional[str], expiration: Optional[str] = None, annoymous=False):
+    @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
+    async def infract(self, ctx, staff: discord.Member, action, reason: str, notes: Optional[str], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
             return
@@ -145,7 +145,7 @@ class Infractions(commands.Cog):
                 embed_thumbnail = custom['thumbnail']
 
             if custom['author_icon'] == "{author.avatar}":
-                if annoymous:
+                if anonymous:
                     authoricon = ctx.guild.icon
                 else:
                     authoricon = ctx.author.display_avatar
@@ -163,7 +163,7 @@ class Infractions(commands.Cog):
             embed = discord.Embed(title=embed_title, description=embed_description, color=int(custom['color'], 16))
 
             embed.set_thumbnail(url=embed_thumbnail)
-            if annoymous == True:
+            if anonymous == True:
                 embed.remove_author()
             else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
@@ -176,7 +176,7 @@ class Infractions(commands.Cog):
             else:
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
-            if annoymous == True:
+            if anonymous == True:
                 embed.remove_author()
             else:
                 embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)

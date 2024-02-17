@@ -18,11 +18,11 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 loa_collection = db['loa']
 loachannel = db['LOA Channel']
-scollection = db['staffrole']
+
 arole = db['adminrole']
 LOARole = db['LOA Role']
 modules = db['Modules']
-
+scollection = db['staffrole']
 
 class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
     def __init__(self, user, guild, author):
