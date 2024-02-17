@@ -414,6 +414,7 @@ class quota(commands.Cog):
 
     @staff.command(description="Send a panel that shows all staff members. (Staff Database)")
     async def panel(self, ctx):
+        await ctx.defer(ephemeral=True)
         if not await has_admin_role(ctx):
             return
         if not await self.modulecheck2(ctx):
@@ -503,7 +504,7 @@ class StaffPanel(discord.ui.Select):
         super().__init__(placeholder='Staff', min_values=1, max_values=1, options=options, custom_id='persistent:staffpanel')
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
         try:
             value = self.values[0]
             if value in ('Reload', 'Load'):
@@ -559,26 +560,24 @@ class StaffPanel(discord.ui.Select):
             
 
     async def update_options(self, interaction: discord.Interaction):
-        try: 
-         results = self.collection.find({'guild_id': interaction.guild.id}).limit(23)
-         options = [discord.SelectOption(label='Reload', description='Reload the staff panel', emoji='<:staticload:1206248311280111616>')]
-         if self.collection.count_documents({'guild_id': interaction.guild.id}) > 1:
+     try: 
+        results = self.collection.find({'guild_id': interaction.guild.id}).limit(23)
+        options = [discord.SelectOption(label='Reload', description='Reload the staff panel', emoji='<:staticload:1206248311280111616>')]
+        if self.collection.count_documents({'guild_id': interaction.guild.id}) > 1:
             options.append(discord.SelectOption(label='Load More', description='Load more staff members', emoji='<:select:1206247978050916423>'))
-         for result in results:
+        for result in results:
             staff_id = result['staff_id']
             staff = await interaction.guild.fetch_member(staff_id)
             if staff:
-
                 if result.get('rolename', None) is not None:
                     description = result['rolename']
                 else:
                     description = ''    
-
                 options.append(discord.SelectOption(label=result['name'], emoji='<:staff:1206248655359840326>', description=description))
-        except Exception as e:
-            print(e)
-        self.options = options
-        await interaction.edit_original_response(view=self.view)
+     except Exception as e:
+        print(e)
+     self.options = options
+     await interaction.edit_original_response(view=self.view)
         
 
 class StaffButton(discord.ui.View):

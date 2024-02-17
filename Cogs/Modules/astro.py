@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.ext import commands
 import os
 from emojis import * 
+import requests
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
@@ -293,8 +294,18 @@ class management(commands.Cog):
                         except discord.HTTPException:
                             print(f"Failed to delete the custom role for {after.name} ({after.id}).")
                             continue
-
-
+    import requests
+    @commands.command()
+    @commands.is_owner()
+    async def deploy(self ,ctx):
+        try:
+         requests.post('http://172.93.103.8:3000/api/deploy/55aebc9c0be53533e069fdaf6e790f22be44f4682370662d')
+         response = requests.get('http://172.93.103.8:3000/api/deploy/0fb0302c8b92e1c905027d01ae9364c5f3318944b21460af')
+         print(response.text)
+        except Exception as e:
+            print(e) 
+        await ctx.send("Deployed!")
+        
 
       
         
