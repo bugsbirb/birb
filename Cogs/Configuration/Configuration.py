@@ -61,10 +61,6 @@ from Cogs.Configuration.Views.staffpanel import StaffCustomise
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
-quota = MongoClient(MONGO_URL)
-dbq = quota['quotab']
-message_quota_collection = dbq["message_quota"]
-
 
 db = mongo['astro']
 scollection = db['staffrole']
@@ -86,7 +82,8 @@ nfractiontypes = db['infractiontypes']
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
 ReportModeratorRole = db['Report Moderator Role']
-mongo2 = MongoClient('mongodb://bugsbirt:deezbird2768@172.93.103.8:55199/?authMechanism=SCRAM-SHA-256&authSource=admin')
+
+mongo2 = MongoClient(MONGO_URL)
 db2 = mongo2['quotab']
 scollection2 = db2['staffrole']
 message_quota_collection = db2["message_quota"]

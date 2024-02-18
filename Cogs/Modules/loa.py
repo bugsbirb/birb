@@ -344,6 +344,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm',
                        emoji=f"{tick}")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
         if not await self.has_admin_role(interaction):
             await interaction.response.edit_message(
                 content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
@@ -358,7 +359,7 @@ class Confirm(discord.ui.View):
         embed.color = discord.Color.brand_green()
         embed.title = f"<:Tick_1:1178749612929069096> LOA Request - Accepted"
         embed.set_footer(text=f"Accepted by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.message.edit(embed=embed, view=None)
         print(f"LOA Request @{interaction.guild.name} accepted")
         loarole_data = await LOARole.find_one({'guild_id': interaction.guild.id})
         await loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': True}})
@@ -375,6 +376,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel',
                        emoji=f"{no}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
         if not await self.has_admin_role(interaction):
             await interaction.response.edit_message(
                 content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
@@ -393,7 +395,7 @@ class Confirm(discord.ui.View):
         embed.color = discord.Color.brand_red()
         embed.title = f"<:crossX:1140623638207397939> LOA Request - Denied"
         embed.set_footer(text=f"Denied by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.message.edit(embed=embed, view=None)
         await loa_collection.delete_one({'guild_id': interaction.guild.id, 'user': self.user.id, 'messageid': interaction.message.id})
         print(f"LOA Request @{interaction.guild.name} denied")
 
