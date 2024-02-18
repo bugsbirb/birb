@@ -35,11 +35,9 @@ class messageevent(commands.Cog):
         module = await modules.find_one({'guild_id': message.guild.id})
         if module:
          if module.get('Quota', False) == False:
-            print('I did not get past it')
             return
         else:
            return 
-        print('I got past it')
         if message.author.bot:
             return
 
