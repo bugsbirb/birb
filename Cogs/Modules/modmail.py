@@ -210,8 +210,8 @@ class Modmail(commands.Cog):
                          embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
                          await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
                         except discord.Forbidden:
-                            
-                            pass     
+                           print("Couldn't send message to user.")
+                           pass    
                 transcriptchannelresult = await transcriptschannel.find_one({'guild_id': ctx.guild.id})
                 if transcriptchannelresult:
                     transcriptchannelid = transcriptchannelresult['channel_id']

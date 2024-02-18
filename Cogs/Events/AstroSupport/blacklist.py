@@ -17,7 +17,7 @@ class blacklist(commands.Cog):
 
      if blacklist:
         await guild.leave()
-        print(f'Left guild {guild.name} owned by blacklisted user {guild.owner}')
+        print(f'Left guild {guild.name} owned by blacklisted user {guild.owner.name}')
      else:
        pass
     
