@@ -49,7 +49,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          await interaction.response.edit_message(embed=embed, view=None)
 
          return
-        result = customcommands.find_one({"name": self.name.value})
+        result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         embed = interaction.message.embeds[0]
         if result:
          embed = discord.Embed()
@@ -82,14 +82,14 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-       result = customcommands.find_one({"name": self.name.value})
+       result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
        embed = interaction.message.embeds[0]
        if result is None:
         embed.title = f"{redx} I could not find that."
         embed.color = discord.Color.brand_red()
         await interaction.response.edit_message(embed=embed)
         return
-       customcommands.delete_one({"name": self.name.value})
+       customcommands.delete_one({"name": self.name.value, "guild_id": interaction.guild.id})
        embed = discord.Embed(description="Succesfully deleted the command.")
        embed.title = f"{greencheck} Command Deleted"
        embed.color = discord.Color.brand_green()
