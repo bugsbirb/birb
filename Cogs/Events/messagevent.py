@@ -30,11 +30,20 @@ class messageevent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild is None:
+            return
+        module = await modules.find_one({'guild_id': message.guild.id})
+        if module:
+         if module.get('Quota', False) == False:
+            print('I did not get past it')
+            return
+        else:
+           return 
+        print('I got past it')
         if message.author.bot:
             return
 
-        if message.guild is None:
-            return
+
 
         staff_data = await scollection2.find_one({'guild_id': message.guild.id})
         admin_data = await arole.find_one({'guild_id': message.guild.id})
