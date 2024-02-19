@@ -117,7 +117,7 @@ class Feedback(commands.Cog):
          if channel:
             embed = discord.Embed(title="Staff Feedback", description=f"* **Staff:** {staff.mention}\n* **Rating:** {rating}\n* **Feedback:** {feedback}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
-            embed.set_author(name=staff.display_name, icon_url=staff.display_avatar) 
+            embed.set_author(name=f"From {ctx.author.display_name}", icon_url=ctx.author.display_avatar) 
             embed.set_footer(text=f"Feedback ID: {feedbackid}")           
             try:
              await channel.send(f"{staff.mention}",embed=embed)
