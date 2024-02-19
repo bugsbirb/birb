@@ -324,7 +324,7 @@ class ReportPanel(discord.ui.View):
                 if any(role.id in staff_role_ids + admin_role_ids for role in interaction.user.roles):
                     return True
 
-        if any(role.id in staff_role_ids for role in interaction.author.roles):
+        if any(role.id in staff_role_ids for role in interaction.user.roles):
             return True
 
      else:
