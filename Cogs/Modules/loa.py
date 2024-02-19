@@ -128,7 +128,7 @@ class loamodule(commands.Cog):
         try:
             current_time = datetime.now()
 
-            filter = {'end_time': {'$lte': current_time}}
+            filter = {'end_time': {'$lte': current_time}, 'active': True}
 
             loa_requests = await loa_collection.find(filter).to_list(length=None)
 
@@ -155,6 +155,28 @@ class loamodule(commands.Cog):
                     await loa_collection.update_many({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
                     
                     loarole_data = await LOARole.find_one({'guild_id': guild.id})
+                    loachannelresult = await loachannel.find_one({'guild_id': guild.id})
+                    if loachannelresult:
+                        channel_id = loachannelresult['channel_id']
+                        try:
+                         channel = guild.get_channel(channel_id)
+                        except discord.Forbidden:
+                            print(f"Failed to get channel {channel_id}. Continuing...")
+                            continue 
+                        if channel:
+                            embed = discord.Embed(title=f"LOA Ended",
+                                                  description=f"* **User:** {user.mention}\n* **Start Date**: <t:{int(request['start_time'].timestamp())}:f>\n* **End Date:** <t:{int(request['end_time'].timestamp())}:f>\n* **Reason:** {request['reason']}",
+                                                  color=discord.Color.dark_embed())
+                            embed.set_author(icon_url=user.display_avatar, name=user.display_name)
+                            embed.set_thumbnail(url=user.display_avatar)
+                            try:
+                             await channel.send(embed=embed)
+                            except discord.Forbidden:
+                                print(f"Failed to send message to channel {channel_id}. Continuing...")
+                                continue 
+                        else:
+                            print(f"Failed to get channel {channel_id}. Continuing...")
+                            continue    
                     if loarole_data:
                             loarole = loarole_data['staffrole']
                             if loarole:
@@ -346,9 +368,9 @@ class Confirm(discord.ui.View):
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         if not await self.has_admin_role(interaction):
-            await interaction.response.edit_message(
+            await interaction.followup.send(
                 content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
-                view=None)
+                ephemeral=True)
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
         if loa_data:
@@ -357,12 +379,12 @@ class Confirm(discord.ui.View):
 
         embed = interaction.message.embeds[0]
         embed.color = discord.Color.brand_green()
-        embed.title = f"<:Tick_1:1178749612929069096> LOA Request - Accepted"
+        embed.title = f"{greencheck} LOA Request - Accepted"
         embed.set_footer(text=f"Accepted by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
         await interaction.message.edit(embed=embed, view=None)
         print(f"LOA Request @{interaction.guild.name} accepted")
         loarole_data = await LOARole.find_one({'guild_id': interaction.guild.id})
-        await loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': True}})
+        await loa_collection.update_one({'guild_id': interaction.guild.id, 'messageid': interaction.message.id ,'user': user.id}, {'$set': {'active': True}})
         if loarole_data:
             loarole = loarole_data['staffrole']
             if loarole:
@@ -370,35 +392,40 @@ class Confirm(discord.ui.View):
                 if role:
                     await user.add_roles(role)
         try:
-            await self.user.send(f"{tick} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been accepted.")
+            embed.remove_footer()
+            embed.remove_author()
+            await self.user.send(embed=embed)
         except discord.Forbidden:
+            print(f"Failed to send a DM to user {self.user.id}. Continuing...")
             pass
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel',
                        emoji=f"{no}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         if not await self.has_admin_role(interaction):
-            await interaction.response.edit_message(
-                content=f"{no} **{interaction.user.display_name}**, you don't have permission to deny this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
-                view=None)
+            await interaction.followup.send(
+                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
+                ephemeral=True)
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
         if loa_data:
             self.user = await interaction.guild.fetch_member(loa_data['user'])
-        try:
-            await self.user.send(
-                f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied.")
-        except discord.Forbidden:
-            pass
+
 
         embed = interaction.message.embeds[0]
         embed.color = discord.Color.brand_red()
-        embed.title = f"<:crossX:1140623638207397939> LOA Request - Denied"
+        embed.title = f"{redx} LOA Request - Denied"
         embed.set_footer(text=f"Denied by {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
         await interaction.message.edit(embed=embed, view=None)
         await loa_collection.delete_one({'guild_id': interaction.guild.id, 'user': self.user.id, 'messageid': interaction.message.id})
         print(f"LOA Request @{interaction.guild.name} denied")
+        try:
 
+            await self.user.send(
+                f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied.")
+        except discord.Forbidden:
+            print(f"Failed to send a DM to user {self.user.id}. Continuing...")
+            pass
 
 class LOAPanel(discord.ui.View):
     def __init__(self, user, guild, author):
@@ -433,11 +460,12 @@ class LOAPanel(discord.ui.View):
         await loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': False}})
         await interaction.response.edit_message(embed=None,
                                                content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA",
-                                               view=None)
+                                               view=None)                                           
         try:
             await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")
         except discord.Forbidden:
-            pass
+            print('Failed to send a DM to user. Continuing... (LOA Manage)')
+            return
 
 
 class LOACreate(discord.ui.View):
