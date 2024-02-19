@@ -368,10 +368,14 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                 )
 
                 if consent_data["PromotionAlerts"] == "Enabled":
-                    await self.user.send(
+                    try:
+                     await self.user.send(
                         f"🎉 You were promoted **@{interaction.guild.name}!**",
                         embed=embed,
                     )
+                    except discord.Forbidden:
+                        print('Could not send message to this user')
+                        pass 
                 else:
                     pass
 
@@ -500,12 +504,6 @@ class Reason(discord.ui.Modal, title="Reason"):
 
         guild_id = interaction.guild.id
         data = infchannel.find_one({"guild_id": guild_id})
-        appeal_data = appealable.find_one({"guild_id": str(interaction.guild.id)})
-
-        if appeal_data is not None:
-            appeal_enabled = appeal_data.get("enabled", False)
-        else:
-            appeal_enabled = False
         if data:
             channel_id = data["channel_id"]
             channel = interaction.guild.get_channel(channel_id)
@@ -534,6 +532,7 @@ class Reason(discord.ui.Modal, title="Reason"):
                             embed=embed,
                         )
                     except discord.Forbidden:
+                        print('Could not send message to this user')
                         pass
                 else:
                     pass
