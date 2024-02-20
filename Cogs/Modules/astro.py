@@ -303,7 +303,7 @@ class management(commands.Cog):
         async with ctx.typing():
          if response.status_code == 200:
           print(response.text)
-          await ctx.send(f"{tick} **{ctx.author.display_name},** I've succesfully deploy Astro Birb!")
+          await ctx.send(f"{tick} **{ctx.author.display_name},** I've succesfully deployed Astro Birb!")
          else:
              print(response.text)
         
