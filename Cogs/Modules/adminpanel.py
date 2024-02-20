@@ -884,9 +884,10 @@ class AdminPanel(discord.ui.View):
             )
             return
 
-        view = PromotionRoleView(self.user, self.guild, self.author)
+        view = Return(self.user, self.guild, self.author)
+        view.add_item(PromotionRole(self.user, self.guild, self.author))
         await interaction.response.edit_message(view=view)
-
+        
     @discord.ui.button(
         label="Infract",
         style=discord.ButtonStyle.grey,
@@ -915,7 +916,8 @@ class AdminPanel(discord.ui.View):
             )
             return
 
-        view = InfractionOptionView(self.user, self.guild, self.author)
+        view = Return(self.user, self.guild, self.author)
+        view.add_item(InfractionOption(self.user, self.guild, self.author))
         await interaction.response.edit_message(view=view)
 
     @discord.ui.button(
@@ -1084,8 +1086,9 @@ class Return(discord.ui.View):
         label="Return",
         style=discord.ButtonStyle.grey,
         emoji="<:Return:1166514220960063568>",
+        row=2
     )
-    async def Return(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def Return77(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
                 description=f"**{interaction.user.global_name},** this is not your view!",

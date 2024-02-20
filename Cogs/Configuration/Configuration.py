@@ -119,7 +119,10 @@ class StaffRole(discord.ui.RoleSelect):
             else:
                 scollection.insert_one(data)
             await refreshembed(interaction)    
-            await interaction.response.edit_message(content=None)
+            try:
+             await interaction.response.edit_message(content=None)
+            except:
+                print('Error editing staff role config message') 
         except Exception as e:
             print(f"An error occurred: {str(e)}")
         print(f"Select Roles {selected_role_ids}")
@@ -143,7 +146,10 @@ class Adminrole(discord.ui.RoleSelect):
 
         arole.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await refreshembed(interaction)  
-        await interaction.response.edit_message(content=None)
+        try:
+         await interaction.response.edit_message(content=None)
+        except: 
+            print('Error editing admin role config message') 
         print(f"Select Roles {selected_role_ids}")
 
 
@@ -836,6 +842,7 @@ async def refreshembed(interaction):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.message.edit(embed=embed)
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConfigCog(client))     
