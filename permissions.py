@@ -82,7 +82,6 @@ async def has_admin_role(ctx):
 
 
 
-
 class PermissionsButtons(discord.ui.View):
     def __init__(self):
         super().__init__()

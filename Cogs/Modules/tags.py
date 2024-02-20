@@ -68,6 +68,27 @@ class Tags(commands.Cog):
         await ctx.send(f"{tick} **`{name}`** created.")
 
 
+    @tags.command(description="Edit a tag")
+    async def edit(self, ctx, name: str, content: str):
+        await ctx.defer()
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         return                 
+        if not await has_admin_role(ctx):
+            return
+        filter = {
+            'guild_id': ctx.guild.id,
+            'name': name
+        }
+
+        tag_data = await tags.find_one(filter)
+
+        if tag_data:
+            await tags.update_one(filter, {"$set": {"content": content}})
+            await ctx.send(f"{tick} **`{name}`** has been updated.")
+        else:
+            await ctx.send(f"{no} Tag with the name `{name}` not found.")
+
     @tags.command(description="List all available tags")
     async def all(self, ctx):
      await ctx.defer()
@@ -129,7 +150,7 @@ class Tags(commands.Cog):
     @tags.command(description="Send a existing tag to this channel.")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def send(self, ctx, name):
-        await ctx.defer()
+        await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return                 

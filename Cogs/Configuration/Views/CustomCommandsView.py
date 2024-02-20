@@ -63,11 +63,75 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
         await interaction.response.edit_message(embed=None,content=None,  view=view)
         customcommands.insert_one({"name": name, "guild_id": interaction.guild.id, "creator": interaction.user.id})
 
+class EditCommand(discord.ui.Modal, title='Edit Command'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+
+
+
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='Whats the name of the command?',
+        max_length=30
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+         result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+         embed = interaction.message.embeds[0]
+         if result is None:
+          embed.title = f"{redx} I could not find that."
+          embed.color = discord.Color.brand_red()
+          await interaction.response.edit_message(embed=embed)
+          return
+
+               
+         if result.get('embed', False) == True:
+            embed_title = result.get('title', None) 
+            embed_description = result.get('description', None)   
+            color_value = result.get('color', None)
+            embed_author = result.get('author', None)
+
+            colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.dark_embed()               
+            embed = discord.Embed(
+                title=embed_title,
+                description=embed_description, color=colors)
+            if 'image' in result:
+                embed.set_image(url=result['image'])
+            if 'thumbnail' in result:
+                embed.set_thumbnail(url=result['thumbnail'])
+
+
+            if embed_author in ["None", None]:
+                embed_author = ""
+
+            if 'author' in result:
+                embed.set_author(name=embed_author, icon_url=result['author_icon'])
+                if 'author_icon' in result:
+                    embed.set_author(name=embed_author, icon_url=result['author_icon'])
+            if 'content' in result:
+                contentmsg = result['content']    
+            else:
+                contentmsg = ""    
+         
+            await interaction.response.edit_message(content=contentmsg, embed=embed, view=Embeds(self.author, self.name.value))
+         else:
+
+            if 'content' in result:
+                contentmsg = result['content']    
+            else:
+                contentmsg = ""               
+            await interaction.response.edit_message(content=contentmsg, embed=None, view=NoEmbeds(self.author, self.name.value))   
+
 
 class DeleteCommand(discord.ui.Modal, title='Delete Command'):
     def __init__(self, author):
         super().__init__()
-        self.authot = author
+        self.author = author
 
 
 
@@ -210,6 +274,7 @@ class CreateButtons(discord.ui.Select):
         options = [
             discord.SelectOption(label="Create", emoji=f"{add}"),
             discord.SelectOption(label="Delete", emoji=f"{bin}"),
+            discord.SelectOption(label="Edit", emoji=f"{pen}"),
             
 
         
@@ -230,6 +295,9 @@ class CreateButtons(discord.ui.Select):
 
         elif color == 'Delete':
             await interaction.response.send_modal(DeleteCommand(self.author))  
+
+        elif color == 'Edit':
+            await interaction.response.send_modal(EditCommand(self.author))    
 
 
     
@@ -477,6 +545,16 @@ class NoEmbeds(discord.ui.View):
         embed = discord.Embed(title="Variables List", description="**{author.name}** = The name of the person who is using the command\n**{author.id}** = The user id who is using the command\n**{author.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp of when the command was used\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner", color=discord.Colour.dark_embed())  
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+    @discord.ui.button(label='Permissions', style=discord.ButtonStyle.blurple, emoji="<:Permissions:1207365901956026368>")    
+    async def Permissions(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_message(content=f"{tick} Please select the required roles for this command.", ephemeral=True, view=PermissionsView(self.author, self.name))
+
+
     @discord.ui.button(label='Finish', style=discord.ButtonStyle.green, emoji=f"{tick}", row=2)
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
@@ -484,7 +562,10 @@ class NoEmbeds(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-
+        result = customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
+        if result.get('permissionroles', None): 
+            await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name},** please select the required permissions for this command using the `Permission` button!", ephemeral=True)
+            return
 
         message = interaction.message
         
@@ -514,7 +595,7 @@ class NoEmbeds(discord.ui.View):
 
         customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
-        embed.title = f"{greencheck} Succesfully Created"
+        embed.title = f"{greencheck} Success!"
         embed.description = f"Start by using /command run and selecting `{self.name}`"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
@@ -561,7 +642,21 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)         
 
         embed = discord.Embed(title="Variables List", description="**{author.name}** = The name of the person who is using the command\n**{author.id}** = The user id who is using the command\n**{author.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp of when the command was used\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner", color=discord.Colour.dark_embed())  
+
+
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @discord.ui.button(label='Permissions', style=discord.ButtonStyle.blurple, emoji="<:Permissions:1207365901956026368>")    
+    async def Permissions(self, interaction: discord.Interaction, button: discord.ui.Button):
+        author = self.author.id
+        if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        await interaction.response.send_message(content=f"{tick} Please select the required roles for this command.", ephemeral=True, view=PermissionsView(self.author, self.name))
+
+
+
     @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
@@ -625,7 +720,11 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-
+        result = customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
+        perm = result.get('permissionroles', None)
+        if perm is None: 
+            await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name},** please select the required permissions for this command using the `Permission` button!", ephemeral=True)
+            return
         message = interaction.message
         if interaction.message.content is None:
             messagecontent = None
@@ -661,7 +760,33 @@ class Embeds(discord.ui.View):
 
         customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
-        embed.title = f"{greencheck} Succesfully Created"
+        embed.title = f"{greencheck} Success!"
         embed.description = f"Start by using </command run:1199462063202902077> and selecting `{self.name}`"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
+
+class Permission(discord.ui.RoleSelect):
+    def __init__(self, author, name):
+
+        super().__init__(placeholder='Command Permission', max_values=20)
+        self.author = author
+        self.name = name
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+  
+        data = {
+            'permissionroles': selected_role_ids
+        }
+
+        customcommands.update_one({'name': self.name, 'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the permission requirement.",  view=None)
+
+
+class PermissionsView(discord.ui.View):
+    def __init__(self, author, name):
+        super().__init__()
+        self.add_item(Permission(author, name))

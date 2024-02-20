@@ -52,7 +52,7 @@ class CustomCommands(commands.Cog):
     @command.command(description="Run one of your servers custom commands.")
     @app_commands.autocomplete(command=commands_auto_complete)
     async def run(self, ctx, command, channel: discord.TextChannel = None):
-        if not await has_admin_role(ctx):
+        if not await has_customcommandrole(ctx, command):
             return
 
         command_data  = await custom_commands.find_one({'name': command, 'guild_id': ctx.guild.id})
@@ -247,6 +247,30 @@ class Voting(discord.ui.View):
         embed_description = str(voters_str)[:4096]
         embed = discord.Embed(title="Voters", description=embed_description, color=discord.Color.dark_embed())
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+async def has_customcommandrole(ctx, command):
+    filter = {
+        'guild_id': ctx.guild.id,
+        'name': command
+    }
+    role_data = await custom_commands.find_one(filter)
+
+    if role_data and 'permissionroles' in role_data:
+        role_ids = role_data['permissionroles']
+        if not isinstance(role_ids, list):
+            role_ids = [role_ids]
+
+        if any(role.id in role_ids for role in ctx.author.roles):
+            print('allowed')
+            return True
+        else:
+            print('not allowed')
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Custom Command Permission`")
+            return False
+    else:
+        print('none')
+        return await has_admin_role(ctx)
 
 class URL(discord.ui.View):
     def __init__(self, url, buttonname):

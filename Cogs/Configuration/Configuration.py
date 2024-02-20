@@ -537,8 +537,15 @@ class Config(discord.ui.Select):
             
             amount = customcommands.count_documents({'guild_id': interaction.guild.id})
             embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/30)", description="", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             for result in commands:
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>", inline=False)
+                permissions = result.get('permissionroles', 'None')
+                if permissions == 'None':
+                    permissions = "None"
+                else:
+                    permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>\n<:arrow:1166529434493386823> **Required Permissions:** {permissions}", inline=False)
                
             view = CustomCommands(self.author)
             
