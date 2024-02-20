@@ -70,10 +70,10 @@ class VoidInf(discord.ui.Modal, title="Void Infraction"):
             )
             return
 
-        collection.delete_one(filter)
+        collection.update_one(filter, {'$set': {'voided': True}})
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've revoked the infraction with ID `{id}`",
+            content=f"{tick} **{interaction.user.display_name}**, I've voided the infraction with ID `{id}`",
             view=Return(self.user, self.guild, self.author),
             embed=None,
         )
