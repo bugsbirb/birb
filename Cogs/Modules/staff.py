@@ -375,7 +375,7 @@ class quota(commands.Cog):
             return
         result = await staffdb.find_one({'guild_id': ctx.guild.id, 'staff_id': staff.id})
         if result is None:
-            await ctx.send(f"{no} **{ctx.author.display_name}**,this user is not in the staff database.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this user is not in the staff database.")
             return
         timezone = ""
         introduction = ""
