@@ -118,11 +118,14 @@ class StaffRole(discord.ui.RoleSelect):
                 scollection.update_one(filter, {'$set': data})
             else:
                 scollection.insert_one(data)
-            await refreshembed(interaction)    
+  
+
+            await interaction.response.edit_message(content=None)
             try:
-             await interaction.response.edit_message(content=None)
+             await refreshembed(interaction)  
             except:
-                print('Error editing staff role config message') 
+                print('Error editing staff role config message')
+                return 
         except Exception as e:
             print(f"An error occurred: {str(e)}")
         print(f"Select Roles {selected_role_ids}")
@@ -145,11 +148,13 @@ class Adminrole(discord.ui.RoleSelect):
 
 
         arole.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
-        await refreshembed(interaction)  
+
+        await interaction.response.edit_message(content=None)
         try:
-         await interaction.response.edit_message(content=None)
-        except: 
-            print('Error editing admin role config message') 
+         await refreshembed(interaction)  
+        except:
+            print('Error editing admin role config message')
+
         print(f"Select Roles {selected_role_ids}")
 
 
