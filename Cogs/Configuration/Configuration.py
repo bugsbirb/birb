@@ -590,7 +590,7 @@ class Config(discord.ui.Select):
             view = StaffDB(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
-        await interaction.edit_original_response(embed=embed, view=view)
+        view.message = await interaction.edit_original_response(embed=embed, view=view)
 
 
 class StaffDB(discord.ui.View):
@@ -600,6 +600,9 @@ class StaffDB(discord.ui.View):
         self.add_item(StaffCustomise(author))
         self.add_item(Config(author))
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
+
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360) 
@@ -607,6 +610,8 @@ class ConfigViewMain(discord.ui.View):
         self.add_item(Adminrole(author))
         self.add_item(Config(author))
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
@@ -625,6 +630,8 @@ class CustomCommands(discord.ui.View):
         self.add_item(CreateButtons(author))
         self.add_item(Config(author))
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
@@ -635,6 +642,8 @@ class Modmail(discord.ui.View):
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class InfractModule(discord.ui.View):
     def __init__(self, author):
@@ -645,6 +654,8 @@ class InfractModule(discord.ui.View):
         self.add_item(InfractionTypes(author))   
         self.add_item(Config(author))        
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class UtilsModule(discord.ui.View):
     def __init__(self, author):
@@ -653,7 +664,8 @@ class UtilsModule(discord.ui.View):
         self.add_item(ToggleUtils(author))
         self.add_item(Config(author))        
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class PromotionModule(discord.ui.View):
     def __init__(self, author):
@@ -663,7 +675,8 @@ class PromotionModule(discord.ui.View):
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Config(author))    
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class LOAModule(discord.ui.View):
     def __init__(self, author):
@@ -673,6 +686,8 @@ class LOAModule(discord.ui.View):
         self.add_item(ToggleLOADropdown(author))              
         self.add_item(Config(author))    
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class TagsModule(discord.ui.View):
     def __init__(self, author):
@@ -680,7 +695,8 @@ class TagsModule(discord.ui.View):
         self.add_item(ToggleTags(author))         
         self.add_item(Config(author)) 
 
- 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**") 
 
 class QuotaModule(discord.ui.View):
     def __init__(self, author):
@@ -689,6 +705,8 @@ class QuotaModule(discord.ui.View):
         self.add_item(QuotaToggle(author))         
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class FeedbackModule(discord.ui.View):
     def __init__(self, author):
@@ -697,7 +715,8 @@ class FeedbackModule(discord.ui.View):
         self.add_item(ToggleFeedback(author))         
         self.add_item(Config(author)) 
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class SuspensionsModule(discord.ui.View):
     def __init__(self, author):
@@ -705,7 +724,8 @@ class SuspensionsModule(discord.ui.View):
         self.add_item(ToggleSuspensions(author))               
         self.add_item(Config(author)) 
 
-    
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")    
 
 class PartnershipModule(discord.ui.View):
     def __init__(self, author):
@@ -714,7 +734,8 @@ class PartnershipModule(discord.ui.View):
         self.add_item(TogglePartnerships(author))               
         self.add_item(Config(author)) 
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class ForumUtilsModule(discord.ui.View):
     def __init__(self, author):
@@ -722,6 +743,8 @@ class ForumUtilsModule(discord.ui.View):
         self.add_item(ToggleForums(author))                          
         self.add_item(Config(author)) 
 
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
@@ -731,7 +754,8 @@ class ReportsModule(discord.ui.View):
         self.add_item(ToggleReportsDropdown(author))                          
         self.add_item(Config(author)) 
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
@@ -741,7 +765,8 @@ class AppResultModule(discord.ui.View):
         self.add_item(ToggleApplications(author))                          
         self.add_item(Config(author)) 
 
-  
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")  
 
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
@@ -749,7 +774,8 @@ class ConnectionsModule(discord.ui.View):
         self.add_item(ToggleConnectionRoles(author))         
         self.add_item(Config(author)) 
 
-  
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")  
 
 class CustomisatiomModule(discord.ui.View):
     def __init__(self, author):
@@ -758,7 +784,8 @@ class CustomisatiomModule(discord.ui.View):
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
-
+    async def on_timeout(self) -> None:
+        await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
 
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -811,7 +838,7 @@ class ConfigCog(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         view = ConfigViewMain(ctx.author)
-        await ctx.send(embed=embed, view=view)
+        view.message = await ctx.send(embed=embed, view=view)
 
     @config.error
     async def permissionerror(self, ctx, error):
