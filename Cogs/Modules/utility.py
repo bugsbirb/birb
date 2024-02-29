@@ -173,7 +173,7 @@ class HelpMenu(discord.ui.Select):
         elif category == 'Configuration':
             embed.title = "Configuration"
             embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Permissions, and Channels to tailor the bot's behavior to your server's requirements."
-            embed.add_field(name="Commands", value="* /config\n* /modmail config\n* /forums config")
+            embed.add_field(name="Commands", value="* /config\n* /forums manage")
         elif category == 'Utility':
             embed.title = "Utilities"
             embed.description = "The Utility commands module consists of commands unrelated to the bot itself. These commands are designed to provide various helpful functionalities for your server, enhancing its overall utility and convenience."
