@@ -297,10 +297,11 @@ class Forums(commands.Cog):
          return              
      if isinstance(ctx.channel, discord.Thread):   
         try:                  
+         await ctx.send(f"{tick} Forum **Locked.**")         
          await ctx.channel.edit(locked=True, reason=f"{ctx.author.display_name}, locked the forum")
         except discord.Forbidden:
             return await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to unlock this forum.")
-        await ctx.send(f"{tick} Forum **Locked.**")
+
      else:   
         await ctx.send(f"{no} This command only works in **forum channels.**")
 
@@ -310,11 +311,12 @@ class Forums(commands.Cog):
          return              
      if isinstance(ctx.channel, discord.Thread):
         try:        
+         await ctx.send(f"{tick} Forum **Unlocked.**")
          await ctx.channel.edit(locked=False, reason=f"{ctx.author.display_name}, unlocked the forum")
         except discord.Forbidden:
             return await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to unlock this forum.")
          
-        await ctx.send(f"{tick} Forum **Unlocked.**")
+        
      else:   
         await ctx.send(f"{no} This command only works in **forum channels.**")
 
@@ -325,10 +327,10 @@ class Forums(commands.Cog):
      if isinstance(ctx.channel, discord.Thread):        
 
         try:
+         await ctx.send(f"{tick} Forum **Archived.**")  
          await ctx.channel.edit(archived=True, reason=f"{ctx.author.display_name}, archived the forum")
         except discord.Forbidden:
-            return await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to unlock this forum.")       
-        await ctx.send(f"{tick} Forum **Archived.**")  
+            return await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to archive this forum.")       
      else:   
         await ctx.send(f"{no} This command only works in **forum channels.**")
 

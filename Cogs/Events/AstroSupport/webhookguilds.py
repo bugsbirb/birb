@@ -21,6 +21,7 @@ class webGuildJoins(commands.Cog):
             return
         channel_id = 1178362100737916988 
         channel = self.client.get_channel(channel_id)
+
         if channel:
             webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
 

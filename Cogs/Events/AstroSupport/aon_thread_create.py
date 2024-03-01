@@ -48,7 +48,7 @@ class ForumManage(discord.ui.View):
         if requiredrole not in interaction.user.roles:
             return await interaction.response.send_message(f"{no} You do not have the required role to mark this thread as resolved.", ephemeral=True)        
         button.disabled = True
-        channel = interaction.guild.get_channel(1170350695220789258)
+        channel = interaction.guild.get_channel(1101807246079442944)
 
         all_tags = channel.available_tags
         tag = discord.utils.get(all_tags, name="Resolved")
