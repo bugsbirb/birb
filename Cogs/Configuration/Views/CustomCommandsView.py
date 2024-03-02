@@ -23,6 +23,44 @@ loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 customcommands = db['Custom Commands']
+commandslogging = db['Commands Logging']
+
+
+
+
+class CmdUsageChannel(discord.ui.ChannelSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Command Usage Logging', channel_types=[discord.ChannelType.text])
+        self.author = author
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+
+
+            commandslogging.update_one(filter, {'$set': data}, upsert=True)
+
+            await refreshembed(interaction)
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")     
+
 
 class CreateCommand(discord.ui.Modal, title='CreateCommand'):
     def __init__(self, author):
@@ -41,9 +79,9 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
 
     async def on_submit(self, interaction: discord.Interaction):
         amount = customcommands.count_documents({"guild_id": interaction.guild.id})
-        if amount >= 30:
+        if amount >= 25:
          embed = discord.Embed()
-         embed.title = f"{redx} {amount}/30"
+         embed.title = f"{redx} {amount}/25"
          embed.description=f"You have reached the maximum amount of custom commands."
          embed.color = discord.Color.brand_red()
          await interaction.response.edit_message(embed=embed, view=None)
@@ -258,14 +296,7 @@ class ToggleCommands(discord.ui.Select):
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)   
             await refreshembed(interaction)   
 
-async def refreshembed(interaction):
-            commands = customcommands.find({'guild_id': interaction.guild.id})
-            
-            amount = customcommands.count_documents({'guild_id': interaction.guild.id})
-            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/30)", description="", color=discord.Color.dark_embed())
-            for result in commands:
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>", inline=False)
-            await interaction.message.edit(embed=embed)
+
 
 
 class CreateButtons(discord.ui.Select):
@@ -784,6 +815,43 @@ class Permission(discord.ui.RoleSelect):
 
         customcommands.update_one({'name': self.name, 'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the permission requirement.",  view=None)
+
+
+async def refreshembed(interaction):
+            commands = customcommands.find({'guild_id': interaction.guild.id})
+            moduledata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = 'False'
+            if moduledata:
+                modulemsg = moduledata.get('customcommands', 'False')
+                
+        
+
+            logging = commandslogging.find_one({'guild_id': interaction.guild.id})
+            loggingmsg = "Not Configured"
+            if logging:
+                loggingid = logging['channel_id']
+                loggingmsg = f"<#{loggingid}>"
+
+
+
+
+
+            amount = customcommands.count_documents({'guild_id': interaction.guild.id})
+            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            embed.add_field(name=f"<:settings:1207368347931516928> Custom Commands Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Logging Channel:** {loggingmsg}")
+            for result in commands:
+                permissions = result.get('permissionroles', 'None')
+                if permissions == 'None':
+                    permissions = "None"
+                else:
+                    permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>\n<:arrow:1166529434493386823> **Required Permissions:** {permissions}", inline=False)
+            try:    
+             await interaction.message.edit(embed=embed)
+            except:
+                return print("Couldn't edit module due to missing permissions.") 
 
 
 class PermissionsView(discord.ui.View):

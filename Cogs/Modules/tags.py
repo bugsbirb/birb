@@ -12,21 +12,18 @@ scollection = db['staffrole']
 arole = db['adminrole']
 tags = db['tags']
 modules = db['Modules']
+tagslogging = db['Tags Logging']
 from permissions import has_admin_role, has_staff_role
 class Tags(commands.Cog):
     def __init__(self, client):
         self.client = client
- 
-
 
     async def modulecheck(self, ctx): 
-     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
-     if modulesdata is None:
-        return False
-     elif modulesdata['Tags'] == True:   
-        return True
-
-
+        modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
+        if modulesdata is None:
+            return False
+        elif modulesdata['Tags'] == True:   
+            return True
 
     async def tag_name_autocompletion(
         self,
@@ -45,7 +42,6 @@ class Tags(commands.Cog):
 
         return choices
 
-
     @commands.hybrid_group()
     async def tags(self, ctx):
         return
@@ -53,10 +49,10 @@ class Tags(commands.Cog):
     @tags.command(description="Create a tag")    
     async def create(self, ctx, name: str, content: str):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
         if not await has_admin_role(ctx):
-         return               
+            return               
 
         data = {
             'management': ctx.author.id,
@@ -67,13 +63,12 @@ class Tags(commands.Cog):
         await tags.insert_one(data)
         await ctx.send(f"{tick} **`{name}`** created.")
 
-
     @tags.command(description="Edit a tag")
     async def edit(self, ctx, name: str, content: str):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
         if not await has_admin_role(ctx):
             return
         filter = {
@@ -91,41 +86,41 @@ class Tags(commands.Cog):
 
     @tags.command(description="List all available tags")
     async def all(self, ctx):
-     await ctx.defer()
-     if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
-     if not await has_staff_role(ctx):
+        await ctx.defer()
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
+        if not await has_staff_role(ctx):
             return               
-     filter = {
+        filter = {
         'guild_id': ctx.guild.id
     }
 
-     tag_data = tags.find(filter)
+        tag_data = tags.find(filter)
 
-     if tag_data:
-        embed = discord.Embed(title="Tags List", color=discord.Color.dark_embed())
-        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-        embed.set_thumbnail(url=ctx.guild.icon)
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+        if tag_data:
+            embed = discord.Embed(title="Tags List", color=discord.Color.dark_embed())
+            embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+            embed.set_thumbnail(url=ctx.guild.icon)
+            embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
 
-        async for tag in tag_data:
-            name = tag['name']
-            content = tag['content']
+            async for tag in tag_data:
+                name = tag['name']
+                content = tag['content']
 
-            embed.add_field(name=name, value=content, inline=False)
+                embed.add_field(name=name, value=content, inline=False)
 
-        await ctx.send(embed=embed)
-     else:
-        await ctx.send(f"{no} No tags found.")
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"{no} No tags found.")
 
     @tags.command(description="Information about a tag")
     @app_commands.autocomplete(name=tag_name_autocompletion)
     async def info(self, ctx, name):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
         if not await has_admin_role(ctx):
             return
 
@@ -152,8 +147,8 @@ class Tags(commands.Cog):
     async def send(self, ctx, name):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
         if not await has_staff_role(ctx):
             return        
         filter = {
@@ -162,12 +157,34 @@ class Tags(commands.Cog):
         }
 
         tag_data = await tags.find_one(filter) 
+        tagsloggingdata = await tagslogging.find_one({'guild_id': ctx.guild.id})
 
         if tag_data:
             content = tag_data.get('content')
             channel = ctx.channel
             await ctx.send(f"{tick} tag **sent**", ephemeral=True)
             await channel.send(content)
+            if tagsloggingdata:
+                channel = self.client.get_channel(tagsloggingdata["channel_id"])
+                if channel:
+                    embed = discord.Embed(
+                        title=f"Tag Usage",
+                        description=f"Tag **{name}** was used by {ctx.author.mention} in {ctx.channel.mention}",
+                        color=discord.Color.dark_embed(),
+                    )
+                    embed.set_author(
+                        name=ctx.author.display_name, icon_url=ctx.author.display_avatar
+                    )
+                    try:
+                        await channel.send(embed=embed)
+                    except discord.Forbidden or discord.HTTPException:
+                        return print(
+                            f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
+                        )
+
+                else:
+                    return print("Channel not found")
+
         else:
             await ctx.send(f"{no} Tag with the name `{name}` not found.")
 
@@ -176,8 +193,8 @@ class Tags(commands.Cog):
     async def delete(self, ctx, name):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return                 
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
         if not await has_admin_role(ctx):
             return        
         filter = {
@@ -186,8 +203,8 @@ class Tags(commands.Cog):
         }        
         tagsz = await tags.find_one(filter)
         if tagsz is None:
-         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the tag **`{name}`**.", allowed_mentions=discord.AllowedMentions.none())
-         return
+            await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the tag **`{name}`**.", allowed_mentions=discord.AllowedMentions.none())
+            return
         await tags.delete_one(filter)        
         await ctx.send(f"{tick} Tag **`{name}`** has been deleted.")
 

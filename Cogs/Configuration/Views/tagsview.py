@@ -21,6 +21,7 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
+tagslogging = db['Tags Logging']
 
 
 class ToggleTags(discord.ui.Select):
@@ -53,14 +54,52 @@ class ToggleTags(discord.ui.Select):
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Tags': False}}, upsert=True)
             await refreshembed(interaction)            
 
+class TagsUsageChannel(discord.ui.ChannelSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Tags Usage Logging', channel_types=[discord.ChannelType.text])
+        self.author = author
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+
+
+            tagslogging.update_one(filter, {'$set': data}, upsert=True)
+
+            await refreshembed(interaction)
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")        
+
 async def refreshembed(interaction):
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})        
+            usagechanneldata = tagslogging.find_one({'guild_id': interaction.guild.id})
+            usagechannelmsg = "Not Configured"    
+            if usagechanneldata:
+                usagechannelmsg = f"<#{usagechanneldata['channel_id']}>"
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Tags']}"            
-            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", color=discord.Color.dark_embed())    
+            embed.add_field(name="<:settings:1207368347931516928> Tags Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Tags Logging:** {usagechannelmsg}\n\n <:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
             try: 
              await interaction.message.edit(embed=embed)
             except discord.Forbidden:

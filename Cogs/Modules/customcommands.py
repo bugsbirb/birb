@@ -14,6 +14,7 @@ db = client['astro']
 
 custom_commands = db['Custom Commands']
 CustomVoting = db['Commands Voting']
+commandslogging = db['Commands Logging']
 
 class CustomCommands(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -142,7 +143,26 @@ class CustomCommands(commands.Cog):
                     await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
                 await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
-
+                loggingdata = await commandslogging.find_one({"guild_id": ctx.guild.id})
+                if loggingdata is None:
+                    return
+                if loggingdata:
+                    loggingchannel = self.client.get_channel(loggingdata["channel_id"])
+                    if loggingchannel:
+                     embed = discord.Embed(
+                        title=f"Custom Command Usage",
+                        description=f"Command **{command}** was used by {ctx.author.mention} in {ctx.channel.mention}",
+                        color=discord.Color.dark_embed(),
+                    )
+                     embed.set_author(
+                        name=ctx.author.display_name, icon_url=ctx.author.display_avatar
+                    )
+                     try:
+                        await loggingchannel.send(embed=embed)
+                     except discord.Forbidden or discord.HTTPException:
+                        return print(
+                            f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
+                        )
         else:
             if content is None:
                 await ctx.send(f"{no} **{ctx.author.display_name},** That command does not have any content or embeds.", allowed_mentions=discord.AllowedMentions.none())
@@ -170,6 +190,28 @@ class CustomCommands(commands.Cog):
                     await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
                 await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+                loggingdata = await commandslogging.find_one({"guild_id": ctx.guild.id})
+                if loggingdata is None:
+                    return
+                if loggingdata:
+                    loggingchannel = self.client.get_channel(loggingdata["channel_id"])
+                    if loggingchannel:
+                     embed = discord.Embed(
+                        title=f"Custom Command Usage",
+                        description=f"Command **{command}** was used by {ctx.author.mention} in {ctx.channel.mention}",
+                        color=discord.Color.dark_embed(),
+                    )
+                     embed.set_author(
+                        name=ctx.author.display_name, icon_url=ctx.author.display_avatar
+                    )
+                     try:
+                        await loggingchannel.send(embed=embed)
+                     except discord.Forbidden or discord.HTTPException:
+                        return print(
+                            f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
+                        )
+                    else:
+                        return print("I could not find the channel to send the command usage")
 
         if 'buttons' in command_data and command_data['buttons'] == "Voting Buttons":
              voting_data = {

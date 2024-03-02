@@ -17,6 +17,7 @@ from Cogs.Configuration.Views.loaview import ToggleLOADropdown
 from Cogs.Configuration.Views.loaview import LOARoled
 
 from Cogs.Configuration.Views.tagsview import ToggleTags
+from Cogs.Configuration.Views.tagsview import TagsUsageChannel
 
 from Cogs.Configuration.Views.quotaview import QuotaToggle
 from Cogs.Configuration.Views.quotaview import QuotaAmount
@@ -58,6 +59,9 @@ from Cogs.Configuration.Views.modmailview import ModmailToggle
 
 from Cogs.Configuration.Views.staffpanel import StaffData
 from Cogs.Configuration.Views.staffpanel import StaffCustomise
+
+from Cogs.Configuration.Views.CustomCommandsView import CmdUsageChannel
+
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -94,6 +98,8 @@ customcommands = db['Custom Commands']
 modmailcategory = db['modmailcategory']
 transcriptchannel = db['transcriptschannel']
 modmailping = db['modmailping']
+tagslogging = db['Tags Logging']
+commandslogging = db['Commands Logging']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -337,11 +343,16 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
         elif color == 'Tags':         # Tags
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})        
+            usagechanneldata = tagslogging.find_one({'guild_id': interaction.guild.id})
+            usagechannelmsg = "Not Configured"    
+            if usagechanneldata:
+                usagechannelmsg = f"<#{usagechanneldata['channel_id']}>"
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Tags']}"            
-            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", color=discord.Color.dark_embed())    
+            embed.add_field(name="<:settings:1207368347931516928> Tags Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Tags Logging:** {usagechannelmsg}\n\n <:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
             view = TagsModule(self.author)
@@ -539,11 +550,28 @@ class Config(discord.ui.Select):
 
         elif color == 'Custom Commands':
             commands = customcommands.find({'guild_id': interaction.guild.id})
-            
+            moduledata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = 'False'
+            if moduledata:
+                modulemsg = moduledata.get('customcommands', 'False')
+                
+        
+
+            logging = commandslogging.find_one({'guild_id': interaction.guild.id})
+            loggingmsg = "Not Configured"
+            if logging:
+                loggingid = logging['channel_id']
+                loggingmsg = f"<#{loggingid}>"
+
+
+
+
+
             amount = customcommands.count_documents({'guild_id': interaction.guild.id})
-            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/30)", description="", color=discord.Color.dark_embed())
+            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            embed.add_field(name=f"<:settings:1207368347931516928> Custom Commands Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Logging Channel:** {loggingmsg}")
             for result in commands:
                 permissions = result.get('permissionroles', 'None')
                 if permissions == 'None':
@@ -616,8 +644,8 @@ class ConfigViewMain(discord.ui.View):
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
+        self.add_item(ToggleSuggestions(author))        
         self.add_item(SuggestionsChannel(author))
-        self.add_item(ToggleSuggestions(author))
         self.add_item(Config(author))
 
 
@@ -628,6 +656,7 @@ class CustomCommands(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(ToggleCommands(author))
         self.add_item(CreateButtons(author))
+        self.add_item(CmdUsageChannel(author))
         self.add_item(Config(author))
 
     async def on_timeout(self) -> None:
@@ -649,8 +678,8 @@ class InfractModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
         self.author = author
+        self.add_item(ToggleInfractionsDropdown(author))         
         self.add_item(InfractionChannel(author))
-        self.add_item(ToggleInfractionsDropdown(author))     
         self.add_item(InfractionTypes(author))   
         self.add_item(Config(author))        
 
@@ -671,8 +700,8 @@ class PromotionModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
         self.author = author
-        self.add_item(Promotionchannel(author))
         self.add_item(PromotionModuleToggle(author))        
+        self.add_item(Promotionchannel(author))
         self.add_item(Config(author))    
 
     async def on_timeout(self) -> None:
@@ -681,9 +710,9 @@ class PromotionModule(discord.ui.View):
 class LOAModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
+        self.add_item(ToggleLOADropdown(author))  
         self.add_item(LOARoled(author))
-        self.add_item(LOAChannel(author))        
-        self.add_item(ToggleLOADropdown(author))              
+        self.add_item(LOAChannel(author))                  
         self.add_item(Config(author))    
 
     async def on_timeout(self) -> None:
@@ -692,7 +721,8 @@ class LOAModule(discord.ui.View):
 class TagsModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
-        self.add_item(ToggleTags(author))         
+        self.add_item(ToggleTags(author))      
+        self.add_item(TagsUsageChannel(author))   
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
@@ -701,8 +731,8 @@ class TagsModule(discord.ui.View):
 class QuotaModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
+        self.add_item(QuotaToggle(author))            
         self.add_item(QuotaAmount(author))          
-        self.add_item(QuotaToggle(author))         
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
@@ -711,8 +741,8 @@ class QuotaModule(discord.ui.View):
 class FeedbackModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
-        self.add_item(FeedbackChannel(author))          
         self.add_item(ToggleFeedback(author))         
+        self.add_item(FeedbackChannel(author))          
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
@@ -730,8 +760,8 @@ class SuspensionsModule(discord.ui.View):
 class PartnershipModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
-        self.add_item(PartnershipChannel(author))            
-        self.add_item(TogglePartnerships(author))               
+        self.add_item(TogglePartnerships(author))          
+        self.add_item(PartnershipChannel(author))                    
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
@@ -748,10 +778,10 @@ class ForumUtilsModule(discord.ui.View):
 
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)     
+        super().__init__(timeout=360)   
+        self.add_item(ToggleReportsDropdown(author))           
         self.add_item(ReportChannel(author))         
-        self.add_item(ReportsModeratorRole(author))
-        self.add_item(ToggleReportsDropdown(author))                          
+        self.add_item(ReportsModeratorRole(author))          
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
@@ -760,9 +790,10 @@ class ReportsModule(discord.ui.View):
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
+        self.add_item(ToggleApplications(author))          
         self.add_item(ApplicationChannel(author))         
         self.add_item(ApplicationsRoles(author))             
-        self.add_item(ToggleApplications(author))                          
+                        
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
