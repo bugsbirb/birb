@@ -843,7 +843,7 @@ class ConfigCog(commands.Cog):
     @config.error
     async def permissionerror(self, ctx, error):
         if isinstance(error, commands.MissingPermissions): 
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``", allowed_mentions=discord.AllowedMentions.none())            
 
 async def refreshembed(interaction):
             staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
