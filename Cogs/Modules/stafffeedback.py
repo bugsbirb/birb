@@ -64,7 +64,7 @@ class Feedback(commands.Cog):
         return
        
        await stafffeedback.delete_one({'feedbackid': id, 'guild_id': ctx.guild.id})
-       await ctx.send(f"{tick} **{ctx.author.display_name}**, I have removed the feedback.")
+       await ctx.send(f"{tick} **{ctx.author.display_name}**, I have removed the feedback.", allowed_mentions=discord.AllowedMentions.none())
 
 
    
@@ -74,13 +74,13 @@ class Feedback(commands.Cog):
     async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
        existing_feedback = await stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        if staff is None:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.", allowed_mentions=discord.AllowedMentions.none())
         return       
        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return          
        if staff == ctx.author:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.", allowed_mentions=discord.AllowedMentions.none())
             return
 
 
@@ -88,11 +88,11 @@ class Feedback(commands.Cog):
        has_staff_role = await self.staffcheck(ctx, staff)
 
        if not has_staff_role:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.", allowed_mentions=discord.AllowedMentions.none())
         return
 
        if existing_feedback:
-        await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.")
+        await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
         return
        
        rating_value = rating.split("/")[0]
@@ -108,7 +108,7 @@ class Feedback(commands.Cog):
         'feedbackid': feedbackid
        }
        await stafffeedback.insert_one(feedbackdata)
-       await ctx.send(f"{tick} You've rated **@{staff.display_name}** {rating}!")
+       await ctx.send(f"{tick} You've rated **@{staff.display_name}** {rating}!", allowed_mentions=discord.AllowedMentions.none())
        data = await feedbackch.find_one({'guild_id': ctx.guild.id})
        if data:
          channel_id = data['channel_id']
@@ -120,9 +120,9 @@ class Feedback(commands.Cog):
             embed.set_author(name=f"From {ctx.author.display_name}", icon_url=ctx.author.display_avatar) 
             embed.set_footer(text=f"Feedback ID: {feedbackid}")           
             try:
-             await channel.send(f"{staff.mention}",embed=embed)
+             await channel.send(f"{staff.mention}",embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
             except discord.Forbidden: 
-               await ctx.send(f"{no} I don't have permission to view this channel.")
+               await ctx.send(f"{no} I don't have permission to view this channel.", allowed_mentions=discord.AllowedMentions.none())
                return
 
          else:   
@@ -143,7 +143,7 @@ class Feedback(commands.Cog):
 
      
      if total_ratings == 0:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find any rating for this user.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find any rating for this user.", allowed_mentions=discord.AllowedMentions.none())
         return
      staff_ratings = await staff_ratings
      sum_ratings = sum(int(rating['rating'].split('/')[0]) for rating in staff_ratings)

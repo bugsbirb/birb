@@ -37,31 +37,31 @@ class Suspensions(commands.Cog):
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
     async def suspend(self, ctx, staff: discord.Member, length: str, reason: str):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
         if not await has_admin_role(ctx):
             return
         if staff.bot:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you can't suspend a bot.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can't suspend a bot.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not re.match(r'^\d+[mhdw]$', length):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if ctx.author == staff:
-            await ctx.send(f"{no} You can't suspend yourself.")
+            await ctx.send(f"{no} You can't suspend yourself.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if ctx.author.top_role <= staff.top_role:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.", ephemeral=True)
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
 
         filter = {'guild_id': ctx.guild.id, 'staff': staff.id, 'active': True}
         existing_suspensions = await suspensions.find_one(filter)
 
         if existing_suspensions:
-            await ctx.send(f"{no} **{staff.display_name}** is already suspended.", ephemeral=True)
+            await ctx.send(f"{no} **{staff.display_name}** is already suspended.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
 
         duration_value = int(length[:-1])
@@ -90,7 +90,7 @@ class Suspensions(commands.Cog):
     @suspension.command(description="View all active suspension")
     async def active(self, ctx):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
         if not await has_admin_role(ctx):
             return             
@@ -100,7 +100,7 @@ class Suspensions(commands.Cog):
         loa_requests = await suspensions.find(filter).to_list(length=None)
 
         if len(loa_requests) == 0:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.", allowed_mentions=discord.AllowedMentions.none())
         else:
             embed = discord.Embed(
             title="Active Suspensions",
@@ -127,7 +127,7 @@ class Suspensions(commands.Cog):
 
     async def manage(self, ctx, staff: discord.Member):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return              
         if not await has_admin_role(ctx):
             return   
@@ -175,7 +175,7 @@ class Suspensions(commands.Cog):
             view = SuspensionPanel(staff, ctx.author)
             await ctx.send(embed=embed, view=view)
         else:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.", allowed_mentions=discord.AllowedMentions.none())
 
     @tasks.loop(minutes=10)
     async def check_suspensions(self):
@@ -287,7 +287,7 @@ class Suspension(discord.ui.RoleSelect):
                 try:
                     await channel.send(f"{self.user.mention}", embed=embed)
                 except discord.Forbidden:
-                    await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None)
+                    await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
                     return
 
                 try:
@@ -297,11 +297,12 @@ class Suspension(discord.ui.RoleSelect):
                         content=f"{no} {interaction.user.display_name}, I don't have permission to add roles.",
                         view=None,
                         embed=None
+                        , allowed_mentions=discord.AllowedMentions.none()
                     )
                     return
   
                 try:
-                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
+                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
                 except:
                  print('Failed to send suspension message to user')
                  pass
@@ -314,7 +315,7 @@ class Suspension(discord.ui.RoleSelect):
                     embed=None
                 )
             else:
-                await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not set up. Please run `/config`.", view=None, embed=None)
+                await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not set up. Please run `/config`.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
 
 
 class RoleTakeAwayYesOrNo(discord.ui.View):
@@ -333,7 +334,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         view = RoleTakeAwayView(self.user, self.author, self.reason, self.end_time, self.start_time)
-        await interaction.response.edit_message(content=f"<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view)
+        await interaction.response.edit_message(content=f"<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
 
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
     async def No(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -371,23 +372,23 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             
             
             try:
-             await channel.send(f"{self.user.mention}", embed=embed)
+             await channel.send(f"{self.user.mention}", embed=embed, view=None, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
             except discord.Forbidden: 
-             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None)             
+             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())             
              return
 
 
             await suspensions.insert_one(infract_data)
-            await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None)        
+            await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())        
             try:
                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
             except:
                 print('Failed to send suspension message to user')
                 pass                
          else:
-            await interaction.response.edit_message(content=f"{no} {interaction.user.display_name}, I don't have permission to view this channel.", view=None, embed=None)
+            await interaction.response.edit_message(content=f"{no} {interaction.user.display_name}, I don't have permission to view this channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
         else:
-          await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not setup please run `/config`", view=None, embed=None)
+          await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not setup please run `/config`", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
 
 class RoleTakeAwayView(discord.ui.View):
     def __init__(self, user, author, reason, end_time, start_time):

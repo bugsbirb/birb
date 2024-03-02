@@ -67,6 +67,7 @@ class VoidInf(discord.ui.Modal, title="Void Infraction"):
                 content=f"{no} **{interaction.user.display_name}**, I couldn't find the infraction with ID `{id}`.",
                 view=Return(self.user, self.guild, self.author),
                 embed=None,
+                allowed_mentions=discord.AllowedMentions.none()
             )
             return
 
@@ -76,6 +77,7 @@ class VoidInf(discord.ui.Modal, title="Void Infraction"):
             content=f"{tick} **{interaction.user.display_name}**, I've voided the infraction with ID `{id}`",
             view=Return(self.user, self.guild, self.author),
             embed=None,
+            allowed_mentions=discord.AllowedMentions.none()
         )
 
 
@@ -162,12 +164,14 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
                     content=f"{tick} Created LOA for **@{self.user.display_name}**",
                     view=Return(self.user, self.guild, self.author),
                     embed=None,
+                    allowed_mentions=discord.AllowedMentions.none()
                 )
                 loa_collection.insert_one(loadata)
                 try:
                     await channel.send(
                         f"<:Add:1163095623600447558> LOA was created by **@{interaction.user.display_name}**",
                         embed=embed,
+                        
                     )
                 except discord.Forbidden:
                     await interaction.response.edit_message(
@@ -180,6 +184,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
                     await self.user.send(
                         f"<:Add:1163095623600447558> A LOA was created for you **@{interaction.guild.name}**",
                         embed=embed,
+                        allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False)
                     )
                 except discord.Forbidden:
                     pass
@@ -215,6 +220,7 @@ class PromotionRole(discord.ui.RoleSelect):
                 content=f"{no} **{interaction.user.display_name}**, you are below the role `{role.name}` and do not have the authority to promote this member.",
                 view=Return(self.user, self.guild, self.author),
                 embed=None,
+                allowed_mentions=discord.AllowedMentions.none(),
             )
             return
 
@@ -347,12 +353,13 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                     await interaction.response.edit_message(
                         content=f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to add roles.",
                         embed=None,
-                        view=Return(self.user, self.guild, self.author),
+                        view=Return(self.user, self.guild, self.author)
+                        , allowed_mentions=discord.AllowedMentions.none()
                     )
                     return
 
                 try:
-                    await channel.send(f"{self.user.mention}", embed=embed)
+                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
                 except discord.Forbidden:
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
@@ -365,6 +372,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                     content=f"{tick} **{self.author.display_name}**, I've promoted **@{self.user.display_name}**",
                     embed=None,
                     view=Return(self.user, self.guild, self.author),
+                    allowed_mentions=discord.AllowedMentions.none()
                 )
 
                 if consent_data["PromotionAlerts"] == "Enabled":
@@ -384,6 +392,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                 content=f"{Warning} **{interaction.user.display_name}**, the channel is not set up. Please run `/config`",
                 embed=None,
                 view=None,
+                allowed_mentions=discord.AllowedMentions.none()
             )
 
 
@@ -511,18 +520,19 @@ class Reason(discord.ui.Modal, title="Reason"):
             if channel:
 
                 try:
-                    await channel.send(f"{self.user.mention}", embed=embed)
+                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
                 except discord.Forbidden:
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
                         view=Return(self.user, self.guild, self.author),
-                        embed=None,
+                        embed=None, allowed_mentions=discord.AllowedMentions.none()
                     )
                     return
                 await interaction.response.edit_message(
                     content=f"{tick} **{self.author.display_name}**, I've infracted **@{self.user.display_name}**",
                     embed=None,
-                    view=Return(self.user, self.guild, self.author),
+                    view=Return(self.user, self.guild, self.author)
+                    , allowed_mentions=discord.AllowedMentions.none()
                 )
                 collection.insert_one(infract_data)
                 if consent_data["infractionalert"] == "Enabled":
@@ -541,6 +551,7 @@ class Reason(discord.ui.Modal, title="Reason"):
                 content=f"{Warning} **{self.author.display_name}**, the channel is not setup please run `/config`",
                 embed=None,
                 view=Return(self.user, self.guild, self.author),
+                allowed_mentions=discord.AllowedMentions.none()
             )
 
 
@@ -1195,7 +1206,7 @@ class LOAPanel(discord.ui.View):
 
         await interaction.response.edit_message(
             embed=None,
-            content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA",
+            content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA", allowed_mentions=discord.AllowedMentions.none(),
             view=Return(self.user, self.guild, self.author),
         )
 

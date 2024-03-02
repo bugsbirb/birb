@@ -93,10 +93,10 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
                                 await interaction.response.edit_message(content=f"{no} I don't have permission to add roles.")
                                 return
 
-                await interaction.response.edit_message(content=f"{tick} Created LOA for **@{self.user.display_name}**", embed=embed, view=None)
+                await interaction.response.edit_message(content=f"{tick} Created LOA for **@{self.user.display_name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
                 await loa_collection.insert_one(loadata)
                 try:
-                    await channel.send(f"<:Add:1163095623600447558> LOA was created by **@{interaction.user.display_name}**", embed=embed)
+                    await channel.send(f"<:Add:1163095623600447558> LOA was created by **@{interaction.user.display_name}**", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
                 except discord.Forbidden:
                     await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.")
                     return
@@ -198,7 +198,7 @@ class loamodule(commands.Cog):
     @loa.command(description="Manage someone leave of Absence")
     async def manage(self, ctx, user: discord.Member):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
         if not await has_admin_role(ctx):
             return
@@ -242,7 +242,7 @@ class loamodule(commands.Cog):
     @loa.command(description="View all Leave Of Absence")
     async def active(self, ctx):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
@@ -254,7 +254,7 @@ class loamodule(commands.Cog):
         loa_requests = await loa_collection.find(filter).to_list(length=None)
 
         if len(loa_requests) == 0:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active LOAs in this server.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, there aren't any active LOAs in this server.", allowed_mentions=discord.AllowedMentions.none())
         else:
             embed = discord.Embed(
                 title="Active LOAs",
@@ -286,12 +286,12 @@ class loamodule(commands.Cog):
             return
         if not re.match(r'^\d+[mhdw]$', duration):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+                f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
             return
         loa_data = await loa_collection.find_one(
             {'guild_id': ctx.guild.id, 'user': ctx.author.id, 'active': True})
         if loa_data:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you already have an active LOA.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you already have an active LOA.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         duration_value = int(duration[:-1])
@@ -338,9 +338,9 @@ class loamodule(commands.Cog):
                     await ctx.send(f"{no} Please contact server admins I can't see the LOA Channel.")
 
             else:
-                await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.")
+                await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view this channel.", allowed_mentions=discord.AllowedMentions.none())
         else:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not set up. Please run `/config`")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not set up. Please run `/config`", allowed_mentions=discord.AllowedMentions.none())
 
 
 class Confirm(discord.ui.View):
@@ -369,7 +369,7 @@ class Confirm(discord.ui.View):
         await interaction.response.defer()
         if not await self.has_admin_role(interaction):
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
+                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`", allowed_mentions=discord.AllowedMentions.none(),
                 ephemeral=True)
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
@@ -404,8 +404,8 @@ class Confirm(discord.ui.View):
         await interaction.response.defer()
         if not await self.has_admin_role(interaction):
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
-                ephemeral=True)
+                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`", allowed_mentions=discord.AllowedMentions.none()
+                ,ephemeral=True)
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
         if loa_data:
@@ -460,7 +460,7 @@ class LOAPanel(discord.ui.View):
         await loa_collection.update_many({'guild_id': interaction.guild.id, 'user': user.id}, {'$set': {'active': False}})
         await interaction.response.edit_message(embed=None,
                                                content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA",
-                                               view=None)                                           
+                                               view=None, allowed_mentions=discord.AllowedMentions.none())                                           
         try:
             await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")
         except discord.Forbidden:

@@ -68,23 +68,23 @@ class Modmail(commands.Cog):
     @modmail.command(description="Unblacklist someone from using modmail")
     async def unblacklist(self, ctx, member: discord.Member):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
             return
         blacklist = await modmailblacklists.find_one({'guild_id': ctx.guild.id})
         if blacklist:
             if member.id not in blacklist['blacklist']:
-                await ctx.send(f"{no} **{member.display_name}** is not blacklisted.")
+                await ctx.send(f"{no} **{member.display_name}** is not blacklisted.", allowed_mentions=discord.AllowedMentions.none())
                 return
         await modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$pull': {'blacklist': member.id}}, upsert=True)
-        await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.")
+        await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.", allowed_mentions=discord.AllowedMentions.none())
 
     @modmail.command(description="Reply to a modmail")
     async def reply(self, ctx, *, content, media: discord.Attachment = None):
      await ctx.defer(ephemeral=True)
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return        
@@ -127,7 +127,7 @@ class Modmail(commands.Cog):
     @commands.command(description="Reply to a modmail channel.")
     async def mreply(self, ctx, *, content):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -171,7 +171,7 @@ class Modmail(commands.Cog):
     @commands.command(description="Close a modmail channel.", name="mclose")
     async def close2(self, ctx, *, reason = None):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -201,11 +201,11 @@ class Modmail(commands.Cog):
                 filename=f"transcript-{ctx.channel.name}.html",
     )     
                 try:   
-                 await ctx.channel.send(f"{tick} Modmail channel has been closed.")    
+                 await ctx.channel.send(f"{tick} Modmail channel has been closed.", allowed_mentions=discord.AllowedMentions.none())    
                  await channel.delete()
 
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
  
                 user_id = modmail_data.get('user_id')
@@ -254,7 +254,7 @@ class Modmail(commands.Cog):
     async def close(self, ctx, *, reason = None):
      await ctx.defer()
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -288,7 +288,7 @@ class Modmail(commands.Cog):
                  await channel.delete()
 
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
  
                 user_id = modmail_data.get('user_id')

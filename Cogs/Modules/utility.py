@@ -261,7 +261,7 @@ class Utility(commands.Cog):
     async def server(self, ctx):
         """ Check info about current server """        
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return          
 
         if ctx.invoked_subcommand is None:
@@ -286,7 +286,7 @@ class Utility(commands.Cog):
     async def user(self, ctx, user: Optional[discord.User] = None):
         """Displays users information"""        
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
 
         if user is None:
@@ -332,7 +332,7 @@ class Utility(commands.Cog):
             await ctx.send(embed=embed)
 
         except aiohttp.ClientError as e:
-            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`")
+            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):

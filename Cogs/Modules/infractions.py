@@ -77,14 +77,14 @@ class Infractions(commands.Cog):
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
     async def infract(self, ctx, staff: discord.Member, action, reason: str, notes: Optional[str], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
             return
 
         if ctx.author == staff:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can't infract yourself.", allowed_mentions=discord.AllowedMentions.none())
             return
 
 
@@ -93,7 +93,7 @@ class Infractions(commands.Cog):
         random_string = ''.join(random.choices(string.digits, k=8))
         if expiration:
             if not re.match(r'^\d+[mhdws]$', expiration):
-                await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.")
+                await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
                 return
 
         if expiration:
@@ -198,8 +198,8 @@ class Infractions(commands.Cog):
 
             if channel:
                 try:
-                    msg = await channel.send(f"{staff.mention}", embed=embed)
-                    await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**")
+                    msg = await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                    await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**", allowed_mentions=discord.AllowedMentions.none())
                     if expiration:
                         infract_data = {
                             'management': ctx.author.id,
@@ -229,7 +229,7 @@ class Infractions(commands.Cog):
                         }
                     await collection.insert_one(infract_data)
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.")
+                    await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
                 if consent_data['infractionalert'] == "Enabled":
                     try:
@@ -240,9 +240,9 @@ class Infractions(commands.Cog):
                 else:
                     pass
             else:
-                await ctx.send(f"{Warning} **{ctx.author.display_name}**, I don't have permission to view that channel.")
+                await ctx.send(f"{Warning} **{ctx.author.display_name}**, I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
         else:
-            await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not set up. Please run `/config`")
+            await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not set up. Please run `/config`", allowed_mentions=discord.AllowedMentions.none())
 
     async def replace_variables(self, message, replacements):
         for placeholder, value in replacements.items():
@@ -258,7 +258,7 @@ class Infractions(commands.Cog):
     async def infractions(self, ctx, staff: discord.Member, scope: Literal['Voided', 'Expired', 'All'] = None):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_staff_role(ctx):
@@ -293,13 +293,13 @@ class Infractions(commands.Cog):
 
         if not infractions:
             if scope == 'Voided':
-                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no voided infractions found for **@{staff.display_name}**.")
+                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no voided infractions found for **@{staff.display_name}**.", allowed_mentions=discord.AllowedMentions.none())
             elif scope == 'All':
-                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no infractions found for **@{staff.display_name}**.")
+                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no infractions found for **@{staff.display_name}**.", allowed_mentions=discord.AllowedMentions.none())
             elif scope == 'Expired':
-                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no expired infractions found for **@{staff.display_name}**.")
+                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no expired infractions found for **@{staff.display_name}**.", allowed_mentions=discord.AllowedMentions.none())
             else:
-                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no infractions found for **@{staff.display_name}**.")
+                await ctx.send(f"{no} **{ctx.author.display_name}**, there are no infractions found for **@{staff.display_name}**.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         print(f"Found {len(infractions)} infractions for {staff.display_name}")
@@ -351,7 +351,7 @@ class Infractions(commands.Cog):
     @app_commands.describe(id="The ID of the infraction to void .eg 12345678")
     async def void(self, ctx, id: str):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
      if not await has_admin_role(ctx):
         return
@@ -364,17 +364,17 @@ class Infractions(commands.Cog):
      infraction = await collection.find_one(filter)
 
      if infraction is None:
-        await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
         return
      await collection.update_one(filter, {'$set': {'voided': True}})
  
-     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.")
+     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
      
     @infraction.command(description="Edit an existing infraction")
     @app_commands.autocomplete(action=infractiontypes)
     async def edit(self, ctx, id: str, action, reason: str, notes: Optional[str]):
       if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
       if not await has_admin_role(ctx):
          return
@@ -387,11 +387,11 @@ class Infractions(commands.Cog):
       infraction = await collection.find_one(filter)
 
       if infraction is None:
-         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.",allowed_mentions=discord.AllowedMentions.none())
          return
       infchannelresult = await infchannel.find_one({'guild_id': ctx.guild.id})
       if infchannelresult is None:
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction channel is not setup please run `/config`")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
          return
       
       staff = await self.client.fetch_user(infraction['staff']) 
@@ -480,7 +480,7 @@ class Infractions(commands.Cog):
             pass                   
       await collection.update_one(filter, {'$set': {'action': action, 'reason': reason, 'notes': notes}})
 
-      await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the infraction with ID `{id}` in this guild.\n{error}")
+      await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the infraction with ID `{id}` in this guild.\n{error}", allowed_mentions=discord.AllowedMentions.none())
 
 
     @tasks.loop(minutes=3)

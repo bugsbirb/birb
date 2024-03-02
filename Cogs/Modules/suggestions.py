@@ -31,7 +31,7 @@ class suggestions(commands.Cog):
     @commands.hybrid_command(description="Submit a suggestion for improvement")
     async def suggest(self, ctx, suggestion: str):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return    
 
         suggestion_data = {
@@ -59,14 +59,14 @@ class suggestions(commands.Cog):
          if channel:
           try:  
            msg = await channel.send(embed=embed, view=view)
-           await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.")
+           await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.", allowed_mentions=discord.AllowedMentions.none())
            await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})           
           except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view that channel.")              
              return
 
         else: 
-            await ctx.send(f"{no} {ctx.author.display_name}, this channel isn't configured. Please do `/config`.")
+            await ctx.send(f"{no} {ctx.author.display_name}, this channel isn't configured. Please do `/config`.", allowed_mentions=discord.AllowedMentions.none())
 
 
 

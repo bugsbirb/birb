@@ -43,7 +43,7 @@ class ApplicationResults(commands.Cog):
         feedback,
     ):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
@@ -77,11 +77,11 @@ class ApplicationResults(commands.Cog):
             channel = self.client.get_channel(channelid)
             if channel:
                 try:
-                    msg = await channel.send(f"{applicant.mention}", embed=embed)
-                    await ctx.send(f"{tick} **{ctx.author.display_name}**, submitted application results for **@{applicant.display_name}**")
+                    msg = await channel.send(f"{applicant.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                    await ctx.send(f"{tick} **{ctx.author.display_name}**, submitted application results for **@{applicant.display_name}**", allowed_mentions=discord.AllowedMentions.none())
                 except discord.Forbidden:
                     await ctx.send(
-                        f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in {channel.mention}."
+                        f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in {channel.mention}.", allowed_mentions=discord.AllowedMentions.none()
                     )
                     return
 
@@ -95,15 +95,15 @@ class ApplicationResults(commands.Cog):
                             try:
                                 await member.add_roles(*roles_to_add)
                             except discord.Forbidden as e:
-                                await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.")
+                                await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none())
                                 return
                 else:
                     await ctx.send(
-                        f"{no} **{ctx.author.display_name}**, the specified channel doesn't exist."
+                        f"{no} **{ctx.author.display_name}**, the specified channel doesn't exist.", allowed_mentions=discord.AllowedMentions.none()
                     )
         else:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this channel isn't configured. Please do `/config`."
+                f"{no} **{ctx.author.display_name}**, this channel isn't configured. Please do `/config`.", allowed_mentions=discord.AllowedMentions.none()
             )
 
 

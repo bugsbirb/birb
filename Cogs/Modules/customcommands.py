@@ -57,7 +57,7 @@ class CustomCommands(commands.Cog):
 
         command_data  = await custom_commands.find_one({'name': command, 'guild_id': ctx.guild.id})
         if command_data is None:
-            return await ctx.send(f'{no} **{ctx.author.display_name},** That command does not exist.')
+            return await ctx.send(f'{no} **{ctx.author.display_name},** That command does not exist.', allowed_mentions=discord.AllowedMentions.none())
         
         if 'buttons' in command_data and command_data['buttons'] == "Voting Buttons":
             voting_data = {
@@ -124,52 +124,52 @@ class CustomCommands(commands.Cog):
                     if content or embed or view:
                         msg = await channel.send(content, embed=embed, view=view)
                     else:
-                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
+                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
+                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
             else:
                 try:
                     if content or embed or view:
                         msg = await ctx.channel.send(content, embed=embed, view=view)
                     else:
-                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
+                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
+                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
         else:
             if content is None:
-                await ctx.send(f"{no} **{ctx.author.display_name},** That command does not have any content. Please remake it.")
+                await ctx.send(f"{no} **{ctx.author.display_name},** That command does not have any content or embeds.", allowed_mentions=discord.AllowedMentions.none())
                 return
             if channel:
                 try:
                     if content or view:
                         msg = await channel.send(content, view=view)
                     else:
-                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
+                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True)
+                await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
             else:
                 try:
                     if content or view:
                         msg = await ctx.channel.send(content, view=view)
                     else:
-                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.")
+                        await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
                 except discord.Forbidden:
-                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.")
+                    await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True)
+                await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
         if 'buttons' in command_data and command_data['buttons'] == "Voting Buttons":
              voting_data = {

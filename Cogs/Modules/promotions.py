@@ -39,18 +39,18 @@ class promo(commands.Cog):
     ) 
     async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str, autorole: Optional[Literal['False']]):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
         if not await has_admin_role(ctx):
          return             
          
    
         if ctx.author == staff:
-         await ctx.send(f"{no} You can't promote yourself.")
+         await ctx.send(f"{no} You can't promote yourself.", allowed_mentions=discord.AllowedMentions.none())
          return
 
         if ctx.author.top_role <= new:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True)
+            await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
         if autorole == "False":
 
@@ -59,7 +59,7 @@ class promo(commands.Cog):
          try:
             await staff.add_roles(new)
          except discord.Forbidden:
-            await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True)
+            await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
 
 
@@ -127,10 +127,10 @@ class promo(commands.Cog):
 
          if channel:
             try:            
-             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**")
-             await channel.send(f"{staff.mention}", embed=embed)
+             await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**", allowed_mentions=discord.AllowedMentions.none())
+             await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
             except discord.Forbidden: 
-             await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to view that channel.")        
+             await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())        
              return       
             if consent_data['PromotionAlerts'] == "Enabled":
                 try:
@@ -142,9 +142,9 @@ class promo(commands.Cog):
             else:    
                 pass
          else:
-            await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.")
+            await ctx.send(f"{Warning} {ctx.author.display_name}, I don't have permission to view this channel.", allowed_mentions=discord.AllowedMentions.none())
         else:
-          await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`")
+          await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
 
     async def replace_variables(self, message, replacements):
      for placeholder, value in replacements.items():

@@ -53,7 +53,7 @@ class Tags(commands.Cog):
     @tags.command(description="Create a tag")    
     async def create(self, ctx, name: str, content: str):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
          return               
@@ -72,7 +72,7 @@ class Tags(commands.Cog):
     async def edit(self, ctx, name: str, content: str):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
             return
@@ -93,7 +93,7 @@ class Tags(commands.Cog):
     async def all(self, ctx):
      await ctx.defer()
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
      if not await has_staff_role(ctx):
             return               
@@ -124,7 +124,7 @@ class Tags(commands.Cog):
     async def info(self, ctx, name):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
             return
@@ -152,7 +152,7 @@ class Tags(commands.Cog):
     async def send(self, ctx, name):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_staff_role(ctx):
             return        
@@ -176,7 +176,7 @@ class Tags(commands.Cog):
     async def delete(self, ctx, name):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
             return        
@@ -186,7 +186,7 @@ class Tags(commands.Cog):
         }        
         tagsz = await tags.find_one(filter)
         if tagsz is None:
-         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the tag **`{name}`**.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the tag **`{name}`**.", allowed_mentions=discord.AllowedMentions.none())
          return
         await tags.delete_one(filter)        
         await ctx.send(f"{tick} Tag **`{name}`** has been deleted.")

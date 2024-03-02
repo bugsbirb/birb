@@ -43,11 +43,11 @@ async def has_staff_role(ctx):
          if ctx.author.guild_permissions.administrator:
             
 
-          await ctx.send(f"{no} **{ctx.author.display_name}**, the staff role isn't set please run </config:1140463441136586784>!", view=PermissionsButtons())
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the staff role isn't set please run </config:1140463441136586784>!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none())
          else:
-              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it!", view=PermissionsButtons()) 
+              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none()) 
          return
-    await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`")
+    await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`", allowed_mentions=discord.AllowedMentions.none())
     return False
 
 
@@ -72,11 +72,11 @@ async def has_admin_role(ctx):
          if ctx.author.guild_permissions.administrator:
             
 
-          await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role isn't set please run </config:1140463441136586784>", view=PermissionsButtons())
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role isn't set please run </config:1140463441136586784>", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none())
          else:
-              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.", view=PermissionsButtons()) 
+              await ctx.send(f"{no} **{ctx.author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none()) 
          return
-     await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
+     await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",  allowed_mentions=discord.AllowedMentions.none())
      return False
 
 

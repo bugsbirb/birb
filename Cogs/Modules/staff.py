@@ -422,7 +422,7 @@ class quota(commands.Cog):
         if not await has_admin_role(ctx):
             return
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:
@@ -456,9 +456,9 @@ class quota(commands.Cog):
                 content = ""     
              try:
               await ctx.channel.send(content, embed=embed, view=view)
-              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
              except discord.errors.HTTPException or discord.errors.Forbidden:
-                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
+                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return              
              return   
             
@@ -470,9 +470,9 @@ class quota(commands.Cog):
              
              try:
               await ctx.channel.send(embed=embed, view=view)
-              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
              except discord.errors.HTTPException or discord.errors.Forbidden:
-                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
+                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return
              return   
 
@@ -482,10 +482,10 @@ class quota(commands.Cog):
             embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
             view = Staffview()
             try:
-             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True)
+             await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
              await ctx.channel.send(embed=embed, view=view)
             except discord.errors.HTTPException or discord.errors.Forbidden:
-                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.") 
+                await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return             
             return   
 
@@ -557,7 +557,7 @@ class StaffPanel(discord.ui.Select):
                         await interaction.followup.send(embed=embed, ephemeral=True)
                         print('3')
                     else:
-                        await interaction.followup.send(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True)
+                        await interaction.followup.send(f"{no} {interaction.user.display_name}, I couldn't find **@{value}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
                         
         except Exception as e:
@@ -637,9 +637,9 @@ class StaffModal(discord.ui.Modal, title='Search Staff'):
                         await interaction.response.send_message(embed=embed, ephemeral=True)
 
                     else:
-                     return await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{staff_name}**.", ephemeral=True)
+                     return await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{staff_name}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
         else:
-                     return await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{staff_name}**.", ephemeral=True)
+                     return await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{staff_name}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
                      
 
