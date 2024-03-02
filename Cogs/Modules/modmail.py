@@ -81,15 +81,20 @@ class Modmail(commands.Cog):
         await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.")
 
     @modmail.command(description="Reply to a modmail")
-    async def reply(self, ctx, *, content):
+    async def reply(self, ctx, *, content, media: discord.Attachment = None):
+     await ctx.defer(ephemeral=True)
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
          return              
      if not await has_staff_role(ctx):
-         return             
+         return        
+          
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id
         modmail_data = await modmail.find_one({'channel_id': channel_id})
+        mediamsg = ""
+        if media:
+           mediamsg = f"**Attachment Below**"
 
         if modmail_data:
             user_id = modmail_data.get('user_id')
@@ -100,14 +105,16 @@ class Modmail(commands.Cog):
                 user = await self.client.fetch_user(user_id)
 
                 if selected_server and user:
-                    embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```")
+                    embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```\n{mediamsg}")
                     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
                     embed.set_thumbnail(url=ctx.guild.icon)
+                    embed.set_image(url=media)
                     await user.send(embed=embed)
 
                     channel = self.client.get_channel(channel_id)
-                    await ctx.send(f"{tick} Response sent.", ephemeral=True)
+                    
                     try:
+                     await ctx.send(f"{tick} Response sent.", ephemeral=True)
                      await channel.send(embed=embed)
                     except discord.Forbidden: 
                         await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)
@@ -127,6 +134,12 @@ class Modmail(commands.Cog):
      if isinstance(ctx.channel, discord.TextChannel):
         channel_id = ctx.channel.id
         modmail_data = await modmail.find_one({'channel_id': channel_id})
+        media = None
+        mediamsg = ""
+        if ctx.message.attachments:
+            media = ctx.message.attachments[0].url
+            mediamsg = f"**Attachment Below**"
+
 
         if modmail_data:
             user_id = modmail_data.get('user_id')
@@ -137,9 +150,10 @@ class Modmail(commands.Cog):
                 user = await self.client.fetch_user(user_id)
 
                 if selected_server and user:
-                    embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```")
+                    embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```\n{mediamsg}")
                     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
                     embed.set_thumbnail(url=ctx.guild.icon)
+                    embed.set_image(url=media)
                     await user.send(embed=embed)
 
                     channel = self.client.get_channel(channel_id)

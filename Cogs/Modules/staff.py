@@ -19,6 +19,7 @@ arole = db['adminrole']
 modules = db['Modules']
 staffdb = db['staff database']
 Customisation = db['Customisation']
+StaffPanelLabel = db['StaffPanel Label']
 
 class SetMessages(discord.ui.Modal, title='Set Message Count'):
     def __init__(self, user_id):
@@ -512,6 +513,7 @@ class StaffPanel(discord.ui.Select):
             value = self.values[0]
             if value in ('Reload', 'Load'):
                 await self.update_options(interaction)
+
                 return
 
             result = self.collection.find_one({'name': value, 'guild_id': interaction.guild.id})
@@ -580,6 +582,13 @@ class StaffPanel(discord.ui.Select):
      except Exception as e:
         print(e)
      self.options = options
+     label_change = await StaffPanelLabel.find_one({'guild_id': interaction.guild.id})
+     labelchange = 'Staff'
+     if label_change:
+        labelchange = label_change['label']
+
+     self.placeholder = labelchange
+      
      await interaction.edit_original_response(view=self.view)
         
 

@@ -8,7 +8,7 @@ mongo = MongoClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 Customisation = db['Customisation']
-
+StaffPanelLabel = db['StaffPanel Label']
 
 class StaffCustomise(discord.ui.Select):
     def __init__(self, author):
@@ -16,6 +16,7 @@ class StaffCustomise(discord.ui.Select):
         options = [
             discord.SelectOption(label="Reset To Default"),
             discord.SelectOption(label="Customize"),
+            discord.SelectOption(label="Dropdown Label"),
             
 
         
@@ -37,9 +38,14 @@ class StaffCustomise(discord.ui.Select):
             Customisation.delete_one({"name": "Staff Panel", "guild_id": interaction.guild.id})
         elif color == 'Customize':
             view = NoEmbeds( interaction.user)
+
+
             
              
             await interaction.response.edit_message(embed=None, view=view)
+
+        elif color == 'Dropdown Label':
+            await interaction.response.send_modal(DropdownLabel())    
         
 
 
@@ -72,6 +78,31 @@ class StaffData(discord.ui.Select):
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Staff Database': False}}, upsert=True)    
             await refreshembed(interaction)        
+
+
+class DropdownLabel(discord.ui.Modal, title='Dropdown Label'):
+    def __init__(self):
+        super().__init__()
+
+
+
+
+    Titles = discord.ui.TextInput(
+        label='Label',
+        placeholder='What do you want the dropdown label to be?',
+        required=False,
+        max_length=20
+    )
+
+
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        StaffPanelLabel.update_one({'guild_id': interaction.guild.id},  {'$set': {'label': self.Titles.value}}, upsert=True)
+        await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, set the dropdown label to {self.Titles.value}", ephemeral=True)
+
+
+
 
 
 class Title(discord.ui.Modal, title='Title'):
