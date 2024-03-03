@@ -8,6 +8,7 @@ import typing
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from permissions import has_admin_role
+import random
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
@@ -55,7 +56,7 @@ class CustomCommands(commands.Cog):
     async def run(self, ctx, command, channel: discord.TextChannel = None):
         if not await has_customcommandrole(ctx, command):
             return
-
+        
         command_data  = await custom_commands.find_one({'name': command, 'guild_id': ctx.guild.id})
         if command_data is None:
             return await ctx.send(f'{no} **{ctx.author.display_name},** That command does not exist.', allowed_mentions=discord.AllowedMentions.none())
@@ -88,8 +89,15 @@ class CustomCommands(commands.Cog):
             '{guild.owner.mention}': ctx.guild.owner.mention if ctx.guild and ctx.guild.owner else '',
             '{guild.owner.name}': ctx.guild.owner.display_name if ctx.guild and ctx.guild.owner else '',
             '{guild.owner.id}': str(ctx.guild.owner.id) if ctx.guild and ctx.guild.owner else '',
-            '\n': "\n"
+            '{random}': int(random.randint(1, 1000000)),
+            '{guild.members}': int(ctx.guild.member_count),
+            '{channel.name}': channel.name if channel else ctx.channel.name,
+            '{channel.id}': str(channel.id) if channel else str(ctx.channel.id),
+            '{channel.mention}': channel.mention if channel else ctx.channel.mention,
+
         }
+               
+             
 
         content = await self.replace_variables(command_data.get('content', ''), replacements)
         if content == "":

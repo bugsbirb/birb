@@ -26,8 +26,6 @@ customcommands = db['Custom Commands']
 commandslogging = db['Commands Logging']
 
 
-
-
 class CmdUsageChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Command Usage Logging', channel_types=[discord.ChannelType.text])
@@ -256,15 +254,12 @@ class ButtonsSelectionView(discord.ui.Select):
         if color == 'Link Button':
             await interaction.response.send_modal(ButtonURLView(self.author, self.name))
 
- 
 
 class ButtonsSelection(discord.ui.View):
     def __init__(self, author, name):
         super().__init__()
         self.add_item(ButtonsSelectionView(author, name))
 
-
-        
 
 class ToggleCommands(discord.ui.Select):
     def __init__(self, author):
@@ -295,8 +290,6 @@ class ToggleCommands(discord.ui.Select):
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)   
             await refreshembed(interaction)   
-
-
 
 
 class CreateButtons(discord.ui.Select):
@@ -331,7 +324,6 @@ class CreateButtons(discord.ui.Select):
             await interaction.response.send_modal(EditCommand(self.author))    
 
 
-    
 class Title(discord.ui.Modal, title='Title'):
     def __init__(self):
         super().__init__()
@@ -456,7 +448,7 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
         except:
            await interaction.response.send_message(f"{no} Please provide a valid url.", ephemeral=True)
            return
- 
+
 class Image(discord.ui.Modal, title='Image'):
     def __init__(self):
         super().__init__()
@@ -522,11 +514,6 @@ class Author(discord.ui.Modal, title='Author'):
         except:
          await interaction.response.send_message(f"{no} Please provide a valid url or name.", ephemeral=True)
          return
-
-                
-
-     
-
 
 
 class NoEmbeds(discord.ui.View):
@@ -643,7 +630,7 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
-        
+
         await interaction.response.edit_message(embed=None, view=NoEmbeds(interaction.user, self.name))        
 
     @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
@@ -654,8 +641,6 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(Context())
 
-
-
     @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1199443313082769498>")
     async def Buttons(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -663,7 +648,6 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         await interaction.response.send_message(view= ButtonsSelection(self.author, self.name), ephemeral=True)     
-         
 
     @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1179470251860185159>")
     async def Var(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -672,8 +656,11 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)         
 
-        embed = discord.Embed(title="Variables List", description="**{author.name}** = The name of the person who is using the command\n**{author.id}** = The user id who is using the command\n**{author.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp of when the command was used\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner", color=discord.Colour.dark_embed())  
-
+        embed = discord.Embed(
+            title="Variables List",
+            description="**{author.name}:** The name of the person who is using the command\n**{author.id}:** The user id who is using the command\n**{author.mention}** = Mention of the user using the command\n**{timestamp}:** Time stamp of when the command was used\n**{guild.name}:** The name of the server\n**{guild.id}:** The id of the server\n**{guild.owner.name}:** The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}:**  The mention of the server owner\n**{random}:** Randomly generated number.\n**{channel.name}:** Name of the channel where the custom command is sent\n**{channel.id}:** Id of the channel where the custom command is sent\n**{channel.mention}:** Mention of the channel where the custom command is sent",
+            color=discord.Colour.dark_embed(),
+        )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -686,8 +673,6 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_message(content=f"{tick} Please select the required roles for this command.", ephemeral=True, view=PermissionsView(self.author, self.name))
 
-
-
     @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
@@ -696,7 +681,6 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Title())
-
 
     @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -763,7 +747,7 @@ class Embeds(discord.ui.View):
             messagecontent = interaction.message.content
 
         if not message.embeds:
-             embed_data = {
+            embed_data = {
             "name": self.name,
             "embed": False,
             "guild_id": interaction.guild.id,
@@ -771,9 +755,9 @@ class Embeds(discord.ui.View):
 
             }        
         else: 
-         embed = message.embeds[0]
-         color_hex = f"{embed.color.value:06x}" if embed.color else None
-         embed_data = {
+            embed = message.embeds[0]
+            color_hex = f"{embed.color.value:06x}" if embed.color else None
+            embed_data = {
             "title": embed.title,
             "embed": True,
             "name": self.name,
@@ -786,8 +770,6 @@ class Embeds(discord.ui.View):
             "guild_id": interaction.guild.id,
             "content": messagecontent
             }
-
-       
 
         customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
