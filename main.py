@@ -129,7 +129,7 @@ class client(commands.AutoShardedBot):
 client = client()
 
 
-@tasks.loop(seconds=300)
+@tasks.loop(minutes=10)
 async def update_channel_name():
     guild_count = len(client.guilds)
     channel_id = 1131245978704420964
