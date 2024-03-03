@@ -26,7 +26,7 @@ class ForumCreaton(commands.Cog):
             return
         if thread.parent_id != config_data['channel_id']:
             return
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         if config_data:
             color_str = config_data.get("color", "2b2d31")
             color = discord.Color(int(color_str, 16))
