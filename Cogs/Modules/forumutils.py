@@ -351,7 +351,7 @@ class Forums(commands.Cog):
             rolemention = f"<@&{role}>"
               
         embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=f"<:arrow:1166529434493386823>**Channel:** <#{result['channel_id']}>\n<:arrow:1166529434493386823>**Role:** {rolemention}\n<:arrow:1166529434493386823>**Title:** {result['title']}\n<:arrow:1166529434493386823>**Description:** {result['description']}\n<:arrow:1166529434493386823>**Thumbnail:** {result['thumbnail']}", inline=False)
-       embed.set_thumbnail(url=ctx.guild.icon.url)
+       embed.set_thumbnail(url=ctx.guild.icon)
        embed.set_author(name=f"{ctx.author.display_name}", icon_url=ctx.author.display_avatar)
        view = ForumsManage(ctx.author)
        await ctx.send(embed=embed, view=view)
