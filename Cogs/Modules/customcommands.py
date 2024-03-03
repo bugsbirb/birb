@@ -54,6 +54,7 @@ class CustomCommands(commands.Cog):
     @command.command(description="Run one of your servers custom commands.")
     @app_commands.autocomplete(command=commands_auto_complete)
     async def run(self, ctx, command, channel: discord.TextChannel = None):
+        await ctx.defer(ephemeral=True)
         if not await has_customcommandrole(ctx, command):
             return
         
@@ -62,14 +63,6 @@ class CustomCommands(commands.Cog):
             return await ctx.send(f'{no} **{ctx.author.display_name},** That command does not exist.', allowed_mentions=discord.AllowedMentions.none())
         
         if 'buttons' in command_data and command_data['buttons'] == "Voting Buttons":
-            voting_data = {
-                'guild_id': ctx.guild.id,
-                'message_id': ctx.message.id,
-                'author': ctx.author.id,
-                'votes': 0,
-                'Voters': []
-            }
-            await CustomVoting.insert_one(voting_data)
             view = Voting()
         elif 'buttons' in command_data and command_data['buttons'] == "Link Button":
             view = URL(command_data['url'], command_data['button_label'])
@@ -132,6 +125,8 @@ class CustomCommands(commands.Cog):
                 try:
                     if content or embed or view:
                         msg = await channel.send(content, embed=embed, view=view)
+
+
                     else:
                         await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
@@ -144,6 +139,8 @@ class CustomCommands(commands.Cog):
                 try:
                     if content or embed or view:
                         msg = await ctx.channel.send(content, embed=embed, view=view)
+
+
                     else:
                         await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
@@ -152,8 +149,6 @@ class CustomCommands(commands.Cog):
                     return
                 await ctx.send(f"{tick} **{ctx.author.display_name},** The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
                 loggingdata = await commandslogging.find_one({"guild_id": ctx.guild.id})
-                if loggingdata is None:
-                    return
                 if loggingdata:
                     loggingchannel = self.client.get_channel(loggingdata["channel_id"])
                     if loggingchannel:
@@ -168,7 +163,7 @@ class CustomCommands(commands.Cog):
                      try:
                         await loggingchannel.send(embed=embed)
                      except discord.Forbidden or discord.HTTPException:
-                        return print(
+                        print(
                             f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
                         )
         else:
@@ -179,6 +174,7 @@ class CustomCommands(commands.Cog):
                 try:
                     if content or view:
                         msg = await channel.send(content, view=view)
+
                     else:
                         await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
@@ -191,16 +187,15 @@ class CustomCommands(commands.Cog):
                 try:
                     if content or view:
                         msg = await ctx.channel.send(content, view=view)
+
                     else:
                         await ctx.send(f"{no} **{ctx.author.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none())
                         return
                 except discord.Forbidden:
                     await ctx.send(f"{no} **{ctx.author.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+                await ctx.send(f"{tick} {ctx.author.display_name}, The command has been sent", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())    
                 loggingdata = await commandslogging.find_one({"guild_id": ctx.guild.id})
-                if loggingdata is None:
-                    return
                 if loggingdata:
                     loggingchannel = self.client.get_channel(loggingdata["channel_id"])
                     if loggingchannel:
@@ -215,21 +210,22 @@ class CustomCommands(commands.Cog):
                      try:
                         await loggingchannel.send(embed=embed)
                      except discord.Forbidden or discord.HTTPException:
-                        return print(
+                        print(
                             f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
                         )
                     else:
-                        return print("I could not find the channel to send the command usage")
-
-        if 'buttons' in command_data and command_data['buttons'] == "Voting Buttons":
-             voting_data = {
+                        print("I could not find the channel to send the command usage")
+        if command_data.get('buttons', None) == "Voting Buttons":
+            print("yes there are buttons")
+            voting_data = {
                 'guild_id': ctx.guild.id,
                 'message_id': msg.id,
                 'author': ctx.author.id,
                 'votes': 0,
                 'Voters': []
             }
-             await CustomVoting.insert_one(voting_data)
+            await CustomVoting.insert_one(voting_data)
+
 
     async def replace_variables(self, message, replacements):
      for placeholder, value in replacements.items():
@@ -249,12 +245,14 @@ class Voting(discord.ui.View):
 
     @discord.ui.button(label="0", style=discord.ButtonStyle.green, emoji=f"{tick}", custom_id="vote")
     async def upvote(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer(ephemeral=True)
         message_id = interaction.message.id
-
+        print(interaction.message.id)
+        
+ 
 
         voting = await CustomVoting.find_one({"message_id": interaction.message.id})
-
-
+        print(voting)
 
         if interaction.user.id in voting.get('Voters', []):
          CustomVoting.update_one(
@@ -267,7 +265,7 @@ class Voting(discord.ui.View):
          new_label = str(voting.get('votes', 0) - 1)
          button.label = new_label
          await interaction.message.edit(view=self)
-         await interaction.response.send_message(f"{tick} **{interaction.user.display_name},** You have successfully unvoted.", ephemeral=True)
+         await interaction.followup.send(f"{tick} **{interaction.user.display_name},** You have successfully unvoted.", ephemeral=True)
          return
 
         CustomVoting.update_one(
@@ -280,7 +278,7 @@ class Voting(discord.ui.View):
         new_label = str(voting.get('votes', 0) + 1)
         button.label = new_label
 
-        await interaction.response.send_message(f"{tick} **{interaction.user.display_name},** You have successfully voted.", ephemeral=True)
+        await interaction.followup.send(f"{tick} **{interaction.user.display_name},** You have successfully voted.", ephemeral=True)
 
         await interaction.message.edit(view=self)
  
@@ -312,14 +310,12 @@ async def has_customcommandrole(ctx, command):
             role_ids = [role_ids]
 
         if any(role.id in role_ids for role in ctx.author.roles):
-            print('allowed')
             return True
         else:
-            print('not allowed')
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Custom Command Permission`")
             return False
     else:
-        print('none')
+
         return await has_admin_role(ctx)
 
 class URL(discord.ui.View):
