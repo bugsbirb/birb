@@ -19,7 +19,7 @@ class botinfo(commands.Cog):
         infractions_count = await infractions.count_documents({})
         loa_count = await loa_collection.count_documents({})        
         embed = discord.Embed(title="**Astro Birb**", description=f"**Discord.py Version:** {discord.__version__}\n**Python Version:** {str(platform.python_version())}\n**Database:** MongoDB", color=discord.Color.dark_embed())
-        embed.add_field(name="Operators", value="**[@bugsbirt](<https://discord.com/users/795743076520820776>)**\n**[@zippybonzo](<https://discord.com/users/1125518069482139658>)**\n**[@mark.api](<https://discord.com/users/856971748549197865>)**")
+        embed.add_field(name="Operators", value="**[@bugsbirt](<https://discord.com/users/795743076520820776>)**\n**[@mark.api](<https://discord.com/users/856971748549197865>)**")
         embed.add_field(name="Links", value="[**Support Server**](https://discord.gg/Qsz6DyGMTB)\n[**Upvote Astro Birb**](https://top.gg/bot/1113245569490616400/vote)")
         embed.add_field(name="Stats", value=f"**Global Users:** {len(self.client.users)}\n**Server Count:** {len(self.client.guilds)}\n**Infractions:** {infractions_count}\n**LOAs:** {loa_count}")
         embed.set_thumbnail(url=self.client.user.avatar.url)
