@@ -75,7 +75,7 @@ class CreateCustomRole(discord.ui.Modal, title='Create your speciailised role!')
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
-        role2 = discord.utils.get(interaction.guild.roles, name="⠀⠀⠀⠀⠀⠀⠀⠀Supporters​⠀⠀⠀⠀⠀⠀⠀⠀⠀​")
+        role2 = discord.utils.get(interaction.guild.roles, id=1127222531733082174)
         position = role2.position + 1
 
 
