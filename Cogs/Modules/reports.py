@@ -357,7 +357,7 @@ class ReportPanel(discord.ui.View):
         view = ActionsPanel(embed, interaction.message.id, message)
         await interaction.response.send_message(view=view, ephemeral=True)
                         
-    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.grey, custom_id='ignore:button', emoji=f"{redx}")
+    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.grey, custom_id='ignore:button', emoji=f"<:x_:1214611537524949123>")
     async def Ignore(self, interaction: discord.Interaction, button: discord.ui.Button):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
