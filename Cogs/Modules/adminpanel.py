@@ -667,7 +667,7 @@ class AdminPanelCog(commands.Cog):
         )
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_image(
-            url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png"
+            url="https://astrobirb.dev/assets/img/logos/invisible.png"
         )
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
@@ -1147,7 +1147,7 @@ class Return(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png"
+            url="https://astrobirb.dev/assets/img/logos/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
@@ -1265,7 +1265,7 @@ class LOAPanel(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png"
+            url="https://astrobirb.dev/assets/img/logos/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
@@ -1441,7 +1441,7 @@ class RevokeInfraction(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png"
+            url="https://astrobirb.dev/assets/img/logos/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 

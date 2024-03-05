@@ -226,14 +226,15 @@ class Reports(commands.Cog):
         reported_at_format = f"<t:{int(reported_at.timestamp())}:t>"
 
 
-        embed = discord.Embed(title=f"{cpending} Pending Report", color=discord.Color.orange())
-        embed.add_field(name="Reported User", value=f"* **User:** {member.mention}\n* **ID:** {member.id}", inline=False)
+        embed = discord.Embed(title=f"<:Crisis:1190412318648062113> Pending Report", color=discord.Color.dark_embed())
+        embed.add_field(name="Reported User", value=f"<:replytop:1207366581735129118>**User:** {member.mention}\n<:replybottom:1207366623913316363>**ID:** {member.id}", inline=False)
         embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if message_link:
-            embed.add_field(name=f"Report Information", value=f"* **Reported By:** {ctx.author.mention}\n* **Reason:** {reason}\n* **Message Link:** {message_link}\n* **Reported At:** {reported_at_format}", inline=False)    
+            embed.add_field(name=f"Report Information", value=f"<:replytop:1207366581735129118>**Reported By:** {ctx.author.mention}\n<:replybottom:1207366623913316363>**Reason:** {reason}\n<:replymiddle:1207366662916014100>**Message Link:** {message_link}\n<:replybottom:1207366623913316363>**Reported At:** {reported_at_format}", inline=False)    
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False)        
         else:
-            embed.add_field(name=f"Report Information", value=f"* **Reported By:** {ctx.author.mention}\n* **Reason:** {reason}\n* **Reported At:** {reported_at_format}", inline=False)
+            embed.add_field(name=f"Report Information", value=f"<:replytop:1207366581735129118>**Reported By:** {ctx.author.mention}\n<:replymiddle:1207366662916014100>**Reason:** {reason}\n<:replybottom:1207366623913316363>**Reported At:** {reported_at_format}", inline=False)
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False) 
                    
 
@@ -249,6 +250,9 @@ class Reports(commands.Cog):
                     
                     try:
                      view = ReportPanel()
+
+                     reports_count = await reports.count_documents({'guild_id': ctx.guild.id}) + 1
+                     view.case.label = f"Case #{reports_count}"
                      msg = await channel.send(embed=embed, view=view, allowed_mentions=discord.AllowedMentions.none())
                      await ctx.send(f"{tick} **{ctx.author.display_name}**, your report has been submitted.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
@@ -336,7 +340,7 @@ class ReportPanel(discord.ui.View):
 
      return False
 
-    @discord.ui.button(label='Actions', style=discord.ButtonStyle.blurple, custom_id='Actions', emoji="<:Setting:1154092651193323661>")
+    @discord.ui.button(label='Actions', style=discord.ButtonStyle.blurple, custom_id='Actions', emoji="<:Options:1163095389671526400>")
     async def Actions(self, interaction: discord.Interaction, button: discord.ui.Button):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
@@ -356,8 +360,12 @@ class ReportPanel(discord.ui.View):
         message = interaction.message
         view = ActionsPanel(embed, interaction.message.id, message)
         await interaction.response.send_message(view=view, ephemeral=True)
-                        
-    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.grey, custom_id='ignore:button', emoji=f"<:x_:1214611537524949123>")
+
+    @discord.ui.button(label='Case #0', style=discord.ButtonStyle.grey, custom_id='disabled:button', disabled=True, emoji="<:case:1214629776606887946>")
+    async def case(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass              
+
+    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.red, custom_id='ignore:button', emoji=f"<:whitex:1190819175447408681>")
     async def Ignore(self, interaction: discord.Interaction, button: discord.ui.Button):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)
