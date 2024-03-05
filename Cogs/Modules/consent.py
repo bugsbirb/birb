@@ -28,18 +28,18 @@ class Consent(commands.Cog):
             consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
         view = Confirm(consent_data, ctx.author)
         if consent_data.get('infractionalert') == "Enabled":
-            infraction_alerts = "<:check:1140623556271685683>"
+            infraction_alerts = "<:check:1214613370448253038>"
             view.toggle_infractions.style = discord.ButtonStyle.green
         else:
-            infraction_alerts = "<:crossX:1140623638207397939>"
+            infraction_alerts = "<:x_:1214611537524949123>"
             view.toggle_infractions.style = discord.ButtonStyle.red
 
         if consent_data.get('PromotionAlerts') == "Enabled":
-            promotion_alert = "<:check:1140623556271685683>"
+            promotion_alert = "<:check:1214613370448253038>"
             view.toggle_promotions.style = discord.ButtonStyle.green
 
         else:
-            promotion_alert = "<:crossX:1140623638207397939>"
+            promotion_alert = "<:x_:1214611537524949123>"
             view.toggle_promotions.style = discord.ButtonStyle.red
 
         embed = discord.Embed(title="<:Notification:1184528462338347039> Notifications",
@@ -63,18 +63,18 @@ class Confirm(discord.ui.View):
         view = Confirm(consent_data, interaction.user)
 
         if consent_data.get('infractionalert') == "Enabled":
-            infraction_alerts = "<:check:1140623556271685683>"
+            infraction_alerts = "<:check:1214613370448253038>"
             view.toggle_infractions.style = discord.ButtonStyle.green
 
         else:
-            infraction_alerts = "<:crossX:1140623638207397939>"
+            infraction_alerts = "<:x_:1214611537524949123>"
             view.toggle_infractions.style = discord.ButtonStyle.red
 
         if consent_data.get('PromotionAlerts') == "Enabled":
-            promotion_alert = "<:check:1140623556271685683>"
+            promotion_alert = "<:check:1214613370448253038>"
             view.toggle_promotions.style = discord.ButtonStyle.green
         else:
-            promotion_alert = "<:crossX:1140623638207397939>"
+            promotion_alert = "<:x_:1214611537524949123>"
             view.toggle_promotions.style = discord.ButtonStyle.red
 
 
