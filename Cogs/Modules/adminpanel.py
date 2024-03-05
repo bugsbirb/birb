@@ -1038,10 +1038,10 @@ class AdminPanel(discord.ui.View):
             )
             return
         loa = loa_collection.find_one(
-            {"user": self.user.id, "guild_id": interaction.guild.id, "active": True}
+            {"user": self.user.id, "guild_id": interaction.guild.id, "active": True,  'request': {'$ne': True}}
         )
         loainactive = loa_collection.find(
-            {"user": self.user.id, "guild_id": interaction.guild.id, "active": False}
+            {"user": self.user.id, "guild_id": interaction.guild.id, "active": False,  'request': {'$ne': True}}
         )
         view = None
 

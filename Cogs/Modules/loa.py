@@ -203,8 +203,8 @@ class loamodule(commands.Cog):
         if not await has_admin_role(ctx):
             return
 
-        loa = await loa_collection.find_one({"user": user.id, "guild_id": ctx.guild.id, 'active': True})
-        loainactive = await loa_collection.find({"user": user.id, "guild_id": ctx.guild.id, 'active': False}).to_list(length=None)
+        loa = await loa_collection.find_one({"user": user.id, "guild_id": ctx.guild.id, 'active': True, 'request': {'$ne': True}})
+        loainactive = await loa_collection.find({"user": user.id, "guild_id": ctx.guild.id, 'active': False,  'request': {'$ne': True}}).to_list(length=None)
         view = None
 
         if loa is None:
@@ -249,7 +249,7 @@ class loamodule(commands.Cog):
             return
 
         current_time = datetime.now()
-        filter = {'guild_id': ctx.guild.id, 'end_time': {'$gte': current_time}, 'active': True}
+        filter = {'guild_id': ctx.guild.id, 'end_time': {'$gte': current_time}, 'active': True, 'request': {'$ne': True}}
 
         loa_requests = await loa_collection.find(filter).to_list(length=None)
 
@@ -320,8 +320,13 @@ class loamodule(commands.Cog):
             channel = self.client.get_channel(channel_id)
 
             if channel:
-
+                past_loas = await loa_collection.count_documents({'guild_id': ctx.guild.id, 'user': ctx.author.id, 'request': {'$ne': True}, 'active': False, })
                 view = Confirm()
+                if past_loas == 0:
+                    view.loacount.disabled = True
+
+                
+                view.loacount.label = f"Past LOAs: {past_loas}"
                 try:
                     msg = await channel.send(embed=embed, view=view)
                     loadata = {'guild_id': ctx.guild.id,
@@ -330,6 +335,7 @@ class loamodule(commands.Cog):
                                'end_time': end_time,
                                'reason': reason,
                                'messageid': msg.id,
+                               'request': True,
                                'active': False}
                     await loa_collection.insert_one(loadata)
                     await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
@@ -374,7 +380,16 @@ class Confirm(discord.ui.View):
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
         if loa_data:
-            self.user = await interaction.guild.fetch_member(loa_data['user'])
+            try:
+             self.user = await interaction.guild.fetch_member(loa_data['user'])
+            except discord.HTTPException or discord.NotFound:
+                    await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
+             
+                    return          
+
+        else:
+                await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
+                return           
         user = self.user
 
         embed = interaction.message.embeds[0]
@@ -384,7 +399,7 @@ class Confirm(discord.ui.View):
         await interaction.message.edit(embed=embed, view=None)
         print(f"LOA Request @{interaction.guild.name} accepted")
         loarole_data = await LOARole.find_one({'guild_id': interaction.guild.id})
-        await loa_collection.update_one({'guild_id': interaction.guild.id, 'messageid': interaction.message.id ,'user': user.id}, {'$set': {'active': True}})
+        await loa_collection.update_one({'guild_id': interaction.guild.id, 'messageid': interaction.message.id ,'user': user.id}, {'$set': {'active': True, 'request': False} })
         if loarole_data:
             loarole = loarole_data['staffrole']
             if loarole:
@@ -398,6 +413,9 @@ class Confirm(discord.ui.View):
         except discord.Forbidden:
             print(f"Failed to send a DM to user {self.user.id}. Continuing...")
             pass
+
+
+
     @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel',
                        emoji=f"{no}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -409,8 +427,15 @@ class Confirm(discord.ui.View):
             return
         loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
         if loa_data:
-            self.user = await interaction.guild.fetch_member(loa_data['user'])
+            try:
+             self.user = await interaction.guild.fetch_member(loa_data['user'])
+            except discord.HTTPException or discord.NotFound:
+                    await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
+                    return   
+        else:
 
+                await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
+                return    
 
         embed = interaction.message.embeds[0]
         embed.color = discord.Color.brand_red()
@@ -427,6 +452,34 @@ class Confirm(discord.ui.View):
             print(f"Failed to send a DM to user {self.user.id}. Continuing...")
             pass
 
+    @discord.ui.button(label="Past LOAs: 0", style=discord.ButtonStyle.grey, custom_id='persistent_view:loacount',
+                       emoji=f"<:case:1214629776606887946>")
+    async def loacount(self, interaction: discord.Interaction, button: discord.ui.Button):
+            loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
+            if loa_data:
+
+                try:
+                 self.user = await interaction.guild.fetch_member(loa_data['user'])
+                except discord.HTTPException or discord.NotFound:
+                    await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
+                    return
+            else:
+                await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
+                return    
+            user = self.user            
+            loainactive = await loa_collection.find({'guild_id': interaction.guild.id, 'request': {'$ne': True}, 'user': user.id, 'active': False}).sort('start_time', -1).to_list(length=None)
+            description = []
+            for request in loainactive:
+                start_time = request['start_time']
+                end_time = request['end_time']
+                reason = request['reason']
+                description.append(
+                    f"<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
+            embed = discord.Embed(title="Past LOAs", description="\n".join(description), color=discord.Color.dark_embed())
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            
+            
 class LOAPanel(discord.ui.View):
     def __init__(self, user, guild, author):
         super().__init__(timeout=None)

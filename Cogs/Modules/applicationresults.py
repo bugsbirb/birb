@@ -41,7 +41,8 @@ class ApplicationResults(commands.Cog):
         result: Literal["Passed", "Failed"],
         *,
         feedback,
-    ):
+    ):  
+        await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
             return
