@@ -121,8 +121,10 @@ class EditCommand(discord.ui.Modal, title='Edit Command'):
          embed = interaction.message.embeds[0]
          if result is None:
           embed.title = f"{redx} I could not find that."
+          embed.description=f"I could not find the command you were trying to edit please try again."
           embed.color = discord.Color.brand_red()
-          await interaction.response.edit_message(embed=embed)
+          embed.clear_fields()
+          await interaction.response.edit_message(embed=embed, view=None)
           return
 
                
@@ -186,8 +188,10 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
        embed = interaction.message.embeds[0]
        if result is None:
         embed.title = f"{redx} I could not find that."
+        embed.description = "I couldn't find the command you were trying to delete please try again."
         embed.color = discord.Color.brand_red()
-        await interaction.response.edit_message(embed=embed)
+        embed.clear_fields()
+        await interaction.response.edit_message(embed=embed, view=None)
         return
        customcommands.delete_one({"name": self.name.value, "guild_id": interaction.guild.id})
        embed = discord.Embed(description="Succesfully deleted the command.")
@@ -580,25 +584,32 @@ class NoEmbeds(discord.ui.View):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
+
         result = customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
-        if result.get('permissionroles', None): 
+        perm = result.get('permissionroles', None)
+        if perm is None: 
             await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name},** please select the required permissions for this command using the `Permission` button!", ephemeral=True)
             return
-
         message = interaction.message
-        
+        if interaction.message.content is None:
+            messagecontent = None
+        else:
+            messagecontent = interaction.message.content
+
         if not message.embeds:
-             embed_data = {
+            embed_data = {
             "name": self.name,
+            "embed": False,
             "guild_id": interaction.guild.id,
-            "content": message.content
+            "content": messagecontent
 
             }        
         else: 
-         embed = message.embeds[0]
-         color_hex = f"{embed.color.value:06x}"
-         embed_data = {
+            embed = message.embeds[0]
+            color_hex = f"{embed.color.value:06x}" if embed.color else None
+            embed_data = {
             "title": embed.title,
+            "embed": True,
             "name": self.name,
             "description": embed.description,
             "color": color_hex,
@@ -606,15 +617,14 @@ class NoEmbeds(discord.ui.View):
             "author_icon": embed.author.icon_url if embed.author else None,
             "thumbnail": embed.thumbnail.url if embed.thumbnail else None,
             "image": embed.image.url if embed.image else None,
-            "guild_id": interaction.guild.id
+            "guild_id": interaction.guild.id,
+            "content": messagecontent
             }
-
-       
 
         customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Success!"
-        embed.description = f"Start by using /command run and selecting `{self.name}`"
+        embed.description = f"Start by using </command run:1199462063202902077> and selecting `{self.name}`"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
 

@@ -26,23 +26,29 @@ class Consent(commands.Cog):
         if consent_data is None:
             await consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
             consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
-
+        view = Confirm(consent_data, ctx.author)
         if consent_data.get('infractionalert') == "Enabled":
             infraction_alerts = "<:check:1140623556271685683>"
+            view.toggle_infractions.style = discord.ButtonStyle.green
         else:
             infraction_alerts = "<:crossX:1140623638207397939>"
+            view.toggle_infractions.style = discord.ButtonStyle.red
 
         if consent_data.get('PromotionAlerts') == "Enabled":
             promotion_alert = "<:check:1140623556271685683>"
+            view.toggle_promotions.style = discord.ButtonStyle.green
+
         else:
             promotion_alert = "<:crossX:1140623638207397939>"
+            view.toggle_promotions.style = discord.ButtonStyle.red
 
         embed = discord.Embed(title="<:Notification:1184528462338347039> Notifications",
                               description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}",
                               color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
-        view = Confirm(consent_data, ctx.author)
+        
+        
         await ctx.send(embed=embed, view=view)
 
 
@@ -54,23 +60,31 @@ class Confirm(discord.ui.View):
 
     async def update_embed(self, interaction: discord.Interaction):
         consent_data = await consentdb.find_one({"user_id": interaction.user.id})
+        view = Confirm(consent_data, interaction.user)
 
         if consent_data.get('infractionalert') == "Enabled":
             infraction_alerts = "<:check:1140623556271685683>"
+            view.toggle_infractions.style = discord.ButtonStyle.green
+
         else:
             infraction_alerts = "<:crossX:1140623638207397939>"
+            view.toggle_infractions.style = discord.ButtonStyle.red
 
         if consent_data.get('PromotionAlerts') == "Enabled":
             promotion_alert = "<:check:1140623556271685683>"
+            view.toggle_promotions.style = discord.ButtonStyle.green
         else:
             promotion_alert = "<:crossX:1140623638207397939>"
-        embed = discord.Embed(title="<:Moderation:1163933000006893648> Notifications",
+            view.toggle_promotions.style = discord.ButtonStyle.red
+
+
+        embed = discord.Embed(title="<:Notification:1184528462338347039> Notifications",
                               description=f"* **Infraction Alerts:** {infraction_alerts}\n* **Promotion Alerts:** {promotion_alert}",
                               color=discord.Color.dark_embed()
                               )
         embed.set_thumbnail(url=interaction.user.display_avatar.url)
 
-        await interaction.message.edit(embed=embed, view=self)
+        await interaction.message.edit(embed=embed, view=view)
 
     @discord.ui.button(label='Infractions Alerts', style=discord.ButtonStyle.grey)
     async def toggle_infractions(self, interaction: discord.Interaction, button: discord.ui.Button):
