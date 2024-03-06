@@ -832,7 +832,7 @@ async def refreshembed(interaction):
             embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-            embed.add_field(name=f"<:settings:1207368347931516928> Custom Commands Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replybottom:1207366623913316363>**Logging Channel:** {loggingmsg}")
+            embed.add_field(name=f"<:settings:1207368347931516928> Custom Commands Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Logging Channel:** {loggingmsg}")
             for result in commands:
                 permissions = result.get('permissionroles', 'None')
                 if permissions == 'None':

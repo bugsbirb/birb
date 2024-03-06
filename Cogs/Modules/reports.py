@@ -227,14 +227,14 @@ class Reports(commands.Cog):
 
 
         embed = discord.Embed(title=f"<:Crisis:1190412318648062113> Pending Report", color=discord.Color.dark_embed())
-        embed.add_field(name="Reported User", value=f"<:replytop:1207366581735129118>**User:** {member.mention}\n<:replybottom:1207366623913316363>**ID:** {member.id}", inline=False)
+        embed.add_field(name="Reported User", value=f"{replytop}**User:** {member.mention}\n{replybottom}**ID:** {member.id}", inline=False)
         embed.set_thumbnail(url=member.display_avatar.url)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if message_link:
-            embed.add_field(name=f"Report Information", value=f"<:replytop:1207366581735129118>**Reported By:** {ctx.author.mention}\n<:replybottom:1207366623913316363>**Reason:** {reason}\n<:replymiddle:1207366662916014100>**Message Link:** {message_link}\n<:replybottom:1207366623913316363>**Reported At:** {reported_at_format}", inline=False)    
+            embed.add_field(name=f"Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replybottom}**Reason:** {reason}\n{replymiddle}**Message Link:** {message_link}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)    
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False)        
         else:
-            embed.add_field(name=f"Report Information", value=f"<:replytop:1207366581735129118>**Reported By:** {ctx.author.mention}\n<:replymiddle:1207366662916014100>**Reason:** {reason}\n<:replybottom:1207366623913316363>**Reported At:** {reported_at_format}", inline=False)
+            embed.add_field(name=f"Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replymiddle}**Reason:** {reason}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False) 
                    
 

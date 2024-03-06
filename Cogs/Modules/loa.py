@@ -279,6 +279,7 @@ class loamodule(commands.Cog):
     @loa.command(description="Request a Leave Of Absence")
     @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reason for this LOA?")
     async def request(self, ctx, duration: str, reason: str):
+        await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
             return
@@ -326,7 +327,7 @@ class loamodule(commands.Cog):
                     view.loacount.disabled = True
 
                 
-                view.loacount.label = f"Past LOAs: {past_loas}"
+                view.loacount.label = f"Past LOAs  |  {past_loas}"
                 try:
                     msg = await channel.send(embed=embed, view=view)
                     loadata = {'guild_id': ctx.guild.id,
@@ -369,7 +370,7 @@ class Confirm(discord.ui.View):
 
         return False
 
-    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm',
+    @discord.ui.button(label='Accept', style=discord.ButtonStyle.green, custom_id='persistent_view:confirm', row=0,
                        emoji=f"{tick}")
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
@@ -416,7 +417,7 @@ class Confirm(discord.ui.View):
 
 
 
-    @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel',
+    @discord.ui.button(label='Deny', style=discord.ButtonStyle.red, custom_id='persistent_view:cancel',row=0,
                        emoji=f"{no}")
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
@@ -452,7 +453,7 @@ class Confirm(discord.ui.View):
             print(f"Failed to send a DM to user {self.user.id}. Continuing...")
             pass
 
-    @discord.ui.button(label="Past LOAs: 0", style=discord.ButtonStyle.grey, custom_id='persistent_view:loacount',
+    @discord.ui.button(label="Past LOAs | 0", style=discord.ButtonStyle.grey, custom_id='persistent_view:loacount',row=0,
                        emoji=f"<:case:1214629776606887946>")
     async def loacount(self, interaction: discord.Interaction, button: discord.ui.Button):
             loa_data = await loa_collection.find_one({'messageid': interaction.message.id})

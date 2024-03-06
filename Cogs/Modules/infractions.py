@@ -76,8 +76,10 @@ class Infractions(commands.Cog):
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
     async def infract(self, ctx, staff: discord.Member, action, reason: str, notes: Optional[str], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+
             return
 
         if not await has_admin_role(ctx):
@@ -289,7 +291,7 @@ class Infractions(commands.Cog):
                 'voided': {'$ne': True}
             }
 
-        infractions = await collection.find(filter).to_list(length=15)
+        infractions = await collection.find(filter).to_list(length=20)
 
         if not infractions:
             if scope == 'Voided':

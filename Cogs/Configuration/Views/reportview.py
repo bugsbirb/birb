@@ -146,7 +146,7 @@ async def refreshembed(interaction):
                 else: 
                  reprolemsg = f"{role.mention}"
             embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Reports Configuration", value=f"<:replytop:1207366581735129118>**Enabled:** {modulemsg}\n<:replymiddle:1207366662916014100>**Reports Channel:** {partnershipchannelmsg}\n<:replybottom:1207366623913316363>**Reports Moderator Role:** {reprolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Reports Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Reports Channel:** {partnershipchannelmsg}\n{replybottom}**Reports Moderator Role:** {reprolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
             try:

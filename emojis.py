@@ -14,3 +14,7 @@ redx = "<:cxk123:1214614818951266314>"
 cpending = "<:pending:1190818130826637414>"
 bin = "<:bin:1160543529542635520>"
 add = "<:Add:1163095623600447558>"
+
+replytop = "<:replytop:1207366581735129118>"
+replymiddle = "<:replymiddle:1207366662916014100> "
+replybottom = "<:replybottom:1207366623913316363>"
