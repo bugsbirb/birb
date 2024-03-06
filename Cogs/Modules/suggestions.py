@@ -94,7 +94,7 @@ class SuggestionView(discord.ui.View):
         message_id = interaction.message.id
         suggestion_data = await suggestions_collection.find_one({"message_id": message_id})
         if suggestion_data is None:
-            await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
+            await interaction.response.send_message(f"{crisis} **Suggestion** data for this suggestion can not be found.", ephemeral=True)
             return
         upvoters = suggestion_data.get("upvoters", [])
         downvoters = suggestion_data.get("downvoters", [])
@@ -139,7 +139,7 @@ class SuggestionView(discord.ui.View):
         message_id = interaction.message.id
         suggestion_data = await suggestions_collection.find_one({"message_id": message_id})
         if suggestion_data is None:
-            await interaction.response.send_message(f"<:Crisis:1190412318648062113> **Suggestion** data for this suggestion can not be found.", ephemeral=True)
+            await interaction.response.send_message(f"{crisis} **Suggestion** data for this suggestion can not be found.", ephemeral=True)
             return        
         upvoters = suggestion_data.get("upvoters", [])
         downvoters = suggestion_data.get("downvoters", [])

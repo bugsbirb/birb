@@ -839,7 +839,7 @@ async def refreshembed(interaction):
                     permissions = "None"
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>\n<:arrow:1166529434493386823> **Required Permissions:** {permissions}", inline=False)
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow}> **Created By:** <@{result['creator']}>\n{arrow}> **Required Permissions:** {permissions}", inline=False)
             try:    
              await interaction.message.edit(embed=embed)
             except:

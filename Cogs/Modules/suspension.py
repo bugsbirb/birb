@@ -117,7 +117,7 @@ class Suspensions(commands.Cog):
 
                 embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
-                value=f"<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
+                value=f"{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
                 inline=False
             )
 
@@ -165,7 +165,7 @@ class Suspensions(commands.Cog):
 
                 embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
-                value=f"<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
+                value=f"{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
                 inline=False
             )
 
@@ -302,7 +302,7 @@ class Suspension(discord.ui.RoleSelect):
                     return
   
                 try:
-                 await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
+                 await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
                 except:
                  print('Failed to send suspension message to user')
                  pass
@@ -381,7 +381,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             await suspensions.insert_one(infract_data)
             await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())        
             try:
-                await self.user.send(f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**", embed=embed, view=None)
+                await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None)
             except:
                 print('Failed to send suspension message to user')
                 pass                

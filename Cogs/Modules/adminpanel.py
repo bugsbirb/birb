@@ -538,7 +538,7 @@ class Reason(discord.ui.Modal, title="Reason"):
                 if consent_data["infractionalert"] == "Enabled":
                     try:
                         await self.user.send(
-                            f"<:SmallArrow:1140288951861649418> From **{interaction.guild.name}**",
+                            f"{smallarrow} From **{interaction.guild.name}**",
                             embed=embed,
                         )
                     except discord.Forbidden:
@@ -658,7 +658,7 @@ class AdminPanelCog(commands.Cog):
         )
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
         )
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
         embed.set_footer(
@@ -813,7 +813,7 @@ class IssuedInfraction(discord.ui.View):
 
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-                value=f"<:arrow:1166529434493386823>**Infracted User:** <@{infraction_info['staff']}>\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}",
+                value=f"{arrow}>**Infracted User:** <@{infraction_info['staff']}>\n{arrow}>**Action:** {infraction_info['action']}\n{arrow}>**Reason:** {infraction_info['reason']}\n{arrow}>**Notes:** {infraction_info['notes']}",
                 inline=False,
             )
 
@@ -1003,18 +1003,18 @@ class AdminPanel(discord.ui.View):
             if infraction_info["jump_url"] == "N/A":
                 jump_url = ""
             else:
-                jump_url = f"\n<:arrow:1166529434493386823>**[Jump to Infraction]({infraction_info['jump_url']})**"
+                jump_url = f"\n{arrow}>**[Jump to Infraction]({infraction_info['jump_url']})**"
 
             if infraction_info["expiration"] == "N/A":
                 expiration = ""
             else:
-                expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
+                expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
                 if infraction_info["expiration"] < datetime.now():
-                    expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
+                    expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
             management = f"<@{infraction_info['management']}>"
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-                value=f"<:arrow:1166529434493386823>**Infracted By:** {management}\n<:arrow:1166529434493386823>**Action:** {infraction_info['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction_info['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
+                value=f"{arrow}>**Infracted By:** {management}\n{arrow}>**Action:** {infraction_info['action']}\n{arrow}>**Reason:** {infraction_info['reason']}\n{arrow}>**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
                 inline=False,
             )
 
@@ -1022,7 +1022,7 @@ class AdminPanel(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
     @discord.ui.button(
-        label="LOA", style=discord.ButtonStyle.grey, emoji="<:LOA:1164969910238203995>"
+        label="LOA", style=discord.ButtonStyle.grey, emoji="{loa}"
     )
     async def LOA(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -1052,7 +1052,7 @@ class AdminPanel(discord.ui.View):
                 end_time = request["end_time"]
                 reason = request["reason"]
                 description.append(
-                    f"<:LOA:1164969910238203995> **Previous LOA**\n<:arrow:1166529434493386823><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}"
+                    f"{loa} **Previous LOA**\n{arrow}><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}"
                 )
 
             embed = discord.Embed(
@@ -1074,7 +1074,7 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(
                 title=f"Leave Of Absence",
                 color=discord.Color.dark_embed(),
-                description=f"<:LOA:1164969910238203995> **Active LOA**\n<:arrow:1166529434493386823>**Start Date:** <t:{int(start_time.timestamp())}:f>\n<:arrow:1166529434493386823>**End Date:** <t:{int(end_time.timestamp())}:f>\n<:arrow:1166529434493386823>**Reason:** {reason}",
+                description=f"{loa} **Active LOA**\n{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
             )
             embed.set_thumbnail(url=self.user.display_avatar)
             embed.set_author(
@@ -1143,7 +1143,7 @@ class Return(discord.ui.View):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1261,7 +1261,7 @@ class LOAPanel(discord.ui.View):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1345,7 +1345,7 @@ class LOACreate(discord.ui.View):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1437,7 +1437,7 @@ class RevokeInfraction(discord.ui.View):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"<:arrow:1166529434493386823>**Infractions:** {infractions}\n<:arrow:1166529434493386823>**Demotions:** {demotions}\n<:arrow:1166529434493386823>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(

@@ -184,7 +184,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
         discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
-        discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
+        discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
         discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
@@ -337,7 +337,7 @@ class Config(discord.ui.Select):
                     loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else:    
                  loachannelmsg = channel.mention       
-            embed = discord.Embed(title="<:LOA:1164969910238203995> LOA Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title=f"{loa} LOA Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> LOA Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**LOA Channel:** {loachannelmsg}\n{replybottom}**LOA Role:** {loarolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = LOAModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -578,7 +578,7 @@ class Config(discord.ui.Select):
                     permissions = "None"
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"<:arrow:1166529434493386823> **Created By:** <@{result['creator']}>\n<:arrow:1166529434493386823> **Required Permissions:** {permissions}", inline=False)
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow}> **Created By:** <@{result['creator']}>\n{arrow}> **Required Permissions:** {permissions}", inline=False)
                
             view = CustomCommands(self.author)
             

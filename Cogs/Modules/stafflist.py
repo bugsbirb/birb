@@ -45,7 +45,7 @@ class StaffList(commands.Cog):
                         role_mentions = set()
                         for member in members:
                             mention = member.mention
-                            role_mentions.add(f"<:SmallArrow:1140288951861649418>{mention}")
+                            role_mentions.add(f"{smallarrow}{mention}")
 
                         if role_mentions:
                             if role.name not in members_by_role:

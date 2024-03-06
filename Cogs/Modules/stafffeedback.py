@@ -131,6 +131,7 @@ class Feedback(commands.Cog):
     @feedback.command(description="View a staff members rating")
     async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
      
+     
      if scope == "global":
         staff_ratings = stafffeedback.find({'staff': staff.id}).to_list(length=None)
         total_ratings = await stafffeedback.count_documents({'staff': staff.id})
@@ -156,9 +157,9 @@ class Feedback(commands.Cog):
 
      rating_text = get_rating_text(average_rating)
 
-     embed = discord.Embed(title="", description=f"* **Average Rating**: {average_rating}/10\n* **Last Rating**: {last_rating}/10\n* **Overall**: {rating_text}", color=discord.Color.dark_embed())
+     embed = discord.Embed(title=f"", description=f"* **Average Rating**: {average_rating}/10\n* **Last Rating**: {last_rating}/10\n* **Overall**: {rating_text}", color=discord.Color.dark_embed())
      embed.set_thumbnail(url=staff.display_avatar)
-     embed.set_author(name=staff.display_name, icon_url=staff.display_avatar)
+     embed.set_author(name=f"{(scope).capitalize()} Ratings", icon_url=staff.display_avatar)
      view = ViewRatings(staff_ratings, staff, ctx, scope, ctx.author)
      await ctx.send(embed=embed, view=view)
 
@@ -206,8 +207,8 @@ class ViewRatings(discord.ui.View):
                date_str = datetime.utcfromtimestamp(date).strftime('%d/%m/%Y')
 
             embed.add_field(
-    name=f"<:Star:1133346299668873216> {rating['rating']}/10",
-    value=f"<:arrow:1166529434493386823>**Date:** {date_str}\n<:arrow:1166529434493386823>**Feedback ID:** {Id}\n<:arrow:1166529434493386823>**Feedback:** {feedback}",
+    name=f"{star} {rating['rating']}/10",
+    value=f"{arrow}**Date:** {date_str}\n{arrow}**Feedback ID:** {Id}\n{arrow}**Feedback:** {feedback}",
     inline=False
 )
 

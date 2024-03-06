@@ -226,7 +226,7 @@ class Reports(commands.Cog):
         reported_at_format = f"<t:{int(reported_at.timestamp())}:t>"
 
 
-        embed = discord.Embed(title=f"<:Crisis:1190412318648062113> Pending Report", color=discord.Color.dark_embed())
+        embed = discord.Embed(title=f"{crisis} Pending Report", color=discord.Color.dark_embed())
         embed.add_field(name="Reported User", value=f"{replytop}**User:** {member.mention}\n{replybottom}**ID:** {member.id}", inline=False)
         embed.set_thumbnail(url=member.display_avatar.url)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)

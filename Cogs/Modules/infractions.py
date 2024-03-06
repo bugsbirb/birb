@@ -235,7 +235,7 @@ class Infractions(commands.Cog):
                     return
                 if consent_data['infractionalert'] == "Enabled":
                     try:
-                        await staff.send(f"<:SmallArrow:1140288951861649418> From **{ctx.guild.name}**", embed=embed)
+                        await staff.send(f"{smallarrow} From **{ctx.guild.name}**", embed=embed)
                     except:
                         print(f"Couldn't send infraction alert to {staff.display_name} in {ctx.guild.name}")
                         pass
@@ -328,18 +328,18 @@ class Infractions(commands.Cog):
             if infraction.get('jump_url', 'N/A') == 'N/A':
                 jump_url = ""
             else:
-                jump_url = f"\n<:arrow:1166529434493386823>**[Jump to Infraction]({infraction['jump_url']})**"
+                jump_url = f"\n{arrow}>**[Jump to Infraction]({infraction['jump_url']})**"
 
             if infraction.get('expiration', 'N/A') == 'N/A':
                 expiration = ""
             else:
-                expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D>"
+                expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D>"
                 if infraction['expiration'] < datetime.now():
-                    expiration = f"\n<:arrow:1166529434493386823>**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D> **(Infraction Expired)**"
+                    expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D> **(Infraction Expired)**"
             management = await self.client.fetch_user(infraction['management'])
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction['random_string']} {voided}",
-                value=f"<:arrow:1166529434493386823>**Infracted By:** {management.mention}\n<:arrow:1166529434493386823>**Action:** {infraction['action']}\n<:arrow:1166529434493386823>**Reason:** {infraction['reason']}\n<:arrow:1166529434493386823>**Notes:** {infraction['notes']}{expiration}{jump_url}",
+                value=f"{arrow}>**Infracted By:** {management.mention}\n{arrow}>**Action:** {infraction['action']}\n{arrow}>**Reason:** {infraction['reason']}\n{arrow}>**Notes:** {infraction['notes']}{expiration}{jump_url}",
                 inline=False
             )
 

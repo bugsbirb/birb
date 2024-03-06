@@ -72,7 +72,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),  #
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), #
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"), #
-        discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"), #
+        discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"), #
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"), 
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>"), #
         discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>"), #

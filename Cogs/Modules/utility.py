@@ -28,7 +28,7 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
-            discord.SelectOption(label="LOA", emoji="<:LOA:1164969910238203995>"),
+            discord.SelectOption(label="LOA", emoji=f"{loa}"),
             discord.SelectOption(label="Staff Feedback", emoji="<:Rate:1162135093129785364>"),         
             discord.SelectOption(label="Partnerships", emoji="<:Partner:1162135285031772300>"),   
             discord.SelectOption(label="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"), 
@@ -126,7 +126,7 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
-            discord.SelectOption(label="LOA", value="LOA", emoji="<:LOA:1164969910238203995>"),
+            discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"),
             discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
             discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>")               
         ]
@@ -332,7 +332,7 @@ class Utility(commands.Cog):
             await ctx.send(embed=embed)
 
         except aiohttp.ClientError as e:
-            await ctx.send(f"<:Crisis:1190412318648062113> {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{crisis} {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.hybrid_command(description="Check the bots latency & uptime")
     async def ping(self, ctx):
