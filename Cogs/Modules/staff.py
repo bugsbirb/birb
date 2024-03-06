@@ -385,14 +385,14 @@ class quota(commands.Cog):
         else:
             introduction = ""
         if result.get('timezone', None):
-            timezone = f"\n{arrow}> **Timezone:** {result['timezone']}" 
+            timezone = f"\n{arrow} **Timezone:** {result['timezone']}" 
         else:
             timezone = ""
 
         if result:
             embed = discord.Embed(
                 title=staff.display_name,
-                description=f"{arrow}> **Staff:** <@{staff.id}>\n{arrow}> **Rank:** {result['rolename']}{timezone}\n{arrow}> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                description=f"{arrow} **Staff:** <@{staff.id}>\n{arrow} **Rank:** {result['rolename']}{timezone}\n{arrow} **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                 color=discord.Color.dark_embed()
             )
             embed.set_thumbnail(url=staff.display_avatar)
@@ -523,7 +523,7 @@ class StaffPanel(discord.ui.Select):
                 staff_names = [result['name'] for result in results]
                  
                  
-                names_str = '\n'.join([f"{arrow}> **{name}**" for name in staff_names])
+                names_str = '\n'.join([f"{arrow} **{name}**" for name in staff_names])
                 embed = discord.Embed(title='All Staff', description=names_str, color=discord.Color.dark_embed())    
                 embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
                 embed.set_thumbnail(url=interaction.guild.icon)
@@ -545,11 +545,11 @@ class StaffPanel(discord.ui.Select):
                         if result.get('introduction') is not None:
                             introduction = f"\n\n**Introduction:**\n```{result['introduction']}```"
                         if result.get('timezone') is not None:
-                            timezone = f"\n{arrow}> **Timezone:** {result['timezone']}" 
+                            timezone = f"\n{arrow} **Timezone:** {result['timezone']}" 
 
                         embed = discord.Embed(
                             title=staff.display_name,
-                            description=f"{arrow}> **Staff:** <@{staff.id}>\n{arrow}> **Rank:** {result['rolename']}{timezone}\n{arrow}> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                            description=f"{arrow} **Staff:** <@{staff.id}>\n{arrow} **Rank:** {result['rolename']}{timezone}\n{arrow} **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                             color=discord.Color.dark_embed()
                         )
                         embed.set_thumbnail(url=staff.display_avatar)
@@ -625,11 +625,11 @@ class StaffModal(discord.ui.Modal, title='Search Staff'):
                         if result.get('introduction') is not None:
                             introduction = f"\n\n**Introduction:**\n```{result['introduction']}```"
                         if result.get('timezone') is not None:
-                            timezone = f"\n{arrow}> **Timezone:** {result['timezone']}" 
+                            timezone = f"\n{arrow} **Timezone:** {result['timezone']}" 
 
                         embed = discord.Embed(
                             title=staff.display_name,
-                            description=f"{arrow}> **Staff:** <@{staff.id}>\n{arrow}> **Rank:** {result['rolename']}{timezone}\n{arrow}> **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
+                            description=f"{arrow} **Staff:** <@{staff.id}>\n{arrow} **Rank:** {result['rolename']}{timezone}\n{arrow} **Joined Staff:** <t:{int(result['joinestaff'].timestamp())}:F>{introduction}",
                             color=discord.Color.dark_embed()
                         )
                         embed.set_thumbnail(url=staff.avatar.url)

@@ -578,7 +578,7 @@ class Config(discord.ui.Select):
                     permissions = "None"
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow}> **Created By:** <@{result['creator']}>\n{arrow}> **Required Permissions:** {permissions}", inline=False)
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=False)
                
             view = CustomCommands(self.author)
             

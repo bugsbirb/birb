@@ -214,7 +214,7 @@ class loamodule(commands.Cog):
                 end_time = request['end_time']
                 reason = request['reason']
                 description.append(
-                    f"{loa} **Previous LOA**\n{arrow}><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
+                    f"{loa} **Previous LOA**\n{arrow}<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
 
             embed = discord.Embed(title="Leave Of Absense",
                                   description=f"\n".join(description), color=discord.Color.dark_embed())
@@ -230,7 +230,7 @@ class loamodule(commands.Cog):
             embed = discord.Embed(
                 title=f"Leave Of Absence",
                 color=discord.Color.dark_embed(),
-                description=f"{loa} **Active LOA**\n{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}"
+                description=f"{loa} **Active LOA**\n{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}"
             )
             embed.set_thumbnail(url=user.display_avatar)
             embed.set_author(icon_url=user.display_avatar, name=user.display_name)
@@ -270,7 +270,7 @@ class loamodule(commands.Cog):
 
                 embed.add_field(
                     name=f"{loa}{user.name.capitalize()}",
-                    value=f"{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
+                    value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
                     inline=False
                 )
 

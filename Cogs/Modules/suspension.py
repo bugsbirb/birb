@@ -117,7 +117,7 @@ class Suspensions(commands.Cog):
 
                 embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
-                value=f"{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
+                value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
                 inline=False
             )
 
@@ -165,7 +165,7 @@ class Suspensions(commands.Cog):
 
                 embed.add_field(
                 name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
-                value=f"{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
+                value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
                 inline=False
             )
 

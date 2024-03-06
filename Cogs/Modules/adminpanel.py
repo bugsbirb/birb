@@ -658,12 +658,12 @@ class AdminPanelCog(commands.Cog):
         )
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
         embed.set_footer(
             text="Staff Management Panel",
-            icon_url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1187454549099806811/1154092651193323661.png?ex=6596f23a&is=65847d3a&hm=289bd45a9c6779853b2a78d7848636433e8aa63173781aec51447c25f8a06453&=",
+            icon_url="https://cdn.discordapp.com/emojis/1207368347931516928.webp?size=96&quality=lossless",
         )
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_image(
@@ -813,7 +813,7 @@ class IssuedInfraction(discord.ui.View):
 
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-                value=f"{arrow}>**Infracted User:** <@{infraction_info['staff']}>\n{arrow}>**Action:** {infraction_info['action']}\n{arrow}>**Reason:** {infraction_info['reason']}\n{arrow}>**Notes:** {infraction_info['notes']}",
+                value=f"{arrow}**Infracted User:** <@{infraction_info['staff']}>\n{arrow}**Action:** {infraction_info['action']}\n{arrow}**Reason:** {infraction_info['reason']}\n{arrow}**Notes:** {infraction_info['notes']}",
                 inline=False,
             )
 
@@ -1003,18 +1003,18 @@ class AdminPanel(discord.ui.View):
             if infraction_info["jump_url"] == "N/A":
                 jump_url = ""
             else:
-                jump_url = f"\n{arrow}>**[Jump to Infraction]({infraction_info['jump_url']})**"
+                jump_url = f"\n{arrow}**[Jump to Infraction]({infraction_info['jump_url']})**"
 
             if infraction_info["expiration"] == "N/A":
                 expiration = ""
             else:
-                expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
+                expiration = f"\n{arrow}**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D>"
                 if infraction_info["expiration"] < datetime.now():
-                    expiration = f"\n{arrow}>**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
+                    expiration = f"\n{arrow}**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
             management = f"<@{infraction_info['management']}>"
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
-                value=f"{arrow}>**Infracted By:** {management}\n{arrow}>**Action:** {infraction_info['action']}\n{arrow}>**Reason:** {infraction_info['reason']}\n{arrow}>**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
+                value=f"{arrow}**Infracted By:** {management}\n{arrow}**Action:** {infraction_info['action']}\n{arrow}**Reason:** {infraction_info['reason']}\n{arrow}**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
                 inline=False,
             )
 
@@ -1022,7 +1022,7 @@ class AdminPanel(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
     @discord.ui.button(
-        label="LOA", style=discord.ButtonStyle.grey, emoji="{loa}"
+        label="LOA", style=discord.ButtonStyle.grey, emoji=f"{loa}"
     )
     async def LOA(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -1052,7 +1052,7 @@ class AdminPanel(discord.ui.View):
                 end_time = request["end_time"]
                 reason = request["reason"]
                 description.append(
-                    f"{loa} **Previous LOA**\n{arrow}><t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}"
+                    f"{loa} **Previous LOA**\n{arrow}<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}"
                 )
 
             embed = discord.Embed(
@@ -1074,7 +1074,7 @@ class AdminPanel(discord.ui.View):
             embed = discord.Embed(
                 title=f"Leave Of Absence",
                 color=discord.Color.dark_embed(),
-                description=f"{loa} **Active LOA**\n{arrow}>**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}>**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}>**Reason:** {reason}",
+                description=f"{loa} **Active LOA**\n{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
             )
             embed.set_thumbnail(url=self.user.display_avatar)
             embed.set_author(
@@ -1138,12 +1138,12 @@ class Return(discord.ui.View):
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(
             text="Staff Management Panel",
-            icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=",
+            icon_url="https://cdn.discordapp.com/emojis/1207368347931516928.webp?size=96&quality=lossless",
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1256,12 +1256,12 @@ class LOAPanel(discord.ui.View):
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(
             text="Staff Management Panel",
-            icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=",
+            icon_url="https://cdn.discordapp.com/emojis/1207368347931516928.webp?size=96&quality=lossless",
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1340,12 +1340,12 @@ class LOACreate(discord.ui.View):
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(
             text="Staff Management Panel",
-            icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=",
+            icon_url="https://cdn.discordapp.com/emojis/1207368347931516928.webp?size=96&quality=lossless",
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
@@ -1432,12 +1432,12 @@ class RevokeInfraction(discord.ui.View):
         embed.set_author(name=self.user.name, icon_url=self.user.display_avatar)
         embed.set_footer(
             text="Staff Management Panel",
-            icon_url="https://media.discordapp.net/ephemeral-attachments/1140411707953520681/1165221940722675722/1035353776460152892.png?ex=6546107f&is=65339b7f&hm=8d73392705483a84a47d09a7cd4838cd2e1235caa1022f10777ea1fec4a91f13&=",
+            icon_url="https://cdn.discordapp.com/emojis/1207368347931516928.webp?size=96&quality=lossless",
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
             name="<:data:1166529224094523422> Staff Data",
-            value=f"{arrow}>**Infractions:** {infractions}\n{arrow}>**Demotions:** {demotions}\n{arrow}>**Leave Of Absence:** {loamsg}",
+            value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(

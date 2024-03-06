@@ -21,11 +21,11 @@ modules = db['Modules']
 class HelpdeskDropdown(discord.ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label='Whats the servers rules?', emoji='{arrow}>'),
-            discord.SelectOption(label='What is Astro Birb?', emoji='{arrow}>'),
-            discord.SelectOption(label="How do I become staff here?", emoji="{arrow}>"),
-            discord.SelectOption(label="Wheres the documentation?", emoji="{arrow}>"),
-            discord.SelectOption(label="How do you setup the bot?", emoji="{arrow}>")
+            discord.SelectOption(label='Whats the servers rules?', emoji='{arrow}'),
+            discord.SelectOption(label='What is Astro Birb?', emoji='{arrow}'),
+            discord.SelectOption(label="How do I become staff here?", emoji="{arrow}"),
+            discord.SelectOption(label="Wheres the documentation?", emoji="{arrow}"),
+            discord.SelectOption(label="How do you setup the bot?", emoji="{arrow}")
 
 
         
