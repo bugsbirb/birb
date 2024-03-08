@@ -165,7 +165,7 @@ class Infractions(commands.Cog):
             embed = discord.Embed(title=embed_title, description=embed_description, color=int(custom['color'], 16))
 
             embed.set_thumbnail(url=embed_thumbnail)
-            if anonymous == True:
+            if anonymous == 'True':
                 embed.remove_author()
             else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
@@ -178,7 +178,7 @@ class Infractions(commands.Cog):
             else:
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
-            if anonymous == True:
+            if anonymous == 'True':
                 embed.remove_author()
             else:
                 embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)

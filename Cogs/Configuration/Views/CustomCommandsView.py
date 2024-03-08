@@ -199,6 +199,52 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
        embed.color = discord.Color.brand_green()
        await interaction.response.edit_message(embed=embed, view=None)
 
+class CustomButton(discord.ui.Modal, title='Button Embed'):
+    def __init__(self, author, names):
+        super().__init__()
+        self.author = author
+        self.names = names
+
+
+
+
+
+
+    name = discord.ui.TextInput(
+        label='Custom Command Name',
+        placeholder='What is the name of the custom command?',
+        max_length=2048
+    )
+
+    label = discord.ui.TextInput(
+        label='Button Name',
+        placeholder='What text should be on the button?',
+        max_length=80
+    )
+    emoji = discord.ui.TextInput(
+        label='Emoji',
+        placeholder='What emoji should be on the button? (Example: <:Alert:1208972002803712000>)',
+        max_length=80,
+        required=False
+    )
+    colour = discord.ui.TextInput(
+        label='Colour',
+        placeholder='Blurple, Red, Green, Grey',
+        max_length=80,
+        required=True
+    )
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        colour = self.colour.value.lower()
+        valid_colours = ['blurple', 'red', 'green', 'grey']
+
+        if colour not in valid_colours:
+         await interaction.response.send_message(f"{redx} **{interaction.user.display_name},** I could not find that colour. (Blurple, Red, Green, Grey)", ephemeral=True)
+         return
+        customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'buttons': 'Embed Button', 'cmd': self.name.value, 'button_label': self.label.value, 'colour': self.colour.value, 'emoji': self.emoji.value}})
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the custom embed button with the command `{self.name.value}`.")
+
 class ButtonURLView(discord.ui.Modal, title='Button URL'):
     def __init__(self, author, names):
         super().__init__()
@@ -237,8 +283,9 @@ class ButtonsSelectionView(discord.ui.Select):
         self.author = author
         self.name = name
         options = [
-            discord.SelectOption(label="Voting Buttons"),
+            discord.SelectOption(label="Voting Buttons", description="Lets you view and vote."),
             discord.SelectOption(label="Link Button"),
+            discord.SelectOption(label="Embed Button", description="Sends a custom command in an ephemeral embed.")
             
 
         
@@ -257,6 +304,8 @@ class ButtonsSelectionView(discord.ui.Select):
          await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the buttons to `{color}`.")
         if color == 'Link Button':
             await interaction.response.send_modal(ButtonURLView(self.author, self.name))
+        if color == 'Embed Button':
+            await interaction.response.send_modal(CustomButton(self.author, self.name))            
 
 
 class ButtonsSelection(discord.ui.View):
