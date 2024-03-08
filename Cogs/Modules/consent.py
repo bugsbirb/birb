@@ -43,7 +43,7 @@ class Consent(commands.Cog):
         else:
             view.toggle_loa.style = discord.ButtonStyle.red
         embed = discord.Embed(title="Notifications",
-                              description=f"{replytop}**Infraction Alerts:** When you are infracted you'll receive a direct message.\n{replybottom}**Promotion Alerts:** When you are promoted you'll receive a direct message.",
+                              description=f"{replytop}**Infraction Alerts:** When you are infracted you'll receive a direct message.\n{replymiddle}**Promotion Alerts:** When you are promoted you'll receive a direct message.\n{replybottom}**LOA Alerts:** When you are on LOA you'll receive direct messages.",
                               color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.author.display_avatar.url)
 
