@@ -8,7 +8,8 @@ import os
 from dotenv import load_dotenv
 from Cogs.Modules.astro import Helpdesk
 from Cogs.Modules.reports import ReportPanel
-from Cogs.Modules.suggestions import SuggestionView
+from Cogs.Modules.suggestions import SuggestionView, SuggestionManageView
+
 import time
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
@@ -86,6 +87,7 @@ class client(commands.AutoShardedBot):
         update_channel_name.start()
         self.add_view(Helpdesk())
         self.add_view(SuggestionView())
+        self.add_view(SuggestionManageView())
         self.add_view(ReportPanel())
         self.add_view(Confirm())
         self.add_view(Voting())
