@@ -276,10 +276,11 @@ class ManageSuggestion(discord.ui.Select):
             if interaction.user.guild_permissions.administrator:
                 
 
-             await interaction.user.send(f"{no} **{interaction.user.display_name}**, the staff role isn't set please run </config:1140463441136586784>!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none())
+             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, the staff role isn't set please run </config:1140463441136586784>!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none(),ephemeral=True)
+             return False
             else:
-                await interaction.user.send(f"{no} **{interaction.user.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none()) 
-            return
+                await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it!", view=PermissionsButtons(), allowed_mentions=discord.AllowedMentions.none(), ephemeral=True   ) 
+            return False
         await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`", allowed_mentions=discord.AllowedMentions.none())
         return False
 
