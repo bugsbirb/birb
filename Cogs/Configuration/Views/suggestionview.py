@@ -22,6 +22,7 @@ loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 suggestschannel = db["suggestion channel"]
+suggestschannel2 = db["Suggestion Management Channel"]
 class SuggestionsChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Suggestion Channel',   channel_types=[discord.ChannelType.text])
@@ -56,6 +57,41 @@ class SuggestionsChannel(discord.ui.ChannelSelect):
             print(f"An error occurred: {str(e)}")
 
         print(f"Channel ID: {channelid.id}")        
+
+class SuggestionsChannelManagement(discord.ui.ChannelSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Suggestions Management Channel',   channel_types=[discord.ChannelType.text])
+        self.author = author
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+            existing_record = suggestschannel2.find_one(filter)
+
+            if existing_record:
+                suggestschannel2.update_one(filter, {'$set': data})
+            else:
+                suggestschannel2.insert_one(data)
+            await refreshembed(interaction)
+            await interaction.response.edit_message(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")    
 
 class ToggleSuggestions(discord.ui.Select):
     def __init__(self, author):
@@ -93,6 +129,9 @@ async def refreshembed(interaction):
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             suggestionchannelmsg = "Not Configured"
+            smschannelresult = suggestschannel2.find_one({'guild_id': interaction.guild.id})
+            smschannelmsg = "Not Configured"
+    
             if moduleddata:
                 modulemsg = moduleddata.get('Suggestions', 'False')
             if suschannelresult:    
@@ -101,9 +140,16 @@ async def refreshembed(interaction):
                 if channel is None:
                  suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
-                 suggestionchannelmsg = channel.mention                
+                 suggestionchannelmsg = channel.mention       
+            if smschannelresult:    
+                channelid = smschannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 smschannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 smschannelmsg = channel.mention                            
             embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suggestion Channel:** {suggestionchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Suggestion Channel:** {suggestionchannelmsg}\n{replybottom}**Suggestions Management Channel:** {smschannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
             try:

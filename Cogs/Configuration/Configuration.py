@@ -43,6 +43,7 @@ from Cogs.Configuration.Views.applicationsview import ToggleApplications
 
 from Cogs.Configuration.Views.suggestionview import SuggestionsChannel
 from Cogs.Configuration.Views.suggestionview import ToggleSuggestions
+from Cogs.Configuration.Views.suggestionview import SuggestionsChannelManagement
 
 from Cogs.Configuration.Views.connectionrolesview import ToggleConnectionRoles
 
@@ -86,6 +87,7 @@ nfractiontypes = db['infractiontypes']
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
 ReportModeratorRole = db['Report Moderator Role']
+suggestschannel2 = db["Suggestion Management Channel"]
 
 mongo2 = MongoClient(MONGO_URL)
 db2 = mongo2['quotab']
@@ -527,6 +529,9 @@ class Config(discord.ui.Select):
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             suggestionchannelmsg = "Not Configured"
+            smschannelresult = suggestschannel2.find_one({'guild_id': interaction.guild.id})
+            smschannelmsg = "Not Configured"
+    
             if moduleddata:
                 modulemsg = moduleddata.get('Suggestions', 'False')
             if suschannelresult:    
@@ -535,12 +540,23 @@ class Config(discord.ui.Select):
                 if channel is None:
                  suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
                 else: 
-                 suggestionchannelmsg = channel.mention                
+                 suggestionchannelmsg = channel.mention       
+            if smschannelresult:    
+                channelid = smschannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                 smschannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else: 
+                 smschannelmsg = channel.mention                            
             embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suggestion Channel:** {suggestionchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = SuggestionModule(self.author)
+            embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Suggestion Channel:** {suggestionchannelmsg}\n{replybottom}**Suggestions Management Channel:** {smschannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+            view = SuggestionModule(self.author)
+            try:
+             await interaction.message.edit(embed=embed)     
+            except discord.Forbidden:
+                print("Couldn't edit module due to missing permissions.") 
 
         elif color == 'Customisation':
             embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
@@ -646,6 +662,7 @@ class SuggestionModule(discord.ui.View):
         super().__init__(timeout=360)
         self.add_item(ToggleSuggestions(author))        
         self.add_item(SuggestionsChannel(author))
+        self.add_item(SuggestionsChannelManagement(author))
         self.add_item(Config(author))
 
 

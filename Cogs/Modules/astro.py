@@ -307,8 +307,11 @@ class management(commands.Cog):
          else:
              print(response.text)
         
-
-      
+    @commands.command()
+    @commands.is_owner()
+    async def reloadjsk(self ,ctx):
+     await self.client.load_extension("jishaku")
+     await ctx.send(f'{tick} **{ctx.author.display_name},** I\'ve succesfully reloaded Jishaku!')      
         
         
 

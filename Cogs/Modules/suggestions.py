@@ -12,6 +12,7 @@ scollection = db['staffrole']
 arole = db['adminrole']
 modules = db['Modules']
 suggestions_collection = db["suggestions"]
+suggestschannel2 = db["Suggestion Management Channel"]
 from emojis import *
 suggestschannel = db["suggestion channel"]
 class suggestions(commands.Cog):
@@ -52,8 +53,8 @@ class suggestions(commands.Cog):
         embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
         embed.set_footer(text=f"0 Upvotes | 0 Downvotes")
         view = SuggestionView()
-        view.add_item(ManageSuggestion())
         channeldata = await suggestschannel.find_one({"guild_id": ctx.guild.id})
+        channeldata2 = await suggestschannel2.find_one({"guild_id": ctx.guild.id})
         if channeldata:
          channel_id = channeldata['channel_id']
          channel = self.client.get_channel(channel_id)
@@ -61,9 +62,18 @@ class suggestions(commands.Cog):
           try:  
            msg = await channel.send(embed=embed, view=view)
            await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.", allowed_mentions=discord.AllowedMentions.none())
-           await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})           
+           await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})    
+           if channeldata2:
+            channel_id = channeldata2['channel_id']
+            channel2 = await self.client.fetch_channel(channel_id)
+            if channel2: 
+             
+             view = SuggestionManageView()
+             embed.title = "Suggestion Manage"
+             msg = await channel2.send(embed=embed, view=view)
+             await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"mgt_message_id": msg.id}})
           except discord.Forbidden: 
-             await ctx.send(f"{no} I don't have permission to view that channel.")              
+             await ctx.send(f"{no} I don't have permission to view either channel.")              
              return
 
         else: 
@@ -217,7 +227,7 @@ class ManageSuggestion(discord.ui.Select):
         
             
         ]
-        super().__init__(placeholder='⚙️ |  Suggestion Manage', min_values=1, max_values=1, options=options, custom_id="manage_suggestion_select")
+        super().__init__(placeholder='⚙️ | Manage Suggestion', min_values=1, max_values=1, options=options, custom_id="manage_suggestion_select")
 
 
 
@@ -230,19 +240,44 @@ class ManageSuggestion(discord.ui.Select):
             return
         color = self.values[0]
         if color == "Accept":
-         suggestiondata = await suggestions_collection.find_one({"message_id": interaction.message.id})
+         suggestiondata = await suggestions_collection.find_one({"mgt_message_id": interaction.message.id})
+         channelresult = await suggestschannel.find_one({"guild_id": interaction.guild.id})
+         if channelresult is None:
+            await interaction.response.send_message(f"{no} You have not set a suggestion channel.", ephemeral=True)
+            return
+         channel = interaction.guild.get_channel(channelresult["channel_id"])
          if suggestiondata is None:
             await interaction.response.send_message(f"{no} I can not find the suggestion data for this suggestion.", ephemeral=True)
             return
-         embed = interaction.message.embeds[0]
-         embed.title = f"{greencheck} Suggestion Accepted"
-         embed.color = discord.Color.brand_green()
-         view = SuggestionView()
-         view.view_voters.disabled = False
-         view.No.disabled = True
-         view.Yes.disabled = True        
-         await interaction.message.edit(embed=embed, view=view)
-         await interaction.response.send_message(f"{tick} Suggestion Accepted", ephemeral=True)
+         msg = await channel.fetch_message(suggestiondata["message_id"])
+         if msg:
+            suggestion = suggestiondata.get("suggestion")
+            submitter = suggestiondata.get("author_id")
+            suser = None
+            if submitter:
+               suser = await interaction.guild.fetch_member(submitter)
+
+
+            upvotes = suggestiondata.get("upvotes")
+            downvotes = suggestiondata.get("downvotes")
+
+            embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"**Submitter**\n<@{submitter}>\n\n**Suggestion**\n{suggestion}", color=discord.Color.brand_green())
+            if suser:
+             embed.set_thumbnail(url=suser.display_avatar)
+            embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+            embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
+            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")    
+            view = SuggestionView()
+            view.view_voters.disabled = False
+            view.No.disabled = True
+            view.Yes.disabled = True        
+            await msg.edit(embed=embed, view=view)
+            embed.set_author(name=f"Accepted By {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
+            await interaction.message.edit(embed=embed, view=None)            
+            await interaction.response.send_message(f"{tick} Suggestion Accepted", ephemeral=True)
+         else:
+            await interaction.response.send_message(f"{no} I can not find the suggestion message for this suggestion.", ephemeral=True)
+            return   
         elif color == "Deny":
             await interaction.response.send_modal(Deny())
 
@@ -291,21 +326,52 @@ class Deny(discord.ui.Modal, title='Deny'):
     reason = discord.ui.TextInput(label='Reason', style=discord.TextStyle.long, required=True)
 
     async def on_submit(self, interaction: discord.Interaction):
-        suggestiondata = await suggestions_collection.find_one({"message_id": interaction.message.id})
+        suggestiondata = await suggestions_collection.find_one({"mgt_message_id": interaction.message.id})
         if suggestiondata is None:
             await interaction.response.send_message(f"{no} I can not find the suggestion data for this suggestion.", ephemeral=True)
             return
-        embed = interaction.message.embeds[0]
-        embed.title = f"{redx} Suggestion Denied"
-        embed.color = discord.Color.brand_red()
-        embed.add_field(name="<:ApplicationFeedback:1178754449125167254> Deny Reason", value=self.reason.value)
-        view = SuggestionView()
-        view.view_voters.disabled = False
-        view.No.disabled = True
-        view.Yes.disabled = True
-        await interaction.message.edit(embed=embed, view=view)
-        await interaction.response.send_message(f"{tick} Suggestion Denied", ephemeral=True)
-   
+        channelresult = await suggestschannel.find_one({"guild_id": interaction.guild.id})
+        if channelresult is None:
+            await interaction.response.send_message(f"{no} You have not set a suggestion channel.", ephemeral=True)
+            return
+        channel = interaction.guild.get_channel(channelresult["channel_id"])
+        if suggestiondata is None:
+            await interaction.response.send_message(f"{no} I can not find the suggestion data for this suggestion.", ephemeral=True)
+            return
+        msg = await channel.fetch_message(suggestiondata["message_id"])
+        if msg:      
+            suggestion = suggestiondata.get("suggestion")
+            submitter = suggestiondata.get("author_id")
+            suser = None
+            if submitter:
+               suser = await interaction.guild.fetch_member(submitter)
+
+
+            upvotes = suggestiondata.get("upvotes")
+            downvotes = suggestiondata.get("downvotes")
+
+            embed = discord.Embed(title=f"{redx} Suggestion Denied", description=f"**Submitter**\n<@{submitter}>\n\n**Suggestion**\n{suggestion}", color=discord.Color.brand_red())
+            if suser:
+             embed.set_thumbnail(url=suser.display_avatar)
+            embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+            embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
+            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")      
+            embed.add_field(name="Denied Reason", value=self.reason.value, inline=False)      
+            view = SuggestionView()
+            view.view_voters.disabled = False
+            view.No.disabled = True
+            view.Yes.disabled = True
+            try:
+             await msg.edit(embed=embed, view=view)
+            except discord.errors.NotFound:
+                await interaction.response.send_message(f"{no} The suggestion message was not found or has been deleted.", ephemeral=True)
+                return               
+            embed.set_author(name=f"Denied By {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
+            await interaction.message.edit(embed=embed, view=None)
+            await interaction.response.send_message(f"{tick} Suggestion Denied", ephemeral=True)
+        else:    
+         await interaction.response.send_message(f"{no} I can not find the suggestion message for this suggestion.", ephemeral=True)
+         return      
 class PermissionsButtons(discord.ui.View):
     def __init__(self):
         super().__init__()
