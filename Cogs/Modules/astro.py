@@ -313,7 +313,6 @@ class management(commands.Cog):
      await self.client.load_extension("jishaku")
      await ctx.send(f'{tick} **{ctx.author.display_name},** I\'ve succesfully reloaded Jishaku!')      
         
-        
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(management(client))     

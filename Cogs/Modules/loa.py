@@ -53,8 +53,9 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
         duration_value = int(duration[:-1])
         duration_unit = duration[-1]
         duration_seconds = duration_value
-
-        if duration_unit == 'm':
+        if duration_unit == 's':
+            duration_seconds *= 1
+        elif duration_unit == 'm':
             duration_seconds *= 60
         elif duration_unit == 'h':
             duration_seconds *= 3600
@@ -147,7 +148,7 @@ class loamodule(commands.Cog):
 
                 if active and current_time >= end_time:
                     try:
-                        loanotification = await consent.find_one({'user_id': self.user.id})
+                        loanotification = await consent.find_one({'user_id': user.id})
                         if loanotification:
                             if loanotification.get('LOAAlerts', "Enabled") == "Enabled":                        
                              await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
@@ -184,15 +185,27 @@ class loamodule(commands.Cog):
                     if loarole_data:
                             loarole = loarole_data['staffrole']
                             if loarole:
-                                role = discord.utils.get(guild.roles, id=loarole)
+                                try:
+                                 role = discord.utils.get(guild.roles, id=loarole)
+                                except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+                                    print(f"Failed to get role {loarole}. Continuing..."
+                                          )
+                                    continue 
                                  
                                 if role:
-                                    member = await self.client.fetch_user(user.id)
+                                    try:
+                                     member = await guild.fetch_member(user.id)
+                                    except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+                                        print(f"Failed to get member {user_id}. Continuing...")
+                                        continue 
                                     try:
                                      await member.remove_roles(role)
                                     except discord.Forbidden:
                                         print(f"Failed to remove role from {user_id}. Continuing...")
                                         continue 
+                                else:
+                                    print(f"Failed to get role {loarole}. Continuing...")
+                                    continue    
             else:
                 pass
         except Exception as e:
@@ -289,7 +302,7 @@ class loamodule(commands.Cog):
             return
         if not await has_staff_role(ctx):
             return
-        if not re.match(r'^\d+[mhdw]$', duration):
+        if not re.match(r'^\d+[smhdw]$', duration):
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -305,6 +318,8 @@ class loamodule(commands.Cog):
 
         if duration_unit == 'm':
             duration_seconds *= 60
+        elif duration_unit == 's':
+            duration_seconds *= 1    
         elif duration_unit == 'h':
             duration_seconds *= 3600
         elif duration_unit == 'd':
