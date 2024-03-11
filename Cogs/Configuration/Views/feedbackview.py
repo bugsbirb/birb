@@ -53,9 +53,9 @@ class FeedbackChannel(discord.ui.ChannelSelect):
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            print(f"[⚠️] An error occurred: {str(e)}")
 
-        print(f"Channel ID: {channelid.id}")        
+        print(f"[#️⃣] Channel ID: {channelid.id}")        
 
 class ToggleFeedback(discord.ui.Select):
     def __init__(self, author):
@@ -109,5 +109,5 @@ async def refreshembed(interaction):
             try:
              await interaction.message.edit(embed=embed)
             except discord.Forbidden:
-                print("Couldn't edit module due to missing permissions.")              
+                print("[⚠️] Couldn't edit module due to missing permissions.")              
                   

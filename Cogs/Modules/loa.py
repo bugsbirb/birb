@@ -158,10 +158,10 @@ class loamodule(commands.Cog):
                             if loanotification.get('LOAAlerts', "Enabled") == "Enabled":                        
                              await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
                     except discord.Forbidden:
-                        print(f"Failed to send a DM to user {user_id}. Continuing...")
+                        print(f"[⚠️] Failed to send a DM to user {user_id}. Continuing...")
                     
-                    print(f"End Time: {end_time}")
-                    print(f"Current Time: {current_time}")
+                    print(f"[⏰] End Time: {end_time}")
+                    print(f"[⏰] Current Time: {current_time}")
                     await loa_collection.update_many({'guild_id': guild_id, 'user': user_id}, {'$set': {'active': False}})
                     
                     loarole_data = await LOARole.find_one({'guild_id': guild.id})
@@ -171,7 +171,7 @@ class loamodule(commands.Cog):
                         try:
                          channel = guild.get_channel(channel_id)
                         except discord.Forbidden:
-                            print(f"Failed to get channel {channel_id}. Continuing...")
+                            print(f"[⚠️] Failed to get channel {channel_id}. Continuing...")
                             continue 
                         if channel:
                             embed = discord.Embed(title=f"LOA Ended",
@@ -182,10 +182,10 @@ class loamodule(commands.Cog):
                             try:
                              await channel.send(embed=embed)
                             except discord.Forbidden:
-                                print(f"Failed to send message to channel {channel_id}. Continuing...")
+                                print(f"[⚠️] Failed to send message to channel {channel_id}. Continuing...")
                                 continue 
                         else:
-                            print(f"Failed to get channel {channel_id}. Continuing...")
+                            print(f"[⚠️] Failed to get channel {channel_id}. Continuing...")
                             continue    
                     if loarole_data:
                             loarole = loarole_data['staffrole']
@@ -201,7 +201,7 @@ class loamodule(commands.Cog):
                                     try:
                                      member = await guild.fetch_member(user.id)
                                     except (discord.Forbidden, discord.NotFound, discord.HTTPException):
-                                        print(f"Failed to get member {user_id}. Continuing...")
+                                        print(f"[⚠️] Failed to get member {user_id}. Continuing...")
                                         continue 
                                     try:
                                      await member.remove_roles(role)
@@ -209,7 +209,7 @@ class loamodule(commands.Cog):
                                         print(f"Failed to remove role from {user_id}. Continuing...")
                                         continue 
                                 else:
-                                    print(f"Failed to get role {loarole}. Continuing...")
+                                    print(f"[⚠️] Failed to get role {loarole}. Continuing...")
                                     continue    
             else:
                 pass

@@ -499,7 +499,11 @@ class Infractions(commands.Cog):
                 for infraction in infractions:
                     guild = self.client.get_guild(infraction['guild_id'])
                     if guild is None:
-                        print('No guild')
+                        await collection.update_one(
+                            {'random_string': infraction['random_string']},
+                            {'$set': {'expired': True}}
+                        )
+                        print('[🛈 INFO] Guild was None so I expired the infraction.')
                         continue
 
                     if infraction['expiration'] < datetime.now():
@@ -507,7 +511,7 @@ class Infractions(commands.Cog):
                             {'random_string': infraction['random_string']},
                             {'$set': {'expired': True}}
                         )
-                        print(f"Updated expired infraction with ID: {infraction['random_string']}")
+                        print(f"[✅] Updated expired infraction with ID: {infraction['random_string']}")
 
                         if infraction.get('msg_id') is not None:
                             infchannelresult = await infchannel.find_one({'guild_id': guild.id})
@@ -522,7 +526,7 @@ class Infractions(commands.Cog):
                                 if msg:
                                     await msg.reply("<:CaseRemoved:1191901322723737600> Infraction has **expired**.")
                                     await msg.edit(content=f"{msg.content} • **Infraction Expired.**")
-                                    print(f"Updated expired infraction message with ID: {infraction['random_string']}")
+                                    print(f"[✅] Updated expired infraction message with ID: {infraction['random_string']}")
 
         except Exception as e:
             print(f"Error checking infractions: {e}")

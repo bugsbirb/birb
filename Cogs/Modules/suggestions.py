@@ -187,13 +187,12 @@ class SuggestionView(discord.ui.View):
 
     async def update_embed(self, interaction, suggestion_data):
         if interaction.message:
-            print(f"Editing message with ID {interaction.message.id}")
             embed = interaction.message.embeds[0]
             upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
             embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")
             await interaction.message.edit(embed=embed)
         else:
-            print("Interaction message is None!")
+            return
 
     @button(label='Voters List', style=discord.ButtonStyle.gray, custom_id="view_voters_button", emoji="<:List:1179470251860185159>")
     async def view_voters(self, interaction, button):

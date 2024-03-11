@@ -896,7 +896,7 @@ async def refreshembed(interaction):
             try:    
              await interaction.message.edit(embed=embed)
             except:
-                return print("Couldn't edit module due to missing permissions.") 
+                return print("[⚠️] Couldn't edit module due to missing permissions.") 
 
 
 class PermissionsView(discord.ui.View):

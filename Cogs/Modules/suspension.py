@@ -212,13 +212,13 @@ class Suspensions(commands.Cog):
                         try:
                             member = guild.get_member(user_id)
                         except discord.Forbidden:
-                            print(f"Failed to get member {user.name} in {guild.name}")
+                            print(f"[⚠️] Failed to get member {user.name} in {guild.name}")
                             continue
                         try:
                             await member.add_roles(*roles_to_return)
                         except discord.Forbidden:
                             print(
-                                f"Failed to restore roles to {member.name} in {guild.name}"
+                                f"[⚠️] Failed to restore roles to {member.name} in {guild.name}"
                             )
 
                 if user:
@@ -227,7 +227,7 @@ class Suspensions(commands.Cog):
                             f"{tick} Your suspension in **@{guild.name}** has ended."
                         )
                     except:
-                        print(f"Failed to send message to {user.name} in {guild.name}")
+                        print(f"[⚠️] Failed to send message to {user.name} in {guild.name}")
                         continue
 
 
