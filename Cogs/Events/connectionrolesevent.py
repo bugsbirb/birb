@@ -1,4 +1,4 @@
-
+import discord
 from discord.ext import commands
 from emojis import *
 import os
@@ -23,7 +23,12 @@ class ConnectionRolesEvent(commands.Cog):
             child_role_id = parent_role_data["child"]
             child_role = after.guild.get_role(child_role_id)
             if child_role:
-                await after.add_roles(child_role)
+                try:
+                 await after.add_roles(child_role)
+                except discord.Forbidden:
+                    print('[⚠️] I don\'t have permission to add roles to this user')
+                    return
+
 
      for role in removed_roles:
         parent_roles_data = await connectionroles.find({"parent": role.id}).to_list(length=1000)
@@ -31,7 +36,10 @@ class ConnectionRolesEvent(commands.Cog):
             child_role_id = parent_role_data["child"]
             child_role = after.guild.get_role(child_role_id)
             if child_role:
-                await after.remove_roles(child_role)
-
+                try:
+                 await after.remove_roles(child_role)
+                except discord.Forbidden:
+                    print('[⚠️] I don\'t have permission to add roles to this user')
+                    return
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConnectionRolesEvent(client))   
