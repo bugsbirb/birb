@@ -33,9 +33,11 @@ class Infractions(commands.Cog):
         self.client = client
         loop = self.check_infractions.start()
         if loop:
-            print("Infractions loop started.")
+            print("[✅] Infractions loop started.")
+        else:
+            print("[❌] Infractions loop failed to start.")
 
-
+    
 
 
     async def modulecheck(self, ctx): 

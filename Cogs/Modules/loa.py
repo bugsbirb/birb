@@ -111,7 +111,12 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
 class loamodule(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
-        self.check_loa_status.start()
+        try:
+         self.check_loa_status.start()
+         print("[✅] LOA Loop Started")
+        except Exception as e:
+         print(f"[❌] LOA Loop Not Started: {e}")
+ 
 
     async def modulecheck(self, ctx):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})
@@ -126,7 +131,7 @@ class loamodule(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def check_loa_status(self):
-        print("Checking LOA Status")
+        print("[👀] Checking LOA Status")
         try:
             current_time = datetime.now()
 

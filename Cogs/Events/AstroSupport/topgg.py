@@ -19,9 +19,9 @@ class Topgg(commands.Cog):
     async def update_stats(self):
       try:
         await self.client.topggpy.post_guild_count()
-        print(f"Posted server count ({self.client.topggpy.guild_count})")
+        print(f"[🔝] Posted server count ({self.client.topggpy.guild_count})")
       except Exception as e:
-        print(f"Failed to post server count\n{e.__class__.__name__}: {e}")
+        print(f"[⬇️] Failed to post server count\n{e.__class__.__name__}: {e}")
 
 
 

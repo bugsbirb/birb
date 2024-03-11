@@ -15,14 +15,15 @@ from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.astro import CustomRoleButtons
 from Cogs.Modules.staff import Staffview
+from motor.motor_asyncio import AsyncIOMotorClient
 from Cogs.Events.AstroSupport.aon_thread_create import ForumManage, Feedback
 load_dotenv()
+
 
 PREFIX = os.getenv("PREFIX")
 TOKEN = os.getenv("TOKEN")
 STATUS = os.getenv("STATUS")
 MONGO_URL = os.getenv("MONGO_URL")
-
 
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_URL"),
@@ -30,6 +31,8 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 
+client = AsyncIOMotorClient(MONGO_URL)
+db = client["astro"]
 
 
 class client(commands.AutoShardedBot):
@@ -74,16 +77,16 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.blacklist",
             "Cogs.Events.AstroSupport.topgg",
             "Cogs.Events.AstroSupport.analytics",
-            "Cogs.Modules.datamanage",
+            "Cogs.Modules.datamanage"
         ]
 
     async def load_jishaku(self):
         await self.wait_until_ready()
         await self.load_extension("jishaku")
-        print("Jishaku Loaded")
+        print("[🔄] Jishaku Loaded")
 
     async def setup_hook(self):
-        self.loop.create_task(self.load_jishaku())
+        
         update_channel_name.start()
         self.add_view(Helpdesk())
         self.add_view(SuggestionView())
@@ -95,18 +98,25 @@ class client(commands.AutoShardedBot):
         self.add_view(Staffview())
         self.add_view(ForumManage())
         self.add_view(Feedback())
+        self.loop.create_task(self.load_jishaku())
 
         for ext in self.cogslist:
             await self.load_extension(ext)
-            print(f"{ext} loaded")
+            print(f"[✅] {ext} loaded")
 
     async def on_ready(self):
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
+        prfx = f"[📖] {prfx}"
         print(prfx + " Logged in as " + self.user.name)
         print(prfx + " Bot ID " + str(self.user.id))
         print(prfx + " Discord Version " + discord.__version__)
         print(prfx + " Python Version " + str(platform.python_version()))
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
+        try:
+         await db.command("ping")
+         print(f"[✅] Successfully connected to MongoDB")
+        except Exception as e:
+         print(f"[❌] Failed to connect to MongoDB: {e}") 
 
 
 
@@ -116,10 +126,10 @@ class client(commands.AutoShardedBot):
             await self.change_presence(activity=activity2)
 
         else:
-            print("STATUS not defined in .env, bot will not set a custom status.")
+            print("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
 
     async def on_disconnect(self):
-        print("Disconnected from Discord Gateway!")
+        print("[⚠️] Disconnected from Discord Gateway!")
 
     async def is_owner(self, user: discord.User):
         if user.id in [795743076520820776]:
@@ -140,13 +150,10 @@ async def update_channel_name():
         try:
             await channel.edit(name=f"{guild_count} Guilds | {len(client.users)} Users")
         except discord.HTTPException:
-            print("Failed to update channel name.")
+            print("[⚠️] Failed to update channel name.")
 
     else:
-        print(f"Channel with ID {channel_id} not found.")
-
-
-
+        print(f"[⚠️] Channel with ID {channel_id} not found.")
 
 if __name__ == "__main__":
     client.run(TOKEN)

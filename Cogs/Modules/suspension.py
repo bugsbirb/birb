@@ -24,7 +24,7 @@ class Suspensions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
         self.check_suspensions.start()
-        print("Suspension loop started")
+        print("[✅] Suspension loop started")
 
     async def modulecheck(self, ctx): 
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
@@ -179,7 +179,7 @@ class Suspensions(commands.Cog):
 
     @tasks.loop(minutes=10)
     async def check_suspensions(self):
-        print("Checking suspensions")
+        print("[👀] Checking suspensions")
         current_time = datetime.now()
         filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}
 
