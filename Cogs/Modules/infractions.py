@@ -499,7 +499,11 @@ class Infractions(commands.Cog):
                 for infraction in infractions:
                     guild = self.client.get_guild(infraction['guild_id'])
                     if guild is None:
-                        print('[🛈 INFO] Guild not found, skipping...')
+                        await collection.update_one(
+                            {'random_string': infraction['random_string']},
+                            {'$set': {'expired': True}}
+                        )
+                        print('[🛈 INFO] Guild was None so I expired the infraction.')
                         continue
 
                     if infraction['expiration'] < datetime.now():
