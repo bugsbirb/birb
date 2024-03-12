@@ -1,9 +1,9 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 scollection = db['staffrole']
 Customisation = db['Customisation']
@@ -36,7 +36,7 @@ class ResetEmbeds(discord.ui.Select):
              if result is None:
                  await interaction.response.send_message(f"{tick} There are no embeds to reset.", ephemeral=True)
                  return             
-             Customisation.delete_one({"guild_id": interaction.guild.id, "type": "Promotions"})
+             await Customisation.delete_one({"guild_id": interaction.guild.id, "type": "Promotions"})
              await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, promotions embed have been reset.", ephemeral=True)
 
         if color == "Infractions":
@@ -44,7 +44,7 @@ class ResetEmbeds(discord.ui.Select):
              if result is None:
                  await interaction.response.send_message(f"{tick} There are no embeds to reset.", ephemeral=True)
                  return
-             Customisation.delete_one({"guild_id": interaction.guild.id, "type": "Infractions"})
+             await Customisation.delete_one({"guild_id": interaction.guild.id, "type": "Infractions"})
              await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, infractions embed have been reset.", ephemeral=True)
  
             
@@ -355,6 +355,6 @@ class Infraction(discord.ui.View):
             "image": embed.image.url if embed.image else None,
             "guild_id": interaction.guild.id
             }
-        Customisation.update_one(filter,  {"$set": embed_data}, upsert=True)
+        await Customisation.update_one(filter,  {"$set": embed_data}, upsert=True)
         embed = discord.Embed(title=f"{greencheck} Customisation Saved", description="Your embed has been saved." ,color=discord.Colour.brand_green())
         await interaction.response.edit_message(content=None, embed=embed, view=None)

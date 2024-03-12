@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -47,11 +47,11 @@ class ToggleTags(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Tags': True}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Tags': True}}, upsert=True)    
             await refreshembed(interaction)   
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Tags': False}}, upsert=True)
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Tags': False}}, upsert=True)
             await refreshembed(interaction)            
 
 class TagsUsageChannel(discord.ui.ChannelSelect):
@@ -78,7 +78,7 @@ class TagsUsageChannel(discord.ui.ChannelSelect):
         try:
 
 
-            tagslogging.update_one(filter, {'$set': data}, upsert=True)
+            await tagslogging.update_one(filter, {'$set': data}, upsert=True)
 
             await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
@@ -88,8 +88,8 @@ class TagsUsageChannel(discord.ui.ChannelSelect):
         print(f"Channel ID: {channelid.id}")        
 
 async def refreshembed(interaction):
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})        
-            usagechanneldata = tagslogging.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})        
+            usagechanneldata = await tagslogging.find_one({'guild_id': interaction.guild.id})
             usagechannelmsg = "Not Configured"    
             if usagechanneldata:
                 usagechannelmsg = f"<#{usagechanneldata['channel_id']}>"

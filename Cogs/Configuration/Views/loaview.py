@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -47,10 +47,10 @@ class LOAChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = loachannel.find_one(filter)
+            existing_record = await loachannel.find_one(filter)
 
             if existing_record:
-                loachannel.update_one(filter, {'$set': data})
+                await loachannel.update_one(filter, {'$set': data})
             else:
                 loachannel.insert_one(data)
             await interaction.response.edit_message(content=None)
@@ -84,9 +84,9 @@ class LOARoled(discord.ui.RoleSelect):
             existing_record = LOARole.find_one(filter)
 
             if existing_record:
-                LOARole.update_one(filter, {'$set': data})
+                await LOARole.update_one(filter, {'$set': data})
             else:
-                LOARole.insert_one(data)
+                await LOARole.insert_one(data)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
         except Exception as e:
@@ -117,18 +117,18 @@ class ToggleLOADropdown(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': True}}, upsert=True)  
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': False}}, upsert=True) 
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'LOA': False}}, upsert=True) 
             await refreshembed(interaction)
 
 
 async def refreshembed(interaction):
-            loachannelresult = loachannel.find_one({'guild_id': interaction.guild.id})
-            loaroleresult = LOARole.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            loachannelresult = await loachannel.find_one({'guild_id': interaction.guild.id})
+            loaroleresult = await LOARole.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             loarolemsg = "Not Configured"
             loachannelmsg = "Not Configured"

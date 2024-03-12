@@ -1,11 +1,11 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 import validators
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -50,7 +50,7 @@ class CmdUsageChannel(discord.ui.ChannelSelect):
         try:
 
 
-            commandslogging.update_one(filter, {'$set': data}, upsert=True)
+            await commandslogging.update_one(filter, {'$set': data}, upsert=True)
 
             await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
@@ -76,7 +76,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-        amount = customcommands.count_documents({"guild_id": interaction.guild.id})
+        amount = await customcommands.count_documents({"guild_id": interaction.guild.id})
         if amount >= 25:
          embed = discord.Embed()
          embed.title = f"{redx} {amount}/25"
@@ -85,7 +85,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          await interaction.response.edit_message(embed=embed, view=None)
 
          return
-        result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+        result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         embed = interaction.message.embeds[0]
         if result:
          embed = discord.Embed()
@@ -97,7 +97,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
         name = self.name.value
         view = NoEmbeds(self.author, name)
         await interaction.response.edit_message(embed=None,content=None,  view=view)
-        customcommands.insert_one({"name": name, "guild_id": interaction.guild.id, "creator": interaction.user.id})
+        await customcommands.insert_one({"name": name, "guild_id": interaction.guild.id, "creator": interaction.user.id})
 
 class EditCommand(discord.ui.Modal, title='Edit Command'):
     def __init__(self, author):
@@ -117,7 +117,7 @@ class EditCommand(discord.ui.Modal, title='Edit Command'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-         result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+         result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
          embed = interaction.message.embeds[0]
          if result is None:
           embed.title = f"{redx} I could not find that."
@@ -184,7 +184,7 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-       result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+       result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
        embed = interaction.message.embeds[0]
        if result is None:
         embed.title = f"{redx} I could not find that."
@@ -238,7 +238,7 @@ class CustomButton(discord.ui.Modal, title='Button Embed'):
     async def on_submit(self, interaction: discord.Interaction):
         colour = self.colour.value.lower()
         valid_colours = ['blurple', 'red', 'green', 'grey']
-        result = customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+        result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         if result is None:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I could not find the custom command.")
             return
@@ -246,7 +246,7 @@ class CustomButton(discord.ui.Modal, title='Button Embed'):
         if colour not in valid_colours:
          await interaction.response.send_message(f"{redx} **{interaction.user.display_name},** I could not find that colour. (Blurple, Red, Green, Grey)", ephemeral=True)
          return
-        customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'buttons': 'Embed Button', 'cmd': self.name.value, 'button_label': self.label.value, 'colour': self.colour.value, 'emoji': self.emoji.value}})
+        await customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'buttons': 'Embed Button', 'cmd': self.name.value, 'button_label': self.label.value, 'colour': self.colour.value, 'emoji': self.emoji.value}})
         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the custom embed button with the command `{self.name.value}`.")
 
 class ButtonURLView(discord.ui.Modal, title='Button URL'):
@@ -278,7 +278,7 @@ class ButtonURLView(discord.ui.Modal, title='Button URL'):
         if not validators.url(url):
             await interaction.response.send_message(f"{no} **{interaction.user.display_name},** that is not a valid website url.", ephemeral=True)
             return
-        customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'url': url, 'buttons': 'Link Button', 'button_label': self.label.value}})
+        await customcommands.update_one({'name': self.names,'guild_id': interaction.guild.id}, {'$set': {'url': url, 'buttons': 'Link Button', 'button_label': self.label.value}})
         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the buttons to URL with the link `{self.name.value}`.")
 
 
@@ -304,7 +304,7 @@ class ButtonsSelectionView(discord.ui.Select):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         if color == 'Voting Buttons':
-         customcommands.update_one({'name': self.name,'guild_id': interaction.guild.id}, {'$set': {'buttons': color}})
+         await customcommands.update_one({'name': self.name,'guild_id': interaction.guild.id}, {'$set': {'buttons': color}})
          await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the buttons to `{color}`.")
         if color == 'Link Button':
             await interaction.response.send_modal(ButtonURLView(self.author, self.name))
@@ -341,11 +341,11 @@ class ToggleCommands(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': True}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': True}}, upsert=True)    
             await refreshembed(interaction)  
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)   
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'customcommands': False}}, upsert=True)   
             await refreshembed(interaction)   
 
 
@@ -638,7 +638,7 @@ class NoEmbeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        result = customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
+        result = await customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
         perm = result.get('permissionroles', None)
         if perm is None: 
             await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name},** please select the required permissions for this command using the `Permission` button!", ephemeral=True)
@@ -674,7 +674,7 @@ class NoEmbeds(discord.ui.View):
             "content": messagecontent
             }
 
-        customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
+        await customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Success!"
         embed.description = f"Start by using </command run:1199462063202902077> and selecting `{self.name}`"
@@ -798,7 +798,7 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        result = customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
+        result = await customcommands.find_one({"name": self.name, "guild_id": interaction.guild.id})
         perm = result.get('permissionroles', None)
         if perm is None: 
             await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name},** please select the required permissions for this command using the `Permission` button!", ephemeral=True)
@@ -834,7 +834,7 @@ class Embeds(discord.ui.View):
             "content": messagecontent
             }
 
-        customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
+        await customcommands.update_one({"name": self.name, "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Success!"
         embed.description = f"Start by using </command run:1199462063202902077> and selecting `{self.name}`"
@@ -858,20 +858,20 @@ class Permission(discord.ui.RoleSelect):
             'permissionroles': selected_role_ids
         }
 
-        customcommands.update_one({'name': self.name, 'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await customcommands.update_one({'name': self.name, 'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the permission requirement.",  view=None)
 
 
 async def refreshembed(interaction):
             commands = customcommands.find({'guild_id': interaction.guild.id})
-            moduledata = modules.find_one({'guild_id': interaction.guild.id})
+            moduledata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = 'False'
             if moduledata:
                 modulemsg = moduledata.get('customcommands', 'False')
                 
         
 
-            logging = commandslogging.find_one({'guild_id': interaction.guild.id})
+            logging = await commandslogging.find_one({'guild_id': interaction.guild.id})
             loggingmsg = "Not Configured"
             if logging:
                 loggingid = logging['channel_id']
@@ -880,8 +880,9 @@ async def refreshembed(interaction):
 
 
 
-
-            amount = customcommands.count_documents({'guild_id': interaction.guild.id})
+            
+            amount = await customcommands.count_documents({'guild_id': interaction.guild.id})
+            commands = await commands.to_list(length=amount)
             embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)

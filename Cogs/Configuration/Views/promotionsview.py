@@ -1,10 +1,9 @@
 import discord
 import os
-from pymongo import MongoClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
-
-mongo = MongoClient(MONGO_URL)
+from motor.motor_asyncio import AsyncIOMotorClient
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -47,9 +46,9 @@ class Promotionchannel(discord.ui.ChannelSelect):
             existing_record = promochannel.find_one(filter)
 
             if existing_record:
-                promochannel.update_one(filter, {'$set': data})
+                await promochannel.update_one(filter, {'$set': data})
             else:
-                promochannel.insert_one(data)
+                await promochannel.insert_one(data)
 
             await refreshembed(interaction) 
             await interaction.response.edit_message(content=None)
@@ -81,22 +80,22 @@ class PromotionModuleToggle(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': True}}, upsert=True)  
             await refreshembed(interaction)
 
             
         if color == 'Disable':    
              
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': False}}, upsert=True) 
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Promotions': False}}, upsert=True) 
             await refreshembed(interaction)
             
                       
 
     
 async def refreshembed(interaction):
-            promochannelresult = promochannel.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            promochannelresult = await promochannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             promochannelmsg = "Not Configured"
             if moduleddata:

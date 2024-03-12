@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -44,12 +44,12 @@ class FeedbackChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = feedbackch.find_one(filter)
+            existing_record = await feedbackch.find_one(filter)
 
             if existing_record:
-                feedbackch.update_one(filter, {'$set': data})
+                await feedbackch.update_one(filter, {'$set': data})
             else:
-                feedbackch.insert_one(data)
+                await feedbackch.insert_one(data)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
         except Exception as e:
@@ -80,17 +80,17 @@ class ToggleFeedback(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': True}}, upsert=True)  
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': False}}, upsert=True)
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': False}}, upsert=True)
             await refreshembed(interaction)
 
 
 async def refreshembed(interaction):
-            feedbackchannelresult = feedbackch.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            feedbackchannelresult = await feedbackch.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             feedbackchannelmsg = "Not Configured"
             if moduleddata:
@@ -103,7 +103,7 @@ async def refreshembed(interaction):
                 else:    
                  feedbackchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Staff Feedback Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom} {feedbackchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Staff Feedback Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Feedback Channel:** {feedbackchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
             try:

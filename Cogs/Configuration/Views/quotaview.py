@@ -1,14 +1,14 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 dbq = mongo['quotab']
 message_quota_collection = dbq["message_quota"]
 
-client = MongoClient(MONGO_URL)
+client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -80,7 +80,7 @@ class QuotaAmount(discord.ui.Select):
         if color == 'Custom Amount':        
             await interaction.response.send_modal(MessageQuota())
         else:    
-         message_quota_collection.update_one(
+         await message_quota_collection.update_one(
             {'guild_id': interaction.guild.id},
             {'$set': {'quota': color}},
             upsert=True  
@@ -106,7 +106,7 @@ class MessageQuota(discord.ui.Modal, title='Quota Amount'):
 
         guild_id = interaction.guild.id
 
-        message_quota_collection.update_one(
+        await message_quota_collection.update_one(
             {'guild_id': guild_id},
             {'$set': {'quota': quota_value}},
             upsert=True  
@@ -119,8 +119,8 @@ class MessageQuota(discord.ui.Modal, title='Quota Amount'):
 
 
 async def refreshembed(interaction):
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
-            messagequotdata = message_quota_collection.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})            
+            messagequotdata = await message_quota_collection.find_one({'guild_id': interaction.guild.id})
             messagecountmsg = "Not Configured"
             if messagequotdata:
                 messagecountmsg = f"{messagequotdata['quota']}"

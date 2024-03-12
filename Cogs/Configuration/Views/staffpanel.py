@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
 from emojis import *
+from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 Customisation = db['Customisation']
@@ -35,7 +35,7 @@ class StaffCustomise(discord.ui.Select):
 
         if color == 'Reset To Default':
             await interaction.response.send_message(content=f"{tick} Reset To Default", ephemeral=True)
-            Customisation.delete_one({"name": "Staff Panel", "guild_id": interaction.guild.id})
+            await Customisation.delete_one({"name": "Staff Panel", "guild_id": interaction.guild.id})
         elif color == 'Customize':
             view = NoEmbeds( interaction.user)
 
@@ -72,11 +72,11 @@ class StaffData(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Staff Database': True}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Staff Database': True}}, upsert=True)    
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Staff Database': False}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Staff Database': False}}, upsert=True)    
             await refreshembed(interaction)        
 
 
@@ -98,7 +98,7 @@ class DropdownLabel(discord.ui.Modal, title='Dropdown Label'):
 
 
     async def on_submit(self, interaction: discord.Interaction):
-        StaffPanelLabel.update_one({'guild_id': interaction.guild.id},  {'$set': {'label': self.Titles.value}}, upsert=True)
+        await StaffPanelLabel.update_one({'guild_id': interaction.guild.id},  {'$set': {'label': self.Titles.value}}, upsert=True)
         await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, set the dropdown label to {self.Titles.value}", ephemeral=True)
 
 
@@ -476,7 +476,7 @@ class Embeds(discord.ui.View):
 
        
 
-        Customisation.update_one({"name": "Staff Panel", "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
+        await Customisation.update_one({"name": "Staff Panel", "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Updated"
         embed.description = f"Start by using /staff panel"
@@ -485,7 +485,7 @@ class Embeds(discord.ui.View):
 
 
 async def refreshembed(interaction):
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             if moduleddata:
                 modulemsg = moduleddata.get('Staff Database', 'False')     
             embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())

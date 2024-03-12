@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -45,12 +45,12 @@ class SuggestionsChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = suggestschannel.find_one(filter)
+            existing_record = await suggestschannel.find_one(filter)
 
             if existing_record:
-                suggestschannel.update_one(filter, {'$set': data})
+                await suggestschannel.update_one(filter, {'$set': data})
             else:
-                suggestschannel.insert_one(data)
+                await suggestschannel.insert_one(data)
             await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
@@ -80,12 +80,12 @@ class SuggestionsChannelManagement(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = suggestschannel2.find_one(filter)
+            existing_record = await suggestschannel2.find_one(filter)
 
             if existing_record:
-                suggestschannel2.update_one(filter, {'$set': data})
+                await suggestschannel2.update_one(filter, {'$set': data})
             else:
-                suggestschannel2.insert_one(data)
+                await suggestschannel2.insert_one(data)
             await refreshembed(interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
@@ -116,20 +116,20 @@ class ToggleSuggestions(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': True}}, upsert=True)  
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': False}}, upsert=True)
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Suggestions': False}}, upsert=True)
             await refreshembed(interaction)
 
 
 async def refreshembed(interaction):
-            suschannelresult = suggestschannel.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            suschannelresult = await suggestschannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             suggestionchannelmsg = "Not Configured"
-            smschannelresult = suggestschannel2.find_one({'guild_id': interaction.guild.id})
+            smschannelresult = await suggestschannel2.find_one({'guild_id': interaction.guild.id})
             smschannelmsg = "Not Configured"
     
             if moduleddata:

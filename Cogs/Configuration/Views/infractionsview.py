@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -45,12 +45,12 @@ class InfractionChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = infchannel.find_one(filter)
+            existing_record = await infchannel.find_one(filter)
 
             if existing_record:
-                infchannel.update_one(filter, {'$set': data})
+                await infchannel.update_one(filter, {'$set': data})
             else:
-                infchannel.insert_one(data)
+                await infchannel.insert_one(data)
             await refreshembed(self, interaction)
             await interaction.response.edit_message(content=None)
         except Exception as e:
@@ -81,11 +81,11 @@ class ToggleInfractionsDropdown(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': True}}, upsert=True)  
             await refreshembed(self, interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': False}}, upsert=True)            
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': False}}, upsert=True)            
             await refreshembed(self, interaction)
 class InfractionTypes(discord.ui.Select):
     def __init__(self, author):
@@ -133,8 +133,8 @@ class CreateInfractionModal(discord.ui.Modal):
             'types': {'$in': [type_value]}
         }
 
-        types = nfractiontypes.find_one(filterm)
-        infractiontypesresult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
+        types = await nfractiontypes.find_one(filterm)
+        infractiontypesresult = await nfractiontypes.find_one({'guild_id': interaction.guild.id})
 
         infractiontypescount = len(infractiontypesresult['types'])
         if infractiontypescount >= 15:
@@ -144,7 +144,7 @@ class CreateInfractionModal(discord.ui.Modal):
 
 
 
-        nfractiontypes.update_one(
+        await nfractiontypes.update_one(
     {'guild_id': interaction.guild.id},
     {'$addToSet': {'types': type_value}},
     upsert=True
@@ -172,11 +172,11 @@ class DeleteInfractionModal(discord.ui.Modal):
             'types': {'$in': [type_value]}
         }
 
-        types = nfractiontypes.find_one(filterm)
+        types = await nfractiontypes.find_one(filterm)
         if types is None:
             return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, Infraction type not found.", ephemeral=True)
 
-        nfractiontypes.update_one(
+        await nfractiontypes.update_one(
     {'guild_id': interaction.guild.id},
     {'$pull': {'types': type_value}},
     upsert=True
@@ -186,12 +186,12 @@ class DeleteInfractionModal(discord.ui.Modal):
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type deleted successfully", ephemeral=True)
         await refreshembed(self, interaction)
 async def refreshembed(self, interaction):
-            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            infractionchannelresult = await infchannel.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             infchannelmsg = "Not Configured"
             infractiontypess = "Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination"
-            infractiontyperesult = nfractiontypes.find_one({'guild_id': interaction.guild.id})
+            infractiontyperesult = await nfractiontypes.find_one({'guild_id': interaction.guild.id})
             if infractiontyperesult:
                 infractiontypess = infractiontyperesult['types']
                 infractiontypess = ', '.join(infractiontypess)

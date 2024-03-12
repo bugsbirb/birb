@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 
@@ -32,15 +32,15 @@ class ToggleConnectionRoles(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Connection': True}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Connection': True}}, upsert=True)    
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Connection': False}}, upsert=True)   
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Connection': False}}, upsert=True)   
             await refreshembed(interaction)         
 
 async def refreshembed(interaction):
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})            
             modulemsg = "True"
             if moduleddata:
                 modulemsg = moduleddata.get('Connection', 'False')

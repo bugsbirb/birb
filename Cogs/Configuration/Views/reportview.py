@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
-
-mongo = MongoClient(MONGO_URL)
+from motor.motor_asyncio import AsyncIOMotorClient
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -78,12 +78,12 @@ class ReportsModeratorRole(discord.ui.RoleSelect):
             'staffrole': selected_role_id.id  
         }
         try:
-            existing_record = ReportModeratorRole.find_one(filter)
+            existing_record = await ReportModeratorRole.find_one(filter)
 
             if existing_record:
-                ReportModeratorRole.update_one(filter, {'$set': data})
+                await ReportModeratorRole.update_one(filter, {'$set': data})
             else:
-                ReportModeratorRole.insert_one(data)
+                await ReportModeratorRole.insert_one(data)
             await refreshembed(interaction)
             await interaction.response.edit_message( content=None)
         except Exception as e:
@@ -114,17 +114,17 @@ class ToggleReportsDropdown(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': True}}, upsert=True)  
             await refreshembed(interaction)
 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': False}}, upsert=True)            
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Reports': False}}, upsert=True)            
             await refreshembed(interaction)
 async def refreshembed(interaction):
-            partnershipchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})
-            reportsmoderatorresult = ReportModeratorRole.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            partnershipchannelresult = await repchannel.find_one({'guild_id': interaction.guild.id})
+            reportsmoderatorresult = await ReportModeratorRole.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
             partnershipchannelmsg = "Not Configured"
             reprolemsg = "Not Configured"

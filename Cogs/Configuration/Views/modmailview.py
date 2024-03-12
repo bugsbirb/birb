@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -23,6 +23,7 @@ modules = db['Modules']
 modmailcategory = db['modmailcategory']
 modmailping = db['modmailping']
 transcriptschannel = db['transcriptschannel']
+
 class ModmailCategory(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Modmail Category', channel_types=[discord.ChannelType.category])
@@ -48,9 +49,9 @@ class ModmailCategory(discord.ui.ChannelSelect):
             existing_record = modmailcategory.find_one(filter)
 
             if existing_record:
-                modmailcategory.update_one(filter, {'$set': data})
+                await modmailcategory.update_one(filter, {'$set': data})
             else:
-                modmailcategory.insert_one(data)
+                await modmailcategory.insert_one(data)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)        
         except Exception as e:
@@ -80,12 +81,12 @@ class TranscriptChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = transcriptschannel.find_one(filter)
+            existing_record = await transcriptschannel.find_one(filter)
 
             if existing_record:
-                transcriptschannel.update_one(filter, {'$set': data})
+                await transcriptschannel.update_one(filter, {'$set': data})
             else:
-                transcriptschannel.insert_one(data)
+                await transcriptschannel.insert_one(data)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
         except Exception as e:
@@ -116,11 +117,11 @@ class ModmailToggle(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': True}}, upsert=True)  
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': True}}, upsert=True)  
             await refreshembed(interaction)
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': False}}, upsert=True) 
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': False}}, upsert=True) 
             await refreshembed(interaction)   
 
 class ModmailPing(discord.ui.RoleSelect):
@@ -141,21 +142,20 @@ class ModmailPing(discord.ui.RoleSelect):
         }
 
 
-        modmailping.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await modmailping.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=None)
         await refreshembed(interaction)
     
 async def refreshembed(interaction):
-            transcriptschannelresult = transcriptschannel.find_one({'guild_id': interaction.guild.id})
-            modmailcategoryresult = modmailcategory.find_one({'guild_id': interaction.guild.id})
+            transcriptschannelresult = await transcriptschannel.find_one({'guild_id': interaction.guild.id})
+            modmailcategoryresult = await modmailcategory.find_one({'guild_id': interaction.guild.id})
             transcriptschannels = "Not Configured"
             modmailcategorys = "Not Configured"
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
-            suggestionchannelmsg = "Not Configured"
             if moduleddata:
                 modulemsg = moduleddata.get('Modmail', 'False')            
-            modmailpingresult = modmailping.find_one({'guild_id': interaction.guild.id})
+            modmailpingresult = await  modmailping.find_one({'guild_id': interaction.guild.id})
             modmailroles = "Not Configured"
             if modmailpingresult:
                 modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if interaction.guild.get_role(roleid) is not None]
@@ -168,7 +168,7 @@ async def refreshembed(interaction):
             if modmailcategoryresult:
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
             embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail",  color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Modmail Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Modmail Category:** {modmailcategorys}\n{replymiddle}**Modmail Pings:** {modmailroles}\n{replybottom}** {transcriptschannels}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
+            embed.add_field(name="<:settings:1207368347931516928> Modmail Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Modmail Category:** {modmailcategorys}\n{replymiddle}**Modmail Pings:** {modmailroles}\n{replybottom}**Transcript Channel** {transcriptschannels}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)  
             try:    

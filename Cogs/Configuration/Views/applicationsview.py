@@ -1,10 +1,10 @@
 import discord
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 
-mongo = MongoClient(MONGO_URL)
+mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 scollection = db['staffrole']
@@ -46,12 +46,12 @@ class ToggleApplications(discord.ui.Select):
 
         if color == 'Enable':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': True}}, upsert=True) 
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': True}}, upsert=True) 
             await refreshembed(interaction)   
 
         if color == 'Disable':    
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)    
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)    
             await refreshembed(interaction)        
 
 class ApplicationChannel(discord.ui.ChannelSelect):
@@ -76,12 +76,12 @@ class ApplicationChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = ApplicationsChannel.find_one(filter)
+            existing_record = await ApplicationsChannel.find_one(filter)
 
             if existing_record:
-                ApplicationsChannel.update_one(filter, {'$set': data})
+                await ApplicationsChannel.update_one(filter, {'$set': data})
             else:
-                ApplicationsChannel.insert_one(data)
+                await ApplicationsChannel.insert_one(data)
 
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
@@ -108,16 +108,16 @@ class ApplicationsRoles(discord.ui.RoleSelect):
         }
 
 
-        ApplicationsRolesDB.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
+        await ApplicationsRolesDB.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=None)
         await refreshembed(interaction)
         print(f"Select Application Roles: {selected_role_ids}")
 
 
 async def refreshembed(interaction):
-            applicationchannelresult = ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
-            staffroleresult = ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
-            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            applicationchannelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            staffroleresult = await ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
+            moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
 
             approlemsg = "Not Configured"
             appchannelmsg = "Not Configured"
