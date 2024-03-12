@@ -78,7 +78,10 @@ class Infractions(commands.Cog):
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
     async def infract(self, ctx, staff: discord.Member, action, reason: str, notes: Optional[str], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
-        await ctx.defer()
+        if anonymous == 'True':
+         await ctx.defer(ephemeral=True)
+        else:
+          await ctx.defer() 
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
 
@@ -193,8 +196,8 @@ class Infractions(commands.Cog):
         data = await infchannel.find_one({'guild_id': guild_id})
         consent_data = await consent.find_one({"user_id": staff.id})
         if consent_data is None:
-            await consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})
-            consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}
+            await consent.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"})
+            consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"}
 
         if data:
             channel_id = data['channel_id']
@@ -235,11 +238,11 @@ class Infractions(commands.Cog):
                 except discord.Forbidden:
                     await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
                     return
-                if consent_data['infractionalert'] == "Enabled":
+                if consent_data.get('infractionalert', "Enabled") == "Enabled":
                     try:
                         await staff.send(f"{smallarrow} From **{ctx.guild.name}**", embed=embed)
                     except:
-                        print(f"Couldn't send infraction alert to {staff.display_name} in {ctx.guild.name}")
+                        print(f"[⚠️] Couldn't send infraction alert to {staff.display_name} in @{ctx.guild.name}")
                         pass
                 else:
                     pass
