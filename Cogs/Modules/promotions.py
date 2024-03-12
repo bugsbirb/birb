@@ -119,8 +119,8 @@ class promo(commands.Cog):
         data = await promochannel.find_one({'guild_id': guild_id})
         consent_data = await consent.find_one({"user_id": staff.id})
         if consent_data is None:
-            await consent.insert_one({"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"})     
-            consent_data = {"user_id": staff.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled"}            
+            await consent.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"})
+            consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"}          
         if data:
          channel_id = data['channel_id']
          channel = self.client.get_channel(channel_id)
