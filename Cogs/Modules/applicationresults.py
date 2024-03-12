@@ -95,8 +95,11 @@ class ApplicationResults(commands.Cog):
                         if roles_to_add and None not in roles_to_add:
                             try:
                                 await member.add_roles(*roles_to_add)
-                            except discord.Forbidden as e:
+                            except (discord.Forbidden) as e:
                                 await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none())
+                                return
+                            except Exception(Exception):
+                                await ctx.send(f"{crisis} An error has occured if this continues please contact support.")
                                 return
                 else:
                     await ctx.send(
