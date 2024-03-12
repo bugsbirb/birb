@@ -1418,7 +1418,7 @@ class RevokeInfraction(discord.ui.View):
         loa = loa_collection.find_one(
             {"user": self.user.id, "guild_id": interaction.guild.id, "active": True}
         )
-        loasmg = ""
+        loamsg = ""
         if loa:
             loamsg = "True"
         else:
