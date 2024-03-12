@@ -517,7 +517,6 @@ class StaffPanel(discord.ui.Select):
                 return
 
             result = self.collection.find_one({'name': value, 'guild_id': interaction.guild.id})
-            print(f"{result} + Guild = {interaction.guild.name}")
             if value == 'Load More':
                 results = self.collection.find({'guild_id': interaction.guild.id})
                 staff_names = [result['name'] for result in results]
