@@ -31,6 +31,7 @@ class suggestions(commands.Cog):
 
     @commands.hybrid_command(description="Submit a suggestion for improvement")
     async def suggest(self, ctx, suggestion: str):
+        await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
          return    
