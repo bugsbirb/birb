@@ -81,21 +81,18 @@ class Confirm(discord.ui.View):
         await consentdb.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data}, upsert=True)
         self.toggle_promotions.style = discord.ButtonStyle.green if self.consent_data['PromotionAlerts'] == "Enabled" else discord.ButtonStyle.red
         await interaction.response.edit_message(content=None, view=self)
-
     @discord.ui.button(label='LOA Alerts', style=discord.ButtonStyle.grey)
     async def toggle_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                 color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-        
         consent = self.consent_data.get('LOAAlerts', "Enabled")
-        print(self.consent_data)
-        self.consent_data['LOAAlerts'] = "Enabled" if consent == "Disabled" else "Disabled"
-        
-        await consentdb.update_one({"user_id": self.consent_data['user_id']}, {"$set": self.consent_data}, upsert=True)
-        
-        self.toggle_loa.style = discord.ButtonStyle.green if self.consent_data['LOAAlerts'] == "Enabled" else discord.ButtonStyle.red
+        consent = "Enabled" if consent == "Disabled" else "Disabled"
+        update_data = {"LOAAlerts": consent}
+        await consentdb.update_one({"user_id": self.consent_data['user_id']}, {"$set": update_data}, upsert=True)
+        self.consent_data['LOAAlerts'] = consent
+        self.toggle_loa.style = discord.ButtonStyle.green if consent == "Enabled" else discord.ButtonStyle.red
         await interaction.response.edit_message(content=None, view=self)
 
 async def setup(client: commands.Bot) -> None:
