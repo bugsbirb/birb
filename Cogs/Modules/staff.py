@@ -207,7 +207,7 @@ class quota(commands.Cog):
 
      if message_data:
         message_count = message_data.get('message_count', 0)
-        await ctx.send(f"<:Messages:1148610048151523339> **{staff.display_name}**, has sent {message_count} messages.")        
+        await ctx.send(f"<:Messages:1148610048151523339> **{staff.display_name}** has sent {message_count} messages.")        
      else:  
           if staff is ctx.author:
            await ctx.send(f"{no} **{ctx.author.display_name}**, couldn't find any messages from you or your not staff.")
