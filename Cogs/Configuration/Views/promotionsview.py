@@ -43,13 +43,7 @@ class Promotionchannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = promochannel.find_one(filter)
-
-            if existing_record:
-                await promochannel.update_one(filter, {'$set': data})
-            else:
-                await promochannel.insert_one(data)
-
+            await promochannel.update_one(filter, {'$set': data}, upsert=True)
             await refreshembed(interaction) 
             await interaction.response.edit_message(content=None)
         except Exception as e:

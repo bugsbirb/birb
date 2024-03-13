@@ -45,7 +45,7 @@ class ReportChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = repchannel.find_one(filter)
+            existing_record = await repchannel.find_one(filter)
 
             if existing_record:
                 repchannel.update_one(filter, {'$set': data})

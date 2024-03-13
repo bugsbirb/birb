@@ -42,7 +42,7 @@ class PartnershipChannel(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = partnershipsch.find_one(filter)
+            existing_record = await partnershipsch.find_one(filter)
 
             if existing_record:
                 await partnershipsch.update_one(filter, {'$set': data})

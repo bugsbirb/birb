@@ -81,12 +81,8 @@ class LOARoled(discord.ui.RoleSelect):
             'staffrole': selected_role_id.id  
         }
         try:
-            existing_record = LOARole.find_one(filter)
 
-            if existing_record:
-                await LOARole.update_one(filter, {'$set': data})
-            else:
-                await LOARole.insert_one(data)
+            await LOARole.update_one(filter, {'$set': data}, upsert=True)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)
         except Exception as e:
