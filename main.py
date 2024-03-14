@@ -6,17 +6,14 @@ from discord.ext import commands, tasks
 import sentry_sdk
 import os
 from dotenv import load_dotenv
-from Cogs.Modules.astro import Helpdesk
 from Cogs.Modules.reports import ReportPanel
 from Cogs.Modules.suggestions import SuggestionView, SuggestionManageView
-
+import asyncio
 import time
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
-from Cogs.Modules.astro import CustomRoleButtons
 from Cogs.Modules.staff import Staffview
 from motor.motor_asyncio import AsyncIOMotorClient
-from Cogs.Events.AstroSupport.aon_thread_create import ForumManage, Feedback
 load_dotenv()
 
 
@@ -65,7 +62,6 @@ class client(commands.AutoShardedBot):
             "Cogs.Modules.adminpanel",
             "Cogs.Modules.customcommands",
             "Cogs.Configuration.Configuration",
-            "Cogs.Events.AstroSupport.aon_thread_create",
             "Cogs.Events.AstroSupport.guilds",
             "Cogs.Events.AstroSupport.webhookguilds",
             "Cogs.Events.AstroSupport.welcome",
@@ -86,18 +82,13 @@ class client(commands.AutoShardedBot):
         print("[🔄] Jishaku Loaded")
 
     async def setup_hook(self):
-        
-        update_channel_name.start()
-        self.add_view(Helpdesk())
+        await asyncio.create_task(update_channel_name())
         self.add_view(SuggestionView())
         self.add_view(SuggestionManageView())
         self.add_view(ReportPanel())
         self.add_view(Confirm())
         self.add_view(Voting())
-        self.add_view(CustomRoleButtons())
         self.add_view(Staffview())
-        self.add_view(ForumManage())
-        self.add_view(Feedback())
         self.loop.create_task(self.load_jishaku())
 
         for ext in self.cogslist:
@@ -139,6 +130,7 @@ class client(commands.AutoShardedBot):
 
 
 client = client()
+
 
 
 @tasks.loop(minutes=10)
