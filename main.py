@@ -82,13 +82,15 @@ class client(commands.AutoShardedBot):
         print("[🔄] Jishaku Loaded")
 
     async def setup_hook(self):
-        await asyncio.create_task(update_channel_name())
+        update_channel_name.start()
+
         self.add_view(SuggestionView())
         self.add_view(SuggestionManageView())
         self.add_view(ReportPanel())
         self.add_view(Confirm())
         self.add_view(Voting())
         self.add_view(Staffview())
+        
         self.loop.create_task(self.load_jishaku())
 
         for ext in self.cogslist:
