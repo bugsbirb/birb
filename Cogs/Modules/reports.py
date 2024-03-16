@@ -141,14 +141,17 @@ class BanReason(discord.ui.Modal, title='Reason'):
 
     async def on_submit(self, interaction: discord.Interaction):
         reportsresult = await reports.find_one({'message_id': self.messageid})
-        reporteduserid = reportsresult['reporteduser']
-
-        reporteduser = interaction.guild.get_member(reporteduserid)
+        reporteduserid = int(reportsresult['reporteduser'])
+        try:
+         reporteduser = await interaction.guild.fetch_member(reporteduserid)
+        except discord.NotFound:
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I could not find this user!", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+            return            
         if reporteduser is None:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I could not find this user!", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
         try:
-            await reporteduser.guild.ban(reason=f"Banned By {interaction.user.display_name} | {self.Reason.value}")
+            await interaction.guild.ban(user=reporteduser, reason=f"Banned By {interaction.user.display_name} | {self.Reason.value}", delete_message_days=7)
         except discord.Forbidden:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I do not have permission to ban this user!", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
@@ -160,10 +163,10 @@ class BanReason(discord.ui.Modal, title='Reason'):
         try:
             await reporteduser.send(f"<:Infraction:1162134605885870180> You have been banned from **{interaction.guild.name}** | {self.Reason.value}")
         except discord.Forbidden:
-            pass
+            print('[⚠️] I could not send a message to this user.')
         try:
             await message.edit(embed=self.embed, view=None)
-            await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully kicked **@{reporteduser}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+            await interaction.response.send_message(f"{tick} **{interaction.user.display_name}**, Successfully banned **@{reporteduser}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
         except discord.Forbidden:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, I can't to edit this message", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
