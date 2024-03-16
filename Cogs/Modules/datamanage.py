@@ -65,7 +65,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"), #
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"), #
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"), #
-        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:ApplicationFeedback:1178754449125167254>"), #
+        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
         discord.SelectOption(label="Quota", value="Quota", emoji="<:Messages:1148610048151523339>"), #
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),  #
@@ -319,7 +319,7 @@ class Welcome(discord.ui.View):
         self.author = author
 
 
-    @discord.ui.button(label="Erase Welcome Configuration", style=discord.ButtonStyle.red, row=1)
+    @discord.ui.button(label="Erase Welcome Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self,interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
