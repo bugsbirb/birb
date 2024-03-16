@@ -271,12 +271,13 @@ class Config(discord.ui.Select):
                 channelid = welcomechannelresult.get('welcome_channel', None)
                 if channelid is None:
                    wchannelmsg = "Not Configured"
+                else:   
                    
-                channel = interaction.guild.get_channel(channelid)
-                if channel is None:
+                 channel = interaction.guild.get_channel(channelid)
+                 if channel is None:
                     wchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
-                else:    
-                 wchannelmsg = channel.mention          
+                 else:    
+                  wchannelmsg = channel.mention          
 
             embed = discord.Embed(title="<:welcome:1218531757691764738> Welcome Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Welcome Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Welcome Channel:** {wchannelmsg}\n\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
