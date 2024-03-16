@@ -248,7 +248,7 @@ class DeleteForum(discord.ui.Modal, title='Delete Forum'):
 
     name = discord.ui.TextInput(
         label='Name',
-        placeholder='Whats the name of the forum channel?',
+        placeholder='Whats the name of the forum autopost?',
         max_length=30
     )
 
@@ -268,6 +268,48 @@ class DeleteForum(discord.ui.Modal, title='Delete Forum'):
        embed.title = f"{greencheck} Forum Deleted"
        embed.color = discord.Color.brand_green()
        await interaction.response.edit_message(embed=embed, view=None)
+
+class EditForum(discord.ui.Modal, title='Edit Forum'):
+    def __init__(self):
+        super().__init__()
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='Whats the name of the forum autopost?',
+        max_length=30
+    )  
+
+    async def on_submit(self, interaction: discord.Interaction):
+       config_data = await forumsconfig.find_one({"name": self.name.value})
+       embed = interaction.message.embeds[0]
+       if config_data is None:
+        embed.title = f"{redx} I could not find that."
+        embed.color = discord.Color.brand_red()
+        await interaction.response.edit_message(embed=embed)
+        return
+       color_str = config_data.get("color", "2b2d31")
+       color = discord.Color(int(color_str, 16))
+       embed = discord.Embed(title=config_data["title"], description=config_data["description"], color=color)
+       thumbnail_url = config_data['thumbnail']
+
+       if thumbnail_url:
+                embed.set_thumbnail(url=thumbnail_url)
+       image_url = config_data.get('image', None)
+       if image_url:
+                embed.set_image(url=image_url)
+
+       role_ids = int(config_data['role'])
+       if role_ids:
+           idmsg = role_ids
+       else:
+           idmsg = ""    
+       
+       channel = interaction.guild.get_channel(int(config_data['channel_id']))
+       if channel is None:
+           return await interaction.response.send_message(content=f"{no} I could not find the channel linked to this forum message.", ephemeral=True)
+       await interaction.response.edit_message(
+             content=idmsg, embed=embed, view = Embed(interaction.user, self.name.value, channel))
+
 
 
 
@@ -384,6 +426,17 @@ class ForumsManage(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(CreateForum(self.author))
 
+    @discord.ui.button(label='Edit', style=discord.ButtonStyle.grey, emoji=pen)
+    async def edit( self, interaction: discord.Interaction, button: discord.ui.Button):
+       author = self.author.id
+       if interaction.user.id != author:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+       await interaction.response.send_modal(EditForum())
+
+       
+        
 
     @discord.ui.button(label='Delete', style=discord.ButtonStyle.red,  emoji="<:bin:1160543529542635520>")
     async def Delete(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -487,7 +540,11 @@ class Embed(discord.ui.View):
             "role": message,
             "name": self.name
             }
-        await forumsconfig.insert_one(embed_data)
+        await forumsconfig.update_one(
+            {"name": self.name, "guild_id": interaction.guild.id},
+            {"$set": embed_data}, 
+            upsert=True  
+        )
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Created"
         embed.description = f"Start by trying to create forum in <#{self.channel.id}>!"
