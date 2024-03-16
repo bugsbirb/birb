@@ -19,6 +19,8 @@ class welcome2(commands.Cog):
     async def on_member_join(self, member):
         guild = member.guild
         modulesresult = await modules.find_one({'guild_id': member.guild.id})
+        if modulesresult is None:
+            return
         if modulesresult.get('welcome', False) == False:
             return
         result = await welcome.find_one({'guild_id': member.guild.id})
