@@ -304,7 +304,7 @@ class EditForum(discord.ui.Modal, title='Edit Forum'):
        else:
            idmsg = ""    
        
-       channel = interaction.guild.get_channel(int(config_data['channel_id']))
+       channel = interaction.guild.get_channel(config_data['channel_id'])
        if channel is None:
            return await interaction.response.send_message(content=f"{no} I could not find the channel linked to this forum message.", ephemeral=True)
        await interaction.response.edit_message(
