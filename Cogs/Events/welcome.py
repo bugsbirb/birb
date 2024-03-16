@@ -51,8 +51,10 @@ class welcome2(commands.Cog):
                     '{guild.id}': str(guild.id),
                     '{guild.owner.name}': guild.owner.display_name,
                     '{guild.owner.id}': str(guild.owner.id),
-                    '{guild.owner.mention}': guild.owner.mention
-                }                
+                    '{guild.owner.mention}': guild.owner.mention,
+                    '{membercount}': int(guild.member_count)
+                }
+                                
                 if 'embed' in result and result['embed']:
                     embed_title = await self.replace_variables(result['title'], replacements)
                     embed_description = await self.replace_variables(result['description'], replacements)

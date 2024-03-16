@@ -333,8 +333,14 @@ class NoEmbeds(discord.ui.View):
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)         
 
-        embed = discord.Embed(title="Variables List", description="**{user}** = The name of the person whos joining.\n**{user.id}** = The user id who joined.\n**{user.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp the user joined.\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner", color=discord.Colour.dark_embed())  
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed = discord.Embed(
+            title="Variables List",
+            description="**{membercount}:** How many members are in the server.\n**{user}** = The name of the person whos joining.\n**{user.id}** = The user id who joined.\n**{user.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp the user joined.\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner",
+            color=discord.Colour.dark_embed(),
+        )
+
+
+        await interaction.response.send_message(embed=embed, view=Button(), ephemeral=True)
 
     @discord.ui.button(label='Finish', style=discord.ButtonStyle.green, emoji=f"{tick}", row=2)
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -411,10 +417,13 @@ class Embeds(discord.ui.View):
 
         embed = discord.Embed(
             title="Variables List",
-            description="**{user}** = The name of the person whos joining.\n**{user.id}** = The user id who joined.\n**{user.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp the user joined.\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner",
+            description="**{membercount}:** How many members are in the server.\n**{user}** = The name of the person whos joining.\n**{user.id}** = The user id who joined.\n**{user.mention}** = Mention of the user using the command\n**{timestamp}** = Time stamp the user joined.\n**{guild.name}** = The name of the server\n**{guild.id}** = The id of the server\n**{guild.owner.name}** = The name of the server owner\n**{guild.owner.id}** = The id of the server owner\n**{guild.owner.mention}** = The mention of the server owner",
             color=discord.Colour.dark_embed(),
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        
+
+
+        await interaction.response.send_message(embed=embed, ephemeral=True, view=Button())
 
     @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -545,3 +554,9 @@ async def refreshembed(interaction):
              await interaction.message.edit(embed=embed)   
             except discord.Forbidden:
                 print("Couldn't edit module due to missing permissions.")       
+class Button(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        url = f'https://discord.gg/DhWdgfh3hN'
+        
+        self.add_item(discord.ui.Button(label='All Variables', url="https://docs.astrobirb.dev/astro-birb/configuration/variables", style=discord.ButtonStyle.blurple, emoji="📚"))
