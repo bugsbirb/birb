@@ -63,6 +63,8 @@ from Cogs.Configuration.Views.staffpanel import StaffCustomise
 
 from Cogs.Configuration.Views.CustomCommandsView import CmdUsageChannel
 
+from Cogs.Configuration.Views.welcomeview import WelcomeChannel, Welcomemessage, ToggleWelcome
+
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = MongoClient(MONGO_URL)
@@ -101,7 +103,9 @@ modmailcategory = db['modmailcategory']
 transcriptchannel = db['transcriptschannel']
 modmailping = db['modmailping']
 tagslogging = db['Tags Logging']
-commandslogging = db['Commands Logging']
+commandslogging = db['Commands Logging'
+                     ]
+welcome = db['welcome settings']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -177,6 +181,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
         discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
+        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
         discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
@@ -253,7 +258,28 @@ class Config(discord.ui.Select):
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = ConfigViewMain(self.author)        
 
+        elif color == 'Welcome':
+            welcomechannelresult = welcome.find_one({'guild_id': interaction.guild.id})
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            modulemsg = ""
+            wchannelmsg = "Not Configured"
 
+                
+            if moduleddata:
+                modulemsg = moduleddata.get('welcome', False)
+            if welcomechannelresult:    
+                channelid = welcomechannelresult['welcome_channel']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    wchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                else:    
+                 wchannelmsg = channel.mention          
+
+            embed = discord.Embed(title="<:welcome:1218531757691764738> Welcome Module",  color=discord.Color.dark_embed())
+            embed.add_field(name="<:settings:1207368347931516928> Welcome Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Welcome Channel:** {wchannelmsg}\n\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            view = WelcomeModule(self.author)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)              
         elif color == 'Infractions':    #infractionss
             infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
@@ -802,6 +828,20 @@ class SuspensionsModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
         self.add_item(ToggleSuspensions(author))               
+        self.add_item(Config(author)) 
+
+    async def on_timeout(self) -> None:
+        try:
+         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
+        except discord.errors.NotFound:
+            return print('[⚠️] I can\'t time out this view because it was already deleted') 
+
+class WelcomeModule(discord.ui.View):
+    def __init__(self, author):
+        super().__init__(timeout=360)
+        self.add_item(ToggleWelcome(author))   
+        self.add_item(Welcomemessage(author))  
+        self.add_item(WelcomeChannel(author))            
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:
