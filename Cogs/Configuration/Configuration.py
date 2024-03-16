@@ -268,7 +268,10 @@ class Config(discord.ui.Select):
             if moduleddata:
                 modulemsg = moduleddata.get('welcome', False)
             if welcomechannelresult:    
-                channelid = welcomechannelresult['welcome_channel']
+                channelid = welcomechannelresult.get('welcome_channel', None)
+                if channelid is None:
+                   wchannelmsg = "Not Configured"
+                   
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
                     wchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
