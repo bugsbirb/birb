@@ -50,6 +50,7 @@ suspensions = db['Suspensions']
 forumsconfig = db['Forum Configuration']
 stafffeedback = db['feedback']
 staffdb = db['staff database']
+welcome = db['welcome settings']
 class DataView(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -64,6 +65,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"), #
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"), #
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"), #
+        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:ApplicationFeedback:1178754449125167254>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
         discord.SelectOption(label="Quota", value="Quota", emoji="<:Messages:1148610048151523339>"), #
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),  #
@@ -102,6 +104,13 @@ class DataSelector(discord.ui.Select):
                 embed.set_thumbnail(url=interaction.guild.icon)
                 embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
                 await interaction.response.edit_message(embed=embed, view=view)
+        elif data_type == 'Welcome':
+                view = Welcome(interaction.user)
+                view.add_item(DataSelector(interaction.user))
+                embed = discord.Embed(title="LOA Data", description="**Erase Welcome Config:** This will erase the configuration for this module.", color=discord.Color.dark_embed())
+                embed.set_thumbnail(url=interaction.guild.icon)
+                embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+                await interaction.response.edit_message(embed=embed, view=view)                
         elif data_type == 'Partnerships':
                 view = Partnerships(interaction.user)
                 view.add_item(DataSelector(interaction.user))
@@ -304,7 +313,25 @@ class Partnerships(discord.ui.View):
             pass
         await partnershipch.delete_many({'guild_id': int(interaction.guild.id)})
         await interaction.followup.send("<:greencheck:1190814894463930480> Partnership configuration have been erased.", ephemeral=True)
+class Welcome(discord.ui.View):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
 
+
+    @discord.ui.button(label="Erase Welcome Configuration", style=discord.ButtonStyle.red, row=1)
+    async def eraseconfig(self,interaction: discord.Interaction,  button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        try:
+         await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'welcome': False}})
+        except:
+            pass
+        await welcome.delete_one({'guild_id': int(interaction.guild.id)})
+        await interaction.followup.send("<:greencheck:1190814894463930480> Welcome configuration have been erased.", ephemeral=True)
 
 class LOAs(discord.ui.View):
     def __init__(self, author):
