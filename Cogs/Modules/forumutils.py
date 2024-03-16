@@ -298,7 +298,7 @@ class EditForum(discord.ui.Modal, title='Edit Forum'):
        if image_url:
                 embed.set_image(url=image_url)
 
-       role_ids = int(config_data['role'])
+       role_ids = config_data['role']
        if role_ids:
            idmsg = role_ids
        else:
