@@ -138,7 +138,6 @@ class loamodule(commands.Cog):
             filter = {'end_time': {'$lte': current_time}, 'active': True}
 
             loa_requests = await loa_collection.find(filter).to_list(length=None)
-
             for request in loa_requests:
                 end_time = request['end_time']
                 user_id = request['user']

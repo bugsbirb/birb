@@ -391,8 +391,13 @@ class Forums(commands.Cog):
 
         else:   
             rolemention = f"<@&{role}>"
+        description = f"{arrow}**Channel:** <#{result['channel_id']}>\n{arrow}**Role:** {rolemention}\n{arrow}**Title:** {result['title']}\n{arrow}**Description:** {result['description']}\n{arrow}**Thumbnail:** {result['thumbnail']}"
+        if len(description) > 1024:
+            description = description[:1021] + "..."
               
-        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=f"{arrow}**Channel:** <#{result['channel_id']}>\n{arrow}**Role:** {rolemention}\n{arrow}**Title:** {result['title']}\n{arrow}**Description:** {result['description']}\n{arrow}**Thumbnail:** {result['thumbnail']}", inline=False)
+        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=description, inline=False)
+
+
        embed.set_thumbnail(url=ctx.guild.icon)
        embed.set_author(name=f"{ctx.author.display_name}", icon_url=ctx.author.display_avatar)
        view = ForumsManage(ctx.author)
