@@ -46,12 +46,7 @@ class ModmailCategory(discord.ui.ChannelSelect):
         }
 
         try:
-            existing_record = modmailcategory.find_one(filter)
-
-            if existing_record:
-                await modmailcategory.update_one(filter, {'$set': data})
-            else:
-                await modmailcategory.insert_one(data)
+            await modmailcategory.update_one(filter, {'$set': data}, upsert=True)
             await interaction.response.edit_message(content=None)
             await refreshembed(interaction)        
         except Exception as e:
