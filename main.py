@@ -150,6 +150,6 @@ async def update_channel_name():
     else:
         print(f"[⚠️] Channel with ID {channel_id} not found.")
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     client.run(TOKEN)
     

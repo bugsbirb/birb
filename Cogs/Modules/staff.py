@@ -499,8 +499,8 @@ class Staffview(discord.ui.View):
 
 class StaffPanel(discord.ui.Select):
     def __init__(self):
-        from motor.motor_asyncio import AsyncIOMotorClient
-        mongo = AsyncIOMotorClient(MONGO_URL)
+        from pymongo import MongoClient
+        mongo = MongoClient(MONGO_URL)
         db = mongo['astro']
         self.collection = db['staff database']
 
