@@ -152,6 +152,9 @@ class Description(discord.ui.Modal, title='Description'):
     async def on_submit(self, interaction: discord.Interaction):
         embed = interaction.message.embeds[0]
         embed.description = self.description.value
+        if embed.title and embed.description is None:
+            await interaction.response.send_message(f"{no} You need either a title or description.", ephemeral=True)
+            return
         await interaction.response.edit_message(embed=embed)
 
 class Colour(discord.ui.Modal, title='Colour'):

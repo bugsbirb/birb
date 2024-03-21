@@ -75,7 +75,11 @@ class suggestions(commands.Cog):
              await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"mgt_message_id": msg.id}})
           except discord.Forbidden: 
              await ctx.send(f"{no} I don't have permission to view either channel.")              
-             return
+             return             
+         else:
+          await ctx.send(f"{crisis} The channel its trying to suggest to no longer exists.")
+             
+
 
         else: 
             await ctx.send(f"{no} {ctx.author.display_name}, this channel isn't configured. Please do `/config`.", allowed_mentions=discord.AllowedMentions.none())
