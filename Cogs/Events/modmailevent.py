@@ -277,7 +277,6 @@ class Modmailevnt(commands.Cog):
     @commands.Cog.listener()
     async def on_command(self, ctx: commands.Context):
         if isinstance(ctx.channel, discord.DMChannel):
-            await ctx.command.before_invoke()
             await ctx.send(f"{no} **{ctx.author.display_name},** I can't execute commands in DMs. Please use the bot in a server.")
             return
             
