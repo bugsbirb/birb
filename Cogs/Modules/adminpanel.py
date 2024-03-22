@@ -548,9 +548,9 @@ class Reason(discord.ui.Modal, title="Reason"):
             if optionresult.get('showissuer', False) == True:
                 embed.remove_author()
             else:
-                embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar)
+                embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
         else:
-             embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar)
+             embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
         guild_id = interaction.guild.id
         data = infchannel.find_one({"guild_id": guild_id})
         if data:
