@@ -9,11 +9,22 @@ mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 welcome = db['welcome settings']
+custom_commands = db['Custom Commands']
+from datetime import datetime
 
+import random
 
 class welcome2(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    async def replace_variables(self, message, replacements):
+     for placeholder, value in replacements.items():
+        if value is not None:
+            message = str(message).replace(placeholder, str(value))
+        else:
+            message = str(message).replace(placeholder, "")  
+     return message
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -43,18 +54,56 @@ class welcome2(commands.Cog):
 
             if channel:
                 replacements = {
-                    '{user}': member.display_name,
+                    '{user}': member.name,
                     '{user.id}': str(member.id),
                     '{user.mention}': member.mention,
                     '{timestamp}': str(member.joined_at),
                     '{guild.name}': guild.name,
                     '{guild.id}': str(guild.id),
-                    '{guild.owner.name}': guild.owner.display_name,
+                    '{guild.owner.name}': guild.owner.name,
                     '{guild.owner.id}': str(guild.owner.id),
                     '{guild.owner.mention}': guild.owner.mention,
                     '{membercount}': int(guild.member_count)
                 }
-                                
+                command_data = result
+                if 'buttons' in command_data and command_data['buttons'] == "Link Button":
+                    view = URL(command_data['url'], command_data['button_label'])
+
+                elif 'buttons' in command_data and command_data['buttons'] == "Embed Button":
+                    label = command_data['button_label']
+                    colour = command_data['colour']
+                    name = command_data['cmd']
+                    print(name)
+
+
+                    view = ButtonEmbed(name)   
+                    view.button_callback.label = label
+                    
+
+                    if colour == "Blurple":
+                        view.button_callback.style = discord.ButtonStyle.blurple
+                    elif colour == "Green":
+                        view.button_callback.style = discord.ButtonStyle.green
+                    elif colour == "Red":
+                        view.button_callback.style = discord.ButtonStyle.red
+                    elif colour == "Grey":
+                        view.button_callback.style = discord.ButtonStyle.grey    
+                    else:
+                        view.button_callback.style = discord.ButtonStyle.grey  
+                    emoji_data = command_data['emoji']    
+                    if emoji_data == "None" or "":
+                        pass
+                    else:
+                       
+                     test = view.button_callback.emoji = command_data['emoji']
+                     if test:
+                        pass
+                     else:
+                        view.button_callback.emoji = command_data['emoji'] = None
+                    
+                     view.button_callback.emoji = command_data['emoji'] = None
+                else:
+                    view = None                                
                 if 'embed' in result and result['embed']:
                     embed_title = await self.replace_variables(result['title'], replacements)
                     embed_description = await self.replace_variables(result['description'], replacements)
@@ -83,7 +132,7 @@ class welcome2(commands.Cog):
                     if contentresult in ["None", None]:
                         contentresult = ""
                     try:
-                     await channel.send(embed=embed, content=contentresult) 
+                     await channel.send(embed=embed, content=contentresult, view=view) 
                     except: 
                         print('I couldn\'t send it to the welcome channel')
                         return 
@@ -92,14 +141,20 @@ class welcome2(commands.Cog):
                     if contentresult in ["None", None]:
                         return
                     try:
-                     await channel.send(contentresult) 
+                     await channel.send(contentresult, view=view) 
                     except: 
                         print('I couldn\'t send it to the welcome channel')
                         return 
 
-
-    
-                    
+class URL(discord.ui.View):
+    def __init__(self, url, buttonname):
+        super().__init__()
+        self.add_item(discord.ui.Button(label=buttonname, url=url, style=discord.ButtonStyle.blurple))
+        
+class ButtonEmbed(discord.ui.View):
+    def __init__(self, name):
+        super().__init__()    
+        self.name = name
 
     async def replace_variables(self, message, replacements):
      for placeholder, value in replacements.items():
@@ -108,6 +163,110 @@ class welcome2(commands.Cog):
         else:
             message = str(message).replace(placeholder, "")  
      return message
+    
+    @discord.ui.button()
+    async def button_callback(self, interaction: discord.Interaction, button):
+
+        command = self.name
+        command_data  = await custom_commands.find_one({'name': command, 'guild_id': interaction.guild.id})
+        if command_data is None:
+            return await interaction.response.send_message(f'{no} **{interaction.user.display_name},** That command does not exist.', allowed_mentions=discord.AllowedMentions.none())
+        
+
+        if 'buttons' in command_data and command_data['buttons'] == "Link Button":
+            view = URL(command_data['url'], command_data['button_label'])
+        else:
+            view = None
+
+        timestamp = datetime.utcnow().timestamp()
+        timestampformat = f"<t:{int(timestamp)}:F>"
+        channel = interaction.channel
+        
+
+        replacements = {
+            '{author.mention}': interaction.user.mention,
+            '{author.name}': interaction.user.display_name,
+            '{author.id}': str(interaction.user.id),
+            '{timestamp}': timestampformat,
+            '{guild.name}': interaction.guild.name if interaction.guild else '',
+            '{guild.id}': str(interaction.guild.id) if interaction.guild else '',
+            '{guild.owner.mention}': interaction.guild.owner.mention if interaction.guild and interaction.guild.owner else '',
+            '{guild.owner.name}': interaction.guild.owner.display_name if interaction.guild and interaction.guild.owner else '',
+            '{guild.owner.id}': str(interaction.guild.owner.id) if interaction.guild and interaction.guild.owner else '',
+            '{random}': int(random.randint(1, 1000000)),
+            '{guild.members}': int(interaction.guild.member_count),
+            '{channel.name}': channel.name if channel else interaction.channel.name,
+            '{channel.id}': str(channel.id) if channel else str(interaction.channel.id),
+            '{channel.mention}': channel.mention if channel else interaction.channel.mention,
+
+        }
+               
+             
+
+        content = await self.replace_variables(command_data.get('content', ''), replacements)
+        if content == "":
+            content = ""
+
+        if 'embed' in command_data and command_data['embed']:
+            embed_title = await self.replace_variables(command_data['title'], replacements)
+            embed_description = await self.replace_variables(command_data['description'], replacements)
+            embed_author = await self.replace_variables(command_data['author'], replacements)
+
+            if embed_title in ["None", None]:
+                embed_title = ""
+            if embed_description in ["None", None]:
+                embed_description = ""
+            color_value = command_data.get('color', None)
+            colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.dark_embed()
+
+            embed = discord.Embed(
+                title=embed_title,
+                description=embed_description, color=colors)
+
+            if embed_author in ["None", None]:
+                embed_author = ""
+            if 'image' in command_data:
+                embed.set_image(url=command_data['image'])
+            if 'thumbnail' in command_data:
+                embed.set_thumbnail(url=command_data['thumbnail'])
+            if 'author' in command_data and 'author_icon' in command_data:
+                embed.set_author(name=embed_author, icon_url=command_data['author_icon'])
+
+
+            try:
+                    if content or embed or view:
+                        msg = await interaction.response.send_message(content, embed=embed, view=view, ephemeral=True)
+
+
+                    else:
+                        await interaction.response.send_message(f"{no} **{interaction.user.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                        return
+            except discord.Forbidden:
+                    await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                    return
+
+        else:
+            if content is None:
+                await interaction.response.send_message(f"{no} **{interaction.user.display_name},** That command does not have any content or embeds.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                return
+
+            try:
+                    if content or view:
+                        msg = await interaction.response.send_message(content, view=view, ephemeral=True)
+
+                    else:
+                        await interaction.response.send_message(f"{no} **{interaction.user.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                        return
+            except discord.Forbidden:
+                    await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                    return
+        
+
+        
+    
+                    
+
+
 
 
 async def setup(client: commands.Bot) -> None:
