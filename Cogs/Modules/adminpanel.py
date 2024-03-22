@@ -36,7 +36,7 @@ consent = db["consent"]
 modules = db["Modules"]
 collection = db["infractions"]
 Customisation = db["Customisation"]
-
+options = db['module options']
 
 class VoidInf(discord.ui.Modal, title="Void Infraction"):
     def __init__(self, user, guild, author):
@@ -58,7 +58,7 @@ class VoidInf(discord.ui.Modal, title="Void Infraction"):
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         id = self.InfractionID.value
-        filter = {"guild_id": interaction.guild.id, "random_string": id}
+        filter = {"guild_id": interaction.guild.id, "random_string": id, 'voided': {'$ne': True}}
 
         infraction = collection.find_one(filter)
 
@@ -257,10 +257,18 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-
+        optionresult = options.find_one({'guild_id': interaction.guild.id})
+        if optionresult:
+            if optionresult.get('promotionissuer', False) == True:
+                view = InfractionIssuer()
+                view.issuer.label = f"Issued By {interaction.user.display_name}"
+            else:
+                view = None    
+        else:
+            view = None   
         reason = self.Reason.value
         role = discord.utils.get(interaction.guild.roles, id=self.role)
-
+        
         consent_data = consent.find_one({"user_id": self.user.id})
         if consent_data is None:
             consent.insert_one(
@@ -338,6 +346,13 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
                 icon_url=self.author.display_avatar.url,
             )
 
+            if optionresult:
+             if optionresult.get('pshowissuer', True) == False:
+                    embed.remove_author()
+             else:
+                    embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
+            else:
+                    embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)  
         guild_id = interaction.guild.id
         data = promochannel.find_one({"guild_id": guild_id})
 
@@ -346,20 +361,24 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
             channel = interaction.guild.get_channel(channel_id)
 
             if channel:
-
-                try:
+                if optionresult:
+                 if optionresult.get('autorole', True) == False:
+                  pass
+                 else:
+                  try:
                     await self.user.add_roles(role)
-                except discord.Forbidden:
-                    await interaction.response.edit_message(
-                        content=f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to add roles.",
-                        embed=None,
-                        view=Return(self.user, self.guild, self.author)
-                        , allowed_mentions=discord.AllowedMentions.none()
-                    )
+                  except discord.Forbidden:
+                    await interaction.response.send_message(f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
                     return
-
+                else:
+                    
+                 try:
+                    await self.user.add_roles(role)
+                 except discord.Forbidden:
+                    await interaction.response.send_message(f"<:Allonswarning:1123286604849631355> **{interaction.user.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+                    return
                 try:
-                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
                 except discord.Forbidden:
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
@@ -424,6 +443,15 @@ class Reason(discord.ui.Modal, title="Reason"):
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
+        optionresult = options.find_one({'guild_id': interaction.guild.id})
+        if optionresult:
+            if optionresult.get('infractedbybutton', False) == True:
+                view = InfractionIssuer()
+                view.issuer.label = f"Issued By {interaction.id.display_name}"
+            else:
+                view = None    
+        else:
+            view = None           
         consent_data = consent.find_one({"user_id": self.user.id})
         if consent_data is None:
             consent.insert_one(
@@ -487,7 +515,13 @@ class Reason(discord.ui.Modal, title="Reason"):
             embed.set_footer(text=f"Infraction ID | {random_string}")
             if custom["image"]:
                 embed.set_image(url=custom["image"])
-
+            if optionresult:
+             if optionresult.get('showissuer', False) == True:
+                embed.remove_author()
+             else:
+                embed.set_author(name=embed_author, icon_url=authoricon)
+            else:
+                 embed.set_author(name=embed_author, icon_url=authoricon)
         else:
 
             embed = discord.Embed(
@@ -510,7 +544,13 @@ class Reason(discord.ui.Modal, title="Reason"):
             "random_string": random_string,
             "guild_id": interaction.guild.id,
         }
-
+        if optionresult:
+            if optionresult.get('showissuer', False) == True:
+                embed.remove_author()
+            else:
+                embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar)
+        else:
+             embed.set_author(name=interaction.user.display_name, icon_url=interaction.user.display_avatar)
         guild_id = interaction.guild.id
         data = infchannel.find_one({"guild_id": guild_id})
         if data:
@@ -520,7 +560,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             if channel:
 
                 try:
-                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
                 except discord.Forbidden:
                     await interaction.response.edit_message(
                         content=f"{no} I don't have permission to view that channel.",
@@ -553,7 +593,14 @@ class Reason(discord.ui.Modal, title="Reason"):
                 view=Return(self.user, self.guild, self.author),
                 allowed_mentions=discord.AllowedMentions.none()
             )
+class InfractionIssuer(discord.ui.View):
+    def __init__(self):
+        super().__init__()
 
+
+    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1166508151290462239>")
+    async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
 
 class InfractionOption(discord.ui.Select):
     def __init__(self, user, guild, author):
@@ -636,11 +683,11 @@ class AdminPanelCog(commands.Cog):
             return
 
         infractions = collection.count_documents(
-            {"staff": staff.id, "guild_id": ctx.guild.id, "action": {"$ne": "Demotion"}}
+            {"staff": staff.id, "guild_id": ctx.guild.id, "action": {"$ne": "Demotion", 'voided': {'$ne': True}}}
         )
         demotions = collection.count_documents(
-            {"staff": staff.id, "guild_id": ctx.guild.id, "action": "Demotion"}
-        )
+            {"staff": staff.id, "guild_id": ctx.guild.id, "action": "Demotion", 'voided': {'$ne': True}}
+        ) 
         loa = loa_collection.find_one(
             {"user": staff.id, "guild_id": ctx.guild.id, "active": True}
         )
@@ -956,6 +1003,7 @@ class AdminPanel(discord.ui.View):
         filter = {
             "guild_id": interaction.guild.id,
             "staff": self.user.id,
+            'voided': {'$ne': True}
         }
 
         infractions = collection.find(filter)
@@ -1111,14 +1159,14 @@ class Return(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"},
+                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True}
             }
         )
         demotions = collection.count_documents(
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion",
+                "action": "Demotion", 'voided': {'$ne': True}
             }
         )
         loa = loa_collection.find_one(
@@ -1229,14 +1277,14 @@ class LOAPanel(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"},
+                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
             }
         )
         demotions = collection.count_documents(
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion",
+                "action": "Demotion", 'voided': {'$ne': True}
             }
         )
         loa = loa_collection.find_one(
@@ -1313,14 +1361,14 @@ class LOACreate(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"},
+                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
             }
         )
         demotions = collection.count_documents(
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion",
+                "action": "Demotion", 'voided': {'$ne': True}, 'voided': {'$ne': True},
             }
         )
         loa = loa_collection.find_one(
@@ -1405,14 +1453,14 @@ class RevokeInfraction(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"},
+                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
             }
         )
         demotions = collection.count_documents(
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion",
+                "action": "Demotion", 'voided': {'$ne': True},
             }
         )
         loa = loa_collection.find_one(
