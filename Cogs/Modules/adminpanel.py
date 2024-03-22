@@ -956,6 +956,7 @@ class AdminPanel(discord.ui.View):
         filter = {
             "guild_id": interaction.guild.id,
             "staff": self.user.id,
+            'voided': {'$ne': True}
         }
 
         infractions = collection.find(filter)
