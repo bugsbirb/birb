@@ -43,13 +43,13 @@ class welcome2(commands.Cog):
 
             if channel:
                 replacements = {
-                    '{user}': member.display_name,
+                    '{user}': member.name,
                     '{user.id}': str(member.id),
                     '{user.mention}': member.mention,
                     '{timestamp}': str(member.joined_at),
                     '{guild.name}': guild.name,
                     '{guild.id}': str(guild.id),
-                    '{guild.owner.name}': guild.owner.display_name,
+                    '{guild.owner.name}': guild.owner.name,
                     '{guild.owner.id}': str(guild.owner.id),
                     '{guild.owner.mention}': guild.owner.mention,
                     '{membercount}': int(guild.member_count)
