@@ -683,8 +683,14 @@ class AdminPanelCog(commands.Cog):
             return
 
         infractions = collection.count_documents(
-            {"staff": staff.id, "guild_id": ctx.guild.id, "action": {"$ne": "Demotion", 'voided': {'$ne': True}}}
+            {
+                "staff": staff.id,
+                "guild_id": ctx.guild.id,
+                "action": {"$ne": "Demotion"},
+                'voided': {'$ne': True}
+            }
         )
+
         demotions = collection.count_documents(
             {"staff": staff.id, "guild_id": ctx.guild.id, "action": "Demotion", 'voided': {'$ne': True}}
         ) 
@@ -1159,7 +1165,8 @@ class Return(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True}
+                "action": {"$ne": "Demotion"},
+                'voided': {'$ne': True}
             }
         )
         demotions = collection.count_documents(
@@ -1277,7 +1284,8 @@ class LOAPanel(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
+                "action": {"$ne": "Demotion"},
+                'voided': {'$ne': True}
             }
         )
         demotions = collection.count_documents(
@@ -1361,7 +1369,8 @@ class LOACreate(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
+                "action": {"$ne": "Demotion"},
+                'voided': {'$ne': True}
             }
         )
         demotions = collection.count_documents(
@@ -1453,14 +1462,18 @@ class RevokeInfraction(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": {"$ne": "Demotion"}, 'voided': {'$ne': True},
+                "action": {"$ne": "Demotion"},
+                'voided': {'$ne': True}
             }
         )
+
+        
         demotions = collection.count_documents(
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion", 'voided': {'$ne': True},
+                "action": "Demotion", 
+                'voided': {'$ne': True}
             }
         )
         loa = loa_collection.find_one(
