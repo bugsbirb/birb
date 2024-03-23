@@ -23,6 +23,7 @@ partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 
 nfractiontypes = db['infractiontypes']
+options = db['module options']
 class InfractionChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Infractions Channel', channel_types=[discord.ChannelType.text])
@@ -87,6 +88,117 @@ class ToggleInfractionsDropdown(discord.ui.Select):
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': False}}, upsert=True)            
             await refreshembed(self, interaction)
+
+class IMoreOptions(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Infraction Issuer Button" ,description="A disabled button that displays the username of the issuer."),
+            discord.SelectOption(label="Show Issuer", description="This toggle will make all infractions annonymous."),
+            discord.SelectOption(label="Notify on Void", description="Notifys the user when their infraction is voided.")
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_option = self.values[0]
+        
+
+        option_result = await options.find_one({'guild_id': interaction.guild.id})
+        if option_result is None:
+            await options.insert_one({'guild_id': interaction.guild.id})
+        if selected_option == "Infraction Issuer Button":
+                view = InfractByButton()
+                embed = discord.Embed(title='Infraction Issuer Button', color=discord.Colour.dark_embed())
+                embed.set_image(url="https://cdn.discordapp.com/attachments/1119278150086570045/1218941681752080485/image.png?ex=66097ee7&is=65f709e7&hm=f3ca0f7f9706bc4e2f50e1fa33b21ca0005f324abeb6b66b7f8b226b64e15bdd&")
+                if option_result:
+                    if option_result.get('infractedbybutton', False) == False:
+                        view.bybuttontoggle.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('infractedbybutton', False) == True:
+                        view.bybuttontoggle.style = discord.ButtonStyle.green
+                        
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+
+        elif selected_option == 'Show Issuer':
+                view = ShowIssuer()
+                embed = discord.Embed(title='Show Issuer', description="If you disable this, the infraction will be annonymous which doesn't work with customisation embeds and it removes the embed author so if the `Infraction Issuer Button` is enabled the button will still appear.", color=discord.Colour.dark_embed())
+                if option_result:
+                    if option_result.get('showissuer', True) == False:
+                        view.issuer.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('showissuer', True) == True:
+                        view.issuer.style = discord.ButtonStyle.green
+                        
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)                    
+
+        elif selected_option == 'Notify on Void':
+                view = onvoid()
+                embed = discord.Embed(title='Notify On Void', description="", color=discord.Colour.dark_embed())
+                embed.set_image(url="https://cdn.discordapp.com/attachments/1119278150086570045/1218950005952352286/image.png?ex=660986a8&is=65f711a8&hm=cff17f86c88e52d800d03451cc58a295e5868465cfa1b1262cc318e0d7247058&")
+                if option_result:
+                    if option_result.get('onvoid', False) == False:
+                        view.void.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('onvoid', False) == True:
+                        view.void.style = discord.ButtonStyle.green
+                        
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)    
+        
+
+ 
+            
+
+
+class InfractByButton(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Issuer Button Display", style=discord.ButtonStyle.red) 
+    async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('infractedbybutton', False) == False:
+                self.bybuttontoggle.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractedbybutton': True}}, upsert=True)
+        else:
+                self.bybuttontoggle.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractedbybutton': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)        
+
+class ShowIssuer(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Show Issuer", style=discord.ButtonStyle.green) 
+    async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('showissuer', True) == False:
+                self.issuer.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'showissuer': True}}, upsert=True)
+        else:
+                self.issuer.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'showissuer': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)        
+
+class onvoid(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Notify on Void", style=discord.ButtonStyle.red) 
+    async def void(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('onvoid', False) == False:
+                self.void.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'onvoid': True}}, upsert=True)
+        else:
+                self.void.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'onvoid': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)            
+
 class InfractionTypes(discord.ui.Select):
     def __init__(self, author):
         self.author = author

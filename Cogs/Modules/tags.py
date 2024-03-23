@@ -4,6 +4,8 @@ from discord import app_commands
 from emojis import *
 import typing
 import os
+
+import Paginator
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
@@ -47,9 +49,10 @@ class Tags(commands.Cog):
         return
 
     @tags.command(description="Create a tag")    
+    @app_commands.describe(name = "The name of the tag", content = "The content of the tag.")
     async def create(self, ctx, name: str, content: str):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_admin_role(ctx):
             return               
@@ -64,10 +67,11 @@ class Tags(commands.Cog):
         await ctx.send(f"{tick} **`{name}`** created.")
 
     @tags.command(description="Edit a tag")
+    @app_commands.describe(name = "The name of the tag", content = "The content of the tag.")
     async def edit(self, ctx, name: str, content: str):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_admin_role(ctx):
             return
@@ -88,38 +92,74 @@ class Tags(commands.Cog):
     async def all(self, ctx):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_staff_role(ctx):
             return               
+        
         filter = {
-        'guild_id': ctx.guild.id
-    }
+            'guild_id': ctx.guild.id
+        }
 
         tag_data = tags.find(filter)
-
-        if tag_data:
-            embed = discord.Embed(title="Tags List", color=discord.Color.dark_embed())
-            embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-            embed.set_thumbnail(url=ctx.guild.icon)
-            embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
-
-            async for tag in tag_data:
-                name = tag['name']
-                content = tag['content']
-
-                embed.add_field(name=name, value=content, inline=False)
-
-            await ctx.send(embed=embed)
-        else:
+        tag_data = await tag_data.to_list(length=750)
+        if tag_data is None:
             await ctx.send(f"{no} No tags found.")
+            return
+
+        embeds = []
+        embed = discord.Embed(title="Tags List", color=discord.Color.dark_embed())
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.set_thumbnail(url=ctx.guild.icon)
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+
+        count = 0
+        
+        for tag in tag_data:
+            name = tag['name']
+            content = tag['content']
+
+            embed.add_field(name=name, value=content, inline=False)
+            count += 1
+
+            if count % 9 == 0 or count == len(tag_data):
+                embeds.append(embed)
+                embed = discord.Embed(title="Tags List", color=discord.Color.dark_embed())
+                embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                embed.set_thumbnail(url=ctx.guild.icon)
+                embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+                
+
+        PreviousButton = discord.ui.Button(label="<")
+        NextButton = discord.ui.Button(label=">")
+        FirstPageButton = discord.ui.Button(label="<<")
+        LastPageButton = discord.ui.Button(label=">>")
+        if len(embeds) <= 1:
+            PreviousButton.disabled = True
+            NextButton.disabled = True
+            FirstPageButton.disabled = True
+            LastPageButton.disabled = True
+        InitialPage = 0
+        timeout = 42069
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+
+        await paginator.start(ctx, pages=embeds)
+
 
     @tags.command(description="Information about a tag")
     @app_commands.autocomplete(name=tag_name_autocompletion)
-    async def info(self, ctx, name):
+    @app_commands.describe(name = "The name of the tag")
+    async def info(self, ctx, name: app_commands.Range[str, 1, 50]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_admin_role(ctx):
             return
@@ -144,10 +184,11 @@ class Tags(commands.Cog):
 
     @tags.command(description="Send a existing tag to this channel.")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
-    async def send(self, ctx, name):
+    @app_commands.describe(name = "The name of the tag")    
+    async def send(self, ctx, name: app_commands.Range[str, 1, 50]):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_staff_role(ctx):
             return        
@@ -190,10 +231,11 @@ class Tags(commands.Cog):
 
     @tags.command(description="Delete a existing tag")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
-    async def delete(self, ctx, name):
+    @app_commands.describe(name = "The name of the tag")    
+    async def delete(self, ctx, name: app_commands.Range[str, 1, 50]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
         if not await has_admin_role(ctx):
             return        

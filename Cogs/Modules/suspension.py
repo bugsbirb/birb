@@ -1,5 +1,6 @@
 from permissions import *
 import discord
+from discord import app_commands
 from discord.ext import commands
 import datetime 
 from datetime import timedelta
@@ -35,9 +36,9 @@ class Suspensions(commands.Cog):
 
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
-    async def suspend(self, ctx, staff: discord.Member, length: str, reason: str):
+    async def suspend(self, ctx, staff: discord.Member, length: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
         if not await has_admin_role(ctx):
             return
@@ -90,7 +91,7 @@ class Suspensions(commands.Cog):
     @suspension.command(description="View all active suspension")
     async def active(self, ctx):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
         if not await has_admin_role(ctx):
             return             
@@ -124,10 +125,10 @@ class Suspensions(commands.Cog):
             await ctx.send(embed=embed)    
 
     @suspension.command(description="Manage suspensions on a user")
-
+    @app_commands.describe(staff = "The user to manage suspensions for.")
     async def manage(self, ctx, staff: discord.Member):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return              
         if not await has_admin_role(ctx):
             return   

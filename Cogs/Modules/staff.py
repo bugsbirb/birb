@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import pymongo
 import Paginator
@@ -138,7 +139,7 @@ class quota(commands.Cog):
     async def manage(self, ctx, staff: discord.Member):
 
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
          return   
      if not await has_admin_role(ctx):
             return                      
@@ -173,7 +174,7 @@ class quota(commands.Cog):
 
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
          return                    
         if not await has_admin_role(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
@@ -193,7 +194,7 @@ class quota(commands.Cog):
     async def messages(self, ctx, staff: discord.Member):
 
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
          return                    
      if not await has_staff_role(ctx):
         return        
@@ -218,7 +219,7 @@ class quota(commands.Cog):
     @staff.command(description="View the staff message leaderboard to see if anyone has passed their quota")
     async def leaderboard(self, ctx):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
             return
 
         await ctx.defer()
@@ -226,9 +227,9 @@ class quota(commands.Cog):
             return
 
         filter = {'guild_id': ctx.guild.id}
-        cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(400)
+        cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(750)
 
-        user_data_list = await cursor.to_list(length=400)
+        user_data_list = await cursor.to_list(length=750)
 
         pages = []
         rank = 1
@@ -289,10 +290,10 @@ class quota(commands.Cog):
         if not pages:
             pages.append(discord.Embed(title="Staff Leaderboard", description="No message data.", color=discord.Color.dark_embed()))
 
-        PreviousButton = discord.ui.Button(label="<")
-        NextButton = discord.ui.Button(label=">")
-        FirstPageButton = discord.ui.Button(label="<<")
-        LastPageButton = discord.ui.Button(label=">>")
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
         timeout = 42069
         paginator = Paginator.Simple(
@@ -312,9 +313,14 @@ class quota(commands.Cog):
 
         
     @staff.command(description="Add a staff member to the staff database.")
+    @app_commands.describe(
+        staff="The staff member to add.",
+        rank="The staff member's rank.",
+        timezone="The staff member's timezone."
+    )
     async def add(self, ctx, staff: discord.User, rank: str, timezone: str = None):
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return        
         if not await has_admin_role(ctx):
             return
@@ -337,9 +343,12 @@ class quota(commands.Cog):
         await ctx.send(f'{tick} **{ctx.author.display_name},** staff member added successfully.')
 
     @staff.command(description="Remove a staff member from the staff database.")
+    @app_commands.describe(
+        staff="The staff member to remove."
+    )
     async def remove(self, ctx, staff: discord.User):
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module isn't enabled.")
             return        
         if not await has_admin_role(ctx):
             return
@@ -352,9 +361,15 @@ class quota(commands.Cog):
         await ctx.send(f'{tick} **{ctx.author.display_name},** staff member removed successfully.')
 
     @staff.command(description="Edit a staff member's rank. (Staff Database)")
+    @app_commands.describe(
+        staff="The staff member to edit.", 
+        rank="The staff member's new rank.", 
+        timezone="The staff member's new timezone.", 
+        introduction="The staff member's new introduction."
+    )
     async def edit(self, ctx, staff: discord.User, rank: str, timezone: str = None, *, introduction = None):
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return        
         if not await has_admin_role(ctx):
             return
@@ -368,9 +383,10 @@ class quota(commands.Cog):
         await ctx.send(f'{tick} **{ctx.author.display_name},** staff member edited successfully.')
     
     @staff.command(description="View a staff member's information. (Staff Database)")
+    @app_commands.describe(staff="The staff member to view.")
     async def view(self, ctx, staff: discord.User):
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this module isn't enabled.")
             return        
         if not await has_staff_role(ctx):
             return
@@ -401,9 +417,10 @@ class quota(commands.Cog):
         else:
             await ctx.send(f"{ctx.author.display_name}, I couldn't find **@{staff.display_name}**.")
     @staff.command(description="Give yourself an introduction (Staff Database)")
+    @app_commands.describe(introduction = "The introduction you want to add to your staff profile.")
     async def introduction(self, ctx, *, introduction):
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return      
         result = await staffdb.find_one({'guild_id': ctx.guild.id, 'staff_id': ctx.author.id})
         if not result:
@@ -422,7 +439,7 @@ class quota(commands.Cog):
         if not await has_admin_role(ctx):
             return
         if not await self.modulecheck2(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is not enabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:

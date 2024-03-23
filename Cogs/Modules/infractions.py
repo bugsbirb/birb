@@ -8,6 +8,7 @@ from typing import Optional
 from discord.ext import commands
 import typing
 import os
+import Paginator
 
 from emojis import *
 from permissions import *
@@ -27,7 +28,7 @@ modules = db['Modules']
 Customisation = db['Customisation']
 infractiontypes = db['infractiontypes']
 
-
+options = db['module options']
 class Infractions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -77,13 +78,22 @@ class Infractions(commands.Cog):
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
-    async def infract(self, ctx, staff: discord.Member, action, reason: str, notes: Optional[str], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+    async def infract(self, ctx, staff: discord.Member, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+        optionresult = await options.find_one({'guild_id': ctx.guild.id})
+        if optionresult:
+            if optionresult.get('infractedbybutton', False) == True:
+                view = InfractionIssuer()
+                view.issuer.label = f"Issued By {ctx.author.display_name}"
+            else:
+                view = None    
+        else:
+            view = None        
         if anonymous == 'True':
          await ctx.defer(ephemeral=True)
         else:
           await ctx.defer() 
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
 
             return
 
@@ -170,10 +180,17 @@ class Infractions(commands.Cog):
             embed = discord.Embed(title=embed_title, description=embed_description, color=int(custom['color'], 16))
 
             embed.set_thumbnail(url=embed_thumbnail)
-            if anonymous == 'True':
+            if optionresult:
+             if optionresult.get('showissuer', True) == False or anonymous == 'True':
                 embed.remove_author()
-            else:
+             else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
+            else:
+                if anonymous:
+                 embed.remove_author()
+                else: 
+                 embed.set_author(name=embed_author, icon_url=authoricon)
+
             embed.set_footer(text=f"Infraction ID | {random_string}")
             if custom['image']:
                 embed.set_image(url=custom['image'])
@@ -183,10 +200,16 @@ class Infractions(commands.Cog):
             else:
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
-            if anonymous == 'True':
+            if optionresult:
+             if optionresult.get('showissuer', True) == False or anonymous == 'True':
                 embed.remove_author()
-            else:
+             else:
                 embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
+            else:
+                if anonymous:
+                 embed.remove_author()
+                else: 
+                 embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
             
             embed.set_footer(text=f"Infraction ID | {random_string}")
             if expiration:
@@ -205,7 +228,7 @@ class Infractions(commands.Cog):
 
             if channel:
                 try:
-                    msg = await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                    msg = await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
                     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**", allowed_mentions=discord.AllowedMentions.none())
                     if expiration:
                         infract_data = {
@@ -265,12 +288,12 @@ class Infractions(commands.Cog):
     async def infractions(self, ctx, staff: discord.Member, scope: Literal['Voided', 'Expired', 'All'] = None):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_staff_role(ctx):
             return
-
+        embeds = []
         print(f"Searching infractions for staff ID: {staff.id} in guild ID: {ctx.guild.id}")
         if scope == 'Voided':
             filter = {
@@ -296,7 +319,7 @@ class Infractions(commands.Cog):
                 'voided': {'$ne': True}
             }
 
-        infractions = await collection.find(filter).to_list(length=20)
+        infractions = await collection.find(filter).to_list(750)
 
         if not infractions:
             if scope == 'Voided':
@@ -324,7 +347,7 @@ class Infractions(commands.Cog):
             embed.title = f"{staff.name}'s Infractions"
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)
-        for infraction in infractions[:15]:
+        for i, infraction in enumerate(infractions):
             if infraction.get('voided', 'N/A') == 'N/A':
                 voided = ""
             else:
@@ -342,13 +365,49 @@ class Infractions(commands.Cog):
                 if infraction['expiration'] < datetime.now():
                     expiration = f"\n{arrow}**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D> **(Infraction Expired)**"
             management = await self.client.fetch_user(infraction['management'])
+            value = f"{arrow}**Infracted By:** {management.mention}\n{arrow}**Action:** {infraction['action']}\n{arrow}**Reason:** {infraction['reason']}\n{arrow}**Notes:** {infraction['notes']}{expiration}{jump_url}"
+            if len(value) > 1024:
+             value = value[:1021] + "..."
             embed.add_field(
                 name=f"<:Document:1166803559422107699> Infraction | {infraction['random_string']} {voided}",
-                value=f"{arrow}**Infracted By:** {management.mention}\n{arrow}**Action:** {infraction['action']}\n{arrow}**Reason:** {infraction['reason']}\n{arrow}**Notes:** {infraction['notes']}{expiration}{jump_url}",
+                value=value,
                 inline=False
             )
-
-        await ctx.send(embed=embed)
+            if (i + 1) % 9 == 0 or i == len(infractions) - 1:
+                embeds.append(embed)
+                embed = discord.Embed(
+                    title=f"{staff.name}'s Infractions",
+                    description=f"* **User:** {staff.mention}\n* **User ID:** {staff.id}",
+                    color=discord.Color.dark_embed()
+                )
+                if scope == 'Voided':
+                    embed.title = f"{staff.name}'s Voided Infractions"
+                elif scope == 'Expired':
+                    embed.title = f"{staff.name}'s Expired Infractions"
+                elif scope == 'All':
+                    embed.title = f"{staff.name}'s Infractions"
+                embed.set_thumbnail(url=staff.display_avatar)
+                embed.set_author(icon_url=staff.display_avatar, name=staff.display_name)            
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
+        InitialPage = 0
+        timeout = 42069
+        if len(embeds) <= 1:
+            PreviousButton.disabled = True
+            NextButton.disabled = True
+            FirstPageButton.disabled = True
+            LastPageButton.disabled = True        
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+        await paginator.start(ctx, pages=embeds)
 
     @commands.hybrid_group()
     async def infraction(self, ctx):
@@ -358,14 +417,15 @@ class Infractions(commands.Cog):
     @app_commands.describe(id="The ID of the infraction to void .eg 12345678")
     async def void(self, ctx, id: str):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
      if not await has_admin_role(ctx):
         return
 
      filter = {
         'guild_id': ctx.guild.id,
-        'random_string': id
+        'random_string': id,
+        'voided': {'$ne': True}
     }
 
      infraction = await collection.find_one(filter)
@@ -374,14 +434,28 @@ class Infractions(commands.Cog):
         await ctx.send(f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
         return
      await collection.update_one(filter, {'$set': {'voided': True}})
- 
-     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
      
+     await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
+     optionsresult = await options.find_one({'guild_id': ctx.guild.id})
+     if optionsresult:
+         if optionsresult.get('onvoid', False) == True:
+             user = self.client.get_user(infraction['staff'])
+             if user:
+                 try:
+                  await user.send(f"<:CaseRemoved:1191901322723737600> Your infraction with ID `{id}` in {ctx.guild.name} has been voided.")
+                 except discord.Forbidden:
+                     print('[⚠️] I couldn\'t dm the user about their infraction void.')
+
+                 return
+                 
+
+
+             
     @infraction.command(description="Edit an existing infraction")
     @app_commands.autocomplete(action=infractiontypes)
     async def edit(self, ctx, id: str, action, reason: str, notes: Optional[str]):
       if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
       if not await has_admin_role(ctx):
          return
@@ -533,6 +607,17 @@ class Infractions(commands.Cog):
 
         except Exception as e:
             print(f"Error checking infractions: {e}")
+
+class InfractionIssuer(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+
+    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1166508151290462239>")
+    async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+    
+
 
 async def setup(client: commands.Bot) -> None:
    await client.add_cog(Infractions(client))       

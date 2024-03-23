@@ -2,12 +2,14 @@ import discord
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
+import validators
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']
 welcome = db['welcome settings']
+customcommands = db['Custom Commands']
 
 
 class ToggleWelcome(discord.ui.Select):
@@ -77,8 +79,9 @@ class Welcomemessage(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
-            discord.SelectOption(label="Custom"),
+            discord.SelectOption(label="Customise"),
             discord.SelectOption(label="Default Welcome Message"),
+            discord.SelectOption(label="Manage Buttons")
             
 
         
@@ -93,16 +96,126 @@ class Welcomemessage(discord.ui.Select):
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
-        if color == 'Custom':    
+        if color == 'Customise':    
             await interaction.response.edit_message(view=NoEmbeds(interaction.user), embed=None, content=None)
 
         elif color == 'Default Welcome Message':    
             await welcome.update_one({'guild_id': interaction.guild.id}, {'$set': {'content': '👋 Welcome {user.mention} to **{guild.name}**! We hope you enjoy your stay here.', 'embed': False}}, upsert=True)
             await interaction.response.edit_message(content=None)
+        elif color == 'Manage Buttons':    
+            view = ButtonManage(interaction.user)
+            await interaction.response.send_message(ephemeral=True, view=view)    
+
+
+class managebuttons(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="URL Button"),
+            discord.SelectOption(label="Custom Command Button"),
+            discord.SelectOption(label="Reset To Default")
+
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='Manage Buttons', min_values=1, max_values=1, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        options = self.values[0]
+        if options == 'URL Button':    
+            await interaction.response.send_modal(ButtonURLView(interaction.user))
+        elif options == 'Custom Command Button':    
+            await interaction.response.send_modal(CustomButton(interaction.user))
+        elif options == 'Reset To Default':
+              await welcome.update_one({'guild_id': interaction.guild.id}, {'$set': {'buttons': None}}, upsert=True)
+              await interaction.response.edit_message(f"{tick} Succesfully reset the buttons to default.", view=None)
+
 
 ## --- Custom Welcome Message Below
 
+class CustomButton(discord.ui.Modal, title='Button Embed'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
 
+
+
+
+
+
+    name = discord.ui.TextInput(
+        label='Custom Command Name',
+        placeholder='What is the name of the custom command?',
+        max_length=2048
+    )
+
+    label = discord.ui.TextInput(
+        label='Button Name',
+        placeholder='What text should be on the button?',
+        max_length=80
+    )
+    emoji = discord.ui.TextInput(
+        label='Emoji',
+        placeholder='What emoji should be on the button? (Example: <:Alert:1208972002803712000>)',
+        max_length=80,
+        required=False
+    )
+    colour = discord.ui.TextInput(
+        label='Colour',
+        placeholder='Blurple, Red, Green, Grey',
+        max_length=80,
+        required=True
+    )
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        colour = self.colour.value.lower()
+        valid_colours = ['blurple', 'red', 'green', 'grey']
+        result = await customcommands.find_one({"guild_id": interaction.guild.id})
+        if result is None:
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I could not find the custom command.")
+            return
+
+        if colour not in valid_colours:
+         await interaction.response.send_message(f"{redx} **{interaction.user.display_name},** I could not find that colour. (Blurple, Red, Green, Grey)", ephemeral=True)
+         return
+        await welcome.update_one({'guild_id': interaction.guild.id}, {'$set': {'buttons': 'Embed Button', 'cmd': self.name.value, 'button_label': self.label.value, 'colour': self.colour.value, 'emoji': self.emoji.value}}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the custom embed button with the command `{self.name.value}`.", view=None)
+
+
+class ButtonURLView(discord.ui.Modal, title='Button URL'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+
+
+
+
+
+
+    name = discord.ui.TextInput(
+        label='URL',
+        placeholder='Whats the url you wanna use? (https://example.com)',
+        max_length=2048
+    )
+
+    label = discord.ui.TextInput(
+        label='Button Name',
+        placeholder='What text should be on the button?',
+        max_length=80
+    )
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+        url = self.name.value
+        if not validators.url(url):
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** that is not a valid website url.", ephemeral=True)
+            return
+        await welcome.update_one({'guild_id': interaction.guild.id}, {'$set': {'url': url, 'buttons': 'Link Button', 'button_label': self.label.value}}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name},** I've set the buttons to URL with the link `{self.name.value}`.", view=None)
 
 
 
@@ -300,6 +413,10 @@ class Author(discord.ui.Modal, title='Author'):
          await interaction.response.send_message(f"{no} Please provide a valid url or name.", ephemeral=True)
          return
 
+class ButtonManage(discord.ui.View):
+    def __init__(self, author):
+        super().__init__(timeout=360)
+        self.add_item(managebuttons(author))
 
 class NoEmbeds(discord.ui.View):
     def __init__(self, author):
@@ -525,6 +642,8 @@ class Embeds(discord.ui.View):
         embed.description = f"Your welcome message has been updated!"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)            
+
+
 
 async def refreshembed(interaction):
             welcomechannelresult = await welcome.find_one({'guild_id': interaction.guild.id})

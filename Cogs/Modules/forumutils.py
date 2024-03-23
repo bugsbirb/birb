@@ -379,6 +379,7 @@ class Forums(commands.Cog):
 
     @forums.command(description="Create a Forum Creation Embed")
     @commands.has_guild_permissions(administrator=True)
+
     async def manage(self, ctx):   
        embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
        async for result in forumsconfig.find({"guild_id": ctx.guild.id}):

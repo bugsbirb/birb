@@ -21,7 +21,7 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
-
+options = db['module options']
 class FeedbackChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Feedback Channel', channel_types=[discord.ChannelType.text])
@@ -87,6 +87,55 @@ class ToggleFeedback(discord.ui.Select):
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Feedback': False}}, upsert=True)
             await refreshembed(interaction)
 
+class MultipleFeedback(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Multiple Feedback", style=discord.ButtonStyle.red) 
+    async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('multiplefeedback', False) == False:
+                self.bybuttontoggle.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'multiplefeedback': True}}, upsert=True)
+        else:
+                self.bybuttontoggle.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'multiplefeedback': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)   
+
+
+class FMoreOptions(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Multiple Feedbacks" ,description="Lets you give more then 1 feedback to people."),
+
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        selected_option = self.values[0]
+        
+
+        option_result = await options.find_one({'guild_id': interaction.guild.id})
+        if option_result is None:
+            await options.insert_one({'guild_id': interaction.guild.id})
+        if selected_option == "Multiple Feedbacks":
+                view = MultipleFeedback()
+                embed = discord.Embed(title='Multiple Feedbacks', description="Allows you give someone feedback more then once.", color=discord.Colour.dark_embed())
+
+                if option_result:
+                    if option_result.get('multiplefeedback', False) == False:
+                        view.bybuttontoggle.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('multiplefeedback', False) == True:
+                        view.bybuttontoggle.style = discord.ButtonStyle.green
+                        
+                await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 async def refreshembed(interaction):
             feedbackchannelresult = await feedbackch.find_one({'guild_id': interaction.guild.id})

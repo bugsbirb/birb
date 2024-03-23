@@ -4,9 +4,13 @@ from discord.ext import commands
 from emojis import *
 import os
 import random
+import Paginator
 import chat_exporter
 import io   
+from datetime import datetime
+import datetime 
 from motor.motor_asyncio import AsyncIOMotorClient
+from discord import app_commands
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
@@ -15,9 +19,9 @@ arole = db['adminrole']
 modmail = db['modmail']
 modmailalerts = db['modmailalerts']
 modmailblacklists = db['modmailblacklists']
-transcripts = db['transcripts']
 modmailcategory = db['modmailcategory']
 transcriptschannel = db['transcriptschannel']
+transcripts = db['Transcripts']
 modules = db['Modules']
 from permissions import has_admin_role, has_staff_role
 class Modmail(commands.Cog):
@@ -43,7 +47,7 @@ class Modmail(commands.Cog):
     @modmail.command(description="Pings you for the next message")
     async def alert(self, ctx):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.")
          return         
         if not await has_staff_role(ctx):
             return
@@ -51,9 +55,10 @@ class Modmail(commands.Cog):
         await modmailalerts.update_one({'channel_id': ctx.channel.id}, {'$set': {'alert': ctx.author.id}}, upsert=True)     
 
     @modmail.command(description="Blacklist someone from using modmail")
+    @app_commands.describe(member = "The member you want to blacklist from using modmail")
     async def blacklist(self, ctx, member: discord.Member):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.")
          return                 
         if not await has_admin_role(ctx):
             return
@@ -66,9 +71,10 @@ class Modmail(commands.Cog):
         await ctx.send(f"{tick} **{member.display_name}** has been blacklisted from using modmail.")
        
     @modmail.command(description="Unblacklist someone from using modmail")
+    @app_commands.describe(member = "The member you want to unblacklist from using modmail")
     async def unblacklist(self, ctx, member: discord.Member):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
         if not await has_admin_role(ctx):
             return
@@ -81,10 +87,11 @@ class Modmail(commands.Cog):
         await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.", allowed_mentions=discord.AllowedMentions.none())
 
     @modmail.command(description="Reply to a modmail")
+    @app_commands.describe(content = 'The message you want to send to the user.', media = "The media you want to send to the user.")
     async def reply(self, ctx, *, content, media: discord.Attachment = None):
      await ctx.defer(ephemeral=True)
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return        
@@ -123,11 +130,64 @@ class Modmail(commands.Cog):
      else:
         await ctx.send(f"{no} You can only use the reply command in a modmail channel")
 
+    @modmail.command(description="View the modmail logs for a member")
+    @app_commands.describe(member = "The member you want to view the modmail logs for")
+    async def logs(self, ctx, member: discord.User):
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return              
+        if not await has_admin_role(ctx):
+            return
 
+        result = await transcripts.find({'author': member.id, 'guild_id': ctx.guild.id}).to_list(None)
+        if not result:
+            await ctx.send(f"{no} No modmail logs found for this user.")
+            return
+
+        embeds = []
+        for i, logs in enumerate(result):
+            embed = discord.Embed(title=f"{(member.name).capitalize()}'s Modmail Logs", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=member.display_avatar)
+            embed.set_author(name=member.name, icon_url=member.display_avatar)
+            value = f"<:arrow:1166529434493386823>**Transcript:** [View Online]({logs.get('transcriptlink')})\n<:arrow:1166529434493386823>**Closed By:** <@{logs.get('closedby')}>\n<:arrow:1166529434493386823>**Date:** <t:{int(logs.get('timestamp').timestamp())}:d>\n<:arrow:1166529434493386823>**Closure Reason:** {logs.get('reason')}"
+            if len(value) > 1024:
+                value = value[:1021] + "..."
+            embed.add_field(name=f"#{logs.get('transcriptid')}", value=value, inline=False)
+            embeds.append(embed)
+
+            if (i + 1) % 9 == 0:
+                embeds.append(embed)
+
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
+        InitialPage = 0
+        timeout = 42069
+
+        if len(embeds) <= 1:
+            PreviousButton.disabled = True
+            NextButton.disabled = True
+            FirstPageButton.disabled = True
+            LastPageButton.disabled = True
+
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+
+        await paginator.start(ctx, pages=embeds) 
+       
+       
+    
     @commands.command(description="Reply to a modmail channel.")
     async def mreply(self, ctx, *, content):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -162,7 +222,8 @@ class Modmail(commands.Cog):
                      await channel.send(embed=embed)
                     except discord.Forbidden: 
                         await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)
-                    await ctx.message.delete()    
+                    await ctx.message.delete()  
+                    
                     return
                     
         await ctx.send(f"{no} No active modmail channel found for that user.")
@@ -171,7 +232,7 @@ class Modmail(commands.Cog):
     @commands.command(description="Close a modmail channel.", name="mclose")
     async def close2(self, ctx, *, reason = None):
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -207,7 +268,9 @@ class Modmail(commands.Cog):
                 except discord.Forbidden:
                     await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
- 
+                testchannel = self.client.get_channel(1202756318897774632)
+                message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                link = await chat_exporter.link(message)  
                 user_id = modmail_data.get('user_id')
                 if user_id:
                     user = await self.client.fetch_user(user_id)
@@ -223,9 +286,11 @@ class Modmail(commands.Cog):
                          embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                          embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
                          await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
+                         await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': ctx.guild.id, 'closedby': ctx.author.id, 'reason': reason, 'author': user.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                         except discord.Forbidden:
-                           print("Couldn't send message to user.")
-                           pass    
+                            
+                            pass     
+                      
                 transcriptchannelresult = await transcriptschannel.find_one({'guild_id': ctx.guild.id})
                 if transcriptchannelresult:
                     transcriptchannelid = transcriptchannelresult['channel_id']
@@ -238,9 +303,7 @@ class Modmail(commands.Cog):
                      embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=ctx.author.mention, inline=True)
                      embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                      embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
-                     testchannel = self.client.get_channel(1202756318897774632)
-                     message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
-                     link = await chat_exporter.link(message)
+
                      print(link)
                      view = TranscriptChannel(link)
                      await transcriptchannel.send(embed=embed, view=view)
@@ -250,11 +313,14 @@ class Modmail(commands.Cog):
             await ctx.send(f"{no} No active modmail channel found for this channel.")
      else:
         await ctx.send(f"{no} You can only use the close command in a modmail channel.") 
+        
+
     @modmail.command(description="Close a modmail channel.")
+    @app_commands.describe(reason="The reason for closing the modmail channel.")
     async def close(self, ctx, *, reason = None):
      await ctx.defer()
      if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
      if not await has_staff_role(ctx):
          return             
@@ -290,7 +356,9 @@ class Modmail(commands.Cog):
                 except discord.Forbidden:
                     await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
- 
+                testchannel = self.client.get_channel(1202756318897774632)
+                message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                link = await chat_exporter.link(message)   
                 user_id = modmail_data.get('user_id')
                 if user_id:
                     user = await self.client.fetch_user(user_id)
@@ -306,9 +374,11 @@ class Modmail(commands.Cog):
                          embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                          embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
                          await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
+                         await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': ctx.guild.id, 'closedby': ctx.author.id, 'reason': reason, 'author': user.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                         except discord.Forbidden:
                             
                             pass     
+                      
                 transcriptchannelresult = await transcriptschannel.find_one({'guild_id': ctx.guild.id})
                 if transcriptchannelresult:
                     transcriptchannelid = transcriptchannelresult['channel_id']
@@ -321,9 +391,7 @@ class Modmail(commands.Cog):
                      embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=ctx.author.mention, inline=True)
                      embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                      embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
-                     testchannel = self.client.get_channel(1202756318897774632)
-                     message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
-                     link = await chat_exporter.link(message)
+
                      print(link)
                      view = TranscriptChannel(link)
                      await transcriptchannel.send(embed=embed, view=view)

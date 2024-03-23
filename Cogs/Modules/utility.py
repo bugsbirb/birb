@@ -258,7 +258,7 @@ class Utility(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["serverinfo"])
-    async def server(self, ctx):
+    async def server(self, ctx: commands.Context):
         """ Check info about current server """        
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -283,10 +283,10 @@ class Utility(commands.Cog):
         
 
     @commands.hybrid_command()
-    async def user(self, ctx, user: Optional[discord.User] = None):
+    async def user(self, ctx: commands.Context, user: Optional[discord.User] = None):
         """Displays users information"""        
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
 
         if user is None:
@@ -307,7 +307,7 @@ class Utility(commands.Cog):
             embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
             await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title=f"@{user.display_name}", description=f"{badge_values}", color=0x2b2d31)
+        embed = discord.Embed(title=f"@{user.display_name}", description=f"{badge_values}", color=user)
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != ctx.guild.default_role][:20])
@@ -323,7 +323,7 @@ class Utility(commands.Cog):
                 return data["image_url"]
 
     @commands.hybrid_command(description="Get silly birb photo")
-    async def birb(self, ctx):
+    async def birb(self, ctx: commands.Context):
         try:
             birb_image_url = await self.fetch_birb_image()
 
@@ -335,22 +335,23 @@ class Utility(commands.Cog):
             await ctx.send(f"{crisis} {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
 
     @commands.hybrid_command(description="Check the bots latency & uptime")
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context):
         server_name = "Astro Birb"
         server_icon = self.client.user.display_avatar
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31, timestamp=datetime.now())
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
+        embed.set_footer(text=f"Shard  |  {ctx.guild.shard_id}", icon_url=ctx.guild.icon)
         await ctx.send(embed=embed)        
         
 
  
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def divider(self, ctx, * ,rolename):
+    async def divider(self, ctx: commands.Context, * ,rolename):
         guild = ctx.guild
         if len(rolename) > 100:
             await ctx.send("Role name is too long. Please provide a name with 100 characters or fewer.")
@@ -371,7 +372,7 @@ class Utility(commands.Cog):
       
 
     @commands.hybrid_command(description="Displays all the commands.")
-    async def help(self, ctx):         
+    async def help(self, ctx: commands.Context):         
      embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
      embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get information about different modules and commands."
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
@@ -383,7 +384,7 @@ class Utility(commands.Cog):
 
 
     @commands.hybrid_command(description="Get support from the support server")
-    async def support(self, ctx):
+    async def support(self, ctx: commands.Context):
         view = Support()
         bot_user = self.client.user
         embed = discord.Embed(
@@ -396,53 +397,13 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @commands.command(aliases=["joinme", "join", "botinvite"])
-    async def invite(self, ctx):
+    async def invite(self, ctx: commands.Context):
      view = invite()
      await ctx.send(view=view)
 
 
-    @commands.command()
-    @commands.is_owner()    
-    async def operational(self, ctx):
-        embed = discord.Embed(title="Astro Birb - Operational", description="Astro Birb is currently operational and online.", color=discord.Color.brand_green())
-        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
-        embed.set_thumbnail(url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1148682178205589534/585894182128975914.png")
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()    
-    async def unstable(self, ctx):
-        embed = discord.Embed(title="Astro Birb - Unstable", description="Astro Birb is currently unstable.", color=discord.Color.orange())
-        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
-        embed.set_thumbnail(url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1148682557618147391/1140809567865933824.png")
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()    
-    async def downtime(self, ctx):
-        embed = discord.Embed(title="Astro Birb - Offline", description="Astro Birb is currently experiencing downtime.", color=discord.Color.red())
-        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
-        embed.set_thumbnail(url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1148682781321330789/1140809593598005358.png")
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()
-    async def restarting(self, ctx):
-        embed = discord.Embed(title="Astro Birb - Restarting", description="Astro Birb is currently restarting, this will take about five minutes.", color=discord.Color.orange())
-        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
-        embed.set_thumbnail(url="https://media.discordapp.net/ephemeral-attachments/1139907646963597423/1148682557618147391/1140809567865933824.png")
-        await ctx.send(embed=embed)
-
-    @commands.command()
-    @commands.is_owner()
-    async def shutdown(self, ctx):
-        embed = discord.Embed(title="Stopping Astro Birb", description="Shutdown command was invoked", color=discord.Color.red())
-        embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)
-        await ctx.send(embed=embed)
-        exit(0)
-
     @commands.hybrid_command(description="❤️ Support Astro Birb!")
-    async def vote(self, ctx):
+    async def vote(self, ctx: commands.Context):
         embed = discord.Embed(title="🚀 Support Astro Birb", description="Hi there! If you enjoy using **Astro Birb**, consider upvoting it on the following platforms to help us grow and reach more servers. Your support means a lot! 🌟", color=discord.Color.dark_embed())
         button = discord.ui.Button(label="Upvote", url="https://top.gg/bot/1113245569490616400/vote", emoji="<:topgg:1206665848408776795>", style=discord.ButtonStyle.blurple)
         button2 = discord.ui.Button(label="Upvote", url="https://wumpus.store/bot/1113245569490616400/vote", emoji="<:wumpus_store:1206665807011258409>", style=discord.ButtonStyle.blurple)

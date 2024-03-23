@@ -53,7 +53,8 @@ class CustomCommands(commands.Cog):
 
     @command.command(description="Run one of your servers custom commands.")
     @app_commands.autocomplete(command=commands_auto_complete)
-    async def run(self, ctx, command, channel: discord.TextChannel = None):
+    @app_commands.describe(command = 'The name of the command you want to run.')
+    async def run(self, ctx: commands.Context, command, channel: discord.TextChannel = None):
         await ctx.defer(ephemeral=True)
         if not await has_customcommandrole(ctx, command):
             return
@@ -88,25 +89,19 @@ class CustomCommands(commands.Cog):
                 view.button_callback.style = discord.ButtonStyle.grey    
             else:
                 view.button_callback.style = discord.ButtonStyle.grey  
-            emoji_data = command_data['emoji']    
-            if emoji_data == "None" or "":
-                pass
-            else:
-             try:     
-            
-              test = view.button_callback.emoji = command_data['emoji']
-              if test:
-                pass
-              else:
-                  view.button_callback.emoji = command_data['emoji'] = None
-              
-             except Exception:
-              view.button_callback.emoji = command_data['emoji'] = None
-              await ctx.send('error')
-              pass
-        else:
-            view = None
+            emoji_data = command_data.get('emoji', None)
+            print(emoji_data)
 
+                    
+            if emoji_data:
+                emoji_id_str = emoji_data.split(':')[2][:-1]
+                emoji_id = int(emoji_id_str)
+
+                emoji = ctx.guild.get_emoji(emoji_id)
+                if emoji:
+                      view.button_callback.emoji = command_data.get('emoji', None)
+        else:
+            view = None               
         timestamp = datetime.utcnow().timestamp()
         timestampformat = f"<t:{int(timestamp)}:F>"
 

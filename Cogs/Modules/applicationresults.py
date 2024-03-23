@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 from emojis import *
 from typing import Literal
@@ -29,11 +30,12 @@ class ApplicationResults(commands.Cog):
         return True
 
 
-    @commands.hybrid_group()
+    @commands.hybrid_group(description="Application results commands.")
     async def application(self, ctx):
         return
 
     @application.command(description="Log Application results")
+    @app_commands.describe(applicant="The applicant to log the results for", result="The result of the application", feedback="The feedback to give the applicant")
     async def results(
         self,
         ctx,
@@ -44,7 +46,7 @@ class ApplicationResults(commands.Cog):
     ):  
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the results module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
@@ -90,11 +92,11 @@ class ApplicationResults(commands.Cog):
                     roles_data = await ApplicationsRolesDB.find_one({"guild_id": ctx.guild.id})
                     if roles_data:
                         application_roles = roles_data.get("applicationroles", [])
-                        member = ctx.guild.get_member(applicant.id)
+                        
                         roles_to_add = [discord.utils.get(ctx.guild.roles, id=role_id) for role_id in application_roles]
                         if roles_to_add and None not in roles_to_add:
                             try:
-                                await member.add_roles(*roles_to_add)
+                                await applicant.add_roles(*roles_to_add)
                             except (discord.Forbidden) as e:
                                 await ctx.send(f"{no} **{ctx.author.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none())
                                 return

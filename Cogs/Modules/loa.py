@@ -217,9 +217,10 @@ class loamodule(commands.Cog):
 
 
     @loa.command(description="Manage someone leave of Absence")
+    @app_commands.describe(user = "The user you want to manage LOA for")
     async def manage(self, ctx, user: discord.Member):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
         if not await has_admin_role(ctx):
             return
@@ -263,7 +264,7 @@ class loamodule(commands.Cog):
     @loa.command(description="View all Leave Of Absence")
     async def active(self, ctx):
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
@@ -299,10 +300,10 @@ class loamodule(commands.Cog):
 
     @loa.command(description="Request a Leave Of Absence")
     @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reason for this LOA?")
-    async def request(self, ctx, duration: str, reason: str):
+    async def request(self, ctx, duration: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.")
             return
         if not await has_staff_role(ctx):
             return
@@ -518,6 +519,7 @@ class LOAPanel(discord.ui.View):
         self.user = user
         self.guild = guild
         self.author = author
+
 
     @discord.ui.button(label='Void LOA', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel',
                        emoji="<:Exterminate:1164970632262451231>")

@@ -23,7 +23,7 @@ class GuildJoins(commands.Cog):
         else:
             blacklisted = {no}
         
-        embed = discord.Embed(title=f"Astro Birb - {guild.name}", description=f"<:Arrow:1115743130461933599>**Owner:** {guild.owner.mention}\n<:Arrow:1115743130461933599>**Guild:** {guild.name}\n<:Arrow:1115743130461933599>**Guild ID** {guild.id}\n <:Arrow:1115743130461933599>**Members:** {guild.member_count}\n<:Arrow:1115743130461933599>**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n<:Arrow:1115743130461933599>**Blacklisted:** {blacklisted}", color=discord.Color.blurple())
+        embed = discord.Embed(title=f"{guild.name}", description=f"<:Arrow:1115743130461933599>**Owner:** {guild.owner.mention}\n<:Arrow:1115743130461933599>**Guild:** {guild.name}\n<:Arrow:1115743130461933599>**Guild ID** {guild.id}\n <:Arrow:1115743130461933599>**Members:** {guild.member_count}\n<:Arrow:1115743130461933599>**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n<:Arrow:1115743130461933599>**Blacklisted:** {blacklisted}", color=discord.Color.blurple())
         embed.set_thumbnail(url=guild.icon)
         channel = self.client.get_channel(1118944466980581376)
         await channel.send(embed=embed)
@@ -35,10 +35,10 @@ class GuildJoins(commands.Cog):
             return
         blacklist = await blacklists.find_one({'user': guild.owner.id})
         if blacklist:  
-            blacklisted = {tick}
+            blacklisted = tick
         else:
-            blacklisted = {no}        
-        embed = discord.Embed(title=f"Astro Birb - {guild.name}", description=f"<:Arrow:1115743130461933599>**Owner:** {guild.owner.mention}\n<:Arrow:1115743130461933599>**Guild:** {guild.name}\n<:Arrow:1115743130461933599>**Guild ID** {guild.id}\n <:Arrow:1115743130461933599>**Members:** {guild.member_count}\n<:Arrow:1115743130461933599>**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n<:Arrow:1115743130461933599>**Blacklisted:** {blacklisted}", color=discord.Color.blurple())
+            blacklisted = no        
+        embed = discord.Embed(title=f"{guild.name}", description=f"<:Arrow:1115743130461933599>**Owner:** {guild.owner.mention}\n<:Arrow:1115743130461933599>**Guild:** {guild.name}\n<:Arrow:1115743130461933599>**Guild ID** {guild.id}\n <:Arrow:1115743130461933599>**Members:** {guild.member_count}\n<:Arrow:1115743130461933599>**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n<:Arrow:1115743130461933599>**Blacklisted:** {blacklisted}", color=discord.Color.blurple())
         embed.set_thumbnail(url=guild.icon)
         channel = self.client.get_channel(1150816700489535508)
         await channel.send(embed=embed)

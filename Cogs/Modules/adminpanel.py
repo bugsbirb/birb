@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import string
 from discord.ext import commands
+from discord import app_commands
 import datetime
 import Paginator
 from pymongo import MongoClient
@@ -516,7 +517,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             if custom["image"]:
                 embed.set_image(url=custom["image"])
             if optionresult:
-             if optionresult.get('showissuer', False) == True:
+             if optionresult.get('showissuer', True) == False:
                 embed.remove_author()
              else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
@@ -545,7 +546,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             "guild_id": interaction.guild.id,
         }
         if optionresult:
-            if optionresult.get('showissuer', False) == True:
+            if optionresult.get('showissuer', True) == False:
                 embed.remove_author()
             else:
                 embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
@@ -673,11 +674,12 @@ class AdminPanelCog(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_group(name="admin")
+    @commands.hybrid_group(description="Administrative tools and stats")
     async def admin(self, ctx):
         pass
 
     @admin.command(description="Manage a staff member.")
+    @app_commands.describe(staff="The staff member to manage.")
     async def panel(self, ctx, staff: discord.Member):
         if not await has_admin_role(ctx):
             return
@@ -742,6 +744,7 @@ class AdminPanelCog(commands.Cog):
         return False
 
     @admin.command(description="View an admins stats")
+    @app_commands.describe(user="The user to view the stats of.")
     async def stats(self, ctx, user: discord.Member = None):
         await ctx.defer()
         if not await has_admin_role(ctx):
@@ -938,7 +941,7 @@ class AdminPanel(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not await self.PromotionModuleCheck(interaction):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, this module is currently disabled.",
+                f"{no} **{interaction.user.display_name}**, the loa module isn't enabled.",
                 ephemeral=True,
             )
             return
@@ -970,7 +973,7 @@ class AdminPanel(discord.ui.View):
 
         if not await self.InfractionModuleCheck(interaction):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, this module is currently disabled.",
+                f"{no} **{interaction.user.display_name}**, the infraction module isn't enabled.",
                 ephemeral=True,
             )
             return
@@ -998,7 +1001,7 @@ class AdminPanel(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not await self.InfractionModuleCheck(interaction):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, this module is currently disabled.",
+                f"{no} **{interaction.user.display_name}**, the infraction module isn't enabled..",
                 ephemeral=True,
             )
             return
@@ -1087,7 +1090,7 @@ class AdminPanel(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not await self.LOAModuleCheck(interaction):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, this module is currently disabled.",
+                f"{no} **{interaction.user.display_name}**, the LOA module isn't enabled.",
                 ephemeral=True,
             )
             return

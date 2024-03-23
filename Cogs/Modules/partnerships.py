@@ -54,7 +54,8 @@ class Partnerships(commands.Cog):
         return True
 
     @partnership.command(description="Log a partnership")
-    async def log(self, ctx, owner: discord.Member, server: str, invite: str):
+    @app_commands.describe(owner="The owner of the server", server="The name of the server", invite="The invite link to the server")
+    async def log(self, ctx, owner: discord.Member, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
         await ctx.defer()
         result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if result:
@@ -62,7 +63,7 @@ class Partnerships(commands.Cog):
             return
        
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
 
         if not await has_admin_role(ctx):
@@ -110,9 +111,9 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
-    async def terminate(self, ctx, server, reason: str):
+    async def terminate(self, ctx, server, reason: app_commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
 
         if not await has_admin_role(ctx):
@@ -170,7 +171,7 @@ class Partnerships(commands.Cog):
     async def all(self, ctx):
         await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
 
         if not await has_admin_role(ctx):
@@ -216,14 +217,10 @@ class Partnerships(commands.Cog):
          embed.set_thumbnail(url=icon_url)
          embeds.append(embed)
 
-
-        if embeds == [] or None:
-            await ctx.send(f"{no} **{ctx.author.display_name}**, there are no active partnerships on this server.", allowed_mentions=discord.AllowedMentions.none())
-            return
-        PreviousButton = discord.ui.Button(label="<")
-        NextButton = discord.ui.Button(label=">")
-        FirstPageButton = discord.ui.Button(label="<<")
-        LastPageButton = discord.ui.Button(label=">>")
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
         timeout = 42069
 

@@ -240,7 +240,7 @@ class CustomButton(discord.ui.Modal, title='Button Embed'):
         valid_colours = ['blurple', 'red', 'green', 'grey']
         result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         if result is None:
-            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I could not find the custom command.")
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I could not find the custom command.", ephemeral=True)
             return
 
         if colour not in valid_colours:

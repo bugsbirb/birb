@@ -16,6 +16,7 @@ stafffeedback = db['feedback']
 feedbackch = db['Staff Feedback Channel']
 scollection = db['staffrole']
 modules = db['Modules']
+options = db['module options']
 class Feedback(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -54,7 +55,11 @@ class Feedback(commands.Cog):
     
 
     @feedback.command(description="Remove feedback from a staff member")
+    @app_commands.describe(id="The ID of the feedback you want to remove.")
     async def remove(self, ctx, id: int):
+       if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the feedback module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+         return               
        if not await has_admin_role(ctx):
         
          return          
@@ -71,13 +76,15 @@ class Feedback(commands.Cog):
        
 
     @feedback.command(description="Rate a staff member", name="give")
-    async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: str):
+    @app_commands.describe(staff="The staff member you want to rate.", rating="The rating you want to give (1-10).", feedback="The feedback you want to give.")
+    async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: app_commands.Range[str, 1, 2000]):
        existing_feedback = await stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
+       optionresult = await options.find_one({'guild_id': ctx.guild.id})
        if staff is None:
         await ctx.send(f"{no} **{ctx.author.display_name}**, please provide a staff member.", allowed_mentions=discord.AllowedMentions.none())
         return       
        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the feedback module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return          
        if staff == ctx.author:
             await ctx.send(f"{no} **{ctx.author.display_name}**, you cannot rate yourself.", allowed_mentions=discord.AllowedMentions.none())
@@ -90,10 +97,16 @@ class Feedback(commands.Cog):
        if not has_staff_role:
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.", allowed_mentions=discord.AllowedMentions.none())
         return
-
-       if existing_feedback:
-        await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
-        return
+       if optionresult:
+        if optionresult.get('multiplefeedback', False) == False:
+         
+         if existing_feedback:
+          await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
+          return
+       else:
+         if existing_feedback:
+          await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
+          return            
        
        rating_value = rating.split("/")[0]
        feedbackid = await stafffeedback.count_documents({}) + 1
@@ -129,8 +142,11 @@ class Feedback(commands.Cog):
             pass
 
     @feedback.command(description="View a staff members rating")
+    @app_commands.describe(staff = 'The staff to view rating for', scope = "The scope of the rating to view")
     async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
-     
+     if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the feedback module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+         return               
      
      if scope == "global":
         staff_ratings = stafffeedback.find({'staff': staff.id}).to_list(length=None)
@@ -215,10 +231,10 @@ class ViewRatings(discord.ui.View):
             if (idx + 1) % 9 == 0 or idx == len(staff_ratings) - 1:  
                 embeds.append(embed)
 
-        PreviousButton = discord.ui.Button(label="<")
-        NextButton = discord.ui.Button(label=">")
-        FirstPageButton = discord.ui.Button(label="<<")
-        LastPageButton = discord.ui.Button(label=">>")
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
         timeout = 42069
 

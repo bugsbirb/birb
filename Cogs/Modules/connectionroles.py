@@ -62,7 +62,7 @@ class ConnectionRoles(commands.Cog):
     @app_commands.describe(parent="Once the role is given it will give the child role", child="Child is the role given after the parent role is given")
     async def connectionrole_add(self, ctx, parent: discord.Role, child: discord.Role):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
         if parent == child:
            await ctx.send(f"{no} **{ctx.author.display_name}**, The parent and child roles cannot be the same.", allowed_mentions=discord.AllowedMentions.none())
@@ -79,7 +79,7 @@ class ConnectionRoles(commands.Cog):
     @app_commands.describe(name="The name of the connection role")
     async def connectionrole_remove(self, ctx, name):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
         roleresult = await connectionroles.find_one({"guild": ctx.guild.id, "name": name})
         if roleresult is None:
@@ -96,7 +96,7 @@ class ConnectionRoles(commands.Cog):
     @commands.has_guild_permissions(manage_roles=True)
     async def connectionrole_list(self, ctx):
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return
 
         roleresult = await connectionroles.find({"guild": ctx.guild.id}).to_list(length=100000)
@@ -129,10 +129,10 @@ class ConnectionRoles(commands.Cog):
         if current_embed:
             embeds.append(current_embed)
 
-        PreviousButton = discord.ui.Button(label="<")
-        NextButton = discord.ui.Button(label=">")
-        FirstPageButton = discord.ui.Button(label="<<")
-        LastPageButton = discord.ui.Button(label=">>")
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
         timeout = 42069
 

@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
+import re
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = AsyncIOMotorClient(MONGO_URL)
@@ -27,7 +28,7 @@ class welcome2(commands.Cog):
      return message
 
     @commands.Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         guild = member.guild
         modulesresult = await modules.find_one({'guild_id': member.guild.id})
         if modulesresult is None:
@@ -79,7 +80,6 @@ class welcome2(commands.Cog):
                     view = ButtonEmbed(name)   
                     view.button_callback.label = label
                     
-
                     if colour == "Blurple":
                         view.button_callback.style = discord.ButtonStyle.blurple
                     elif colour == "Green":
@@ -90,20 +90,21 @@ class welcome2(commands.Cog):
                         view.button_callback.style = discord.ButtonStyle.grey    
                     else:
                         view.button_callback.style = discord.ButtonStyle.grey  
-                    emoji_data = command_data['emoji']    
-                    if emoji_data == "None" or "":
-                        pass
-                    else:
-                       
-                     test = view.button_callback.emoji = command_data['emoji']
-                     if test:
-                        pass
-                     else:
-                        view.button_callback.emoji = command_data['emoji'] = None
+                    emoji_data = command_data.get('emoji', None)
+                    print(emoji_data)
+
                     
-                     view.button_callback.emoji = command_data['emoji'] = None
+                    if emoji_data:
+                     emoji_id_str = emoji_data.split(':')[2][:-1]
+                     emoji_id = int(emoji_id_str)
+
+                     emoji = member.guild.get_emoji(emoji_id)
+                     if emoji:
+                      view.button_callback.emoji = command_data.get('emoji', None)
+                    
+                     
                 else:
-                    view = None                                
+                    view = None                                   
                 if 'embed' in result and result['embed']:
                     embed_title = await self.replace_variables(result['title'], replacements)
                     embed_description = await self.replace_variables(result['description'], replacements)

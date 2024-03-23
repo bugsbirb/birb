@@ -4,12 +4,12 @@ from discord.ext import commands
 from pymongo import MongoClient
 import os
 from emojis import *
-from Cogs.Configuration.Views.infractionsview import InfractionChannel
+from Cogs.Configuration.Views.infractionsview import InfractionChannel, IMoreOptions
 
 from Cogs.Configuration.Views.infractionsview import ToggleInfractionsDropdown
 from Cogs.Configuration.Views.Utilityview import ToggleUtils
 
-from Cogs.Configuration.Views.promotionsview import Promotionchannel
+from Cogs.Configuration.Views.promotionsview import Promotionchannel, PMoreOptions
 from Cogs.Configuration.Views.promotionsview import PromotionModuleToggle
 
 from Cogs.Configuration.Views.loaview import LOAChannel
@@ -22,7 +22,7 @@ from Cogs.Configuration.Views.tagsview import TagsUsageChannel
 from Cogs.Configuration.Views.quotaview import QuotaToggle
 from Cogs.Configuration.Views.quotaview import QuotaAmount
 
-from Cogs.Configuration.Views.feedbackview import FeedbackChannel
+from Cogs.Configuration.Views.feedbackview import FeedbackChannel, FMoreOptions
 from Cogs.Configuration.Views.feedbackview import ToggleFeedback
 
 from Cogs.Configuration.Views.suspensionsview import ToggleSuspensions
@@ -740,6 +740,7 @@ class InfractModule(discord.ui.View):
         self.add_item(ToggleInfractionsDropdown(author))         
         self.add_item(InfractionChannel(author))
         self.add_item(InfractionTypes(author))   
+        self.add_item(IMoreOptions(author))
         self.add_item(Config(author))        
 
     async def on_timeout(self) -> None:
@@ -767,6 +768,7 @@ class PromotionModule(discord.ui.View):
         self.author = author
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Promotionchannel(author))
+        self.add_item(PMoreOptions(author))
         self.add_item(Config(author))    
 
     async def on_timeout(self) -> None:
@@ -819,7 +821,8 @@ class FeedbackModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
         self.add_item(ToggleFeedback(author))         
-        self.add_item(FeedbackChannel(author))          
+        self.add_item(FeedbackChannel(author))    
+        self.add_item(FMoreOptions(author))      
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:

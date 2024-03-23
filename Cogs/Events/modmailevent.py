@@ -19,11 +19,12 @@ arole = db['adminrole']
 modmail = db['modmail']
 modules = db['Modules']
 modmailcategory = db['modmailcategory']
-transcripts = db['transcripts']
+transcripts = db['Transcripts']
 modmailblacklists = db['modmailblacklists']
 transcriptschannel = db['transcriptschannel']
 modmailping = db['modmailping']
 modmailalerts = db['modmailalerts']
+
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -78,12 +79,14 @@ class Modmailevnt(commands.Cog):
                       embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                       embed.add_field(name="<:reason:1202773873095868476> Reason", value="Closed by modmail author.", inline=True)
                       await message.author.send(embed=embed)
+                      
                       testchannel = self.client.get_channel(1202756318897774632)
                       message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
                       link = await chat_exporter.link(message)
                       print(link)
                       view = TranscriptChannel(link)
                       await transcriptchannel.send(embed=embed, view=view)
+                      await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': channel.guild.id, 'closedby': message.author.id, 'reason': "Closed by modmail author.", 'author': message.author.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                 else:
                     await message.author.send(f"{no} Modmail channel not found.")
                 return

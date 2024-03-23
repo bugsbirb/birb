@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import os
 from emojis import *
@@ -19,7 +20,8 @@ class StaffList(commands.Cog):
 
 
 
-    @commands.hybrid_command(description="Lists the staff team")
+    @commands.hybrid_command(description="Lists the staff team (Doesn't use staff DB)")
+    @app_commands.describe(display = 'If you want the staff list to be displayed')
     async def stafflist(self, ctx: commands.Context, display: Optional[Literal['True', 'False']]):
         guild_id = ctx.guild.id
         guild = self.client.get_guild(guild_id)

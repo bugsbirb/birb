@@ -8,6 +8,7 @@ from emojis import *
 from typing import Literal, Optional
 from permissions import has_admin_role
 MONGO_URL = os.getenv('MONGO_URL')
+
 from motor.motor_asyncio import AsyncIOMotorClient
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
@@ -17,6 +18,7 @@ promochannel = db['promo channel']
 consent = db['consent']
 modules = db['Modules']
 Customisation = db['Customisation']
+options = db['module options']
 class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -37,13 +39,22 @@ class promo(commands.Cog):
     reason='What makes them deserve the promotion?',
     autorole='Do you want to give them the role automatically?'
     ) 
-    async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: str, autorole: Optional[Literal['False']]):
+    async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: app_commands.Range[str, 1, 2000], autorole: Optional[Literal['False']]):
+        await ctx.defer()
         if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, this module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the promotion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
         if not await has_admin_role(ctx):
          return             
-         
+        optionresult = await options.find_one({'guild_id': ctx.guild.id})
+        if optionresult:
+            if optionresult.get('promotionissuer', False) == True:
+                view = PromotionIssuer()
+                view.issuer.label = f"Issued By {ctx.author.display_name}"
+            else:
+                view = None    
+        else:
+            view = None             
    
         if ctx.author == staff:
          await ctx.send(f"{no} You can't promote yourself.", allowed_mentions=discord.AllowedMentions.none())
@@ -52,8 +63,7 @@ class promo(commands.Cog):
         if ctx.author.top_role <= new:
             await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
-        if autorole == "False":
-
+        if autorole == "False" or optionresult.get('autorole', True) == False:
          pass
         else:
          try:
@@ -112,7 +122,13 @@ class promo(commands.Cog):
               
          embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description=f"* **User:** {staff.mention}\n* **Updated Rank:** {new.mention}\n* **Reason:** {reason}")
          embed.set_thumbnail(url=staff.display_avatar)
-         embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar.url)
+         if optionresult:
+          if optionresult.get('pshowissuer', True) == False:
+                embed.remove_author()
+          else:
+                embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
+         else:
+                embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)  
 
 
         guild_id = ctx.guild.id
@@ -128,7 +144,7 @@ class promo(commands.Cog):
          if channel:
             try:            
              await ctx.send(f"{tick} **{ctx.author.display_name}**, I've promoted **@{staff.display_name}**", allowed_mentions=discord.AllowedMentions.none())
-             await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+             await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
             except discord.Forbidden: 
              await ctx.send(f"{no} **{ctx.author.display_name},** I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())        
              return       
@@ -154,6 +170,13 @@ class promo(commands.Cog):
             message = str(message).replace(placeholder, "")  
      return message
 
+class PromotionIssuer(discord.ui.View):
+    def __init__(self):
+        super().__init__()
 
+
+    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1166508151290462239>")
+    async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(promo(client))            
