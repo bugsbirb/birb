@@ -82,29 +82,71 @@ class Welcomemessage(discord.ui.Select):
             discord.SelectOption(label="Customise"),
             discord.SelectOption(label="Default Welcome Message"),
             discord.SelectOption(label="Manage Buttons")
-            
-
-        
-            
         ]
         super().__init__(placeholder='Welcome Message', min_values=1, max_values=1, options=options)
 
-
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)   
-        if color == 'Customise':    
-            await interaction.response.edit_message(view=NoEmbeds(interaction.user), embed=None, content=None)
+        try:
+            if interaction.user.id != self.author.id:
+                embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+                                      color=discord.Colour.dark_embed())
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
 
-        elif color == 'Default Welcome Message':    
-            await welcome.update_one({'guild_id': interaction.guild.id}, {'$set': {'content': '👋 Welcome {user.mention} to **{guild.name}**! We hope you enjoy your stay here.', 'embed': False}}, upsert=True)
-            await interaction.response.edit_message(content=None)
-        elif color == 'Manage Buttons':    
-            view = ButtonManage(interaction.user)
-            await interaction.response.send_message(ephemeral=True, view=view)    
+            if color == 'Customise':
+                if await welcome.find_one({'guild_id': interaction.guild.id}):
+                    result = await welcome.find_one({'guild_id': interaction.guild.id})
+
+                    if 'embed' in result and result['embed']:
+                        embed_title = result.get('title')
+                        embed_description = result.get('description')
+                        embed_author = result.get('author')
+
+                        if embed_title in ["None", None]:
+                            embed_title = ""
+                        if embed_description in ["None", None]:
+                            embed_description = ""
+                        color_value = result.get('color', None)
+                        colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.dark_embed()
+
+                        embed = discord.Embed(
+                            title=embed_title,
+                            description=embed_description, color=colors)
+
+                        if embed_author in ["None", None]:
+                            embed_author = ""
+                        if 'image' in result:
+                            embed.set_image(url=result['image'])
+                        if 'thumbnail' in result:
+                            embed.set_thumbnail(url=result['thumbnail'])
+                        if 'author' in result and 'author_icon' in result:
+                            embed.set_author(name=embed_author, icon_url=result['author_icon'])
+                        contentresult = result.get('content')
+                        if contentresult in ["None", None]:
+                            contentresult = ""
+                        await interaction.response.edit_message(
+                            content=contentresult, embed=embed, view=Embeds(interaction.user))
+                    else:
+                        contentresult = result.get('content')
+                        if contentresult in ["None", None]:
+                            return
+                        await interaction.response.edit_message(
+                            content=contentresult, embed=None, view=NoEmbeds(interaction.user))
+                else:
+                    await interaction.response.edit_message(view=NoEmbeds(interaction.user), embed=None, content=None)
+
+            elif color == 'Default Welcome Message':
+                await welcome.update_one({'guild_id': interaction.guild.id}, {
+                    '$set': {'content': '👋 Welcome {user.mention} to **{guild.name}**! We hope you enjoy your stay here.',
+                             'embed': False}}, upsert=True)
+                await interaction.response.edit_message(content=None)
+            elif color == 'Manage Buttons':
+                view = ButtonManage(interaction.user)
+                await interaction.response.send_message(ephemeral=True, view=view)
+        except Exception as e:
+            print(f"An error occurred at {interaction.guild.name}: {e}")
+            await interaction.response.send_message(f"{crisis} An error occurred if this continues contact support.", ephemeral=True)
+ 
 
 
 class managebuttons(discord.ui.Select):

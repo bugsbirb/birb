@@ -15,7 +15,7 @@ class webGuildJoins(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_guild_join(self, guild):
+    async def on_guild_join(self, guild: discord.Guild):
         blacklist = await blacklists.find_one({'user': guild.owner.id})
         if blacklist:
             return

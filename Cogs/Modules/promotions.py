@@ -74,9 +74,13 @@ class promo(commands.Cog):
             await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
         else:
-          try:
+          if autorole == 'False':
+              pass
+          else:
+
+           try:
             await staff.add_roles(new)
-          except discord.Forbidden:
+           except discord.Forbidden:
             await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return           
 
