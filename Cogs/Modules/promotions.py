@@ -63,14 +63,22 @@ class promo(commands.Cog):
         if ctx.author.top_role <= new:
             await ctx.send(f"{no} **{ctx.author.display_name}**, your below the role `{new.name}` you do not have authority to promote this member.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
-        if autorole == "False" or optionresult.get('autorole', True) == False:
-         pass
-        else:
-         try:
+        
+        if optionresult:
+         if optionresult.get('autorole', True) == False:
+          pass
+         else:
+          try:
             await staff.add_roles(new)
-         except discord.Forbidden:
+          except discord.Forbidden:
             await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
             return
+        else:
+          try:
+            await staff.add_roles(new)
+          except discord.Forbidden:
+            await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
+            return           
 
 
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Promotions'})
