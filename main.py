@@ -37,7 +37,7 @@ class client(commands.AutoShardedBot):
         intents = discord.Intents.default()
         intents.members = True
         super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1,
         )
         self.client = client
         self.cogslist = [
