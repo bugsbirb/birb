@@ -287,31 +287,59 @@ class Utility(commands.Cog):
         """Displays users information"""        
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
-         return            
+         return      
 
         if user is None:
             user = ctx.author
         user_badges = badges.find({'user_id': user.id})            
         badge_values = ""
+   
+        public_flags_emojis = {
+            "staff": "<:Staff:1221449338744602655>",
+            "partner": "<:blurple_partner:1221449485792841791>",
+            "hypesquad": "<:hypesquad_events:1221444926995169361>",
+            "bug_hunter": "<:bug_hunter_2:1221449642328457237>",
+            "hypesquad_bravery": "<:hypesquad_bravery:1221444906409660529>",
+            "hypesquad_brilliance": "<:hypesquad_brilliance:1221444915515490334>",
+            "hypesquad_balance": "<:hypesquad_balance:1221444890827817090>",
+            "early_supporter": "<:early:1221444939733536868>",
+            "verified_bot": "<:Twitter_VerifiedBadge:1221450046625812591>",
+            "verified_developer": "<:verified:1221450133997097052>",
+            "active_developer": "<:Active_Developer_Badge:1221444993873477714>"
+        }
+        badgecount = 0
         async for badge_data in user_badges:
          badge = badge_data['badge']
          badge_values += f"{badge}\n"
+         badgecount += 1 
         try:
          member = await ctx.guild.fetch_member(user.id)
         except discord.HTTPException:
             member = None 
-         
+        userFlags = user.public_flags.all()
+        for flag in userFlags:
+            flag_name = flag.name
+            if flag_name in public_flags_emojis:
+                flag_name2 = str(flag_name).replace("Userflags.", "").replace("_", " ").title()
+                badge_values += f"{public_flags_emojis[flag_name]} {flag_name2}\n"
+                badgecount += 1 
+          
         if not member:
             embed = discord.Embed(title=f"@{user.display_name}", description=f"## <:Scaredbirb:1178005514584596580> Not inside of server ", color=0x2b2d31)
             embed.set_thumbnail(url=user.display_avatar.url)    
+            if userFlags or badge_values:
+                embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}")
             embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
             await ctx.send(embed=embed)
             return
-        embed = discord.Embed(title=f"@{user.display_name}", description=f"{badge_values}", color=user)
+        embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=discord.Color.dark_embed())
+        if userFlags or badge_values:
+                embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}")        
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != ctx.guild.default_role][:20])
-        embed.add_field(name="**Roles**", value=user_roles, inline=False)        
+        rolecount = len(user.roles) - 1
+        embed.add_field(name=f"**Roles** [{rolecount}]", value=user_roles, inline=False)        
         await ctx.send(embed=embed)
 
     async def fetch_birb_image(self):
