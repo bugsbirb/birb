@@ -448,7 +448,7 @@ class Reason(discord.ui.Modal, title="Reason"):
         if optionresult:
             if optionresult.get('infractedbybutton', False) == True:
                 view = InfractionIssuer()
-                view.issuer.label = f"Issued By {interaction.id.display_name}"
+                view.issuer.label = f"Issued By {interaction.user.display_name}"
             else:
                 view = None    
         else:

@@ -334,7 +334,7 @@ class Utility(commands.Cog):
             return
         embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=discord.Color.dark_embed())
         if userFlags or badge_values:
-                embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}")        
+                embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}") 
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != ctx.guild.default_role][:20])

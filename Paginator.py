@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import discord
 from discord.ext import commands
-
+from emojis import *
 
 class Simple(discord.ui.View):
     """
@@ -99,24 +99,24 @@ class Simple(discord.ui.View):
 
     async def next_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await self.next()
         await interaction.response.defer()
 
     async def previous_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await self.previous()
         await interaction.response.defer()
         
     async def start_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.current_page = 0
         self.page_counter.label = f"{self.current_page + 1}/{self.total_page_count}"
@@ -125,8 +125,8 @@ class Simple(discord.ui.View):
 
     async def end_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.current_page = self.total_page_count - 1
         self.page_counter.label = f"{self.current_page + 1}/{self.total_page_count}"
