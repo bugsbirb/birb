@@ -26,7 +26,7 @@ class management(commands.Cog):
  
     @commands.command()
     @commands.is_owner()
-    async def addbadge(self, ctx, user: discord.Member, *, badge):
+    async def addbadge(self, ctx: commands.Context, user: discord.Member, *, badge):
         badge = {
             'user_id': user.id,
             'badge': badge
@@ -36,7 +36,7 @@ class management(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def removebadge(self, ctx, user: discord.Member, *, badge):
+    async def removebadge(self, ctx: commands.Context, user: discord.Member, *, badge):
         badge = {
             'user_id': user.id,
             'badge': badge
@@ -48,7 +48,7 @@ class management(commands.Cog):
     
     @commands.command()
     @commands.is_owner()
-    async def analytics(self, ctx):
+    async def analytics(self, ctx: commands.Context):
         result = await analytics.find({}).to_list(length=None)
 
         description = ""
@@ -67,7 +67,7 @@ class management(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def guildinfo(self, ctx, guildid: int):
+    async def guildinfo(self, ctx: commands.Context, guildid: int):
         await ctx.defer()
         guild = await self.client.fetch_guild(guildid)
         if guild is None:

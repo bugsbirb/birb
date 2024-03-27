@@ -181,8 +181,8 @@ class ForumChannel(discord.ui.ChannelSelect):
         self.name = name
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
 
@@ -319,21 +319,21 @@ class Forums(commands.Cog):
         self.client = client
 
     @commands.hybrid_group()
-    async def forums(self, ctx):
+    async def forums(self, ctx: commands.Context):
         return
 
 
 
 
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Forums'] == True:   
         return True
     @forums.command(description="Lock a forum thread")        
-    async def lock(self, ctx):
+    async def lock(self, ctx: commands.Context):
      if not await has_staff_role(ctx):
         
          return              
@@ -348,7 +348,7 @@ class Forums(commands.Cog):
         await ctx.send(f"{no} This command only works in **forum channels.**")
 
     @forums.command(description="Unlock a forum thread")        
-    async def unlock(self, ctx):
+    async def unlock(self, ctx: commands.Context):
      if not await has_staff_role(ctx):
          return              
      if isinstance(ctx.channel, discord.Thread):
@@ -363,7 +363,7 @@ class Forums(commands.Cog):
         await ctx.send(f"{no} This command only works in **forum channels.**")
 
     @forums.command(description="Archive a forum thread")        
-    async def archive(self, ctx):
+    async def archive(self, ctx: commands.Context):
      if not await has_staff_role(ctx):
          return            
      if isinstance(ctx.channel, discord.Thread):        
@@ -380,7 +380,7 @@ class Forums(commands.Cog):
     @forums.command(description="Create a Forum Creation Embed")
     @commands.has_guild_permissions(administrator=True)
 
-    async def manage(self, ctx):   
+    async def manage(self, ctx: commands.Context):   
        embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
        async for result in forumsconfig.find({"guild_id": ctx.guild.id}):
         role = result['role']
@@ -412,7 +412,7 @@ class Forums(commands.Cog):
 
 
     @manage.error
-    async def permissionerror(self, ctx, error):
+    async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions): 
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to manage forums.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")              
 
@@ -427,8 +427,8 @@ class ForumsManage(discord.ui.View):
     async def Create(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(CreateForum(self.author))
 
@@ -436,8 +436,8 @@ class ForumsManage(discord.ui.View):
     async def edit( self, interaction: discord.Interaction, button: discord.ui.Button):
        author = self.author.id
        if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
        await interaction.response.send_modal(EditForum())
 
@@ -448,8 +448,8 @@ class ForumsManage(discord.ui.View):
     async def Delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         await interaction.response.send_modal(DeleteForum())
 
@@ -470,8 +470,8 @@ class Embed(discord.ui.View):
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Title())
 
@@ -480,8 +480,8 @@ class Embed(discord.ui.View):
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Description())
 
@@ -489,8 +489,8 @@ class Embed(discord.ui.View):
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Thumbnail())
 
@@ -498,8 +498,8 @@ class Embed(discord.ui.View):
     async def Images(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Image())
 
@@ -507,8 +507,8 @@ class Embed(discord.ui.View):
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Colour())        
 
@@ -516,8 +516,8 @@ class Embed(discord.ui.View):
     async def Ping(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Roleping())
 
@@ -526,8 +526,8 @@ class Embed(discord.ui.View):
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
         embed = interaction.message.embeds[0]

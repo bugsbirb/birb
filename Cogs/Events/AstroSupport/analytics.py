@@ -13,7 +13,7 @@ class analyticss(commands.Cog):
         self.client = client
 
     @commands.Cog.listener()
-    async def on_command(self, ctx):
+    async def on_command(self, ctx: commands.Context):
      start_execution_time = time.perf_counter()
      prfx = (time.strftime("%H:%M:%S GMT", time.gmtime()))
 

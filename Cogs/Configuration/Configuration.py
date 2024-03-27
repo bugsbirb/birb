@@ -113,8 +113,8 @@ class StaffRole(discord.ui.RoleSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
         filter = {
@@ -148,8 +148,8 @@ class Adminrole(discord.ui.RoleSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
   
@@ -218,9 +218,9 @@ class Config(discord.ui.Select):
         await interaction.response.defer()
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.followup.send(embed=embed, ephemeral=True)    
         if color == 'Settings':  # basic
             staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
             adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
@@ -941,7 +941,7 @@ class ConfigCog(commands.Cog):
 
     @commands.hybrid_command(description="Configure the bot for your servers needs")
     @commands.has_guild_permissions(administrator=True)
-    async def config(self, ctx):
+    async def config(self, ctx: commands.Context):
         await ctx.defer()
         staffroleresult = scollection.find_one({'guild_id': ctx.guild.id})
         types = nfractiontypes.find_one({'guild_id': ctx.guild.id})
@@ -989,7 +989,7 @@ class ConfigCog(commands.Cog):
         view.message = await ctx.send(embed=embed, view=view)
 
     @config.error
-    async def permissionerror(self, ctx, error):
+    async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions): 
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``", allowed_mentions=discord.AllowedMentions.none())            
 

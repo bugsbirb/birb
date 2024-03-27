@@ -27,10 +27,10 @@ class ConnectionRoles(commands.Cog):
 
 
     @commands.hybrid_group()
-    async def connectionrole(self, ctx):
+    async def connectionrole(self, ctx: commands.Context):
         pass
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
 
      if modulesdata is None:
@@ -60,7 +60,7 @@ class ConnectionRoles(commands.Cog):
     @connectionrole.command(name="add", description="Add a connection role to your server")
     @commands.has_guild_permissions(manage_roles=True)
     @app_commands.describe(parent="Once the role is given it will give the child role", child="Child is the role given after the parent role is given")
-    async def connectionrole_add(self, ctx, parent: discord.Role, child: discord.Role):
+    async def connectionrole_add(self, ctx: commands.Context, parent: discord.Role, child: discord.Role):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
@@ -77,7 +77,7 @@ class ConnectionRoles(commands.Cog):
     @app_commands.autocomplete(name=tag_name_autocompletion)
     @commands.has_guild_permissions(manage_roles=True)
     @app_commands.describe(name="The name of the connection role")
-    async def connectionrole_remove(self, ctx, name):
+    async def connectionrole_remove(self, ctx: commands.Context, name):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
@@ -94,7 +94,7 @@ class ConnectionRoles(commands.Cog):
 
     @connectionrole.command(name="list", description="List all connection roles in your server")
     @commands.has_guild_permissions(manage_roles=True)
-    async def connectionrole_list(self, ctx):
+    async def connectionrole_list(self, ctx: commands.Context):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return
@@ -154,7 +154,7 @@ class ConnectionRoles(commands.Cog):
     @connectionrole_add.error
     @connectionrole_remove.error
     @connectionrole_list.error
-    async def permissionerror(self, ctx, error):
+    async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions): 
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n<:Arrow:1115743130461933599>**Required:** ``Manage Roles``", allowed_mentions=discord.AllowedMentions.none())              
 

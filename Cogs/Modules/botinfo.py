@@ -15,7 +15,7 @@ class botinfo(commands.Cog):
         self.client = client
 
     @commands.hybrid_command(name="botinfo", description="Statstics + Information about the bot.")
-    async def botinfo(self, ctx):
+    async def botinfo(self, ctx: commands.Context):
         infractions_count = await infractions.count_documents({})
         loa_count = await loa_collection.count_documents({})        
         embed = discord.Embed(title="**Astro Birb**", description=f"**Discord.py Version:** {discord.__version__}\n**Python Version:** {str(platform.python_version())}\n**Database:** MongoDB", color=discord.Color.dark_embed())

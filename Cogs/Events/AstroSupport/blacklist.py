@@ -25,13 +25,13 @@ class blacklist(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def blacklist(self, ctx, id: int):
+    async def blacklist(self, ctx: commands.Context, id: int):
         await blacklists.insert_one({'user': id})
         await ctx.send(f"{tick} {ctx.author.display_name}, I have blacklisted the user with the id `{id}`")
 
     @commands.command()
     @commands.is_owner()
-    async def unblacklist(self, ctx, id: int):
+    async def unblacklist(self, ctx: commands.Context, id: int):
         result = await blacklists.find_one({'user': id})
         if result:
            await ctx.send(f"{no} {ctx.author.display_name}, The user with the id `{id}` is not blacklisted")

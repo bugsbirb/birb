@@ -22,7 +22,7 @@ class ApplicationResults(commands.Cog):
  
 
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -31,7 +31,7 @@ class ApplicationResults(commands.Cog):
 
 
     @commands.hybrid_group(description="Application results commands.")
-    async def application(self, ctx):
+    async def application(self, ctx: commands.Context):
         return
 
     @application.command(description="Log Application results")

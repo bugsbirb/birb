@@ -118,7 +118,7 @@ class loamodule(commands.Cog):
          print(f"[❌] LOA Loop Not Started: {e}")
  
 
-    async def modulecheck(self, ctx):
+    async def modulecheck(self, ctx: commands.Context):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
@@ -126,7 +126,7 @@ class loamodule(commands.Cog):
             return True
 
     @commands.hybrid_group()
-    async def loa(self, ctx):
+    async def loa(self, ctx: commands.Context):
         pass
 
     @tasks.loop(minutes=10)
@@ -218,7 +218,7 @@ class loamodule(commands.Cog):
 
     @loa.command(description="Manage someone leave of Absence")
     @app_commands.describe(user = "The user you want to manage LOA for")
-    async def manage(self, ctx, user: discord.Member):
+    async def manage(self, ctx: commands.Context, user: discord.Member):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -262,7 +262,7 @@ class loamodule(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @loa.command(description="View all Leave Of Absence")
-    async def active(self, ctx):
+    async def active(self, ctx: commands.Context):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -300,7 +300,7 @@ class loamodule(commands.Cog):
 
     @loa.command(description="Request a Leave Of Absence")
     @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reason for this LOA?")
-    async def request(self, ctx, duration: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
+    async def request(self, ctx: commands.Context, duration: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.")
@@ -430,7 +430,13 @@ class Confirm(discord.ui.View):
             if loarole:
                 role = discord.utils.get(interaction.guild.roles, id=loarole)
                 if role:
-                    await user.add_roles(role)
+                    try:
+                     await user.add_roles(role)
+                    except discord.Forbidden:
+                     await interaction.followup.send(content=f"{crisis} I do not have permission to add the loa role. Make sure I have the `Manage Roles` permission or If I'm lower then role I'm trying to give.", ephemeral=True)
+
+                     return
+ 
         loanotification = await consent.find_one({'user_id': self.user.id})
         if loanotification:
             if loanotification.get('LOAAlerts', "Enabled") == "Enabled":
@@ -527,8 +533,8 @@ class LOAPanel(discord.ui.View):
         user = self.user
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         loa = await loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id, 'active': True})
         loarole_data = await LOARole.find_one({'guild_id': interaction.guild.id})
@@ -569,8 +575,8 @@ class LOACreate(discord.ui.View):
                        custom_id='persistent_view:cancel', emoji="<:Add:1163095623600447558>")
     async def CreateLOA(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.response.send_modal(LOA(self.user, self.guild, self.author))
 

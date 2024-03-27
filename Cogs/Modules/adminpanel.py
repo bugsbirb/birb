@@ -675,12 +675,12 @@ class AdminPanelCog(commands.Cog):
         self.client = client
 
     @commands.hybrid_group(description="Administrative tools and stats")
-    async def admin(self, ctx):
+    async def admin(self, ctx: commands.Context):
         pass
 
     @admin.command(description="Manage a staff member.")
     @app_commands.describe(staff="The staff member to manage.")
-    async def panel(self, ctx, staff: discord.Member):
+    async def panel(self, ctx: commands.Context, staff: discord.Member):
         if not await has_admin_role(ctx):
             return
 
@@ -727,7 +727,7 @@ class AdminPanelCog(commands.Cog):
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
 
-    async def acheck(self, ctx, staff):
+    async def acheck(self, ctx: commands.Context, staff):
         filter = {"guild_id": ctx.guild.id}
         staff_data = arole.find_one(filter)
 
@@ -745,7 +745,7 @@ class AdminPanelCog(commands.Cog):
 
     @admin.command(description="View an admins stats")
     @app_commands.describe(user="The user to view the stats of.")
-    async def stats(self, ctx, user: discord.Member = None):
+    async def stats(self, ctx: commands.Context, user: discord.Member = None):
         await ctx.defer()
         if not await has_admin_role(ctx):
             return
@@ -799,7 +799,7 @@ class IssuedInfraction(discord.ui.View):
         self.author = author
         self.ctx = ctx
 
-    async def InfractionModuleCheck(self, ctx):
+    async def InfractionModuleCheck(self, ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
@@ -904,21 +904,21 @@ class AdminPanel(discord.ui.View):
         self.guild = guild
         self.author = author
 
-    async def InfractionModuleCheck(self, ctx):
+    async def InfractionModuleCheck(self, ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
         elif modulesdata["infractions"] == True:
             return True
 
-    async def PromotionModuleCheck(self, ctx):
+    async def PromotionModuleCheck(self, ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
         elif modulesdata["Promotions"] == True:
             return True
 
-    async def LOAModuleCheck(self, ctx):
+    async def LOAModuleCheck(self, ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False

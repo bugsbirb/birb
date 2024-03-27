@@ -23,7 +23,7 @@ class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -39,7 +39,7 @@ class promo(commands.Cog):
     reason='What makes them deserve the promotion?',
     autorole='Do you want to give them the role automatically?'
     ) 
-    async def promote(self, ctx, staff: discord.Member, new: discord.Role, reason: app_commands.Range[str, 1, 2000], autorole: Optional[Literal['False']]):
+    async def promote(self, ctx: commands.Context, staff: discord.Member, new: discord.Role, reason: app_commands.Range[str, 1, 2000], autorole: Optional[Literal['False']]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the promotion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

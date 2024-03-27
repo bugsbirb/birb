@@ -28,8 +28,8 @@ class StaffCustomise(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         
 
@@ -66,8 +66,8 @@ class StaffData(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
         if color == 'Enable':    
@@ -302,8 +302,8 @@ class NoEmbeds(discord.ui.View):
     @discord.ui.button(label='Add Embed', style=discord.ButtonStyle.blurple, emoji="<:Add:1163095623600447558>")
     async def add_embed(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         embed = discord.Embed(title="Untitled Embed", color=discord.Colour.dark_embed())
         view = Embeds(interaction.user)
@@ -313,8 +313,8 @@ class NoEmbeds(discord.ui.View):
     @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(Context())
 
@@ -324,8 +324,8 @@ class NoEmbeds(discord.ui.View):
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
 
@@ -370,8 +370,8 @@ class Embeds(discord.ui.View):
     @discord.ui.button(label='Remove Embed', style=discord.ButtonStyle.blurple, emoji="<:bin:1160543529542635520>")
     async def removeembed(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         
         await interaction.response.edit_message(embed=None, view=NoEmbeds(interaction.user))        
@@ -379,8 +379,8 @@ class Embeds(discord.ui.View):
     @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(Context())
 
@@ -389,8 +389,8 @@ class Embeds(discord.ui.View):
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Title())
 
@@ -399,8 +399,8 @@ class Embeds(discord.ui.View):
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Description())
 
@@ -408,8 +408,8 @@ class Embeds(discord.ui.View):
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Thumbnail())
 
@@ -417,8 +417,8 @@ class Embeds(discord.ui.View):
     async def photo(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Image())
 
@@ -426,8 +426,8 @@ class Embeds(discord.ui.View):
     async def Author(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Author())
 
@@ -435,8 +435,8 @@ class Embeds(discord.ui.View):
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Colour())        
 
@@ -444,8 +444,8 @@ class Embeds(discord.ui.View):
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
 

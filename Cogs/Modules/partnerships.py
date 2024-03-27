@@ -43,10 +43,10 @@ class Partnerships(commands.Cog):
         return choices
 
     @commands.hybrid_group()
-    async def partnership(self, ctx):
+    async def partnership(self, ctx: commands.Context):
         pass
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -55,7 +55,7 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Log a partnership")
     @app_commands.describe(owner="The owner of the server", server="The name of the server", invite="The invite link to the server")
-    async def log(self, ctx, owner: discord.Member, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
+    async def log(self, ctx: commands.Context, owner: discord.Member, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
         await ctx.defer()
         result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if result:
@@ -111,7 +111,7 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
-    async def terminate(self, ctx, server, reason: app_commands.Range[str, 1, 2000]):
+    async def terminate(self, ctx: commands.Context, server, reason: app_commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            
@@ -168,7 +168,7 @@ class Partnerships(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())        
 
     @partnership.command(description="View all Partnerships in this server.")
-    async def all(self, ctx):
+    async def all(self, ctx: commands.Context):
         await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

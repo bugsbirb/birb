@@ -182,7 +182,7 @@ class Reports(commands.Cog):
         reported_at = datetime.utcnow().timestamp()
         reported_at_format = f"<t:{int(reported_at)}:F>"
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -197,7 +197,7 @@ class Reports(commands.Cog):
         member='Who are you reporting?',
         reason='What is the reason for reporting this user',
         message_link='Do you have proof of this person doing this?')
-    async def report(self, ctx, member: discord.User, *, reason: app_commands.Range[str, 1, 750], message_link: Optional[str] = None, proof: discord.Attachment, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
+    async def report(self, ctx: commands.Context, member: discord.User, *, reason: app_commands.Range[str, 1, 750], message_link: Optional[str] = None, proof: discord.Attachment, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the report module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

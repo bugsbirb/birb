@@ -59,8 +59,8 @@ class StaffManage(discord.ui.View):
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
        staff_id = self.staff_id
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                 
        filter = {'guild_id': interaction.guild.id, 'user_id': staff_id}
        update = {'$set': {'message_count': 0}}
@@ -72,8 +72,8 @@ class StaffManage(discord.ui.View):
     @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.grey)
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
        await interaction.response.send_modal(SetMessages(self.staff_id))      
 
@@ -95,14 +95,14 @@ class quota(commands.Cog):
 
 
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Quota'] == True:   
         return True
 
-    async def modulecheck2(self, ctx): 
+    async def modulecheck2(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -112,11 +112,11 @@ class quota(commands.Cog):
         return False
 
     @commands.hybrid_group(name="staff")
-    async def staff(self, ctx):
+    async def staff(self, ctx: commands.Context):
         return
 
     @commands.command()
-    async def staffcommand(self, ctx):
+    async def staffcommand(self, ctx: commands.Context):
         if await has_staff_role(ctx):
             await ctx.send("Worked")
         else:
@@ -125,7 +125,7 @@ class quota(commands.Cog):
 
 
     @commands.command()
-    async def checkadmin(self, ctx):
+    async def checkadmin(self, ctx: commands.Context):
         if await has_admin_role(ctx):
             await ctx.send("You have an admin role!")
         else:
@@ -136,7 +136,7 @@ class quota(commands.Cog):
 
 
     @staff.command(name="manage", description="Manage your staffs messages.")    
-    async def manage(self, ctx, staff: discord.Member):
+    async def manage(self, ctx: commands.Context, staff: discord.Member):
 
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
@@ -165,11 +165,11 @@ class quota(commands.Cog):
 
 
     @commands.hybrid_group(name="leaderboard")
-    async def leader(self, ctx):
+    async def leader(self, ctx: commands.Context):
         return
 
     @leader.command(name="reset", description="Reset the message quota leaderboard")
-    async def reset_staff_message_counts(self, ctx):
+    async def reset_staff_message_counts(self, ctx: commands.Context):
 
 
         await ctx.defer()
@@ -191,7 +191,7 @@ class quota(commands.Cog):
 
 
     @staff.command(name="messages", description="Display the amount the message count of a staff member.")
-    async def messages(self, ctx, staff: discord.Member):
+    async def messages(self, ctx: commands.Context, staff: discord.Member):
 
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
@@ -217,7 +217,7 @@ class quota(commands.Cog):
 
 
     @staff.command(description="View the staff message leaderboard to see if anyone has passed their quota")
-    async def leaderboard(self, ctx):
+    async def leaderboard(self, ctx: commands.Context):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
             return
@@ -318,7 +318,7 @@ class quota(commands.Cog):
         rank="The staff member's rank.",
         timezone="The staff member's timezone."
     )
-    async def add(self, ctx, staff: discord.User, rank: str, timezone: str = None):
+    async def add(self, ctx: commands.Context, staff: discord.User, rank: str, timezone: str = None):
         if not await self.modulecheck2(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return        
@@ -346,7 +346,7 @@ class quota(commands.Cog):
     @app_commands.describe(
         staff="The staff member to remove."
     )
-    async def remove(self, ctx, staff: discord.User):
+    async def remove(self, ctx: commands.Context, staff: discord.User):
         if not await self.modulecheck2(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module isn't enabled.")
             return        
@@ -367,7 +367,7 @@ class quota(commands.Cog):
         timezone="The staff member's new timezone.", 
         introduction="The staff member's new introduction."
     )
-    async def edit(self, ctx, staff: discord.User, rank: str, timezone: str = None, *, introduction = None):
+    async def edit(self, ctx: commands.Context, staff: discord.User, rank: str, timezone: str = None, *, introduction = None):
         if not await self.modulecheck2(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return        
@@ -384,7 +384,7 @@ class quota(commands.Cog):
     
     @staff.command(description="View a staff member's information. (Staff Database)")
     @app_commands.describe(staff="The staff member to view.")
-    async def view(self, ctx, staff: discord.User):
+    async def view(self, ctx: commands.Context, staff: discord.User):
         if not await self.modulecheck2(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, this module isn't enabled.")
             return        
@@ -418,7 +418,7 @@ class quota(commands.Cog):
             await ctx.send(f"{ctx.author.display_name}, I couldn't find **@{staff.display_name}**.")
     @staff.command(description="Give yourself an introduction (Staff Database)")
     @app_commands.describe(introduction = "The introduction you want to add to your staff profile.")
-    async def introduction(self, ctx, *, introduction):
+    async def introduction(self, ctx: commands.Context, *, introduction):
         if not await self.modulecheck2(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the staff database module isn't enabled.")
             return      
@@ -434,7 +434,7 @@ class quota(commands.Cog):
 
 
     @staff.command(description="Send a panel that shows all staff members. (Staff Database)")
-    async def panel(self, ctx):
+    async def panel(self, ctx: commands.Context):
         await ctx.defer(ephemeral=True)
         if not await has_admin_role(ctx):
             return

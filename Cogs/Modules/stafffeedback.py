@@ -23,7 +23,7 @@ class Feedback(commands.Cog):
 
 
 
-    async def staffcheck(self, ctx, staff):
+    async def staffcheck(self, ctx: commands.Context, staff):
      filter = {
         'guild_id': ctx.guild.id
     }
@@ -41,7 +41,7 @@ class Feedback(commands.Cog):
 
      return False
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -50,13 +50,13 @@ class Feedback(commands.Cog):
 
 
     @commands.hybrid_group(description="Staff Feedback")
-    async def feedback(self, ctx):
+    async def feedback(self, ctx: commands.Context):
        pass
     
 
     @feedback.command(description="Remove feedback from a staff member")
     @app_commands.describe(id="The ID of the feedback you want to remove.")
-    async def remove(self, ctx, id: int):
+    async def remove(self, ctx: commands.Context, id: int):
        if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the feedback module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return               
@@ -77,7 +77,7 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="Rate a staff member", name="give")
     @app_commands.describe(staff="The staff member you want to rate.", rating="The rating you want to give (1-10).", feedback="The feedback you want to give.")
-    async def feedback2(self, ctx, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: app_commands.Range[str, 1, 2000]):
+    async def feedback2(self, ctx: commands.Context, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback: app_commands.Range[str, 1, 2000]):
        existing_feedback = await stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        optionresult = await options.find_one({'guild_id': ctx.guild.id})
        if staff is None:
@@ -143,7 +143,7 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="View a staff members rating")
     @app_commands.describe(staff = 'The staff to view rating for', scope = "The scope of the rating to view")
-    async def ratings(self, ctx, staff: discord.Member, scope: Literal["global", "server"]):
+    async def ratings(self, ctx: commands.Context, staff: discord.Member, scope: Literal["global", "server"]):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the feedback module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return               

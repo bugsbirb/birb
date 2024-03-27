@@ -85,8 +85,8 @@ class DataSelector(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         data_type = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
         if data_type == 'Infractions':
@@ -217,12 +217,12 @@ class datamanage(commands.Cog):
         self.client = client
 
     @commands.hybrid_group(name="data", description="Data Management Commands")
-    async def data(self, ctx):
+    async def data(self, ctx: commands.Context):
         pass
 
     @data.command(name="manage", description="Manage your servers data.")
     @commands.has_permissions(administrator=True)
-    async def manage(self, ctx):
+    async def manage(self, ctx: commands.Context):
 
         embed = discord.Embed(title="Data Portal", description="The Data Portal is a place where you can manage your server data. You can erase data and reset configurations for modules.", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.guild.icon)
@@ -232,7 +232,7 @@ class datamanage(commands.Cog):
         await ctx.send(embed=embed, view=view)
 
     @manage.error
-    async def permissionerror(self, ctx, error):
+    async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions): 
             await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to manage data in this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``")         
             return       

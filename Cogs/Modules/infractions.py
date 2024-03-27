@@ -41,7 +41,7 @@ class Infractions(commands.Cog):
     
 
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -78,7 +78,7 @@ class Infractions(commands.Cog):
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
-    async def infract(self, ctx, staff: discord.Member, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+    async def infract(self, ctx: commands.Context, staff: discord.Member, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
         if optionresult:
             if optionresult.get('infractedbybutton', False) == True:
@@ -285,7 +285,7 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="View a staff member's infractions")
     @app_commands.describe(staff="The staff member to view infractions for", scope="The scope of infractions to view")
-    async def infractions(self, ctx, staff: discord.Member, scope: Literal['Voided', 'Expired', 'All'] = None):
+    async def infractions(self, ctx: commands.Context, staff: discord.Member, scope: Literal['Voided', 'Expired', 'All'] = None):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -410,12 +410,12 @@ class Infractions(commands.Cog):
         await paginator.start(ctx, pages=embeds)
 
     @commands.hybrid_group()
-    async def infraction(self, ctx):
+    async def infraction(self, ctx: commands.Context):
         return
 
     @infraction.command(description="Void a staff member's infraction")
     @app_commands.describe(id="The ID of the infraction to void .eg 12345678")
-    async def void(self, ctx, id: str):
+    async def void(self, ctx: commands.Context, id: str):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
@@ -453,7 +453,7 @@ class Infractions(commands.Cog):
              
     @infraction.command(description="Edit an existing infraction")
     @app_commands.autocomplete(action=infractiontypes)
-    async def edit(self, ctx, id: str, action, reason: str, notes: Optional[str]):
+    async def edit(self, ctx: commands.Context, id: str, action, reason: str, notes: Optional[str]):
       if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return         

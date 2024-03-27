@@ -27,7 +27,7 @@ class Suspensions(commands.Cog):
         self.check_suspensions.start()
         print("[✅] Suspension loop started")
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
         if modulesdata is None:
             return False
@@ -36,7 +36,7 @@ class Suspensions(commands.Cog):
 
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
-    async def suspend(self, ctx, staff: discord.Member, length: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
+    async def suspend(self, ctx: commands.Context, staff: discord.Member, length: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
@@ -85,11 +85,11 @@ class Suspensions(commands.Cog):
         await ctx.send("<:Role:1162074735803387944> Would you like to **remove roles** from this person? Don't worry the roles will be **returned** after suspension.", view=view, embed=embed)
 
     @commands.hybrid_group()    
-    async def suspension(self, ctx):
+    async def suspension(self, ctx: commands.Context):
         pass
 
     @suspension.command(description="View all active suspension")
-    async def active(self, ctx):
+    async def active(self, ctx: commands.Context):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
@@ -126,7 +126,7 @@ class Suspensions(commands.Cog):
 
     @suspension.command(description="Manage suspensions on a user")
     @app_commands.describe(staff = "The user to manage suspensions for.")
-    async def manage(self, ctx, staff: discord.Member):
+    async def manage(self, ctx: commands.Context, staff: discord.Member):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return              
@@ -331,8 +331,8 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
     @discord.ui.button(label='Yes', style=discord.ButtonStyle.green)
     async def Yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         view = RoleTakeAwayView(self.user, self.author, self.reason, self.end_time, self.start_time)
         await interaction.response.edit_message(content=f"<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
@@ -340,8 +340,8 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
     async def No(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
-                                  color=discord.Colour.dark_embed())
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         infract_data = {'guild_id': interaction.guild.id,
         'management': interaction.user.id,

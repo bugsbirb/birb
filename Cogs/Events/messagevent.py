@@ -40,6 +40,8 @@ class messageevent(commands.Cog):
            return 
         if message.author.bot:
             return
+        if message.author is None:
+           return
 
 
 

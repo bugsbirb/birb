@@ -28,7 +28,7 @@ class Modmail(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -40,12 +40,12 @@ class Modmail(commands.Cog):
 
 
     @commands.hybrid_group(alias="m", description="Modmail commands")
-    async def modmail(self, ctx):
+    async def modmail(self, ctx: commands.Context):
         return
     
 
     @modmail.command(description="Pings you for the next message")
-    async def alert(self, ctx):
+    async def alert(self, ctx: commands.Context):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.")
          return         
@@ -56,7 +56,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Blacklist someone from using modmail")
     @app_commands.describe(member = "The member you want to blacklist from using modmail")
-    async def blacklist(self, ctx, member: discord.Member):
+    async def blacklist(self, ctx: commands.Context, member: discord.Member):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.")
          return                 
@@ -72,7 +72,7 @@ class Modmail(commands.Cog):
        
     @modmail.command(description="Unblacklist someone from using modmail")
     @app_commands.describe(member = "The member you want to unblacklist from using modmail")
-    async def unblacklist(self, ctx, member: discord.Member):
+    async def unblacklist(self, ctx: commands.Context, member: discord.Member):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return                 
@@ -88,7 +88,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Reply to a modmail")
     @app_commands.describe(content = 'The message you want to send to the user.', media = "The media you want to send to the user.")
-    async def reply(self, ctx, *, content, media: discord.Attachment = None):
+    async def reply(self, ctx: commands.Context, *, content, media: discord.Attachment = None):
      await ctx.defer(ephemeral=True)
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -132,7 +132,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="View the modmail logs for a member")
     @app_commands.describe(member = "The member you want to view the modmail logs for")
-    async def logs(self, ctx, member: discord.User):
+    async def logs(self, ctx: commands.Context, member: discord.User):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return              
@@ -185,7 +185,7 @@ class Modmail(commands.Cog):
        
     
     @commands.command(description="Reply to a modmail channel.")
-    async def mreply(self, ctx, *, content):
+    async def mreply(self, ctx: commands.Context, *, content):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
@@ -230,7 +230,7 @@ class Modmail(commands.Cog):
      else:
         await ctx.send(f"{no} You can only use the reply command in a modmail channel")
     @commands.command(description="Close a modmail channel.", name="mclose")
-    async def close2(self, ctx, *, reason = None):
+    async def close2(self, ctx: commands.Context, *, reason = None):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return              
@@ -317,7 +317,7 @@ class Modmail(commands.Cog):
 
     @modmail.command(description="Close a modmail channel.")
     @app_commands.describe(reason="The reason for closing the modmail channel.")
-    async def close(self, ctx, *, reason = None):
+    async def close(self, ctx: commands.Context, *, reason = None):
      await ctx.defer()
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

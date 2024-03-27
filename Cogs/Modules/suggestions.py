@@ -18,7 +18,7 @@ class suggestions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    async def modulecheck(self, ctx): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -30,7 +30,7 @@ class suggestions(commands.Cog):
 
     @commands.hybrid_command(description="Submit a suggestion for improvement")
     @app_commands.describe(suggestion="The suggestion to make.")
-    async def suggest(self, ctx, suggestion: str):
+    async def suggest(self, ctx: commands.Context, suggestion: str):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the suggestion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
