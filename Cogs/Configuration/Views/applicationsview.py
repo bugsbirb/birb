@@ -77,7 +77,7 @@ class AccepButtons(discord.ui.View):
     @discord.ui.button(label="Accept/Deny Buttons", style=discord.ButtonStyle.green) 
     async def AcceptButtons(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('acceptbuttons', True) == False:
+        if optionresult.get('acceptbuttons', False) == False:
                 self.AcceptButtons.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'acceptbuttons': True}}, upsert=True)
         else:

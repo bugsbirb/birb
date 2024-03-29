@@ -105,6 +105,7 @@ tagslogging = db['Tags Logging']
 commandslogging = db['Commands Logging']
 welcome = db['welcome settings']
 ApplicationsSubChannel = db['Applications Submissions']
+options = db['module options']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -953,6 +954,9 @@ class ConfigCog(commands.Cog):
     @commands.has_guild_permissions(administrator=True)
     async def config(self, ctx: commands.Context):
         await ctx.defer()
+        option_result = options.find_one({'guild_id': ctx.guild.id})
+        if option_result is None:
+            await options.insert_one({'guild_id': ctx.guild.id})        
         staffroleresult = scollection.find_one({'guild_id': ctx.guild.id})
         types = nfractiontypes.find_one({'guild_id': ctx.guild.id})
         if types is None:
