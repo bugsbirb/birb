@@ -74,7 +74,7 @@ class MuteReason(discord.ui.Modal, title='Reason'):
         self.embed.add_field(name="Mute Duration", value=self.Duration.value, inline=True)
         message = self.message
         try:
-            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been muted from **{interaction.guild.name}** for `{self.Duration.value}`| {self.Reason.value}")
+            await reporteduser.send(f"<:Infraction:1223063128275943544> You have been muted from **{interaction.guild.name}** for `{self.Duration.value}`| {self.Reason.value}")
         except discord.Forbidden:
             pass
         try:
@@ -116,7 +116,7 @@ class KickReason(discord.ui.Modal, title='Reason'):
         self.embed.add_field(name="Kick Reason", value=self.Reason.value, inline=False)
         message = self.message
         try:
-            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been kicked from **{interaction.guild.name}** | {self.Reason.value}", allowed_mentions=discord.AllowedMentions.none())
+            await reporteduser.send(f"<:Infraction:1223063128275943544> You have been kicked from **{interaction.guild.name}** | {self.Reason.value}", allowed_mentions=discord.AllowedMentions.none())
         except discord.Forbidden:
             pass
         try:
@@ -161,7 +161,7 @@ class BanReason(discord.ui.Modal, title='Reason'):
         self.embed.add_field(name="Ban Reason", value=self.Reason.value, inline=False)
         message = self.message
         try:
-            await reporteduser.send(f"<:Infraction:1162134605885870180> You have been banned from **{interaction.guild.name}** | {self.Reason.value}")
+            await reporteduser.send(f"<:Infraction:1223063128275943544> You have been banned from **{interaction.guild.name}** | {self.Reason.value}")
         except discord.Forbidden:
             print('[⚠️] I could not send a message to this user.')
         try:

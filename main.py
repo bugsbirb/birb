@@ -10,6 +10,7 @@ from Cogs.Modules.reports import ReportPanel
 from Cogs.Modules.suggestions import SuggestionView, SuggestionManageView
 import asyncio
 import time
+from Cogs.Modules.applicationresults import AcceptAndDeny
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.staff import Staffview
@@ -91,6 +92,7 @@ class client(commands.AutoShardedBot):
         self.add_view(Confirm())
         self.add_view(Voting())
         self.add_view(Staffview())
+        self.add_view(AcceptAndDeny())
         
         self.loop.create_task(self.load_jishaku())
 

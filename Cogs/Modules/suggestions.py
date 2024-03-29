@@ -62,6 +62,11 @@ class suggestions(commands.Cog):
          if channel:
           try:  
            msg = await channel.send(embed=embed, view=view)
+           try:
+            await msg.create_thread(name="Suggestion Discussion")
+           except discord.Forbidden:
+              await ctx.send(f"{crisis} I can't create a thread for this suggestion.") 
+              return
            await ctx.send(f"{tick} **{ctx.author.display_name}**, succesfully sent the suggestion.", allowed_mentions=discord.AllowedMentions.none())
            await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"message_id": msg.id}})    
            if channeldata2:
@@ -123,7 +128,7 @@ class SuggestionView(discord.ui.View):
             )
             suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
-            await interaction.followup.send("<:Exterminate:1164970632262451231> Unvoted!", ephemeral=True)
+            await interaction.followup.send("<:Exterminate:1223063042246443078> Unvoted!", ephemeral=True)
         elif interaction.user.id in downvoters:
             await suggestions_collection.update_one(
                 {"message_id": message_id},
@@ -169,7 +174,7 @@ class SuggestionView(discord.ui.View):
             )
             suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
-            await interaction.followup.send("<:Exterminate:1164970632262451231> Unvoted!", ephemeral=True)
+            await interaction.followup.send("<:Exterminate:1223063042246443078> Unvoted!", ephemeral=True)
         elif interaction.user.id in upvoters:
             await suggestions_collection.update_one(
                 {"message_id": message_id},

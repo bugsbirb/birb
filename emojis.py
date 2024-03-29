@@ -1,11 +1,11 @@
-tick = "<:whitecheck:1190819388941668362>"
+tick = "<:whitecheck:1223062421212631211>"
 no = "<:whitex:1190819175447408681>"
 Warning = "<:Allonswarning:1123286604849631355>"
 Settings = "<:Setting:1154092651193323661>"
 folder = "<:discotoolsxyzicon2:1148813584957194250>"
 pen = "<:Pen:1126527802255085628>"
 tagsemoji = "<:tag:1162134250414415922>"
-infractions = "<:Infraction:1162134605885870180> "
+infractions = "<:Infraction:1223063128275943544> "
 promotions = "<:Promotion:1162134864594735315>"
 dropdown = "<:ArrowDropDown:1223063384946249789> "
 

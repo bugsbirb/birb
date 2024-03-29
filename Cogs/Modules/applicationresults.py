@@ -2,10 +2,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from emojis import *
+from discord.ui import TextInput, Modal
 from typing import Literal
+import typing
 import os
-from permissions import *
+from permissions import has_admin_role, has_staff_role
 from motor.motor_asyncio import AsyncIOMotorClient
+
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 
@@ -16,11 +19,32 @@ tags = db['tags']
 modules = db['Modules']
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
+applicationn = db['applications']
+ApplicationsSubChannel = db['Applications Submissions']
+applicationmsglogs = db['Application Message Logs']
+options = db['module options']
 class ApplicationResults(commands.Cog):
     def __init__(self, client):
         self.client = client
  
+    async def applications(
+        self,
+        interaction: discord.Interaction,
+        current: str
+    ) -> typing.List[app_commands.Choice[str]]:
+        filter = {
+            'guild_id': interaction.guild_id,
+            'saved': {'$ne': False}
+            
+        }
 
+        tag_names = await applicationn.distinct("name", filter)
+
+        filtered_names = [name for name in tag_names if current.lower() in name.lower()]
+
+        choices = [app_commands.Choice(name=name, value=name) for name in filtered_names]
+
+        return choices
 
     async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
@@ -28,6 +52,27 @@ class ApplicationResults(commands.Cog):
         return False
      elif modulesdata['Applications'] == True:   
         return True
+    
+    @commands.hybrid_command(description="Apply for a position.")
+    @app_commands.autocomplete(application=applications)
+    async def apply(self, ctx: commands.Context, application: str):
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return
+
+        await ctx.defer(ephemeral=True)
+        result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application})
+        if result is None:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find this application", allowed_mentions=discord.AllowedMentions.none())
+            return
+        else:
+            view = StartApplication(ctx.guild, ctx.author, application)
+            await ctx.send(view=view, ephemeral=True)
+
+
+            
+
+            
 
 
     @commands.hybrid_group(description="Application results commands.")
@@ -46,7 +91,7 @@ class ApplicationResults(commands.Cog):
     ):  
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, the results module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         if not await has_admin_role(ctx):
@@ -73,7 +118,7 @@ class ApplicationResults(commands.Cog):
             name=f"Reviewed by {ctx.author.display_name.capitalize()}",
             icon_url=ctx.author.display_avatar,
         )
-
+        
         channeldata = await ApplicationsChannel.find_one({"guild_id": ctx.guild.id})
         if channeldata:
             channelid = channeldata["channel_id"]
@@ -114,8 +159,486 @@ class ApplicationResults(commands.Cog):
 
 
 
+class StartApplication(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Start", style=discord.ButtonStyle.green)
+    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
+        result = await ApplicationsSubChannel.find_one({'guild_id': int(self.guild.id)})
+        if result is None:
+            await interaction.response.edit_message(content=f"{crisis} There is no application submission channel set!", view=None)
+            return        
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        if result:
+            questions  = result.get('section1', {})
+            await interaction.response.send_modal(Section1(self.guild, self.author, self.name, questions))
+
+        
 
 
+class Section1(discord.ui.Modal):
+    def __init__(self, guild, author, name, section_data):
+        super().__init__(title="Section 1")
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+        if isinstance(section_data, dict):
+            input_counter = 0
+            
+
+            for question_name, question_value in list(section_data.items())[:5]:
+                if isinstance(question_name, str):
+                    input_counter += 1
+                    
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    
+                    
+
+                    if input_counter >= 5:
+                        break
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        input_responses = {}
+
+        for question in self.children:
+            if isinstance(question, discord.ui.TextInput):
+                input_responses[question.label] = question.value
+        embed = discord.Embed(title="Section 1", description="", color=discord.Color.dark_embed())
+        embed.set_author(name=f"{self.author.display_name}s Application", icon_url=self.author.display_avatar)
+        embed.set_thumbnail(url=self.author.display_avatar)
+        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_footer(text=f"{(self.name).capitalize()} Application")
+        for question_label, response in input_responses.items():
+            embed.description += f"### **{question_label}**\n{response}\n"
+
+
+
+        if result:
+            questions  = result.get('section2', {})
+            if questions:
+              view = Continue(self.guild, self.author, self.name)
+              await interaction.response.edit_message(embed=embed, view=view)                     
+            else:
+                view = Finish(self.guild, self.author, self.name)      
+                await interaction.response.edit_message(embed=embed, view=view)   
+class Section2(discord.ui.Modal):
+    def __init__(self, guild, author, name, section_data):
+        super().__init__(title="Section 2")
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+        if isinstance(section_data, dict):
+            input_counter = 0
+            
+
+            for question_name, question_value in list(section_data.items())[:5]:
+                if isinstance(question_name, str):
+                    input_counter += 1
+                    
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    
+                    
+
+                    if input_counter >= 5:
+                        break
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        input_responses = {}
+
+        for question in self.children:
+            if isinstance(question, discord.ui.TextInput):
+                input_responses[question.label] = question.value
+        embed = discord.Embed(title="Section 2", description="", color=discord.Color.dark_embed())
+        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+
+        for question_label, response in input_responses.items():
+            embed.description += f"### **{question_label}**\n{response}\n"
+
+        embeds = interaction.message.embeds
+        embeds.append(embed)
+
+        if result:
+            questions = result.get('section3', {})
+            if questions:
+                view = Continue2(self.guild, self.author, self.name) 
+                await interaction.response.edit_message(embeds=embeds, view=view)
+            else:
+                view = Finish(self.guild, self.author, self.name)      
+                await interaction.response.edit_message(embeds=embeds, view=view)
+
+class Section3(discord.ui.Modal):
+    def __init__(self, guild, author, name, section_data):
+        super().__init__(title="Section 3")
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+        if isinstance(section_data, dict):
+            input_counter = 0
+            
+
+            for question_name, question_value in list(section_data.items())[:5]:
+                if isinstance(question_name, str):
+                    input_counter += 1
+                    
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    
+                    
+
+                    if input_counter >= 5:
+                        break
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        input_responses = {}
+
+        for question in self.children:
+            if isinstance(question, discord.ui.TextInput):
+                input_responses[question.label] = question.value
+        embed = discord.Embed(title="Section 3", description="", color=discord.Color.dark_embed())
+        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+
+        for question_label, response in input_responses.items():
+            embed.description += f"### **{question_label}**\n{response}\n"
+
+        embeds = interaction.message.embeds
+        embeds.append(embed)
+
+        if result:
+            questions = result.get('section4', {})
+            view = Continue3(self.guild, self.author, self.name)
+            if questions:
+                await interaction.response.edit_message(embeds=embeds, view=view)       
+            else:
+                view = Finish(self.guild, self.author, self.name)      
+                await interaction.response.edit_message(embeds=embeds, view=view)
+class Section4(discord.ui.Modal):
+    def __init__(self, guild, author, name, section_data):
+        super().__init__(title="Section 4")
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+        if isinstance(section_data, dict):
+            input_counter = 0
+            
+
+            for question_name, question_value in list(section_data.items())[:5]:
+                print(question_value)
+                if isinstance(question_name, str):
+                    input_counter += 1
+                    
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    
+                    
+
+                    if input_counter >= 5:
+                        break
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        input_responses = {}
+
+        for question in self.children:
+            if isinstance(question, discord.ui.TextInput):
+                input_responses[question.label] = question.value
+        embed = discord.Embed(title="Section 4", description="", color=discord.Color.dark_embed())
+        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+
+        for question_label, response in input_responses.items():
+            embed.description += f"### **{question_label}**\n{response}\n"
+
+        embeds = interaction.message.embeds
+        embeds.append(embed)
+
+        if result:
+            questions = result.get('section5', {})
+            view = Continue4(self.guild, self.author, self.name)
+            if questions:
+                await interaction.response.edit_message(embeds=embeds, view=view)   
+            else:
+                view = Finish(self.guild, self.author, self.name)      
+                await interaction.response.edit_message(embeds=embeds, view=view)
+
+class Section5(discord.ui.Modal):
+    def __init__(self, guild, author, name, section_data):
+        super().__init__(title="Section 5")
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+        if isinstance(section_data, dict):
+            input_counter = 0
+            
+
+            for question_name, question_value in list(section_data.items())[:5]:
+                if isinstance(question_name, str):
+                    input_counter += 1
+                    
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    
+                    
+
+                    if input_counter >= 5:
+                        break
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        input_responses = {}
+
+        for question in self.children:
+            if isinstance(question, discord.ui.TextInput):
+                input_responses[question.label] = question.value
+        embed = discord.Embed(title="Section 5", description="", color=discord.Color.dark_embed())
+        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+
+        for question_label, response in input_responses.items():
+            embed.description += f"### **{question_label}**\n{response}\n"
+
+        embeds = interaction.message.embeds
+        embeds.append(embed)
+        view = Finish(self.guild, self.author, self.name)
+        await interaction.response.edit_message(embeds=embeds, view=view)    
+
+class Continue(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Continue", style=discord.ButtonStyle.blurple)
+    async def Continue(self, interaction: discord.Interaction, button: discord.ui.Button):
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        print(result)
+        if result:
+            questions  = result.get('section2', {})
+            print(questions )
+            await interaction.response.send_modal(Section2(self.guild, self.author, self.name, questions))    
+
+class Continue2(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Continue", style=discord.ButtonStyle.blurple)
+    async def Continue2(self, interaction: discord.Interaction, button: discord.ui.Button):
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        print(result)
+        if result:
+            questions  = result.get('section3', {})
+            print(questions)
+            await interaction.response.send_modal(Section3(self.guild, self.author, self.name, questions))    
+
+class Continue3(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Continue", style=discord.ButtonStyle.blurple)
+    async def Continue3(self, interaction: discord.Interaction, button: discord.ui.Button):
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        print(result)
+        if result:
+            questions  = result.get('section4', {})
+            print(questions)
+            await interaction.response.send_modal(Section4(self.guild, self.author, self.name, questions)) 
+
+class Continue4(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Continue", style=discord.ButtonStyle.blurple)
+    async def Continue4(self, interaction: discord.Interaction, button: discord.ui.Button):
+        result = await applicationn.find_one({'guild_id': int(self.guild.id), 'name': self.name})
+        print(result)
+        if result:
+            questions  = result.get('section5', {})
+            print(questions)
+            await interaction.response.send_modal(Section5(self.guild, self.author, self.name, questions)) 
+
+                      
+
+class Finish(discord.ui.View):
+    def __init__(self, guild, author, name):
+        super().__init__()
+        self.guild = guild
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Submit", style=discord.ButtonStyle.green)
+    async def Submit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embeds = interaction.message.embeds
+        result = await ApplicationsSubChannel.find_one({'guild_id': int(self.guild.id)})
+        if result is None:
+            await interaction.response.send_message(f"{crisis} There is no application submission channel set!", ephemeral=True)
+            return
+        if result:
+            channel = interaction.guild.get_channel(result.get('channel_id'))
+            if channel is None:
+                await interaction.response.send_message(f"{crisis} The application submission channel could not be found!", ephemeral=True)
+                return
+            else:
+                optionsresult = await options.find_one({'guild_id': interaction.guild.id})
+                if optionsresult:
+                  if optionsresult.get('acceptbuttons', False) == True:
+                      view = AcceptAndDeny()
+                  else:    
+                      view = None
+                else:
+                    view = None      
+                
+                try:
+                 msg = await channel.send(embeds=embeds, view=view)
+                except discord.Forbidden:
+                    await interaction.response.send_message(f"{crisis} I do not have permission to send messages in the application submission channel!", ephemeral=True)
+                    return 
+                view = discord.ui.View()
+                view.add_item(discord.ui.Button(label="Submitted!", style=discord.ButtonStyle.green, disabled=True))
+                await interaction.response.edit_message(view=view)
+                await applicationmsglogs.insert_one({'guild_id': int(self.guild.id), 'msgid': msg.id, 'applicantid': self.author.id, 'application': self.name})
+
+        
+class AcceptAndDeny(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+
+    @discord.ui.button(label="Accept", style=discord.ButtonStyle.green, custom_id="accept:persistants")
+    async def Accept(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(PassReason())
+
+
+    @discord.ui.button(label="Deny", style=discord.ButtonStyle.red, custom_id="accept:deny")
+    async def Deny(self, interaction: discord.Interaction, button: discord.ui.Button):
+       await interaction.response.send_modal(DenyReason())
+
+class PassReason(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(title="Any Feedback?")
+
+    reason = discord.ui.TextInput(label="Do you want to add any feedback to this?", required=False)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+            result = await applicationmsglogs.find_one({'guild_id': int(interaction.guild_id), 'msgid': interaction.message.id})
+            channelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            if result is None:
+                await interaction.response.send_message(f"{crisis} The application data could not be found!", ephemeral=True)
+                return
+            else:
+             applicant = interaction.guild.get_member(result.get('applicantid'))
+             if applicant is None:
+                 await interaction.response.send_message(f"{crisis} The applicant is no longer in the server.", ephemeral=True)
+                 return
+             feedback = self.reason.value
+
+             if not self.reason.value:
+                feedback = "None Given"
+             if channelresult is None:
+                 await interaction.response.send_message(f"{crisis} There is no application results channel set!", ephemeral=True)
+                 return
+             else:
+              channel = interaction.guild.get_channel(channelresult.get('channel_id'))
+              if channel is None:
+                  await interaction.response.send_message(f"{crisis} I can not find the application results channel!", ephemeral=True)
+                  return
+              roles_data = await ApplicationsRolesDB.find_one({"guild_id": interaction.guild.id})
+              if roles_data:
+                        application_roles = roles_data.get("applicationroles", [])
+                        
+                        roles_to_add = [discord.utils.get(interaction.guild.roles, id=role_id) for role_id in application_roles]
+                        if roles_to_add and None not in roles_to_add:
+                            try:
+                                await applicant.add_roles(*roles_to_add)
+                            except (discord.Forbidden) as e:
+                                await interaction.response.send_message(f"{no} **{interaction.user.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                                return
+                            except Exception(Exception):
+                                await interaction.response.send_message(f"{crisis} An error has occured if this continues please contact support.", ephemeral=True)
+                                return              
+              embed = discord.Embed(
+                title=f"{greencheck} Application Passed",
+                description=f"**Applicant:** {applicant.mention}\n**Feedback:** {feedback}",
+                color=discord.Color.brand_green(),
+             )
+              embed.set_thumbnail(url=applicant.display_avatar)
+              embed.set_author(
+                name=f"Reviewed by {interaction.user.display_name.capitalize()}",
+                icon_url=interaction.user.display_avatar,) 
+              embed.set_footer(text=f"{result.get('application')} Application")                        
+              try:
+               await channel.send(f"{applicant.mention}", embed=embed)
+              except discord.Forbidden:
+                  await interaction.response.send_message(f"{crisis} I could not see or send a message to the application results channel.", ephemeral=True) 
+                  return
+              view = discord.ui.View()
+              view.add_item(discord.ui.Button(label="Accepted!", style=discord.ButtonStyle.green, disabled=True))              
+              await interaction.response.edit_message(view=view)
+        
+class DenyReason(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(title="Any Feedback?")
+
+    reason = discord.ui.TextInput(label="Do you want to add any feedback to this?", required=False)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:    
+            result = await applicationmsglogs.find_one({'guild_id': int(interaction.guild_id), 'msgid': interaction.message.id})
+            channelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            if result is None:
+                await interaction.response.send_message(f"{crisis} The application data could not be found!", ephemeral=True)
+                return
+            else:
+             applicant = interaction.guild.get_member(result.get('applicantid'))
+             if applicant is None:
+                 await interaction.response.send_message(f"{crisis} The applicant is no longer in the server.", ephemeral=True)
+                 return
+             feedback = self.reason.value
+
+             if not self.reason.value:
+                feedback = "None Given"
+             if channelresult is None:
+                 await interaction.response.send_message(f"{crisis} There is no application results channel set!", ephemeral=True)
+                 return
+             else:
+              channel = interaction.guild.get_channel(channelresult.get('channel_id'))
+              if channel is None:
+                  await interaction.response.send_message(f"{crisis} I can not find the application results channel!", ephemeral=True)
+                  return
+              
+              embed = discord.Embed(
+                title=f"{redx} Application Failed",
+                description=f"**Applicant:** {applicant.mention}\n**Feedback:** {feedback}",
+                color=discord.Color.brand_red(),
+            )
+              embed.set_thumbnail(url=applicant.display_avatar)
+              embed.footer
+              embed.set_author(
+                name=f"Reviewed by {interaction.user.display_name.capitalize()}",
+                icon_url=interaction.user.display_avatar,
+        )     
+              embed.set_footer(text=f"{result.get('application')} Application")                        
+              try:
+               await channel.send(f"{applicant.mention}", embed=embed)
+              except discord.Forbidden:
+                  await interaction.response.send_message(f"{crisis} I could not see or send a message to the application results channel.", ephemeral=True) 
+                  return
+              view = discord.ui.View()
+              view.add_item(discord.ui.Button(label="Denied!", style=discord.ButtonStyle.red, disabled=True))              
+              await interaction.response.edit_message(view=view)              
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ApplicationResults(client))        

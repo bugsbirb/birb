@@ -777,7 +777,7 @@ class AdminPanelCog(commands.Cog):
             color=discord.Color.dark_embed(),
         )
         embed.add_field(
-            name="<:Infraction:1162134605885870180> Punishments",
+            name="<:Infraction:1223063128275943544> Punishments",
             value=f">>> **Infractions Logged:** {infractioncount}\n**Demotions Logged:** {demotioncount}\n**Suspensions Logged:** {suspensioncount}",
             inline=False,
         )
@@ -958,7 +958,7 @@ class AdminPanel(discord.ui.View):
     @discord.ui.button(
         label="Infract",
         style=discord.ButtonStyle.grey,
-        emoji="<:Infraction:1162134605885870180>",
+        emoji="<:Infraction:1223063128275943544>",
     )
     async def Infract(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1221,7 +1221,7 @@ class LOAPanel(discord.ui.View):
         label="Void LOA",
         style=discord.ButtonStyle.grey,
         custom_id="persistent_view:cancel",
-        emoji="<:Exterminate:1164970632262451231>",
+        emoji="<:Exterminate:1223063042246443078>",
     )
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user

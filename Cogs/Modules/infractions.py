@@ -9,10 +9,11 @@ from discord.ext import commands
 import typing
 import os
 import Paginator
-
+from discord import app_commands
 from emojis import *
 from permissions import *
 from datetime import datetime, timedelta
+import re
 import discord
 from discord.ext import tasks
 from motor.motor_asyncio import AsyncIOMotorClient

@@ -601,7 +601,7 @@ class NoEmbeds(discord.ui.View):
 
 
 
-    @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1199443313082769498>")
+    @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1223063359184830494>")
     async def Buttons(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -704,7 +704,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(Context())
 
-    @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1199443313082769498>")
+    @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1223063359184830494>")
     async def Buttons(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",

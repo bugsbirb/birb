@@ -75,7 +75,7 @@ class Modmailevnt(commands.Cog):
                       embed.set_author(name=channel.guild.name, icon_url=channel.guild.icon)
                       embed.add_field(name="<:Document:1191926049857097748> ID", value=transcriptid, inline=True)
                       embed.add_field(name="<:Add:1163095623600447558> Opened", value=message.author.mention, inline=True)
-                      embed.add_field(name="<:Exterminate:1164970632262451231> Closed", value=message.author.mention, inline=True)
+                      embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=message.author.mention, inline=True)
                       embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                       embed.add_field(name="<:reason:1202773873095868476> Reason", value="Closed by modmail author.", inline=True)
                       await message.author.send(embed=embed)

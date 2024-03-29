@@ -2,9 +2,9 @@ import discord
 import sys
 sys.dont_write_bytecode = True
 import discord
-from Cogs.Modules.loa import *
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
+from emojis import *
 
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)

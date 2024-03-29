@@ -527,7 +527,7 @@ class LOAPanel(discord.ui.View):
 
 
     @discord.ui.button(label='Void LOA', style=discord.ButtonStyle.grey, custom_id='persistent_view:cancel',
-                       emoji="<:Exterminate:1164970632262451231>")
+                       emoji="<:Exterminate:1223063042246443078>")
     async def End(self, interaction: discord.Interaction, button: discord.ui.Button):
         user = self.user
         author = self.author.id

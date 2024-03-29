@@ -11,7 +11,6 @@ from Cogs.Configuration.Views.Utilityview import ToggleUtils
 
 from Cogs.Configuration.Views.promotionsview import Promotionchannel, PMoreOptions
 from Cogs.Configuration.Views.promotionsview import PromotionModuleToggle
-
 from Cogs.Configuration.Views.loaview import LOAChannel
 from Cogs.Configuration.Views.loaview import ToggleLOADropdown
 from Cogs.Configuration.Views.loaview import LOARoled
@@ -37,7 +36,7 @@ from Cogs.Configuration.Views.reportview import ToggleReportsDropdown
 from Cogs.Configuration.Views.reportview import ReportsModeratorRole
 
 from Cogs.Configuration.Views.applicationsview import ApplicationChannel
-from Cogs.Configuration.Views.applicationsview import ApplicationsRoles
+from Cogs.Configuration.Views.applicationsview import ApplicationsRoles, ApplicationCreator, ApplicationSubmissions, AMoreOptions
 from Cogs.Configuration.Views.applicationsview import ToggleApplications
 
 
@@ -103,9 +102,9 @@ modmailcategory = db['modmailcategory']
 transcriptchannel = db['transcriptschannel']
 modmailping = db['modmailping']
 tagslogging = db['Tags Logging']
-commandslogging = db['Commands Logging'
-                     ]
+commandslogging = db['Commands Logging']
 welcome = db['welcome settings']
+ApplicationsSubChannel = db['Applications Submissions']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author):
 
@@ -195,7 +194,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
         discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
-        discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
+        discord.SelectOption(label="Applications", value="Applications", emoji="<:ApplicationFeedback:1178754449125167254>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
 ]
 
         super().__init__(placeholder='Config Menu', min_values=1, max_values=1, options=options)
@@ -312,7 +311,7 @@ class Config(discord.ui.Select):
             infractiontypescount = len(infractiontyperesult['types'])
             if infractiontypescount == None:
                 infractiontypess = "0"
-            embed = discord.Embed(title="<:Infraction:1162134605885870180> Infractions Module",  color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Infraction:1223063128275943544> Infractions Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = InfractModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -500,15 +499,19 @@ class Config(discord.ui.Select):
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
-        elif color == 'Applications Results':            
+        elif color == 'Applications':            
 
 
             applicationchannelresult = ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            submissionchannelresult = ApplicationsSubChannel.find_one({'guild_id': interaction.guild.id})
+
             staffroleresult = ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
 
             approlemsg = "Not Configured"
+            subchannelmsg = "Not Configured"
             appchannelmsg = "Not Configured"
+
 
             if moduleddata:
                 modulemsg = moduleddata.get('Applications', 'False')
@@ -526,6 +529,9 @@ class Config(discord.ui.Select):
                 else:
                     approlemsg = ", ".join(staff_roles_mentions)
 
+            if submissionchannelresult:
+                channelid = submissionchannelresult['channel_id']
+                subchannelmsg = f"<#{channelid}>"
 
             if applicationchannelresult:
                 channelid = applicationchannelresult['channel_id']
@@ -539,7 +545,7 @@ class Config(discord.ui.Select):
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
-                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -902,10 +908,10 @@ class ReportsModule(discord.ui.View):
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
         super().__init__(timeout=360)
-        self.add_item(ToggleApplications(author))          
-        self.add_item(ApplicationChannel(author))         
-        self.add_item(ApplicationsRoles(author))             
-                        
+        self.add_item(ToggleApplications(author))       
+        self.add_item(ApplicationCreator(author))   
+        self.add_item(ApplicationSubmissions(author))
+        self.add_item(AMoreOptions(author))                   
         self.add_item(Config(author)) 
 
     async def on_timeout(self) -> None:

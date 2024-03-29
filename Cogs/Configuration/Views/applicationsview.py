@@ -22,7 +22,69 @@ loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 ApplicationsChannel = db['Applications Channel']
+ApplicationsSubChannel = db['Applications Submissions']
 ApplicationsRolesDB = db['Applications Roles']
+application = db['applications']
+options = db['module options']
+class AMoreOptions(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Application Roles", description="Roles given after being accepted."),
+            discord.SelectOption(label="Application Results Channel", description="Where application results are sent."),
+            discord.SelectOption(label="Deny/Accept Buttons", description="Once a application is submitted there will be buttons to accept or deny.")
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        color = self.values[0]
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+        if color == 'Application Roles':
+            view = discord.ui.View()
+            view.add_item(ApplicationsRoles(self.author))
+            await interaction.response.send_message(view=view, ephemeral=True)
+        elif color == ('Application Results Channel'):
+            view = discord.ui.View()
+            view.add_item(ApplicationChannel(self.author))
+            await interaction.response.send_message(view=view, ephemeral=True)
+        elif color == ('Deny/Accept Buttons'):
+            view = AccepButtons()
+            option_result = await options.find_one({'guild_id': interaction.guild.id})
+            if option_result:
+                    if option_result.get('acceptbuttons', False) == False:
+                        view.AcceptButtons.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('acceptbuttons', False) == True:
+                        view.AcceptButtons.style = discord.ButtonStyle.green            
+            await interaction.response.send_message(view=view, ephemeral=True)
+
+            
+    
+
+            
+class AccepButtons(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Accept/Deny Buttons", style=discord.ButtonStyle.green) 
+    async def AcceptButtons(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('acceptbuttons', True) == False:
+                self.AcceptButtons.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'acceptbuttons': True}}, upsert=True)
+        else:
+                self.AcceptButtons.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'acceptbuttons': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)  
+
 class ToggleApplications(discord.ui.Select):
     def __init__(self, author):
         self.author = author
@@ -54,9 +116,45 @@ class ToggleApplications(discord.ui.Select):
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)    
             await refreshembed(interaction)        
 
+class ApplicationSubmissions(discord.ui.ChannelSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Application Submissions Channel',  channel_types=[discord.ChannelType.text])
+        self.author = author
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id
+        }        
+
+        data = {
+            'channel_id': channelid.id,  
+            'guild_id': interaction.guild_id
+        }
+
+        try:
+            existing_record = await ApplicationsSubChannel.find_one(filter)
+
+            if existing_record:
+                await ApplicationsSubChannel.update_one(filter, {'$set': data})
+            else:
+                await ApplicationsSubChannel.insert_one(data)
+
+            await interaction.response.edit_message(content=None)
+            await refreshembed(interaction)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel ID: {channelid.id}")         
+
 class ApplicationChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Application Channel',  channel_types=[discord.ChannelType.text])
+        super().__init__(placeholder='Application Results Channel',  channel_types=[discord.ChannelType.text])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -84,7 +182,6 @@ class ApplicationChannel(discord.ui.ChannelSelect):
                 await ApplicationsChannel.insert_one(data)
 
             await interaction.response.edit_message(content=None)
-            await refreshembed(interaction)
         except Exception as e:
             print(f"An error occurred: {str(e)}")
 
@@ -110,17 +207,462 @@ class ApplicationsRoles(discord.ui.RoleSelect):
 
         await ApplicationsRolesDB.update_one({'guild_id': interaction.guild.id}, {'$set': data}, upsert=True)
         await interaction.response.edit_message(content=None)
-        await refreshembed(interaction)
         print(f"Select Application Roles: {selected_role_ids}")
 
+class ApplicationCreator(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Create"),
+            discord.SelectOption(label="Edit"),
+            discord.SelectOption(label="Delete")
+        ]
+        super().__init__(placeholder='Application Builder', min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        option = self.values[0]
+        if option == 'Create':
+            await interaction.response.send_modal(createapp(author=self.author))
+        elif option == 'Delete':
+            await interaction.response.send_modal(deleapp(author=self.author))
+        elif option == 'Edit':
+            await interaction.response.send_modal(editapp(author=self.author))
+
+
+
+class createapp(discord.ui.Modal):
+    def __init__(self, author):
+        super().__init__(title="Create Application")
+        self.author = author
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='What\'s the name of this application?'
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await application.insert_one({'guild_id': interaction.guild.id, 'name': self.name.value, 'saved': False})
+        view = SectionButtons(author=self.author, name=self.name.value)
+        embed = discord.Embed(title=f"Application Builder", description=f"No added sections...", color=discord.Colour.dark_embed())
+        embed.set_thumbnail(url=interaction.guild.icon)
+        embed.set_author(
+            name=interaction.user.name,
+            icon_url=interaction.user.display_avatar
+        ) 
+        await interaction.response.edit_message(embed=embed, view=view)
+
+class deleapp(discord.ui.Modal):
+    def __init__(self, author):
+        super().__init__(title="Delete Application")
+        self.author = author
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='What\'s the name of this application?'
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name.value})
+        if applicationresult is None:
+            await interaction.response.send_message(f"{no} I couldn't find the application specified.", ephemeral=True)
+            return
+
+        await application.delete_one({'guild_id': interaction.guild.id, 'name': self.name.value})
+        await interaction.response.send_message(f"{no} Application deleted!", ephemeral=True)
+
+class editapp(discord.ui.Modal):
+    def __init__(self, author):
+        super().__init__(title="Edit Application")
+        self.author = author
+
+    name = discord.ui.TextInput(
+        label='Name',
+        placeholder='What\'s the name of this application?'
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name.value})
+        if applicationresult is None:
+            await interaction.response.send_message(f"{no} I couldn't find the application specified.", ephemeral=True)
+            return
+        view = SectionButtons(author=self.author, name=self.name.value)
+        embed = discord.Embed(title=f"Application Builder", description="", color=discord.Colour.dark_embed())
+        embed.set_thumbnail(url=interaction.guild.icon)
+        embed.set_author(
+            name=interaction.user.name,
+            icon_url=interaction.user.display_avatar
+        )         
+        
+        sections_found = False
+        
+        for section_number in range(1, 6):
+            section_key = f'section{section_number}'
+            section = applicationresult.get(section_key)
+            if section:
+                sections_found = True
+                question_values = [f"> **{key.capitalize()}:** {value}" for key, value in section.items()]
+                section_description = "\n".join(question_values)
+                embed.add_field(name=f"Section {section_number}", value=section_description, inline=False)
+        
+        if not sections_found:
+            embed.description = "No sections found in this application."
+        if applicationresult.get('section1'):
+            view.section2.disabled = False
+        if applicationresult.get('section2'):
+            view.section3.disabled = False
+        if applicationresult.get('section3'):
+            view.section4.disabled = False
+        if applicationresult.get('section4'):
+            view.section5.disabled = False    
+
+    
+
+        await interaction.response.edit_message(embed=embed, view=view)
+
+class SectionButtons(discord.ui.View):
+    def __init__(self, author, name):
+        super().__init__()
+        self.author = author
+        self.name = name
+    
+    @discord.ui.button(label="Section 1", style=discord.ButtonStyle.primary, custom_id="section1")
+    async def section1(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)  
+        await interaction.response.send_modal(Section1(author=self.author, name=self.name))
+
+    @discord.ui.button(label="Section 2", style=discord.ButtonStyle.primary, custom_id="section2", disabled=True)
+    async def section2(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        await interaction.response.send_modal(Section2(author=self.author, name=self.name))
+
+    @discord.ui.button(label="Section 3", style=discord.ButtonStyle.primary, custom_id="section3", disabled=True)
+    async def section3(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        await interaction.response.send_modal(Section3(author=self.author, name=self.name))
+
+    @discord.ui.button(label="Section 4", style=discord.ButtonStyle.primary, custom_id="section4", disabled=True)
+    async def section4(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        await interaction.response.send_modal(Section4(author=self.author, name=self.name))
+
+    @discord.ui.button(label="Section 5", style=discord.ButtonStyle.primary, custom_id="section5", disabled=True)
+    async def section5(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        await interaction.response.send_modal(Section5(author=self.author, name=self.name))
+
+    @discord.ui.button(style=discord.ButtonStyle.success, emoji="<:Save:1223293419678470245>", custom_id="save")
+    async def save(self, interaction: discord.Interaction, button:discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        await application.update_one({'guild_id': interaction.guild.id, 'name': self.name}, {'$set': {'saved': True}})
+        embed = discord.Embed(color=discord.Color.brand_green())
+        embed.title =f"{greencheck} Succesfully Saved"
+        embed.description = f"Application Successfully saved!"
+        await interaction.response.edit_message(
+            embed=embed,
+            view=None
+        )
+
+
+
+class Section1(discord.ui.Modal):
+    def __init__(self, author, name):
+        super().__init__(title="Section 1")
+        self.author = author
+        self.name = name
+
+    question1 = discord.ui.TextInput(
+        label='Question 1',
+        placeholder='',
+        max_length=45
+    )
+
+    question2 = discord.ui.TextInput(
+        label='Question 2',
+        placeholder='',
+        max_length=45
+    )
+
+    question3 = discord.ui.TextInput(
+        label='Question 3',
+        placeholder='',
+        max_length=45
+    )
+
+    question4 = discord.ui.TextInput(
+        label='Question 4',
+        placeholder='',
+        max_length=45
+    )
+
+    question5 = discord.ui.TextInput(
+        label='Question 5',
+        placeholder='',
+        max_length=45
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        await application.update_one(
+            {'guild_id': interaction.guild.id, 'name': self.name},
+            {'$set': {'section1': {'question1': self.question1.value,
+                                   'question2': self.question2.value,
+                                   'question3': self.question3.value,
+                                   'question4': self.question4.value,
+                                   'question5': self.question5.value}}}
+        )
+        embed.description = None
+        embed.add_field(name="Section 1", value=f">>> **Question 1**: {self.question1.value}\n**Question 2**: {self.question2.value}\n**Question 3**: {self.question3.value}\n**Question 4**: {self.question4.value}\n**Question 5**: {self.question5.value}", inline=False)
+        view = SectionButtons(self.author, self.name)
+        view.section2.disabled = False
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
+        
+class Section2(discord.ui.Modal):
+    def __init__(self, author, name):
+        super().__init__(title="Section 2")
+        self.author = author
+        self.name = name
+
+    question1 = discord.ui.TextInput(
+        label='Question 1',
+        placeholder='',
+        max_length=45
+    )
+
+    question2 = discord.ui.TextInput(
+        label='Question 2',
+        placeholder='',
+        max_length=45
+    )
+
+    question3 = discord.ui.TextInput(
+        label='Question 3',
+        placeholder='',
+        max_length=45
+    )
+
+    question4 = discord.ui.TextInput(
+        label='Question 4',
+        placeholder='',
+        max_length=45
+    )
+
+    question5 = discord.ui.TextInput(
+        label='Question 5',
+        placeholder='',
+        max_length=45
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        await application.update_one(
+            {'guild_id': interaction.guild.id, 'name': self.name},
+            {'$set': {'section2': {'question1': self.question1.value,
+                                   'question2': self.question2.value,
+                                   'question3': self.question3.value,
+                                   'question4': self.question4.value,
+                                   'question5': self.question5.value}}}
+        )
+        embed.description = None
+        embed.add_field(name="Section 2", value=f">>> **Question 6**: {self.question1.value}\n**Question 7**: {self.question2.value}\n**Question 8**: {self.question3.value}\n**Question 9**: {self.question4.value}\n**Question 10**: {self.question5.value}", inline=False)
+        view = SectionButtons(self.author, self.name)
+        view.section3.disabled = False
+        view.section2.disabled = False
+        await interaction.response.edit_message(embed=embed, view=view, content=None)        
+
+class Section3(discord.ui.Modal):
+    def __init__(self, author, name):
+        super().__init__(title="Section 3")
+        self.author = author
+        self.name = name
+
+    question1 = discord.ui.TextInput(
+        label='Question 1',
+        placeholder='',
+        max_length=45
+    )
+
+    question2 = discord.ui.TextInput(
+        label='Question 2',
+        placeholder='',
+        max_length=45
+    )
+
+    question3 = discord.ui.TextInput(
+        label='Question 3',
+        placeholder='',
+        max_length=45
+    )
+
+    question4 = discord.ui.TextInput(
+        label='Question 4',
+        placeholder='',
+        max_length=45
+    )
+
+    question5 = discord.ui.TextInput(
+        label='Question 5',
+        placeholder='',
+        max_length=45
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        await application.update_one(
+            {'guild_id': interaction.guild.id, 'name': self.name},
+            {'$set': {'section3': {'question1': self.question1.value,
+                                   'question2': self.question2.value,
+                                   'question3': self.question3.value,
+                                   'question4': self.question4.value,
+                                   'question5': self.question5.value}}}
+        )
+        embed.description = None
+        embed.add_field(name="Section 3", value=f">>> **Question 11**: {self.question1.value}\n**Question 12**: {self.question2.value}\n**Question 13**: {self.question3.value}\n**Question 14**: {self.question4.value}\n**Question 15**: {self.question5.value}", inline=False)
+        view = SectionButtons(self.author, self.name)
+        view.section4.disabled = False
+        view.section3.disabled = False        
+        view.section2.disabled = False
+        await interaction.response.edit_message(embed=embed, view=view, content=None)       
+
+class Section4(discord.ui.Modal):
+    def __init__(self, author, name):
+        super().__init__(title="Section 4")
+        self.author = author
+        self.name = name
+
+    question1 = discord.ui.TextInput(
+        label='Question 1',
+        placeholder='',
+        max_length=45
+    )
+
+    question2 = discord.ui.TextInput(
+        label='Question 2',
+        placeholder='',
+        max_length=45
+    )
+
+    question3 = discord.ui.TextInput(
+        label='Question 3',
+        placeholder='',
+        max_length=45
+    )
+
+    question4 = discord.ui.TextInput(
+        label='Question 4',
+        placeholder='',
+        max_length=45
+    )
+
+    question5 = discord.ui.TextInput(
+        label='Question 5',
+        placeholder='',
+        max_length=45
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        await application.update_one(
+            {'guild_id': interaction.guild.id, 'name': self.name},
+            {'$set': {'section4': {'question1': self.question1.value,
+                                   'question2': self.question2.value,
+                                   'question3': self.question3.value,
+                                   'question4': self.question4.value,
+                                   'question5': self.question5.value}}}
+        )
+        embed.description = None
+        embed.add_field(name="Section 4", value=f">>> **Question 16**: {self.question1.value}\n**Question 17**: {self.question2.value}\n**Question 18**: {self.question3.value}\n**Question 19**: {self.question4.value}\n**Question 20**: {self.question5.value}", inline=False)
+        view = SectionButtons(self.author, self.name)
+        view.section5.disabled = False
+        view.section4.disabled = False
+        view.section3.disabled = False        
+        view.section2.disabled = False
+        await interaction.response.edit_message(embed=embed, view=view, content=None)  
+
+class Section5(discord.ui.Modal):
+    def __init__(self, author, name):
+        super().__init__(title="Section 5")
+        self.author = author
+        self.name = name
+
+    question1 = discord.ui.TextInput(
+        label='Question 1',
+        placeholder='',
+        max_length=45
+    )
+
+    question2 = discord.ui.TextInput(
+        label='Question 2',
+        placeholder='',
+        max_length=45
+    )
+
+    question3 = discord.ui.TextInput(
+        label='Question 3',
+        placeholder='',
+        max_length=45
+    )
+
+    question4 = discord.ui.TextInput(
+        label='Question 4',
+        placeholder='',
+        max_length=45
+    )
+
+    question5 = discord.ui.TextInput(
+        label='Question 5',
+        placeholder='',
+        max_length=45
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = interaction.message.embeds[0]
+        await application.update_one(
+            {'guild_id': interaction.guild.id, 'name': self.name},
+            {'$set': {'section5': {'question1': self.question1.value,
+                                   'question2': self.question2.value,
+                                   'question3': self.question3.value,
+                                   'question4': self.question4.value,
+                                   'question5': self.question5.value}}}
+        )
+        embed.description = None
+        embed.add_field(name="Section 5", value=f">>> **Question 21**: {self.question1.value}\n**Question 22**: {self.question2.value}\n**Question 23**: {self.question3.value}\n**Question 24**: {self.question4.value}\n**Question 25**: {self.question5.value}", inline=False)
+        view = SectionButtons(self.author, self.name)
+        view.section4.disabled = False
+        view.section3.disabled = False        
+        view.section2.disabled = False
+        await interaction.response.edit_message(embed=embed, view=view, content=None)  
 
 async def refreshembed(interaction):
+
+
             applicationchannelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
+            submissionchannelresult = await ApplicationsSubChannel.find_one({'guild_id': interaction.guild.id})
+
             staffroleresult = await ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
             moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
 
             approlemsg = "Not Configured"
+            subchannelmsg = "Not Configured"
             appchannelmsg = "Not Configured"
+
 
             if moduleddata:
                 modulemsg = moduleddata.get('Applications', 'False')
@@ -138,6 +680,9 @@ async def refreshembed(interaction):
                 else:
                     approlemsg = ", ".join(staff_roles_mentions)
 
+            if submissionchannelresult:
+                channelid = submissionchannelresult['channel_id']
+                subchannelmsg = f"<#{channelid}>"
 
             if applicationchannelresult:
                 channelid = applicationchannelresult['channel_id']
@@ -147,11 +692,11 @@ async def refreshembed(interaction):
                 else:
                     appchannelmsg = channel.mention
 
-            embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Result Module",
+            embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Module",
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
-                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)

@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from emojis import *
+import re
 import os
 
 from datetime import datetime
@@ -117,7 +118,7 @@ class Suspensions(commands.Cog):
                 reason = request['reason']
 
                 embed.add_field(
-                name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
+                name=f"<:Infraction:1223063128275943544>{user.name.capitalize()}",
                 value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
                 inline=False
             )
@@ -165,7 +166,7 @@ class Suspensions(commands.Cog):
                 reason = record['reason']
 
                 embed.add_field(
-                name=f"<:Infraction:1162134605885870180>{user.name.capitalize()}",
+                name=f"<:Infraction:1223063128275943544>{user.name.capitalize()}",
                 value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
                 inline=False
             )
@@ -417,7 +418,7 @@ class SuspensionPanel(discord.ui.View):
         self.author = author        
 
 
-    @discord.ui.button(label='Suspension Void', style=discord.ButtonStyle.grey, emoji='<:Exterminate:1164970632262451231>')
+    @discord.ui.button(label='Suspension Void', style=discord.ButtonStyle.grey, emoji='<:Exterminate:1223063042246443078>')
     async def SuspensionVoid(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.mention},** this is not your view.", color=discord.Colour.dark_grey())
