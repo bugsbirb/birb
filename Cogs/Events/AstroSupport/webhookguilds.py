@@ -29,7 +29,7 @@ class webGuildJoins(commands.Cog):
         owner = guild.owner
         view = Support()
         try:
-         await owner.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1163171628050563153> Guild `#{len(self.client.guilds)}`", view=view)
+         await owner.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1223063384946249789> Guild `#{len(self.client.guilds)}`", view=view)
         except discord.Forbidden:
             print("[⚠️] I couldn't dm the owner of the guild for the guild join.")
             return

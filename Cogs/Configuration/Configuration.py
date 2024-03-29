@@ -179,7 +179,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Settings", value="Settings", emoji="<:Setting:1154092651193323661>", description=self.permissionsconfig(author)),
         discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'infractions': True}) else "Disabled"),
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
-        discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1195037906620911717>"),
+        discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1223063306131210322>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
@@ -234,7 +234,7 @@ class Config(discord.ui.Select):
              admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                     for role_id in admin_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
              if not admin_roles_mentions:
-                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
              else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
 
@@ -245,15 +245,19 @@ class Config(discord.ui.Select):
              staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                     for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
              if not staff_roles_mentions:
-                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
              else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
+
             embed = discord.Embed(
             title="<:Setting:1154092651193323661> Settings",
             description=f"",
             color=discord.Color.dark_embed(),
-        )
-            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+        )   
+            value = f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)"
+            if len(value) > 1024:
+             value = value[:1021] + "..."
+            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=value, inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = ConfigViewMain(self.author)        
@@ -275,7 +279,7 @@ class Config(discord.ui.Select):
                    
                  channel = interaction.guild.get_channel(channelid)
                  if channel is None:
-                    wchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    wchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                  else:    
                   wchannelmsg = channel.mention          
 
@@ -301,7 +305,7 @@ class Config(discord.ui.Select):
                 channelid = infractionchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    infchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    infchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  infchannelmsg = channel.mention          
 
@@ -337,7 +341,7 @@ class Config(discord.ui.Select):
                 channelid = promochannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 promochannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
@@ -358,7 +362,7 @@ class Config(discord.ui.Select):
                 roleid = loaroleresult['staffrole']
                 role = discord.utils.get(interaction.guild.roles, id=roleid)
                 if role is None:
-                 loarolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                 loarolemsg = "<:Error:1223063223910010920> Role wasn't found please reconfigure."
                 else: 
                  loarolemsg = f"{role.mention}"
 
@@ -366,7 +370,7 @@ class Config(discord.ui.Select):
                 channelid = loachannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    loachannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  loachannelmsg = channel.mention       
             embed = discord.Embed(title=f"{loa} LOA Module", color=discord.Color.dark_embed())
@@ -415,7 +419,7 @@ class Config(discord.ui.Select):
                 channelid = feedbackchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    feedbackchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    feedbackchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  feedbackchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", color=discord.Color.dark_embed())
@@ -451,7 +455,7 @@ class Config(discord.ui.Select):
                 if channel:
                  partnershipchannelmsg = f"{channel.mention}"                     
                 else:
-                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
             embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Partnership Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Partnership Channel:** {partnershipchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = PartnershipModule(self.author)
@@ -480,7 +484,7 @@ class Config(discord.ui.Select):
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  partnershipchannelmsg = channel.mention    
 
@@ -488,7 +492,7 @@ class Config(discord.ui.Select):
                 roleid = reportsmoderatorresult['staffrole']
                 role = discord.utils.get(interaction.guild.roles, id=roleid)
                 if role is None:
-                 reprolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                 reprolemsg = "<:Error:1223063223910010920> Role wasn't found please reconfigure."
                 else: 
                  reprolemsg = f"{role.mention}"
             embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", color=discord.Color.dark_embed())
@@ -518,7 +522,7 @@ class Config(discord.ui.Select):
                 staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                         for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
                 if not staff_roles_mentions:
-                    approlemsg = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                    approlemsg = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
                 else:
                     approlemsg = ", ".join(staff_roles_mentions)
 
@@ -527,7 +531,7 @@ class Config(discord.ui.Select):
                 channelid = applicationchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    appchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    appchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:
                     appchannelmsg = channel.mention
 
@@ -568,14 +572,14 @@ class Config(discord.ui.Select):
                 channelid = suschannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 suggestionchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  suggestionchannelmsg = channel.mention       
             if smschannelresult:    
                 channelid = smschannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 smschannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 smschannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  smschannelmsg = channel.mention                            
             embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
@@ -589,7 +593,7 @@ class Config(discord.ui.Select):
                 print("Couldn't edit module due to missing permissions.") 
 
         elif color == 'Customisation':
-            embed = discord.Embed(title="<:Customisation:1195037906620911717> Customisation", description="From here you can edit **promotions, infraction** embeds\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Customisation:1223063306131210322> Customisation", description="From here you can edit **promotions, infraction** embeds\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
             view = CustomisatiomModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
@@ -643,7 +647,7 @@ class Config(discord.ui.Select):
             if modmailpingresult:
                 modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if interaction.guild.get_role(roleid) is not None]
                 if not modmailroles:
-                    modmailroles = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                    modmailroles = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
                 modmailroles = ", ".join(filter(None, modmailroles))
 
             if transcriptschannelresult:
@@ -962,7 +966,7 @@ class ConfigCog(commands.Cog):
             admin_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention
                                     for role_id in admin_roles_ids if discord.utils.get(ctx.guild.roles, id=role_id) is not None]
             if not admin_roles_mentions:
-                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
 
@@ -973,7 +977,7 @@ class ConfigCog(commands.Cog):
             staff_roles_mentions = [discord.utils.get(ctx.guild.roles, id=role_id).mention
                                     for role_id in staff_roles_ids if discord.utils.get(ctx.guild.roles, id=role_id) is not None]
             if not staff_roles_mentions:
-                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
 
@@ -1006,7 +1010,7 @@ async def refreshembed(interaction):
              admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                     for role_id in admin_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
              if not admin_roles_mentions:
-                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
              else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
 
@@ -1017,7 +1021,7 @@ async def refreshembed(interaction):
              staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                     for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
              if not staff_roles_mentions:
-                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
              else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
             embed = discord.Embed(
@@ -1025,7 +1029,10 @@ async def refreshembed(interaction):
             description=f"",
             color=discord.Color.dark_embed(),
         )
-            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
+            value = f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)"
+            if len(value) > 1024:
+             value = value[:1021] + "..."            
+            embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=value)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             await interaction.message.edit(embed=embed)

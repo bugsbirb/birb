@@ -134,7 +134,7 @@ async def refreshembed(interaction):
                 staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
                                         for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
                 if not staff_roles_mentions:
-                    approlemsg = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                    approlemsg = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
                 else:
                     approlemsg = ", ".join(staff_roles_mentions)
 
@@ -143,7 +143,7 @@ async def refreshembed(interaction):
                 channelid = applicationchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    appchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    appchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:
                     appchannelmsg = channel.mention
 

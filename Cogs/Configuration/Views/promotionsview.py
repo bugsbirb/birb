@@ -198,7 +198,7 @@ async def refreshembed(interaction):
                 channelid = promochannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 promochannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 promochannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())

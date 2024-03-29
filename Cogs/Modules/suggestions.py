@@ -67,6 +67,8 @@ class suggestions(commands.Cog):
            if channeldata2:
             channel_id = channeldata2['channel_id']
             channel2 = await self.client.fetch_channel(channel_id)
+            if channel2 is None:
+               await ctx.send(f"{crisis} I can not find the suggestion management channel.")
             if channel2: 
              
              view = SuggestionManageView()

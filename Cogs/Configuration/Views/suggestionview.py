@@ -138,14 +138,14 @@ async def refreshembed(interaction):
                 channelid = suschannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 suggestionchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 suggestionchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  suggestionchannelmsg = channel.mention       
             if smschannelresult:    
                 channelid = smschannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 smschannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 smschannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  smschannelmsg = channel.mention                            
             embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())

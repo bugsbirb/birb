@@ -534,7 +534,7 @@ class Infractions(commands.Cog):
                try:
                   await msg.edit(embed=embed)
                except discord.HTTPException or discord.NotFound:
-                  error = f"<:Crisis:1190412318648062113> I couldn't edit the infraction embed."
+                  error = f"<:Crisis:1223063318252748932> I couldn't edit the infraction embed."
             else:
                pass      
       else:
@@ -556,7 +556,7 @@ class Infractions(commands.Cog):
                await msg.edit(embed=embed)
                print(f"Edited the infraction embed for ID: {id}")
             except discord.HTTPException or discord.NotFound:
-                  error = f"<:Crisis:1190412318648062113> I couldn't edit the infraction embed."      
+                  error = f"<:Crisis:1223063318252748932> I couldn't edit the infraction embed."      
          else:
             pass                   
       await collection.update_one(filter, {'$set': {'action': action, 'reason': reason, 'notes': notes}})

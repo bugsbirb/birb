@@ -706,7 +706,7 @@ async def refreshembed(interaction):
                    
                  channel = interaction.guild.get_channel(channelid)
                  if channel is None:
-                    wchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    wchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                  else:    
                   wchannelmsg = channel.mention          
 

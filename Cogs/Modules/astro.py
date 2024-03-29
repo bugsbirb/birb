@@ -84,7 +84,7 @@ class management(commands.Cog):
             admin_roles_mentions = [discord.utils.get(guild.roles, id=role_id).name
                                     for role_id in admin_roles_ids if discord.utils.get(guild.roles, id=role_id) is not None]
             if not admin_roles_mentions:
-                adminrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
 
@@ -95,7 +95,7 @@ class management(commands.Cog):
             staff_roles_mentions = [discord.utils.get(guild.roles, id=role_id).name
                                     for role_id in staff_roles_ids if discord.utils.get(guild.roles, id=role_id) is not None]
             if not staff_roles_mentions:
-                staffrolemessage = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
 

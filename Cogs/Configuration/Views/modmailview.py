@@ -155,7 +155,7 @@ async def refreshembed(interaction):
             if modmailpingresult:
                 modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if interaction.guild.get_role(roleid) is not None]
                 if not modmailroles:
-                    modmailroles = "<:Error:1126526935716085810> Roles weren't found, please reconfigure."
+                    modmailroles = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
                 modmailroles = ", ".join(filter(None, modmailroles))
 
             if transcriptschannelresult:

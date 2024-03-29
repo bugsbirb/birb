@@ -185,13 +185,20 @@ class Suspensions(commands.Cog):
         filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}
 
         suspension_requests = suspensions.find(filter)
-
+        
         async for request in suspension_requests:
             end_time = request["end_time"]
             user_id = request["staff"]
             guild_id = request["guild_id"]
             guild = self.client.get_guild(guild_id)
+            if guild is None:
+                continue
+            member = guild.get_member(user_id)
+            if member is None:
+                continue
             user = self.client.get_user(user_id)
+            if user is None:
+                continue
             if current_time >= end_time:
 
                 delete_filter = {
@@ -221,6 +228,7 @@ class Suspensions(commands.Cog):
                             print(
                                 f"[⚠️] Failed to restore roles to {member.name} in {guild.name}"
                             )
+                            continue
 
                 if user:
                     try:

@@ -134,7 +134,7 @@ async def refreshembed(interaction):
                 roleid = loaroleresult['staffrole']
                 role = discord.utils.get(interaction.guild.roles, id=roleid)
                 if role is None:
-                 loarolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                 loarolemsg = "<:Error:1223063223910010920> Role wasn't found please reconfigure."
                 else: 
                  loarolemsg = f"{role.mention}"
 
@@ -142,7 +142,7 @@ async def refreshembed(interaction):
                 channelid = loachannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    loachannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    loachannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  loachannelmsg = channel.mention       
             embed = discord.Embed(title=f"{loa} LOA Module", color=discord.Color.dark_embed())

@@ -148,7 +148,7 @@ async def refreshembed(interaction):
                 channelid = feedbackchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                    feedbackchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                    feedbackchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  feedbackchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", color=discord.Color.dark_embed())

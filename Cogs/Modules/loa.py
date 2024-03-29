@@ -434,8 +434,7 @@ class Confirm(discord.ui.View):
                      await user.add_roles(role)
                     except discord.Forbidden:
                      await interaction.followup.send(content=f"{crisis} I do not have permission to add the loa role. Make sure I have the `Manage Roles` permission or If I'm lower then role I'm trying to give.", ephemeral=True)
-
-                     return
+                     pass
  
         loanotification = await consent.find_one({'user_id': self.user.id})
         if loanotification:

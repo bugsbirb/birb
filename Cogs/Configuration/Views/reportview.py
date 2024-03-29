@@ -134,7 +134,7 @@ async def refreshembed(interaction):
                 channelid = partnershipchannelresult['channel_id']
                 channel = interaction.guild.get_channel(channelid)
                 if channel is None:
-                 partnershipchannelmsg = "<:Error:1126526935716085810> Channel wasn't found please reconfigure."
+                 partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  partnershipchannelmsg = channel.mention    
 
@@ -142,7 +142,7 @@ async def refreshembed(interaction):
                 roleid = reportsmoderatorresult['staffrole']
                 role = discord.utils.get(interaction.guild.roles, id=roleid)
                 if role is None:
-                 reprolemsg = "<:Error:1126526935716085810> Role wasn't found please reconfigure."
+                 reprolemsg = "<:Error:1223063223910010920> Role wasn't found please reconfigure."
                 else: 
                  reprolemsg = f"{role.mention}"
             embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", color=discord.Color.dark_embed())
