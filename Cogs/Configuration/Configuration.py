@@ -986,7 +986,10 @@ class ConfigCog(commands.Cog):
             description=f"",
             color=discord.Color.dark_embed(),
         )
-        embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
+        value = f"{replytop}**Staff Role:** {staffrolemessage}\n{replybottom}**Admin Role:** {adminrolemessage}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)"
+        if len(value) > 1024:
+             value = value[:1021] + "..."         
+        embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=value)
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         view = ConfigViewMain(ctx.author)
