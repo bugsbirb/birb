@@ -61,7 +61,7 @@ class ApplicationResults(commands.Cog):
             return
 
         await ctx.defer(ephemeral=True)
-        result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application})
+        result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application, 'saved': {'$ne': False}})
         if result is None:
             await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find this application", allowed_mentions=discord.AllowedMentions.none())
             return
