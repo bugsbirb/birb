@@ -32,7 +32,8 @@ class AMoreOptions(discord.ui.Select):
         options = [
             discord.SelectOption(label="Application Roles", description="Roles given after being accepted."),
             discord.SelectOption(label="Application Results Channel", description="Where application results are sent."),
-            discord.SelectOption(label="Deny/Accept Buttons", description="Once a application is submitted there will be buttons to accept or deny.")
+            discord.SelectOption(label="Deny/Accept Buttons", description="Once a application is submitted there will be buttons to accept or deny."),
+            discord.SelectOption(label="Thread Discussion", description="Automaticly creates a thread attached to application submissions.")
             
 
         
@@ -65,10 +66,58 @@ class AMoreOptions(discord.ui.Select):
                     elif option_result.get('acceptbuttons', False) == True:
                         view.AcceptButtons.style = discord.ButtonStyle.green            
             await interaction.response.send_message(view=view, ephemeral=True)
-
+        elif color == ('Thread Discussion'):
+            view = ResultThread()
+            option_result = await options.find_one({'guild_id': interaction.guild.id})
+            if option_result:
+                    if option_result.get('threaddiscussion', False) == False:
+                        view.AcceptButtons.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('threaddiscussion', False) == True:
+                        view.AcceptButtons.style = discord.ButtonStyle.green            
+            await interaction.response.send_message(view=view, ephemeral=True)
             
-    
+class RequiredRoles(discord.ui.RoleSelect):
+    def __init__(self, author, name):
+        super().__init__(placeholder='Required Roles', max_values=10)
+        self.author = author
+        self.name = name
 
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+  
+        data = {
+            'guild_id': interaction.guild.id,
+            'required': selected_role_ids
+        }
+
+        await application.update_one({'guild_id': interaction.guild.id, 'name': self.name}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} Set required roles.", view=None) 
+
+class AcceptedRoles(discord.ui.RoleSelect):
+    def __init__(self, author, name):
+        super().__init__(placeholder='Accepted Roles', max_values=10)
+        self.author = author
+        self.name = name
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+  
+        data = {
+            'guild_id': interaction.guild.id,
+            'Accepted': selected_role_ids
+        }
+
+        await application.update_one({'guild_id': interaction.guild.id, 'name': self.name}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} Set accepted roles.", view=None) 
             
 class AccepButtons(discord.ui.View):    
     def __init__(self):
@@ -83,6 +132,21 @@ class AccepButtons(discord.ui.View):
         else:
                 self.AcceptButtons.style = discord.ButtonStyle.red        
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'acceptbuttons': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)  
+
+class ResultThread(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Application Thread Discussion", style=discord.ButtonStyle.green) 
+    async def AcceptButtons(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('threaddiscussion', False) == False:
+                self.AcceptButtons.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'threaddiscussion': True}}, upsert=True)
+        else:
+                self.AcceptButtons.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'threaddiscussion': False}}, upsert=True)
         await interaction.response.edit_message(content="", view=self)  
 
 class ToggleApplications(discord.ui.Select):
@@ -308,13 +372,16 @@ class editapp(discord.ui.Modal):
             embed.description = "No sections found in this application."
         if applicationresult.get('section1'):
             view.section2.disabled = False
+            view.save.disabled = False
         if applicationresult.get('section2'):
             view.section3.disabled = False
+            view.save.disabled = False            
         if applicationresult.get('section3'):
             view.section4.disabled = False
+            view.save.disabled = False            
         if applicationresult.get('section4'):
             view.section5.disabled = False    
-
+            view.save.disabled = False
     
 
         await interaction.response.edit_message(embed=embed, view=view)
@@ -365,7 +432,28 @@ class SectionButtons(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section5(author=self.author, name=self.name))
 
-    @discord.ui.button(style=discord.ButtonStyle.success, emoji="<:Save:1223293419678470245>", custom_id="save")
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji=f"<:Role:1162074735803387944>")
+    async def role(self, interaction: discord.Interaction, button:discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)         
+        view = discord.ui.View()
+        view.add_item(RequiredRoles(self.author, self.name))
+        await interaction.response.send_message(view=view, ephemeral=True)
+    
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji=f"<:Role:1162074735803387944>")
+    async def acceptedroles(self, interaction: discord.Interaction, button:discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)  
+        view = discord.ui.View()
+        view.add_item(AcceptedRoles(self.author, self.name))
+        await interaction.response.send_message(view=view, ephemeral=True)
+
+
+    @discord.ui.button(style=discord.ButtonStyle.success, emoji="<:Save:1223293419678470245>", custom_id="save", disabled=True)
     async def save(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -432,6 +520,7 @@ class Section1(discord.ui.Modal):
         embed.add_field(name="Section 1", value=f">>> **Question 1**: {self.question1.value}\n**Question 2**: {self.question2.value}\n**Question 3**: {self.question3.value}\n**Question 4**: {self.question4.value}\n**Question 5**: {self.question5.value}", inline=False)
         view = SectionButtons(self.author, self.name)
         view.section2.disabled = False
+        view.save.disabled = False
         await interaction.response.edit_message(embed=embed, view=view, content=None)
         
 class Section2(discord.ui.Modal):
@@ -485,6 +574,7 @@ class Section2(discord.ui.Modal):
         view = SectionButtons(self.author, self.name)
         view.section3.disabled = False
         view.section2.disabled = False
+        view.save.disabled = False        
         await interaction.response.edit_message(embed=embed, view=view, content=None)        
 
 class Section3(discord.ui.Modal):
@@ -539,6 +629,7 @@ class Section3(discord.ui.Modal):
         view.section4.disabled = False
         view.section3.disabled = False        
         view.section2.disabled = False
+        view.save.disabled = False         
         await interaction.response.edit_message(embed=embed, view=view, content=None)       
 
 class Section4(discord.ui.Modal):
@@ -594,6 +685,7 @@ class Section4(discord.ui.Modal):
         view.section4.disabled = False
         view.section3.disabled = False        
         view.section2.disabled = False
+        view.save.disabled = False         
         await interaction.response.edit_message(embed=embed, view=view, content=None)  
 
 class Section5(discord.ui.Modal):
@@ -648,6 +740,7 @@ class Section5(discord.ui.Modal):
         view.section4.disabled = False
         view.section3.disabled = False        
         view.section2.disabled = False
+        view.save.disabled = False         
         await interaction.response.edit_message(embed=embed, view=view, content=None)  
 
 async def refreshembed(interaction):

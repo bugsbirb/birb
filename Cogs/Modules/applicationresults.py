@@ -56,20 +56,48 @@ class ApplicationResults(commands.Cog):
     @commands.hybrid_command(description="Apply for a position.")
     @app_commands.autocomplete(application=applications)
     async def apply(self, ctx: commands.Context, application: str):
+        if not await self.has_required_role(ctx, application):
+            return
+        
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         await ctx.defer(ephemeral=True)
         result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application, 'saved': {'$ne': False}})
+
         if result is None:
             await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find this application", allowed_mentions=discord.AllowedMentions.none())
             return
         else:
+            blacklists = result.get('blacklists', [])
+            if blacklists:
+                if ctx.author.id in blacklists:
+                    await ctx.send(f"{no} **{ctx.author.display_name}**, you are blacklisted from applying for **{application}**", allowed_mentions=discord.AllowedMentions.none())
+                    return
             view = StartApplication(ctx.guild, ctx.author, application)
             await ctx.send(view=view, ephemeral=True)
 
+    async def has_required_role(self, ctx: commands.Context, name):
+        filter = {
+            'guild_id': ctx.guild.id,
+            'name': name
+        }
+        role_data = await applicationn.find_one(filter)
 
+        if role_data and 'required' in role_data:
+            role_ids = role_data['required']
+            if not isinstance(role_ids, list):
+                role_ids = [role_ids]
+
+            if any(role.id in role_ids for role in ctx.author.roles):
+                return True
+            else:
+                await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to apply for this application.", allowed_mentions=discord.AllowedMentions.none())
+                
+                return False
+        else:
+            return True
             
 
             
@@ -78,11 +106,59 @@ class ApplicationResults(commands.Cog):
     @commands.hybrid_group(description="Application results commands.")
     async def application(self, ctx: commands.Context):
         return
+    
+    @application.command(description="Blacklist a user from applying from an application.")
+    @app_commands.autocomplete(application=applications)
+    async def blacklist(self, ctx: commands.Context, user: discord.Member, application: str):
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return
+
+        if not await has_admin_role(ctx):
+            return
+        result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application})
+        if result is None:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find this application", allowed_mentions=discord.AllowedMentions.none())
+            return
+        else:
+            blacklists = result.get('blacklists', [])
+            if user.id in blacklists:
+                await ctx.send(f"{no} **{ctx.author.display_name}**, this user is already blacklisted.", allowed_mentions=discord.AllowedMentions.none())
+                return
+            else:
+                await applicationn.update_one({'guild_id': ctx.guild.id, 'name': application}, {'$push': {'blacklists': user.id}})
+                await ctx.send(f"{tick} **{ctx.author.display_name}**, this user has been blacklisted from applying for {application}.", allowed_mentions=discord.AllowedMentions.none())
+
+
+
+    @application.command(description="Unblacklist a user from applying from an application.")
+    @app_commands.autocomplete(application=applications)
+    async def unblacklist(self, ctx: commands.Context, user: discord.Member, application: str):
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return
+
+        if not await has_admin_role(ctx):
+            return
+        result = await applicationn.find_one({'guild_id': ctx.guild.id, 'name': application})
+        if result is None:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find this application", allowed_mentions=discord.AllowedMentions.none())
+            return
+        else:
+            blacklists = result.get('blacklists', [])
+            if user.id not in blacklists:
+                await ctx.send(f"{no} **{ctx.author.display_name}**, this user is not blacklisted.", allowed_mentions=discord.AllowedMentions.none())
+                return
+            else:
+                await applicationn.update_one({'guild_id': ctx.guild.id, 'name': application}, {'$pull': {'blacklists': user.id}})
+                await ctx.send(f"{tick} **{ctx.author.display_name}**, this user has been unblacklisted from applying for {application}.", allowed_mentions=discord.AllowedMentions.none())        
+        
+
 
     @application.command(description="Log Application results")
     @app_commands.describe(applicant="The applicant to log the results for", result="The result of the application", feedback="The feedback to give the applicant")
     async def results(
-        self,
+        self, 
         ctx,
         applicant: discord.Member,
         result: Literal["Passed", "Failed"],
@@ -511,7 +587,13 @@ class Finish(discord.ui.View):
                 view.add_item(discord.ui.Button(label="Submitted!", style=discord.ButtonStyle.green, disabled=True))
                 await interaction.response.edit_message(view=view)
                 await applicationmsglogs.insert_one({'guild_id': int(self.guild.id), 'msgid': msg.id, 'applicantid': self.author.id, 'application': self.name})
-
+                if optionsresult:
+                    if optionsresult.get('threaddiscussion'):
+                        try:
+                            await msg.create_thread(name="Application Discussion")
+                        except:
+                            print("I don't have permission to create a thread.")
+                            pass    
         
 class AcceptAndDeny(discord.ui.View):
     def __init__(self):
@@ -534,41 +616,43 @@ class PassReason(discord.ui.Modal):
     reason = discord.ui.TextInput(label="Do you want to add any feedback to this?", required=False)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
+            await interaction.response.defer()
             result = await applicationmsglogs.find_one({'guild_id': int(interaction.guild_id), 'msgid': interaction.message.id})
             channelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
             if result is None:
-                await interaction.response.send_message(f"{crisis} The application data could not be found!", ephemeral=True)
+                await interaction.followup.send(f"{crisis} The application data could not be found!", ephemeral=True)
                 return
             else:
              applicant = interaction.guild.get_member(result.get('applicantid'))
              if applicant is None:
-                 await interaction.response.send_message(f"{crisis} The applicant is no longer in the server.", ephemeral=True)
+                 await interaction.followup.send(f"{crisis} The applicant is no longer in the server.", ephemeral=True)
                  return
              feedback = self.reason.value
 
              if not self.reason.value:
                 feedback = "None Given"
              if channelresult is None:
-                 await interaction.response.send_message(f"{crisis} There is no application results channel set!", ephemeral=True)
+                 await interaction.followup.send(f"{crisis} There is no application results channel set!", ephemeral=True)
                  return
              else:
               channel = interaction.guild.get_channel(channelresult.get('channel_id'))
               if channel is None:
-                  await interaction.response.send_message(f"{crisis} I can not find the application results channel!", ephemeral=True)
+                  await interaction.followup.send(f"{crisis} I can not find the application results channel!", ephemeral=True)
                   return
-              roles_data = await ApplicationsRolesDB.find_one({"guild_id": interaction.guild.id})
+              roles_data = await applicationn.find_one({"guild_id": interaction.guild.id})
               if roles_data:
-                        application_roles = roles_data.get("applicationroles", [])
+                        application_roles = roles_data.get("Accepted", [])
+                        if application_roles:
                         
-                        roles_to_add = [discord.utils.get(interaction.guild.roles, id=role_id) for role_id in application_roles]
-                        if roles_to_add and None not in roles_to_add:
+                         roles_to_add = [discord.utils.get(interaction.guild.roles, id=role_id) for role_id in application_roles]
+                         if roles_to_add and None not in roles_to_add:
                             try:
                                 await applicant.add_roles(*roles_to_add)
                             except (discord.Forbidden) as e:
-                                await interaction.response.send_message(f"{no} **{interaction.user.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                                await interaction.followup.send(f"{no} **{interaction.user.display_name},** Please check if I have permission to add roles and if I'm higher than the role.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
                                 return
                             except Exception(Exception):
-                                await interaction.response.send_message(f"{crisis} An error has occured if this continues please contact support.", ephemeral=True)
+                                await interaction.followup.send(f"{crisis} An error has occured if this continues please contact support.", ephemeral=True)
                                 return              
               embed = discord.Embed(
                 title=f"{greencheck} Application Passed",
@@ -583,11 +667,11 @@ class PassReason(discord.ui.Modal):
               try:
                await channel.send(f"{applicant.mention}", embed=embed)
               except discord.Forbidden:
-                  await interaction.response.send_message(f"{crisis} I could not see or send a message to the application results channel.", ephemeral=True) 
+                  await interaction.followup.send(f"{crisis} I could not see or send a message to the application results channel.", ephemeral=True) 
                   return
               view = discord.ui.View()
               view.add_item(discord.ui.Button(label="Accepted!", style=discord.ButtonStyle.green, disabled=True))              
-              await interaction.response.edit_message(view=view)
+              await interaction.edit_original_response(view=view)
         
 class DenyReason(discord.ui.Modal):
     def __init__(self):
