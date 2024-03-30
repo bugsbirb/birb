@@ -195,7 +195,7 @@ class Section1(discord.ui.Modal):
                 if isinstance(question_name, str):
                     input_counter += 1
                     
-                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500, style=discord.TextStyle.long))
                     
                     
 
@@ -242,7 +242,7 @@ class Section2(discord.ui.Modal):
                 if isinstance(question_name, str):
                     input_counter += 1
                     
-                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500, style=discord.TextStyle.long))
                     
                     
 
@@ -289,7 +289,7 @@ class Section3(discord.ui.Modal):
                 if isinstance(question_name, str):
                     input_counter += 1
                     
-                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500, style=discord.TextStyle.long))
                     
                     
 
@@ -336,7 +336,7 @@ class Section4(discord.ui.Modal):
                 if isinstance(question_name, str):
                     input_counter += 1
                     
-                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500, style=discord.TextStyle.long))
                     
                     
 
@@ -383,7 +383,7 @@ class Section5(discord.ui.Modal):
                 if isinstance(question_name, str):
                     input_counter += 1
                     
-                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500))
+                    question = self.add_item(discord.ui.TextInput(label=question_value, max_length=1500, style=discord.TextStyle.long))
                     
                     
 
