@@ -639,10 +639,10 @@ class PassReason(discord.ui.Modal):
               if channel is None:
                   await interaction.followup.send(f"{crisis} I can not find the application results channel!", ephemeral=True)
                   return
-              roles_data = await applicationn.find_one({"guild_id": interaction.guild.id})
-              if roles_data:
-                        application_roles = roles_data.get("Accepted", [])
-                        if application_roles:
+              result = await applicationn.find_one({'guild_id': interaction.guild.id, 'name': result.get('application')})
+              if result:
+                application_roles = result.get("Accepted", [])
+                if application_roles:
                         
                          roles_to_add = [discord.utils.get(interaction.guild.roles, id=role_id) for role_id in application_roles]
                          if roles_to_add and None not in roles_to_add:
