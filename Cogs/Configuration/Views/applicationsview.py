@@ -305,6 +305,10 @@ class createapp(discord.ui.Modal):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
+        result = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name.value})
+        if result:
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** This application already exists!", ephemeral=True)
+            return
         await application.insert_one({'guild_id': interaction.guild.id, 'name': self.name.value, 'saved': False})
         view = SectionButtons(author=self.author, name=self.name.value)
         embed = discord.Embed(title=f"Application Builder", description=f"No added sections...", color=discord.Colour.dark_embed())
@@ -359,14 +363,20 @@ class editapp(discord.ui.Modal):
         
         sections_found = False
         
-        for section_number in range(1, 6):
-            section_key = f'section{section_number}'
-            section = applicationresult.get(section_key)
-            if section:
-                sections_found = True
-                question_values = [f"> **{key.capitalize()}:** {value}" for key, value in section.items()]
-                section_description = "\n".join(question_values)
-                embed.add_field(name=f"Section {section_number}", value=section_description, inline=False)
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )         
         
         if not sections_found:
             embed.description = "No sections found in this application."
@@ -517,10 +527,29 @@ class Section1(discord.ui.Modal):
                                    'question5': self.question5.value}}}
         )
         embed.description = None
-        embed.add_field(name="Section 1", value=f">>> **Question 1**: {self.question1.value}\n**Question 2**: {self.question2.value}\n**Question 3**: {self.question3.value}\n**Question 4**: {self.question4.value}\n**Question 5**: {self.question5.value}", inline=False)
+        
+        
         view = SectionButtons(self.author, self.name)
         view.section2.disabled = False
         view.save.disabled = False
+        embed.clear_fields()
+        embed.clear_fields()
+        
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )                                                     
         await interaction.response.edit_message(embed=embed, view=view, content=None)
         
 class Section2(discord.ui.Modal):
@@ -570,11 +599,27 @@ class Section2(discord.ui.Modal):
                                    'question5': self.question5.value}}}
         )
         embed.description = None
-        embed.add_field(name="Section 2", value=f">>> **Question 6**: {self.question1.value}\n**Question 7**: {self.question2.value}\n**Question 8**: {self.question3.value}\n**Question 9**: {self.question4.value}\n**Question 10**: {self.question5.value}", inline=False)
+        
         view = SectionButtons(self.author, self.name)
-        view.section3.disabled = False
         view.section2.disabled = False
-        view.save.disabled = False        
+        view.save.disabled = False
+        embed.clear_fields()
+        
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )                                                           
         await interaction.response.edit_message(embed=embed, view=view, content=None)        
 
 class Section3(discord.ui.Modal):
@@ -624,13 +669,27 @@ class Section3(discord.ui.Modal):
                                    'question5': self.question5.value}}}
         )
         embed.description = None
-        embed.add_field(name="Section 3", value=f">>> **Question 11**: {self.question1.value}\n**Question 12**: {self.question2.value}\n**Question 13**: {self.question3.value}\n**Question 14**: {self.question4.value}\n**Question 15**: {self.question5.value}", inline=False)
         view = SectionButtons(self.author, self.name)
-        view.section4.disabled = False
-        view.section3.disabled = False        
         view.section2.disabled = False
-        view.save.disabled = False         
-        await interaction.response.edit_message(embed=embed, view=view, content=None)       
+        view.save.disabled = False
+        embed.clear_fields()
+
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )                                                           
+        await interaction.response.edit_message(embed=embed, view=view, content=None)      
 
 class Section4(discord.ui.Modal):
     def __init__(self, author, name):
@@ -679,14 +738,28 @@ class Section4(discord.ui.Modal):
                                    'question5': self.question5.value}}}
         )
         embed.description = None
-        embed.add_field(name="Section 4", value=f">>> **Question 16**: {self.question1.value}\n**Question 17**: {self.question2.value}\n**Question 18**: {self.question3.value}\n**Question 19**: {self.question4.value}\n**Question 20**: {self.question5.value}", inline=False)
+        
         view = SectionButtons(self.author, self.name)
-        view.section5.disabled = False
-        view.section4.disabled = False
-        view.section3.disabled = False        
         view.section2.disabled = False
-        view.save.disabled = False         
-        await interaction.response.edit_message(embed=embed, view=view, content=None)  
+        view.save.disabled = False
+        embed.clear_fields()
+
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )                                                      
+        await interaction.response.edit_message(embed=embed, view=view, content=None)
 
 class Section5(discord.ui.Modal):
     def __init__(self, author, name):
@@ -737,10 +810,25 @@ class Section5(discord.ui.Modal):
         embed.description = None
         embed.add_field(name="Section 5", value=f">>> **Question 21**: {self.question1.value}\n**Question 22**: {self.question2.value}\n**Question 23**: {self.question3.value}\n**Question 24**: {self.question4.value}\n**Question 25**: {self.question5.value}", inline=False)
         view = SectionButtons(self.author, self.name)
-        view.section4.disabled = False
-        view.section3.disabled = False        
         view.section2.disabled = False
-        view.save.disabled = False         
+        view.save.disabled = False
+        embed.clear_fields()
+
+        applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if applicationresult:
+            for i in range(1, 6):
+                section_name = f'section{i}'
+                if applicationresult.get(section_name):
+                    section = applicationresult.get(section_name)
+                    embed.add_field(
+                        name=f"Section {i}",
+                        value=f">>> **Question 1**: {section.get('question1')}\n"
+                            f"**Question 2**: {section.get('question2')}\n"
+                            f"**Question 3**: {section.get('question3')}\n"
+                            f"**Question 4**: {section.get('question4')}\n"
+                            f"**Question 5**: {section.get('question5')}",
+                        inline=False
+                    )                                                     
         await interaction.response.edit_message(embed=embed, view=view, content=None)  
 
 async def refreshembed(interaction):
