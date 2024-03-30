@@ -536,7 +536,20 @@ class Section1(discord.ui.Modal):
         embed.clear_fields()
         
         applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+
         if applicationresult:
+            if applicationresult.get('section1'):
+                view.section2.disabled = False
+                view.save.disabled = False
+            if applicationresult.get('section2'):
+                view.section3.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section3'):
+                view.section4.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section4'):
+                view.section5.disabled = False    
+                view.save.disabled = False            
             for i in range(1, 6):
                 section_name = f'section{i}'
                 if applicationresult.get(section_name):
@@ -549,7 +562,7 @@ class Section1(discord.ui.Modal):
                             f"**Question 4**: {section.get('question4')}\n"
                             f"**Question 5**: {section.get('question5')}",
                         inline=False
-                    )                                                     
+                    )                                                               
         await interaction.response.edit_message(embed=embed, view=view, content=None)
         
 class Section2(discord.ui.Modal):
@@ -607,6 +620,18 @@ class Section2(discord.ui.Modal):
         
         applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
         if applicationresult:
+            if applicationresult.get('section1'):
+                view.section2.disabled = False
+                view.save.disabled = False
+            if applicationresult.get('section2'):
+                view.section3.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section3'):
+                view.section4.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section4'):
+                view.section5.disabled = False    
+                view.save.disabled = False            
             for i in range(1, 6):
                 section_name = f'section{i}'
                 if applicationresult.get(section_name):
@@ -619,7 +644,7 @@ class Section2(discord.ui.Modal):
                             f"**Question 4**: {section.get('question4')}\n"
                             f"**Question 5**: {section.get('question5')}",
                         inline=False
-                    )                                                           
+                    )                                                                    
         await interaction.response.edit_message(embed=embed, view=view, content=None)        
 
 class Section3(discord.ui.Modal):
@@ -676,6 +701,18 @@ class Section3(discord.ui.Modal):
 
         applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
         if applicationresult:
+            if applicationresult.get('section1'):
+                view.section2.disabled = False
+                view.save.disabled = False
+            if applicationresult.get('section2'):
+                view.section3.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section3'):
+                view.section4.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section4'):
+                view.section5.disabled = False    
+                view.save.disabled = False            
             for i in range(1, 6):
                 section_name = f'section{i}'
                 if applicationresult.get(section_name):
@@ -688,7 +725,7 @@ class Section3(discord.ui.Modal):
                             f"**Question 4**: {section.get('question4')}\n"
                             f"**Question 5**: {section.get('question5')}",
                         inline=False
-                    )                                                           
+                    )                                                            
         await interaction.response.edit_message(embed=embed, view=view, content=None)      
 
 class Section4(discord.ui.Modal):
@@ -746,6 +783,18 @@ class Section4(discord.ui.Modal):
 
         applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
         if applicationresult:
+            if applicationresult.get('section1'):
+                view.section2.disabled = False
+                view.save.disabled = False
+            if applicationresult.get('section2'):
+                view.section3.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section3'):
+                view.section4.disabled = False
+                view.save.disabled = False            
+            if applicationresult.get('section4'):
+                view.section5.disabled = False    
+                view.save.disabled = False            
             for i in range(1, 6):
                 section_name = f'section{i}'
                 if applicationresult.get(section_name):
