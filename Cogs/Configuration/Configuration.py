@@ -956,7 +956,7 @@ class ConfigCog(commands.Cog):
         await ctx.defer()
         option_result = options.find_one({'guild_id': ctx.guild.id})
         if option_result is None:
-            await options.insert_one({'guild_id': ctx.guild.id})        
+            options.insert_one({'guild_id': ctx.guild.id})        
         staffroleresult = scollection.find_one({'guild_id': ctx.guild.id})
         types = nfractiontypes.find_one({'guild_id': ctx.guild.id})
         if types is None:
