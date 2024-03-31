@@ -19,6 +19,8 @@ class On_error(commands.Cog):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         if isinstance(error, commands.CommandNotFound):
             return
+        if isinstance(error, commands.MissingPermissions):
+            return
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f"{no} **{ctx.author.display_name}**, you are missing a requirement.")
             return

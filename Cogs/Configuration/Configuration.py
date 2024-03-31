@@ -951,7 +951,7 @@ class ConfigCog(commands.Cog):
         self.client = client
 
     @commands.hybrid_command(description="Configure the bot for your servers needs")
-    @commands.has_guild_permissions(administrator=True)
+    @commands.has_guild_permissions(manage_guild=True)
     async def config(self, ctx: commands.Context):
         await ctx.defer()
         option_result = options.find_one({'guild_id': ctx.guild.id})
@@ -1008,7 +1008,7 @@ class ConfigCog(commands.Cog):
     @config.error
     async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions): 
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Administrator``", allowed_mentions=discord.AllowedMentions.none())            
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to configure this server.\n<:Arrow:1115743130461933599>**Required:** ``Manage Guild``", allowed_mentions=discord.AllowedMentions.none())            
 
 async def refreshembed(interaction):
             staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
