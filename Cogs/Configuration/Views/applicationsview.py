@@ -533,7 +533,7 @@ class Section1(discord.ui.Modal):
         view.section2.disabled = False
         view.save.disabled = False
         embed.clear_fields()
-        embed.clear_fields()
+
         
         applicationresult = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name})
 
