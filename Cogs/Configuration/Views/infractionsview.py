@@ -23,6 +23,7 @@ partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 
 nfractiontypes = db['infractiontypes']
+infractiontypeactions = db['infractiontypeactions']
 options = db['module options']
 class InfractionChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
@@ -199,12 +200,126 @@ class onvoid(discord.ui.View):
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'onvoid': False}}, upsert=True)
         await interaction.response.edit_message(content="", view=self)            
 
+class InfractionTypesAction(discord.ui.Select):
+    def __init__(self, author, name):
+        self.author = author
+        self.name = name
+        options = [
+            discord.SelectOption(label="Send to channel", emoji="<:tag:1162134250414415922>"),
+            discord.SelectOption(label="Give Roles", emoji="<:Promotion:1162134864594735315>"),
+            discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1162134605885870180>")
+        ]
+        super().__init__(placeholder='Infraction Type Action', min_values=1, max_values=3, options=options)
+        
+
+    async def callback(self, interaction: discord.Interaction):
+        options = self.values
+        view = discord.ui.View()
+        if 'Send to channel' in options:
+            view.add_item(TypeChannel(self.author, self.name, options))  
+            await interaction.response.edit_message(view=view)
+            return 
+        elif 'Give Roles' in options:
+            view.add_item(GiveRoles(self.author, self.name, options)) 
+            await interaction.response.edit_message(view=view)
+            return               
+        elif 'Remove Roles' in options:
+            view.add_item(
+                Removeroles(self.author, self.name, options))   
+            await interaction.response.edit_message(view=view)
+            return         
+
+class TypeChannel(discord.ui.ChannelSelect):
+    def __init__(self, author, name, selected):
+        super().__init__(placeholder='Infractions Type Channel', channel_types=[discord.ChannelType.text])
+        self.author = author
+        self.name = name
+        self.selected = selected
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)                  
+        channelid = self.values[0]
+
+        
+        filter = {
+            'guild_id': interaction.guild.id,
+            'name': self.name
+        }        
+
+
+        await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'channel': channelid.id}}, upsert=True)
+
+
+
+        if 'Give Roles' in self.selected:
+                view = discord.ui.View()
+                view.add_item(GiveRoles(self.author, self.name, self.selected))
+                await interaction.response.edit_message(content=f"{tick} Succesfully set channel, now set the given roles!", view=view)
+        elif 'Remove Roles' in self.selected:
+                view = discord.ui.View()
+                view.add_item(Removeroles(self.author, self.name, self.selected))
+                await interaction.response.edit_message(content=f"{tick} Succesfully set channel, now set the removed roles!", view=view)
+        else:        
+            await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
+
+
+
+
+class GiveRoles(discord.ui.RoleSelect):
+    def __init__(self, author, name, selected):
+        super().__init__(placeholder='Given Roles', max_values=10)
+        self.author = author
+        self.name = name
+        self.selected = selected
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+        filter = {
+            'guild_id': interaction.guild.id,
+            'name': self.name
+        }
+        await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'givenroles': selected_role_ids}}, upsert=True)
+
+
+        if 'Remove Roles' in self.selected:
+                view = discord.ui.View()
+                view.add_item(Removeroles(self.author, self.name, self.selected))
+                await interaction.response.edit_message(content=f"{tick} Succesfully set channel, now set the removed roles!", view=view)   
+        else:
+            await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
+class Removeroles(discord.ui.RoleSelect):
+    def __init__(self, author, name, selected):
+        super().__init__(placeholder='Removed Roles', max_values=10)
+        self.author = author
+        self.name = name
+        self.selected = selected
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+        filter = {
+            'guild_id': interaction.guild.id,
+            'name': self.name
+        }
+        await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'removedroles': selected_role_ids}}, upsert=True)
+
+
+        await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
+
 class InfractionTypes(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
             discord.SelectOption(label="Create"),
             discord.SelectOption(label="Delete"),
+            discord.SelectOption(label="Edit")
         ]
         super().__init__(placeholder='Infraction Types', min_values=1, max_values=1, options=options)
 
@@ -220,8 +335,36 @@ class InfractionTypes(discord.ui.Select):
             await interaction.response.send_modal(CreateInfractionModal(self.author))
         elif type_action == 'Delete':
             await interaction.response.send_modal(DeleteInfractionModal(self.author))
+        elif type_action =='Edit':
+             await interaction.response.send_modal(EditInfractionModal(self.author))   
 
 
+class EditInfractionModal(discord.ui.Modal):
+    def __init__(self, author):
+        self.author = author
+        super().__init__(title="Create Infraction Type")
+
+    type_input = discord.ui.TextInput(
+            label='Type',
+            placeholder='What is the infraction type?',
+            max_length=30,
+        )
+
+
+    async def on_submit(self, interaction: discord.Interaction):
+         type = self.type_input.value   
+         filterm = {
+            'guild_id': interaction.guild.id,
+            'types': {'$in': [type]}
+         }         
+         result = await nfractiontypes.find_one(filterm)
+         if result is None:
+             return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, Infraction type not found.", ephemeral=True)
+         view = discord.ui.View()
+         view.add_item(InfractionTypesAction(self.author, type))
+         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Editing infraction type. Please select the action you want to take.", view=view, ephemeral=True)
+       
+         
 
 
 class CreateInfractionModal(discord.ui.Modal):
@@ -229,13 +372,12 @@ class CreateInfractionModal(discord.ui.Modal):
         self.author = author
         super().__init__(title="Create Infraction Type")
 
-        self.type_input = discord.ui.TextInput(
+    type_input = discord.ui.TextInput(
             label='Type',
             placeholder='What is the infraction type?',
             max_length=30,
         )
 
-        self.add_item(self.type_input)
 
     async def on_submit(self, interaction: discord.Interaction):
         
@@ -262,20 +404,32 @@ class CreateInfractionModal(discord.ui.Modal):
     upsert=True
 )
         await refreshembed(self, interaction)
-        await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type created successfully", ephemeral=True)
+        view = NoThanks()
         
+        view.add_item(InfractionTypesAction(self.author, type_value))
+        await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?", view=view, ephemeral=True)
+
+class NoThanks(discord.ui.View):
+     def __init__(self) -> None:
+        super().__init__()
+    
+     @discord.ui.button(label="No Thanks", style=discord.ButtonStyle.red, row=0)
+     async def no_thanks(self, interaction: discord.Interaction):
+         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, No problem!, I've created the infraction type for you!", view=None)
+        
+   
 
 class DeleteInfractionModal(discord.ui.Modal):
     def __init__(self, author):
         self.author = author
         super().__init__(title="Delete Infraction Type")
 
-        self.type_input = discord.ui.TextInput(
+    type_input = discord.ui.TextInput(
             label='Type',
             placeholder='What is the infraction type?',
         )
 
-        self.add_item(self.type_input)
+
 
     async def on_submit(self, interaction: discord.Interaction):
         type_value = self.type_input.value   

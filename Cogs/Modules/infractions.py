@@ -28,7 +28,7 @@ consent = db['consent']
 modules = db['Modules']
 Customisation = db['Customisation']
 infractiontypes = db['infractiontypes']
-
+infractiontypeactions = db['infractiontypeactions']
 options = db['module options']
 class Infractions(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -81,6 +81,7 @@ class Infractions(commands.Cog):
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
     async def infract(self, ctx: commands.Context, staff: discord.Member, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
+        typeactions = await infractiontypeactions.find_one({'guild_id': ctx.guild.id, 'name': action})
         if optionresult:
             if optionresult.get('infractedbybutton', False) == True:
                 view = InfractionIssuer()
@@ -222,6 +223,80 @@ class Infractions(commands.Cog):
         if consent_data is None:
             await consent.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"})
             consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"}
+        if typeactions:
+            if typeactions.get('givenroles'):
+                roles = typeactions.get('givenroles')
+                for role_id in roles:  
+                    role = ctx.guild.get_role(role_id)
+                    try:
+                        await staff.add_roles(role)  
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
+            if typeactions.get('removedroles'):
+                roles = typeactions.get('removedroles')
+                for role_id in roles:  
+                    role = ctx.guild.get_role(role_id)
+                    try:
+                        await staff.remove_roles(role)  
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
+ 
+
+
+              
+            if typeactions.get('channel'):  
+               channel_id = typeactions['channel']
+               channel = self.client.get_channel(channel_id)
+               if channel:
+                try:
+                    msg = await channel.send(f"{staff.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
+                    await ctx.send(f"{tick} **{ctx.author.display_name}**, I've infracted **@{staff.display_name}**", allowed_mentions=discord.AllowedMentions.none())
+                    if expiration:
+                        infract_data = {
+                            'management': ctx.author.id,
+                            'staff': staff.id,
+                            'action': action,
+                            'reason': reason,
+                            'notes': notes,
+                            'random_string': random_string,
+                            'guild_id': ctx.guild.id,
+                            'jump_url': msg.jump_url,
+                            'msg_id': msg.id,
+                            'timestamp': datetime.now(),
+                            'expiration': end_time
+                        }
+                    else:
+                        infract_data = {
+                            'management': ctx.author.id,
+                            'staff': staff.id,
+                            'action': action,
+                            'reason': reason,
+                            'notes': notes,
+                            'random_string': random_string,
+                            'guild_id': ctx.guild.id,
+                            'jump_url': msg.jump_url,
+                            'msg_id': msg.id,
+                            'timestamp': datetime.now()
+                        }
+                    await collection.insert_one(infract_data)
+                    if consent_data.get('infractionalert', "Enabled") == "Enabled":
+                     try:
+                        await staff.send(f"{smallarrow} From **{ctx.guild.name}**", embed=embed)
+                     except:
+                        print(f"[⚠️] Couldn't send infraction alert to {staff.display_name} in @{ctx.guild.name}")
+                        pass
+                    else:
+                     pass
+                    return                    
+                except discord.Forbidden:
+                     await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
+                     return
+
+               
 
         if data:
             channel_id = data['channel_id']

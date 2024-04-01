@@ -21,6 +21,8 @@ loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 options = db['module options']
+promotionroles = db['promotion roles']
+
 class Promotionchannel(discord.ui.ChannelSelect):
     def __init__(self, author):
         super().__init__(placeholder='Promotion Channel',   channel_types=[discord.ChannelType.text])
@@ -50,6 +52,107 @@ class Promotionchannel(discord.ui.ChannelSelect):
             print(f"An error occurred: {str(e)}")
 
         print(f"Channel ID: {channelid.id}")        
+
+class Promotionrank(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        options = [
+            discord.SelectOption(label="Create"),
+            discord.SelectOption(label="Delete"),
+            discord.SelectOption(label="View")
+            
+
+        
+            
+        ]
+        super().__init__(placeholder='Promotion Ranks', min_values=1, max_values=1, options=options)
+         
+        
+
+
+    async def callback(self, interaction: discord.Interaction):
+        selected = self.values[0]
+        if selected == 'Create':
+             view = discord.ui.View(timeout=None)
+             view.add_item(PromotionRanks(self.author))
+             await interaction.response.send_message(content=f"{dropdown} Now select the rank you want to manage.", view=view, ephemeral=True)
+        elif selected == 'Delete':
+             view = discord.ui.View(timeout=None)
+             view.add_item(DeleteRank(self.author))
+             await interaction.response.send_message(content=f"{dropdown} Now select the rank you want to delete.", view=view, ephemeral=True)
+        elif selected == 'View':
+            ranks = promotionroles.find({'guild_id': interaction.guild.id})
+            
+            embed = discord.Embed(title="Promotion Ranks")
+            embed.set_thumbnail(url=interaction.guild.icon)
+
+            if ranks is None:
+                embed.description = "There is no current promotion ranks."
+            ranks = await ranks.to_list(None)       
+            if ranks:         
+             for rank in ranks:
+                role = interaction.guild.get_role(rank['rank'])
+                roles = [interaction.guild.get_role(role_id) for role_id in rank['promotionranks'] if interaction.guild.get_role(role_id)]
+                if roles:
+                    value = ', '.join([f"<@&{role.id}>" for role in roles])
+                    if role:
+                     embed.add_field(name=f"{role.name}", value=value)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+             
+                  
+
+class PromotionRanks(discord.ui.RoleSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Add Rank', max_values=1)
+        self.author = author
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)          
+        view = discord.ui.View(timeout=None)
+        view.add_item(AdditonalRoles(self.author, self.values[0].id))
+        await interaction.response.edit_message(content=f"{dropdown} Now select roles that will also be added when promoted with `{self.values[0].name}`.", view=view)
+
+class DeleteRank(discord.ui.RoleSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Delete Rank', max_values=1)
+        self.author = author
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        await promotionroles.delete_one({'guild_id': interaction.guild.id, 'rank': self.values[0].id})
+        await interaction.response.edit_message(content=f"{tick} Succesfully deleted promotion rank.", view=None)
+
+
+
+class AdditonalRoles(discord.ui.RoleSelect):
+    def __init__(self, author, rank):
+        super().__init__(placeholder='Additional roles', max_values=10)
+        self.author = author
+        self.rank = rank
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+        selected_role_ids = [role.id for role in self.values]    
+  
+        data = {
+            'guild_id': interaction.guild.id,
+            'rank': self.rank,
+            'promotionranks': selected_role_ids
+        }
+
+
+        await promotionroles.update_one({'guild_id': interaction.guild.id, 'rank': self.rank}, {'$set': data}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} Succesfully set up additional roles for the rank.", view=None)
+
 
 class PromotionModuleToggle(discord.ui.Select):
     def __init__(self, author):
@@ -202,7 +305,7 @@ async def refreshembed(interaction):
                 else: 
                  promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
             try:

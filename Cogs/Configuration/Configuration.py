@@ -10,7 +10,7 @@ from Cogs.Configuration.Views.infractionsview import ToggleInfractionsDropdown
 from Cogs.Configuration.Views.Utilityview import ToggleUtils
 
 from Cogs.Configuration.Views.promotionsview import Promotionchannel, PMoreOptions
-from Cogs.Configuration.Views.promotionsview import PromotionModuleToggle
+from Cogs.Configuration.Views.promotionsview import PromotionModuleToggle, Promotionrank
 from Cogs.Configuration.Views.loaview import LOAChannel
 from Cogs.Configuration.Views.loaview import ToggleLOADropdown
 from Cogs.Configuration.Views.loaview import LOARoled
@@ -345,7 +345,7 @@ class Config(discord.ui.Select):
                 else: 
                  promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
             view = PromotionModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                   
@@ -779,7 +779,9 @@ class PromotionModule(discord.ui.View):
         self.author = author
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Promotionchannel(author))
+        self.add_item(Promotionrank(author))
         self.add_item(PMoreOptions(author))
+        
         self.add_item(Config(author))    
 
     async def on_timeout(self) -> None:
