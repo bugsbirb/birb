@@ -211,8 +211,6 @@ class ViewRatings(discord.ui.View):
                 embed = discord.Embed(title="Staff Ratings", color=discord.Color.dark_theme())
                 embed.set_thumbnail(url=self.staff.display_avatar)
                 embed.set_author(name=self.staff.display_name, icon_url=self.staff.display_avatar)
-                embed.set_footer(text="If the feedback ID is invalid and you want to delete it contact support.", icon_url="https://media.discordapp.net/ephemeral-attachments/1129817866766663770/1194412760675651695/1192867080408682526.png?ex=65b04291&is=659dcd91&hm=411b4ce856699b19d6190f69b4692476f72673933e3828b71c83a6397a0ec09b&=&format=webp&quality=lossless")
-
             date = rating.get('date', 'N/A')
             Id = rating.get('feedbackid', 'N/A')
             feedback = rating.get('feedback', 'Non Given')

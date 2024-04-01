@@ -209,7 +209,7 @@ class InfractionTypesAction(discord.ui.Select):
             discord.SelectOption(label="Give Roles", emoji="<:Promotion:1162134864594735315>"),
             discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1162134605885870180>")
         ]
-        super().__init__(placeholder='Infraction Type Action', min_values=1, max_values=3, options=options)
+        super().__init__(placeholder='Infraction Type Action', min_values=1, max_values=3, options=options, row=0)
         
 
     async def callback(self, interaction: discord.Interaction):
@@ -410,13 +410,13 @@ class CreateInfractionModal(discord.ui.Modal):
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?", view=view, ephemeral=True)
 
 class NoThanks(discord.ui.View):
-     def __init__(self) -> None:
+    def __init__(self) -> None:
         super().__init__()
-    
-     @discord.ui.button(label="No Thanks", style=discord.ButtonStyle.red, row=0)
-     async def no_thanks(self, interaction: discord.Interaction):
-         await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, No problem!, I've created the infraction type for you!", view=None)
-        
+
+    @discord.ui.button(label="No Thanks", style=discord.ButtonStyle.red, row=1)
+    async def no_thanks(self,  interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, No problem!, I've created the infraction type for you!", view=None)
+
    
 
 class DeleteInfractionModal(discord.ui.Modal):
