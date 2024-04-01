@@ -28,7 +28,7 @@ tags = db['tags']
 partnershipch = db['Partnerships Channel']
 modules = db['Modules']
 nfractiontypes = db['infractiontypes']
-
+promotions = db['promotions']
 ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
 ReportModeratorRole = db['Report Moderator Role']
@@ -51,6 +51,9 @@ forumsconfig = db['Forum Configuration']
 stafffeedback = db['feedback']
 staffdb = db['staff database']
 welcome = db['welcome settings']
+infractiontypeactions = db['infractiontypeactions']
+
+promotionroles = db['promotion roles']
 class DataView(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -261,7 +264,8 @@ class Infractions(discord.ui.View):
             
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
-        infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']}}, upsert=True)
+        await infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']}}, upsert=True)
+        await infractiontypeactions.delete_many({'guild_id': int(interaction.guild.id)})
         await interaction.followup.send("<:greencheck:1190814894463930480> Infractions types have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Infraction Configuration", style=discord.ButtonStyle.red, row=2)
@@ -276,7 +280,8 @@ class Infractions(discord.ui.View):
         except:
             pass
         await infchannel.delete_many({'guild_id': int(interaction.guild.id)})
-        infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination']}}, upsert=True)
+        await infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination']}}, upsert=True)
+        await infractiontypeactions.delete_many({'guild_id': int(interaction.guild.id)})   
         await interaction.followup.send("<:greencheck:1190814894463930480> Infractions configuration have been erased.", ephemeral=True)
 
 
@@ -656,6 +661,25 @@ class Promotions(discord.ui.View):
         super().__init__()
         self.author = author
 
+    @discord.ui.button(label="Erase Promotions", style=discord.ButtonStyle.red, row=0)
+    async def eraseinfractions(self, interaction: discord.Interaction,  button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        await promotionroles.delete_many({'guild_id': int(interaction.guild.id)})
+        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions have been erased.", ephemeral=True)
+    
+    @discord.ui.button(label="Erase Promotions Ranks", style=discord.ButtonStyle.red, row=0)
+    async def erasepromotionroles(self, interaction: discord.Interaction,  button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+                                  color=discord.Colour.dark_embed())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
+        await interaction.response.defer()
+        await promotions.delete_many({'guild_id': int(interaction.guild.id)})
+        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions roles have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Promotions Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):

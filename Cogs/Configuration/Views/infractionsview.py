@@ -441,7 +441,7 @@ class DeleteInfractionModal(discord.ui.Modal):
         types = await nfractiontypes.find_one(filterm)
         if types is None:
             return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, Infraction type not found.", ephemeral=True)
-
+        await infractiontypeactions.delete_one({'guild_id': interaction.guild.id, 'name': type_value})  
         await nfractiontypes.update_one(
     {'guild_id': interaction.guild.id},
     {'$pull': {'types': type_value}},
