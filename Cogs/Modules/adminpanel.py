@@ -782,7 +782,7 @@ class AdminPanelCog(commands.Cog):
             inline=False,
         )
         embed.add_field(
-            name="<:Partner:1162135285031772300> Partnerships",
+            name="<:partnerships:1224724406144733224> Partnerships",
             value=f">>> **Partnerships Logged:** {partnershipscount}",
             inline=False,
         )

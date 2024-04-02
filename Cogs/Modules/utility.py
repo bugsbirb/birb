@@ -21,7 +21,7 @@ class SetupGuide(discord.ui.Select):
         self.author = author
         options = [
             discord.SelectOption(label="Basic Settings", emoji="<:Help:1184535847513624586>"),
-            discord.SelectOption(label="Message Quota", emoji="<:Messages:1148610048151523339>"),
+            discord.SelectOption(label="Message Quota", emoji="<:messageup:1224722310687359106>"),
             discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", emoji="<:tag:1162134250414415922>"),
@@ -30,8 +30,8 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="LOA", emoji=f"{loa}"),
             discord.SelectOption(label="Staff Feedback", emoji="<:Rate:1162135093129785364>"),         
-            discord.SelectOption(label="Partnerships", emoji="<:Partner:1162135285031772300>"),   
-            discord.SelectOption(label="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"), 
+            discord.SelectOption(label="Partnerships", emoji="<:partnerships:1224724406144733224>"),   
+            discord.SelectOption(label="Applications Results", emoji="<:Application:1224722901328986183>"), 
             discord.SelectOption(label="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
         ]
         super().__init__(placeholder="Setup Guides", options=options)
@@ -113,7 +113,7 @@ class HelpMenu(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
-            discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>"),
+            discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:messageup:1224722310687359106>"),
             discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
@@ -122,13 +122,13 @@ class HelpMenu(discord.ui.Select):
             discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
             discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),                   
             discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
-            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>"),                        
+            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:Application:1224722901328986183>"),                        
             discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
             discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
             discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"),
             discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
-            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>")               
+            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>")               
         ]
         super().__init__(placeholder="Help Categories", options=options)
 

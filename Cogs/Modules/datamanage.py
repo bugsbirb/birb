@@ -70,7 +70,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1199456319363633192>"), #
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
-        discord.SelectOption(label="Quota", value="Quota", emoji="<:Messages:1148610048151523339>"), #
+        discord.SelectOption(label="Quota", value="Quota", emoji="<:messageup:1224722310687359106>"), #
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),  #
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
         discord.SelectOption(label="Forums Autopost + Utils", value="Forums Autopost + Utils", emoji="<:forum:1162134180218556497>"), #
@@ -79,9 +79,9 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"), #
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"), #
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"), 
-        discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>"), #
-        discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>"), #
-        discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:ApplicationFeedback:1178754449125167254>") #
+        discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>"), #
+        discord.SelectOption(label="Reports", value="Reports", emoji="<:reports:1224723845726998651>"), #
+        discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:Application:1224722901328986183>") #
         ]
         super().__init__(placeholder='Data Select', min_values=1, max_values=1, options=options,)
 

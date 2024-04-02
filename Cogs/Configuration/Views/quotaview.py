@@ -127,7 +127,7 @@ async def refreshembed(interaction):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Quota']}"            
-            embed = discord.Embed(title="<:Messages:1148610048151523339> Message Quota Module",  color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:messageup:1224722310687359106> Message Quota Module",  color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Quota:** {messagecountmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)      

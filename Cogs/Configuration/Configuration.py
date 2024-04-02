@@ -184,7 +184,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
-        discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:Messages:1148610048151523339>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
+        discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:messageup:1224722310687359106>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
         discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
@@ -193,9 +193,9 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
-        discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:Partner:1162135285031772300>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
-        discord.SelectOption(label="Reports", value="Reports", emoji="<:Moderation:1163933000006893648>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
-        discord.SelectOption(label="Applications", value="Applications", emoji="<:ApplicationFeedback:1178754449125167254>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
+        discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
+        discord.SelectOption(label="Reports", value="Reports", emoji="<:reports:1224723845726998651>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
+        discord.SelectOption(label="Applications", value="Applications", emoji="<:Application:1224722901328986183>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
 ]
 
         super().__init__(placeholder='Config Menu', min_values=1, max_values=1, options=options)
@@ -344,7 +344,7 @@ class Config(discord.ui.Select):
                  promochannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
-            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.blurple())
             embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
             view = PromotionModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -402,7 +402,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Quota']}"            
-            embed = discord.Embed(title="<:Messages:1148610048151523339> Message Quota Module",  color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:messageup:1224722310687359106> Message Quota Module",  color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Quota:** {messagecountmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
@@ -456,7 +456,7 @@ class Config(discord.ui.Select):
                  partnershipchannelmsg = f"{channel.mention}"                     
                 else:
                  partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
-            embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:partnerships:1224724406144733224> Partnership Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Partnership Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Partnership Channel:** {partnershipchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = PartnershipModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -495,7 +495,7 @@ class Config(discord.ui.Select):
                  reprolemsg = "<:Error:1223063223910010920> Role wasn't found please reconfigure."
                 else: 
                  reprolemsg = f"{role.mention}"
-            embed = discord.Embed(title="<:Moderation:1163933000006893648> Reports Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:reports:1224723845726998651> Reports Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Reports Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Reports Channel:** {partnershipchannelmsg}\n{replybottom}**Reports Moderator Role:** {reprolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = ReportsModule(self.author)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -542,7 +542,7 @@ class Config(discord.ui.Select):
                 else:
                     appchannelmsg = channel.mention
 
-            embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Result Module",
+            embed = discord.Embed(title="<:Application:1224722901328986183> Applications Module",
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",

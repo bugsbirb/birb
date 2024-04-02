@@ -296,7 +296,7 @@ class ApplicationCreator(discord.ui.Select):
 
 class createapp(discord.ui.Modal):
     def __init__(self, author):
-        super().__init__(title="Create Application")
+        super().__init__(title="Create Application", timeout=None)
         self.author = author
 
     name = discord.ui.TextInput(
@@ -340,7 +340,7 @@ class deleapp(discord.ui.Modal):
 
 class editapp(discord.ui.Modal):
     def __init__(self, author):
-        super().__init__(title="Edit Application")
+        super().__init__(title="Edit Application", timeout=None)
         self.author = author
 
     name = discord.ui.TextInput(
@@ -398,7 +398,7 @@ class editapp(discord.ui.Modal):
 
 class SectionButtons(discord.ui.View):
     def __init__(self, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.author = author
         self.name = name
     
@@ -482,7 +482,7 @@ class SectionButtons(discord.ui.View):
 
 class Section1(discord.ui.Modal):
     def __init__(self, author, name):
-        super().__init__(title="Section 1")
+        super().__init__(title="Section 1", timeout=None)
         self.author = author
         self.name = name
 
@@ -567,7 +567,7 @@ class Section1(discord.ui.Modal):
         
 class Section2(discord.ui.Modal):
     def __init__(self, author, name):
-        super().__init__(title="Section 2")
+        super().__init__(title="Section 2", timeout=None)
         self.author = author
         self.name = name
 
@@ -649,7 +649,7 @@ class Section2(discord.ui.Modal):
 
 class Section3(discord.ui.Modal):
     def __init__(self, author, name):
-        super().__init__(title="Section 3")
+        super().__init__(title="Section 3", timeout=None)
         self.author = author
         self.name = name
 
@@ -730,7 +730,7 @@ class Section3(discord.ui.Modal):
 
 class Section4(discord.ui.Modal):
     def __init__(self, author, name):
-        super().__init__(title="Section 4")
+        super().__init__(title="Section 4", timeout=None)
         self.author = author
         self.name = name
 
@@ -922,7 +922,7 @@ async def refreshembed(interaction):
                 else:
                     appchannelmsg = channel.mention
 
-            embed = discord.Embed(title="<:ApplicationFeedback:1178754449125167254> Applications Module",
+            embed = discord.Embed(title="<:Application:1224722901328986183> Applications Module",
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",

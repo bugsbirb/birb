@@ -100,7 +100,7 @@ async def refreshembed(interaction):
                  partnershipchannelmsg = f"{channel.mention}"                     
                 else:
                  partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
-            embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:partnerships:1224724406144733224> Partnership Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Partnership Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Partnership Channel:** {partnershipchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
 
             embed.set_thumbnail(url=interaction.guild.icon)
