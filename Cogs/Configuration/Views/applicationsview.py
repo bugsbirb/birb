@@ -280,10 +280,13 @@ class ApplicationCreator(discord.ui.Select):
             discord.SelectOption(label="Create"),
             discord.SelectOption(label="Edit"),
             discord.SelectOption(label="Delete")
+            
+
         ]
         super().__init__(placeholder='Application Builder', min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
+       
         option = self.values[0]
         if option == 'Create':
             await interaction.response.send_modal(createapp(author=self.author))
@@ -378,21 +381,23 @@ class editapp(discord.ui.Modal):
                         inline=False
                     )         
         
-        if not sections_found:
-            embed.description = "No sections found in this application."
+        
         if applicationresult.get('section1'):
             view.section2.disabled = False
             view.save.disabled = False
-        if applicationresult.get('section2'):
+        elif applicationresult.get('section2'):
             view.section3.disabled = False
             view.save.disabled = False            
-        if applicationresult.get('section3'):
+        elif applicationresult.get('section3'):
             view.section4.disabled = False
             view.save.disabled = False            
-        if applicationresult.get('section4'):
+        elif applicationresult.get('section4'):
             view.section5.disabled = False    
             view.save.disabled = False
-    
+        else:  
+              embed.description = f"No sections found for this application."
+
+
 
         await interaction.response.edit_message(embed=embed, view=view)
 

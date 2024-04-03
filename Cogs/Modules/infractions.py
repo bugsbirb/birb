@@ -79,9 +79,12 @@ class Infractions(commands.Cog):
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
-    async def infract(self, ctx: commands.Context, staff: discord.Member, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+    async def infract(self, ctx: commands.Context, staff: discord.User, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
         typeactions = await infractiontypeactions.find_one({'guild_id': ctx.guild.id, 'name': action})
+        if staff is None:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, this user can not be found.", allowed_mentions=discord.AllowedMentions.none())
+          return                   
         if optionresult:
             if optionresult.get('infractedbybutton', False) == True:
                 view = InfractionIssuer()
@@ -226,20 +229,24 @@ class Infractions(commands.Cog):
         if typeactions:
             if typeactions.get('givenroles'):
                 roles = typeactions.get('givenroles')
-                for role_id in roles:  
+                member = ctx.guild.get_member(staff.id)
+                if member:
+                 for role_id in roles:  
                     role = ctx.guild.get_role(role_id)
                     try:
-                        await staff.add_roles(role)  
+                        await member.add_roles(role)  
                     except discord.Forbidden:
                         pass
                     except discord.HTTPException:
                         pass
             if typeactions.get('removedroles'):
-                roles = typeactions.get('removedroles')
-                for role_id in roles:  
+                member = ctx.guild.get_member(staff.id)
+                if member:                
+                 roles = typeactions.get('removedroles')
+                 for role_id in roles:  
                     role = ctx.guild.get_role(role_id)
                     try:
-                        await staff.remove_roles(role)  
+                        await member.remove_roles(role)  
                     except discord.Forbidden:
                         pass
                     except discord.HTTPException:
@@ -361,8 +368,11 @@ class Infractions(commands.Cog):
 
     @commands.hybrid_command(description="View a staff member's infractions")
     @app_commands.describe(staff="The staff member to view infractions for", scope="The scope of infractions to view")
-    async def infractions(self, ctx: commands.Context, staff: discord.Member, scope: Literal['Voided', 'Expired', 'All'] = None):
+    async def infractions(self, ctx: commands.Context, staff: discord.User, scope: Literal['Voided', 'Expired', 'All'] = None):
         await ctx.defer()
+        if staff is None:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, this user can not be found.", allowed_mentions=discord.AllowedMentions.none())
+          return            
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -440,8 +450,8 @@ class Infractions(commands.Cog):
                 expiration = f"\n{arrow}**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D>"
                 if infraction['expiration'] < datetime.now():
                     expiration = f"\n{arrow}**Expiration:** <t:{int(infraction['expiration'].timestamp())}:D> **(Infraction Expired)**"
-            management = await self.client.fetch_user(infraction['management'])
-            value = f"{arrow}**Infracted By:** {management.mention}\n{arrow}**Action:** {infraction['action']}\n{arrow}**Reason:** {infraction['reason']}\n{arrow}**Notes:** {infraction['notes']}{expiration}{jump_url}"
+            management = f"<@{infraction['management']}>"
+            value = f"{arrow}**Infracted By:** {management}\n{arrow}**Action:** {infraction['action']}\n{arrow}**Reason:** {infraction['reason']}\n{arrow}**Notes:** {infraction['notes']}{expiration}{jump_url}"
             if len(value) > 1024:
              value = value[:1021] + "..."
             embed.add_field(

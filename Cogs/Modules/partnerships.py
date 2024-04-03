@@ -54,9 +54,12 @@ class Partnerships(commands.Cog):
         return True
 
     @partnership.command(description="Log a partnership")
-    @app_commands.describe(owner="The owner of the server", server="The name of the server", invite="The invite link to the server")
-    async def log(self, ctx: commands.Context, owner: discord.Member, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
+    @app_commands.describe(respresentive="The partnership respresentive of the server", server="The name of the server", invite="The invite link to the server")
+    async def log(self, ctx: commands.Context, respresentive: discord.User, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
         await ctx.defer()
+        if respresentive is None:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, this user can not be found.", allowed_mentions=discord.AllowedMentions.none())
+          return
         result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
         if result:
             await ctx.send(f"{no} **{ctx.author.display_name}**, that server is already in the partnerships database.", allowed_mentions=discord.AllowedMentions.none())
@@ -86,7 +89,7 @@ class Partnerships(commands.Cog):
           
           partnershipdata = {
             'guild_id': ctx.guild.id,
-            'owner': owner.id,
+            'owner': respresentive.id,
             'admin': ctx.author.id,
             'invite': invite,
             'server': server
@@ -97,7 +100,7 @@ class Partnerships(commands.Cog):
           guild_id = "Unknown" if guild is None or guild.id is None else guild.id
           icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
           invite = "Unknown" if guild is None or invited.url is None else invited.url
-          embed = discord.Embed(title=f"<:Partner:1162135285031772300> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
+          embed = discord.Embed(title=f"<:Partner:1162135285031772300> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {respresentive.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
           embed.set_author(name=guild_name, icon_url=icon_url)
           embed.set_thumbnail(url=guild.icon.url)
           try:
@@ -106,9 +109,13 @@ class Partnerships(commands.Cog):
            await partnerships.insert_one(partnershipdata)
           except discord.Forbidden: 
             await ctx.send(f"{no} I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
+            return
+         else:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, the channel can not be found please resetup the channel in `/config`", allowed_mentions=discord.AllowedMentions.none())   
+           return                        
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
-
+         
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
     async def terminate(self, ctx: commands.Context, server, reason: app_commands.Range[str, 1, 2000]):
@@ -164,9 +171,12 @@ class Partnerships(commands.Cog):
             await ctx.send(f"{no} I don't have permission to view that channel.")     
             return      
           await partnerships.delete_one({'guild_id': ctx.guild.id, 'server': server})
+         else:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, the channel can not be found please resetup the channel in `/config`", allowed_mentions=discord.AllowedMentions.none())   
+           return                           
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())        
-
+         return
     @partnership.command(description="View all Partnerships in this server.")
     async def all(self, ctx: commands.Context):
         await ctx.defer()

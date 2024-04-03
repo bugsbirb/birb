@@ -38,7 +38,7 @@ modules = db["Modules"]
 collection = db["infractions"]
 Customisation = db["Customisation"]
 options = db['module options']
-
+infractiontypeactions = db['infractiontypeactions']
 class VoidInf(discord.ui.Modal, title="Void Infraction"):
     def __init__(self, user, guild, author):
         super().__init__()
@@ -554,6 +554,72 @@ class Reason(discord.ui.Modal, title="Reason"):
              embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
         guild_id = interaction.guild.id
         data = infchannel.find_one({"guild_id": guild_id})
+        typeactions = infractiontypeactions.find_one(({"guild_id": guild_id, "name": self.option}))
+        if typeactions:
+            if typeactions.get('givenroles'):
+                roles = typeactions.get('givenroles')
+                member = interaction.guild.get_member(self.user.id)
+                if member:
+                 for role_id in roles:  
+                    role = interaction.guild.get_role(role_id)
+                    try:
+                        await member.add_roles(role)  
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
+            if typeactions.get('removedroles'):
+                member = interaction.guild.get_member(self.user.id)
+                if member:                
+                 roles = typeactions.get('removedroles')
+                 for role_id in roles:  
+                    role = interaction.guild.get_role(role_id)
+                    try:
+                        await member.remove_roles(role)  
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
+ 
+
+
+              
+            if typeactions.get('channel'):  
+               channel_id = typeactions['channel']
+               channel = interaction.guild.get_channel(channel_id)
+            if channel:
+
+                try:
+                    await channel.send(f"{self.user.mention}", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False), view=view)
+                except discord.Forbidden:
+                    await interaction.response.edit_message(
+                        content=f"{no} I don't have permission to view that channel.",
+                        view=Return(self.user, self.guild, self.author),
+                        embed=None, allowed_mentions=discord.AllowedMentions.none()
+                    )
+                    return
+                await interaction.response.edit_message(
+                    content=f"{tick} **{self.author.display_name}**, I've infracted **@{self.user.display_name}**",
+                    embed=None,
+                    view=Return(self.user, self.guild, self.author)
+                    , allowed_mentions=discord.AllowedMentions.none()
+                )
+                collection.insert_one(infract_data)
+                if consent_data["infractionalert"] == "Enabled":
+                    try:
+                        await self.user.send(
+                            f"{smallarrow} From **{interaction.guild.name}**",
+                            embed=embed,
+                        )
+                    except discord.Forbidden:
+                        print('Could not send message to this user')
+                        pass
+                else:
+                    pass
+                return
+            
+
+                       
         if data:
             channel_id = data["channel_id"]
             channel = interaction.guild.get_channel(channel_id)

@@ -39,8 +39,9 @@ class promo(commands.Cog):
 
     @commands.hybrid_command(description="View a staff member's promotions")
     @app_commands.describe(staff="The staff member to view promotion for")
-    async def promotions(self, ctx: commands.Context, staff: discord.Member):
+    async def promotions(self, ctx: commands.Context, staff: discord.User):
         await ctx.defer()
+
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -54,8 +55,10 @@ class promo(commands.Cog):
                 'guild_id': ctx.guild.id,
                 'staff': staff.id,
             }
-
         promotion_list = await promotions.find(filter).to_list(750)
+        if len(promotion_list) == 0:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this staff member doesn't have any promotions.", allowed_mentions=discord.AllowedMentions.none())
+            return   
 
         if not promotion_list:
             print(f"Found {len(promotion_list)} promotions for {staff.display_name}")
@@ -75,8 +78,8 @@ class promo(commands.Cog):
             else:
                 jump_url = f"\n{arrow}**[Jump to Promotion]({promotion['jump_url']})**"
 
-            management = await self.client.fetch_user(promotion['management'])
-            value = f"{arrow}**Promoted By:** {management.mention}\n{arrow}**New:** <@&{promotion['new']}>\n{arrow}**Reason:** {promotion['reason']}{jump_url}"
+            management = f"<@{promotion['management']}>"
+            value = f"{arrow}**Promoted By:** {management}\n{arrow}**New:** <@&{promotion['new']}>\n{arrow}**Reason:** {promotion['reason']}{jump_url}"
             if len(value) > 1024:
                 value = value[:1021] + "..."
             embed.add_field(
@@ -121,7 +124,7 @@ class promo(commands.Cog):
         new='What is the role you are awarding them with?',
         reason='What makes them deserve the promotion?'
     ) 
-    async def promote(self, ctx: commands.Context, staff: discord.Member, new: discord.Role, reason: app_commands.Range[str, 1, 2000]):
+    async def promote(self, ctx: commands.Context, staff: discord.User, new: discord.Role, reason: app_commands.Range[str, 1, 2000]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the promotion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -129,7 +132,10 @@ class promo(commands.Cog):
         
         if not await has_admin_role(ctx):
             return             
-        
+        member = ctx.guild.get_member(staff.id)
+        if member is None:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, this user isn't in the server how are you gonna promote them?", allowed_mentions=discord.AllowedMentions.none())
+            return       
 
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
         if optionresult:
