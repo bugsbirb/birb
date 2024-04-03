@@ -343,12 +343,12 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed)
 
     async def fetch_birb_image(self):
-        birb_api_url = "https://birbapi.astrobirb.dev/birb"
+        birb_api_url = "https://api.alexflipnote.dev/birb"
         async with aiohttp.ClientSession() as session:
             async with session.get(birb_api_url) as response:
                 response.raise_for_status()
                 data = await response.json()
-                return data["image_url"]
+                return data["file"]
 
     @commands.hybrid_command(description="Get silly birb photo")
     async def birb(self, ctx: commands.Context):

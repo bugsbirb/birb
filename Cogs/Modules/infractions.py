@@ -366,6 +366,9 @@ class Infractions(commands.Cog):
         return message
 
 
+
+
+
     @commands.hybrid_command(description="View a staff member's infractions")
     @app_commands.describe(staff="The staff member to view infractions for", scope="The scope of infractions to view")
     async def infractions(self, ctx: commands.Context, staff: discord.User, scope: Literal['Voided', 'Expired', 'All'] = None):
