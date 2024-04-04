@@ -10,6 +10,7 @@ import os
 import chat_exporter
 import random
 import io
+from discord import app_commands
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)

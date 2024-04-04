@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import motor.motor_asyncio
 from dotenv import load_dotenv
@@ -19,14 +20,16 @@ class Consent(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.hybrid_command(description="Configure notifications", name="consent")
-    async def consent(self, ctx: commands.Context):
-        consent_data = await consentdb.find_one({"user_id": ctx.author.id})
+    @app_commands.command(description="Configure notifications", name="consent")
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)       
+    async def consent(self, interaction: discord.Interaction):
+        consent_data = await consentdb.find_one({"user_id": interaction.user.id})
 
         if consent_data is None:
-            await consentdb.insert_one({"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"})
-            consent_data = {"user_id": ctx.author.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"}
-        view = Confirm(consent_data, ctx.author)
+            await consentdb.insert_one({"user_id": interaction.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"})
+            consent_data = {"user_id": interaction.user.id, "infractionalert": "Enabled", "PromotionAlerts": "Enabled", "LOAAlerts": "Enabled"}
+        view = Confirm(consent_data, interaction.user)
         if consent_data.get('infractionalert') == "Enabled":
             view.toggle_infractions.style = discord.ButtonStyle.green
         else:
@@ -45,11 +48,11 @@ class Consent(commands.Cog):
         embed = discord.Embed(title="Notifications",
                               description=f"{replytop}**Infraction Alerts:** When you are infracted you'll receive a direct message.\n{replymiddle}**Promotion Alerts:** When you are promoted you'll receive a direct message.\n{replybottom}**LOA Alerts:** When you are on LOA you'll receive direct messages.",
                               color=discord.Color.dark_embed())
-        embed.set_thumbnail(url=ctx.author.display_avatar.url)
+        embed.set_thumbnail(url=interaction.user.display_avatar.url)
 
         
         
-        await ctx.send(embed=embed, view=view)
+        await interaction.response.send_message(embed=embed, view=view)
 
 
 class Confirm(discord.ui.View):

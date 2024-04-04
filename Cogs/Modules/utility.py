@@ -144,9 +144,7 @@ class Utility(commands.Cog):
             return "Not Connected"
 
 
-    @app_commands.command()
-    @app_commands.allowed_installs(guilds=True, users=True)
-    @app_commands.allowed_contexts(guilds=True, dms=False, private_channels=False)
+    @commands.hybrid_command()
     async def server(self, interaction: discord.Interaction):
         """ Check info about current server """        
 
@@ -166,6 +164,17 @@ class Utility(commands.Cog):
         
 
         
+    @app_commands.command(description="View someones avatar")
+    @app_commands.allowed_installs(guilds=False, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def avatar(self, interaction: discord.Interaction, user: discord.User = None):
+        if user is None:
+            user = interaction.user
+        embed = discord.Embed(title=f"{(user.name).capitalize()}'s Avatar", color=discord.Color.dark_embed())
+        embed.set_image(url=user.display_avatar)
+        await interaction.response.send_message(embed=embed)
+
+
 
     @app_commands.command()
     @app_commands.allowed_installs(guilds=True, users=True)
@@ -316,10 +325,12 @@ class Utility(commands.Cog):
         embed.set_author(name=bot_user.display_name, icon_url=bot_user.display_avatar)
         await ctx.send(embed=embed, view=view)
 
-    @commands.command(aliases=["joinme", "join", "botinvite"])
-    async def invite(self, ctx: commands.Context):
+    @app_commands.command(description="Invite Astro Birb to your server")
+    @app_commands.allowed_installs(guilds=False, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)     
+    async def invite(self, interaction: discord.Interaction):
      view = invite()
-     await ctx.send(view=view)
+     await interaction.response.send_message(view=view)
 
 
     @app_commands.command(name='vote',description="❤️ Support Astro Birb!")
