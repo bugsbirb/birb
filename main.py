@@ -29,6 +29,7 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
 load_dotenv()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["astro"]
@@ -112,7 +113,8 @@ class client(commands.AutoShardedBot):
 
     async def on_ready(self):
         if environment == 'custom':
-         guild = await self.fetch_guild(1223982982977556570)
+         
+         guild = await self.fetch_guild(guildid)
          if guild:
             
             await guild.chunk(cache=True)
