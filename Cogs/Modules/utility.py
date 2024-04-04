@@ -109,125 +109,11 @@ class SetupGuide(discord.ui.Select):
 
 
 
-class HelpMenu(discord.ui.Select):
-    def __init__(self, author):
-        self.author = author
-        options = [
-            discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:messageup:1224722310687359106>"),
-            discord.SelectOption(label="Modmail", value="Modmail", emoji="<:Mail:1162134038614650901>"),
-            discord.SelectOption(label="Forums", value="Forums", emoji="<:forum:1162134180218556497>"),
-            discord.SelectOption(label="Tags", value="Tags", emoji="<:tag:1162134250414415922>"),
-            discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"),
-            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
-            discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
-            discord.SelectOption(label="Staff List", value="Staff List", emoji="<:List:1179470251860185159>"),                   
-            discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
-            discord.SelectOption(label="Applications Results", value="Applications Results", emoji="<:Application:1224722901328986183>"),                        
-            discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"),
-            discord.SelectOption(label="Configuration", value="Configuration", emoji="<:Setting:1154092651193323661>"),
-            discord.SelectOption(label="Utility", value="Utility", emoji="<:Folder:1148813584957194250>"),
-            discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"),
-            discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:Rate:1162135093129785364>"),            
-            discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>")               
-        ]
-        super().__init__(placeholder="Help Categories", options=options)
 
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your panel!",
-                                  color=discord.Colour.dark_embed())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)          
-        category = self.values[0]
-        embed = discord.Embed(title="", description="", color=discord.Color.dark_embed())
-        embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-
-        if category == 'Modmail':
-            embed.title = "Modmail Module"
-            embed.description = "The Modmail module is a system for handling private messages sent by server members. It allows staff members to respond to user queries, feedback, or issues privately without cluttering the main chat channels. With this module, you can efficiently manage and respond to user inquiries, ensuring a smooth and organized support experience for your server members."
-            embed.add_field(name="Commands", value="* /modmail reply\n* /modmail close/n* /modmail blacklist\n* /modmail unblacklist\n* /modmail alert")
-        elif category == 'Forums':
-            embed.title = "Forums Utils Module"
-            embed.description = "This module provides commands for managing forums within your server & on forum creation embeds."
-            embed.add_field(name="Commands", value="* /forums unlock\n* /forums lock\n* /forums archive\n* /forums manage")
-        elif category == 'Tags':
-            embed.title = "Tags Module"
-            embed.description = "The Tags Module allows you to create, manage, and use custom text-based tags within your server. Tags are short snippets of text that can be easily retrieved and sent in chat. This module enhances communication and enables you to create quick responses or share information efficiently."
-            embed.add_field(name="Commands", value="* /tags send\n* /tags info\n* /tags delete\n* /tags all")
-        elif category == 'Infractions':
-            embed.title = "Infractions Module"
-            embed.description = "The Infractions Module is a powerful tool for managing staff discipline within your server. It offers a range of disciplinary actions, including 'Termination,' 'Demotion,' 'Warnings,' 'Verbal Warning,' and 'Activity Notice.' With these options, you can effectively address various staff-related issues and maintain a harmonious server environment."
-            embed.add_field(name="Commands", value="* /infract\n* /infractions\n* /infraction void\n* /admin panel")
-        elif category == 'Suspensions':
-            embed.title = "Suspensions Module"
-            embed.description = "Manage staff suspensions with ease. This module allows authorized users to suspend staff members for a specified duration, optionally removing their roles during the suspension. It also handles the automatic removal of suspensions when the duration expires and restoration of roles to the suspended staff members."
-            embed.add_field(name="Commands", value="* /suspend\n* /suspension manage\n* /suspension active")
-        elif category == 'Promotions':
-            embed.title = "Promotions Module"
-            embed.description = "The Promotion module is designed to recognize and reward exceptional staff members. It provides a straightforward way to promote active and highly skilled staff members, acknowledging their contributions and dedication to your server."
-            embed.add_field(name="Commands", value="* /promote\n* /admin panel")
-        elif category == 'Staff Database & Panel':
-            embed.title = "Staff Database & Panel"
-            embed.description = "The Staff Database & Panel is a comprehensive tool for managing your server's staff team. It provides a centralized database for storing staff information and a user-friendly panel for efficient staff management. With this module, you can easily add, remove, and view staff members, ensuring a well-organized and effective staff team."
-            embed.add_field(name="Commands", value="* /staff add\n* /staff remove\n* /staff introduction\n* /staff panel")
-    
-        elif category == 'Configuration':
-            embed.title = "Configuration"
-            embed.description = "The Configuration module allows you to customize the bot to meet your server's specific needs. You can configure Permissions, and Channels to tailor the bot's behavior to your server's requirements."
-            embed.add_field(name="Commands", value="* /config\n* /forums manage")
-        elif category == 'Utility':
-            embed.title = "Utilities"
-            embed.description = "The Utility commands module consists of commands unrelated to the bot itself. These commands are designed to provide various helpful functionalities for your server, enhancing its overall utility and convenience."
-            embed.add_field(name="Commands", value="* /user\n* /server\n* /ping\n* /help")
-        elif category == 'LOA':
-            embed.title = "LOA Module"
-            embed.description = "The LOA (Leave of Absence) Module simplifies LOA requests in your Discord server. Members can easily request time off with a specified duration and reason. Server Admins can efficiently manage these requests and track active LOAs. When LOAs end, notifications ensure everyone is informed. A streamlined solution for a well-organized server."
-            embed.add_field(name="Commands", value="* /loa request\n* /admin panel\n* /loa active")                        
-        elif category == 'Staff Feedback':
-            embed.title = "Staff Feedback Module"
-            embed.description = "This module facilitates the process of providing feedback and ratings for staff members. Users can use the commands within this module to share their feedback and experiences with the staff, helping to maintain a positive and efficient community environment."
-            embed.add_field(name="Commands", value="* /feedback give\n* /feedback ratings")                
-        elif category == 'Partnerships':
-            embed.title = "Partnerships Module"
-            embed.description = "Log partnerships, terminate partnerships, and view partnerships."
-            embed.add_field(name="Commands", value="* /partnership log\n* /partnership all\n* /partnership terminate")               
-        elif category == 'Message Quota':
-            embed.title = "Message Quota Module"
-            embed.description = "If you servers staff team has a message quota this feature is extremely helpful for tracking it."
-            embed.add_field(name="Commands", value="* /staff leaderboard\n* /staff manage\n* /staff messages")   
-        elif category == 'Connection Roles':
-            embed.title = "Connection Roles Module"
-            embed.description = "The connection roles module is a module where if the parent role is given to a member it also gives the child role to the member."
-            embed.add_field(name="Commands", value="* /connectionrole add\n* /connectionrole remove\n* /connectionrole list")   
-
-        elif category == 'Applications Results':
-            embed.title = "Application Results Module"
-            embed.description = """
-❓ **How does this work?**
-* **Application Results Module.** is a module that automatically assigns roles to applicants after passing based on your application results configuration settings. It also logs a application result in a channel of your choosing.
-"""
-            embed.add_field(name="Commands", value="* /application results")    
-
-
-        elif category == 'Staff List':
-            embed.title = "Staff List Module"
-            embed.description = """
-❓ **How does this work?**
-* **Roles.** It uses the staff roles & admin roles from config.
-* **Role Hierarchy Sorting.** It considers the role hierarchy, sorting roles based on their positions to ensure an accurate representation of the staff list.
-* **Hoisted Roles.** It selects hoisted roles, ensuring that only roles marked as hoisted are included in the staff list.
-"""
-            embed.add_field(name="Commands", value="* /stafflist")               
-        else:
-            embed.title = "Error"
-            embed.description = "The specified category could not be found, our team has been notified."
-            print("Category not found in utility.py.")
-
-        await interaction.response.edit_message(embed=embed)
 class Help(discord.ui.View):
     def __init__(self, author):
         super().__init__()
         self.author = author
-        self.add_item(HelpMenu(self.author))
         self.add_item(SetupGuide(self.author))
 
 
@@ -398,15 +284,14 @@ class Utility(commands.Cog):
         
       
 
-    @commands.hybrid_command(description="Displays all the commands.")
+    @commands.hybrid_command(description="Get help with Astro Birb.")
     async def help(self, ctx: commands.Context):         
      embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
-     embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get information about different modules and commands."
+     embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get setup guides."
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
      embed.add_field(name="**Command Prefix**", value="`/`")
      embed.add_field(name="**Support Links**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.\n[**Read the documentation**](https://docs.astrobirb.dev) for some extra help.")     
      view = Help(ctx.author)
-
      await ctx.send(embed=embed, view=view)
 
 

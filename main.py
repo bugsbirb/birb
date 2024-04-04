@@ -49,7 +49,6 @@ class client(commands.AutoShardedBot):
             "Cogs.Modules.botinfo",
             "Cogs.Modules.tags",
             "Cogs.Modules.suspension",
-            "Cogs.Modules.stafflist",
             "Cogs.Modules.stafffeedback",
             "Cogs.Modules.reports",
             "Cogs.Modules.staff",
