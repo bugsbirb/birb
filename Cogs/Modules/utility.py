@@ -147,24 +147,22 @@ class Utility(commands.Cog):
     @app_commands.command()
     @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=False, private_channels=False)
-    async def server(self, ctx: commands.Context):
+    async def server(self, interaction: discord.Interaction):
         """ Check info about current server """        
-   
 
-        if ctx.invoked_subcommand is None:
-            find_bots = sum(1 for member in ctx.guild.members if member.bot)
-            guild = ctx.guild
-            text = ctx.guild.text_channels
-            voice = ctx.guild.voice_channels
-            total_members = len(ctx.guild.members)
-            human_members = sum(1 for member in ctx.guild.members if not member.bot)
-            embed = discord.Embed(title=f"**{ctx.guild.name}** in a nutshell", description=f"* **Owner:** {guild.owner.mention}\n* **Guild:** {guild.name}\n* **Guild ID:** {guild.id}\n* **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)", color=0x2b2d31)
-            embed.add_field(name="Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
-            embed.add_field(name="Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {ctx.guild.premium_subscription_count} (Level: {ctx.guild.premium_tier})\n* **Total Roles:** {len(ctx.guild.roles)}", inline=True)         
-            embed.add_field(name="Security", value=f"* **Verification Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{str(ctx.guild.explicit_content_filter).capitalize()}`")
-            embed.set_thumbnail(url=ctx.guild.icon)
-            embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
-            await ctx.send(embed=embed)
+        find_bots = sum(1 for member in interaction.guild.members if member.bot)
+        guild = interaction.guild
+        text = interaction.guild.text_channels
+        voice = interaction.guild.voice_channels
+        total_members = len(interaction.guild.members)
+        human_members = sum(1 for member in interaction.guild.members if not member.bot)
+        embed = discord.Embed(title=f"**{interaction.guild.name}** in a nutshell", description=f"* **Owner:** {guild.owner.mention}\n* **Guild:** {guild.name}\n* **Guild ID:** {guild.id}\n* **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)", color=0x2b2d31)
+        embed.add_field(name="Channels", value=f"* **Categories:** {len(interaction.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(interaction.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
+        embed.add_field(name="Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {interaction.guild.premium_subscription_count} (Level: {interaction.guild.premium_tier})\n* **Total Roles:** {len(interaction.guild.roles)}", inline=True)         
+        embed.add_field(name="Security", value=f"* **Verification Level:** {str(interaction.guild.verification_level).capitalize()}\n* **Content Filter:** `{str(interaction.guild.explicit_content_filter).capitalize()}`")
+        embed.set_thumbnail(url=interaction.guild.icon)
+        embed.set_author(name=f"{interaction.guild.owner}'s creation", icon_url=interaction.guild.owner.display_avatar)
+        await interaction.response.send_message(embed=embed)
         
 
         
