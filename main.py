@@ -8,38 +8,46 @@ import os
 from dotenv import load_dotenv
 from Cogs.Modules.reports import ReportPanel
 from Cogs.Modules.suggestions import SuggestionView, SuggestionManageView
-import asyncio
 import time
 from Cogs.Modules.applicationresults import AcceptAndDeny
 from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.staff import Staffview
 from motor.motor_asyncio import AsyncIOMotorClient
-load_dotenv()
 
+from dotenv import dotenv_values
 
 PREFIX = os.getenv("PREFIX")
 TOKEN = os.getenv("TOKEN")
 STATUS = os.getenv("STATUS")
 MONGO_URL = os.getenv("MONGO_URL")
 
+
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_URL"),
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
 )
-
+environment = os.getenv("ENVIRONMENT")
+load_dotenv()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["astro"]
-
+print(environment)
 
 class client(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
-        super().__init__(
+        if environment == "custom":
+         print('Custom Branding Loaded')
+         super().__init__(
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=False
+         )
+        else:
+         print('Production Loaded')
+         super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1
-        )
+         )             
         self.client = client
         self.cogslist = [
             "Cogs.Modules.astro",
@@ -93,6 +101,7 @@ class client(commands.AutoShardedBot):
         self.add_view(Confirm())
         self.add_view(Voting())
         self.add_view(Staffview())
+
         self.add_view(AcceptAndDeny())
         
         self.loop.create_task(self.load_jishaku())
@@ -102,6 +111,15 @@ class client(commands.AutoShardedBot):
             print(f"[✅] {ext} loaded")
 
     async def on_ready(self):
+        if environment == 'custom':
+         guild = await self.fetch_guild(1223982982977556570)
+         if guild:
+            
+            await guild.chunk(cache=True)
+            print(f"[✅] Connected to guild {guild.name} ({guild.id})")
+         else:
+            print('Guild not found.')
+        
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
         prfx = f"[📖] {prfx}"
         print(prfx + " Logged in as " + self.user.name)

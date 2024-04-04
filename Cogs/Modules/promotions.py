@@ -158,7 +158,6 @@ class promo(commands.Cog):
             try:
                 if await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id}):
                     promotionroleresult = await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id})
-                    print('yea')
                     for role in promotionroleresult.get('promotionranks'):
                         role = staff.guild.get_role(role)
                         if role is None:
@@ -173,7 +172,6 @@ class promo(commands.Cog):
                 await staff.add_roles(new)
                 if await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id}):
                     promotionroleresult = await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id})
-                    print('yea')
                     for role in promotionroleresult.get('promotionranks'):
                         role = staff.guild.get_role(role)
                         if role is None:
