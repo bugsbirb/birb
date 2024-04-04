@@ -38,7 +38,7 @@ class client(commands.AutoShardedBot):
         intents = discord.Intents.default()
         intents.members = True
         super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1,
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1
         )
         self.client = client
         self.cogslist = [
@@ -76,6 +76,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.welcome",
             "Cogs.Modules.datamanage",
             "Cogs.Events.on_error"
+
         ]
 
     async def load_jishaku(self):

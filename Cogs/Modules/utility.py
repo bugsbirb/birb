@@ -8,6 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import aiohttp
 import os
 from emojis import *
+from typing import Literal
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
@@ -143,12 +144,12 @@ class Utility(commands.Cog):
             return "Not Connected"
 
 
-    @commands.hybrid_command(aliases=["serverinfo"])
+    @app_commands.command()
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=False, private_channels=False)
     async def server(self, ctx: commands.Context):
         """ Check info about current server """        
-        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module is currently disabled.", allowed_mentions=discord.AllowedMentions.none())
-         return          
+   
 
         if ctx.invoked_subcommand is None:
             find_bots = sum(1 for member in ctx.guild.members if member.bot)
@@ -168,15 +169,13 @@ class Utility(commands.Cog):
 
         
 
-    @commands.hybrid_command()
-    async def user(self, ctx: commands.Context, user: Optional[discord.User] = None):
+    @app_commands.command()
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def user(self, interaction: discord.Interaction, user: Optional[discord.User] = None) -> None:
         """Displays users information"""        
-        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the **utilities** module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
-         return      
-
         if user is None:
-            user = ctx.author
+            user = interaction.user
         user_badges = badges.find({'user_id': user.id})            
         badge_values = ""
    
@@ -198,9 +197,11 @@ class Utility(commands.Cog):
          badge = badge_data['badge']
          badge_values += f"{badge}\n"
          badgecount += 1 
-        try:
-         member = await ctx.guild.fetch_member(user.id)
-        except discord.HTTPException:
+        member = None 
+        if interaction.guild: 
+         try:
+          member = await interaction.guild.fetch_member(user.id)
+         except discord.HTTPException:
             member = None 
         userFlags = user.public_flags.all()
         for flag in userFlags:
@@ -211,22 +212,22 @@ class Utility(commands.Cog):
                 badgecount += 1 
           
         if not member:
-            embed = discord.Embed(title=f"@{user.display_name}", description=f"## <:Scaredbirb:1178005514584596580> Not inside of server ", color=0x2b2d31)
+            embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=0x2b2d31)
             embed.set_thumbnail(url=user.display_avatar.url)    
             if userFlags or badge_values:
                 embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}")
             embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
-            await ctx.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=discord.Color.dark_embed())
         if userFlags or badge_values:
                 embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}") 
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
-        user_roles = " ".join([role.mention for role in reversed(user.roles) if role != ctx.guild.default_role][:20])
+        user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
         rolecount = len(user.roles) - 1
         embed.add_field(name=f"**Roles** [{rolecount}]", value=user_roles, inline=False)        
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     async def fetch_birb_image(self):
         birb_api_url = "https://api.alexflipnote.dev/birb"
@@ -236,29 +237,36 @@ class Utility(commands.Cog):
                 data = await response.json()
                 return data["file"]
 
-    @commands.hybrid_command(description="Get silly birb photo")
-    async def birb(self, ctx: commands.Context):
+    @app_commands.command(name='birb', description="Get silly birb photo")
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def birb(self, interaction: discord.Interaction):
         try:
             birb_image_url = await self.fetch_birb_image()
 
             embed = discord.Embed(color=discord.Color.dark_embed())
             embed.set_image(url=birb_image_url)
-            await ctx.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
         except aiohttp.ClientError as e:
-            await ctx.send(f"{crisis} {ctx.author.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
+            await interaction.response.send_message(f"{crisis} {interaction.user.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`", allowed_mentions=discord.AllowedMentions.none())
 
-    @commands.hybrid_command(description="Check the bots latency & uptime")
-    async def ping(self, ctx: commands.Context):
+    @app_commands.command(name='ping',description="Check the bots latency & uptime")
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def ping(self, interaction: discord.Interaction):
         server_name = "Astro Birb"
         server_icon = self.client.user.display_avatar
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>\n**Shard:** {ctx.guild.shard_id}", color=0x2b2d31, timestamp=datetime.now())
+        if interaction.guild:
+         embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>\n**Shard:** {interaction.guild.shard_id}", color=0x2b2d31, timestamp=datetime.now())
+        else: 
+            embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31, timestamp=datetime.now())
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
-        await ctx.send(embed=embed)        
+        await interaction.response.send_message(embed=embed)        
         
 
  
@@ -295,7 +303,9 @@ class Utility(commands.Cog):
      await ctx.send(embed=embed, view=view)
 
 
-    @commands.hybrid_command(description="Get support from the support server")
+    @app_commands.command(description="Get support from the support server")
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)    
     async def support(self, ctx: commands.Context):
         view = Support()
         bot_user = self.client.user
@@ -314,8 +324,10 @@ class Utility(commands.Cog):
      await ctx.send(view=view)
 
 
-    @commands.hybrid_command(description="❤️ Support Astro Birb!")
-    async def vote(self, ctx: commands.Context):
+    @app_commands.command(name='vote',description="❤️ Support Astro Birb!")
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def vote(self, interaction: discord.Interaction):
         embed = discord.Embed(title="🚀 Support Astro Birb", description="Hi there! If you enjoy using **Astro Birb**, consider upvoting it on the following platforms to help us grow and reach more servers. Your support means a lot! 🌟", color=discord.Color.dark_embed())
         button = discord.ui.Button(label="Upvote", url="https://top.gg/bot/1113245569490616400/vote", emoji="<:topgg:1206665848408776795>", style=discord.ButtonStyle.blurple)
         button2 = discord.ui.Button(label="Upvote", url="https://wumpus.store/bot/1113245569490616400/vote", emoji="<:wumpus_store:1206665807011258409>", style=discord.ButtonStyle.blurple)
@@ -326,9 +338,42 @@ class Utility(commands.Cog):
         view.add_item(button)
         view.add_item(button2)
         view.add_item(button3)
-        await ctx.send(embed=embed
+        await interaction.response.send_message(embed=embed
                        , view=view)
    
+    @commands.command()
+    @commands.guild_only()
+    @commands.is_owner()
+    async def sync(self, ctx: commands.Context, guilds: commands.Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+        if not guilds:
+            if spec == "~":
+                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            elif spec == "*":
+                ctx.bot.tree.copy_global_to(guild=ctx.guild)
+                synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            elif spec == "^":
+                ctx.bot.tree.clear_commands(guild=ctx.guild)
+                await ctx.bot.tree.sync(guild=ctx.guild)
+                synced = []
+            else:
+                synced = await ctx.bot.tree.sync()
+
+            await ctx.send(
+                f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
+            )
+            return
+
+        ret = 0
+        for guild in guilds:
+            try:
+                await ctx.bot.tree.sync(guild=guild)
+            except discord.HTTPException:
+                pass
+            else:
+                ret += 1
+
+        await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
 class invite(discord.ui.View):
     def __init__(self):
         super().__init__()
