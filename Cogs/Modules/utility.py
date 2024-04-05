@@ -162,7 +162,7 @@ class Utility(commands.Cog):
         embed.set_author(name=f"{interaction.guild.owner}'s creation", icon_url=interaction.guild.owner.display_avatar)
         await interaction.response.send_message(embed=embed)
         
-
+    
         
     @app_commands.command(description="View someones avatar")
     @app_commands.allowed_installs(guilds=False, users=True)
@@ -313,7 +313,7 @@ class Utility(commands.Cog):
     @app_commands.command(description="Get support from the support server")
     @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)    
-    async def support(self, ctx: commands.Context):
+    async def support(self, interaction: discord.Interaction):
         view = Support()
         bot_user = self.client.user
         embed = discord.Embed(
@@ -323,7 +323,7 @@ class Utility(commands.Cog):
     )
         embed.set_thumbnail(url=bot_user.avatar.url)
         embed.set_author(name=bot_user.display_name, icon_url=bot_user.display_avatar)
-        await ctx.send(embed=embed, view=view)
+        await interaction.response.send_message(embed=embed, view=view)
 
     @app_commands.command(description="Invite Astro Birb to your server")
     @app_commands.allowed_installs(guilds=False, users=True)
