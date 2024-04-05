@@ -129,7 +129,7 @@ class welcome2(commands.Cog):
                         embed.set_thumbnail(url=result['thumbnail'])
                     if 'author' in result and 'author_icon' in result:
                         embed.set_author(name=embed_author, icon_url=result['author_icon'])    
-                    contentresult = await self.replace_variables(result['content'], replacements)
+                    contentresult = await self.replace_variables(result.get('content', ""), replacements)
                     if contentresult in ["None", None]:
                         contentresult = ""
                     try:
@@ -138,7 +138,7 @@ class welcome2(commands.Cog):
                         print('I couldn\'t send it to the welcome channel')
                         return 
                 else:
-                    contentresult = await self.replace_variables(result['content'], replacements)
+                    contentresult = await self.replace_variables(result.get('content', ""), replacements)
                     if contentresult in ["None", None]:
                         return
                     try:
