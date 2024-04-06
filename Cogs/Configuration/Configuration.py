@@ -679,33 +679,25 @@ class Config(discord.ui.Select):
 
 class StaffDB(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(StaffData(author))
         self.add_item(StaffCustomise(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class ConfigViewMain(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360) 
+        super().__init__(timeout=None) 
         self.add_item(StaffRole(author))
         self.add_item(Adminrole(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class SuggestionModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleSuggestions(author))        
         self.add_item(SuggestionsChannel(author))
         self.add_item(SuggestionsChannelManagement(author))
@@ -722,30 +714,22 @@ class CustomCommands(discord.ui.View):
         self.add_item(CmdUsageChannel(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ModmailToggle(author))
         self.add_item(ModmailCategory(author))
         self.add_item(ModmailPing(author))
         self.add_item(TranscriptChannel(author))
         self.add_item(Config(author))
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class InfractModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.author = author
         self.add_item(ToggleInfractionsDropdown(author))         
         self.add_item(InfractionChannel(author))
@@ -753,28 +737,20 @@ class InfractModule(discord.ui.View):
         self.add_item(IMoreOptions(author))
         self.add_item(Config(author))        
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class UtilsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.author = author
         self.add_item(ToggleUtils(author))
         self.add_item(Config(author))        
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class PromotionModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.author = author
         self.add_item(PromotionModuleToggle(author))        
         self.add_item(Promotionchannel(author))
@@ -783,156 +759,105 @@ class PromotionModule(discord.ui.View):
         
         self.add_item(Config(author))    
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class LOAModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleLOADropdown(author))  
         self.add_item(LOARoled(author))
         self.add_item(LOAChannel(author))                  
         self.add_item(Config(author))    
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class TagsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleTags(author))      
         self.add_item(TagsUsageChannel(author))   
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class QuotaModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(QuotaToggle(author))            
         self.add_item(QuotaAmount(author))          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class FeedbackModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleFeedback(author))         
         self.add_item(FeedbackChannel(author))    
         self.add_item(FMoreOptions(author))      
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class SuspensionsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleSuspensions(author))               
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted') 
+ 
 
 class WelcomeModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleWelcome(author))   
         self.add_item(Welcomemessage(author))  
         self.add_item(WelcomeChannel(author))            
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted') 
+ 
 
 class PartnershipModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(TogglePartnerships(author))          
         self.add_item(PartnershipChannel(author))                    
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 class ForumUtilsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleForums(author))                          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class ReportsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)   
+        super().__init__(timeout=None)   
         self.add_item(ToggleReportsDropdown(author))           
         self.add_item(ReportChannel(author))         
         self.add_item(ReportsModeratorRole(author))          
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class AppResultModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleApplications(author))       
         self.add_item(ApplicationCreator(author))   
         self.add_item(ApplicationSubmissions(author))
         self.add_item(AMoreOptions(author))                   
         self.add_item(Config(author)) 
-
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted') 
-
 class ConnectionsModule(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(ToggleConnectionRoles(author))         
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class CustomisatiomModule(discord.ui.View):
     def __init__(self, author):
@@ -941,11 +866,7 @@ class CustomisatiomModule(discord.ui.View):
         self.add_item(ResetEmbeds(author))       
         self.add_item(Config(author)) 
 
-    async def on_timeout(self) -> None:
-        try:
-         await self.message.edit(view=None, embed=None, content=f"{no} **Timed out**")
-        except discord.errors.NotFound:
-            return print('[⚠️] I can\'t time out this view because it was already deleted')
+
 
 class ConfigCog(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -1004,7 +925,7 @@ class ConfigCog(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         view = ConfigViewMain(ctx.author)
-        view.message = await ctx.send(embed=embed, view=view)
+        await ctx.send(embed=embed, view=view)
 
     @config.error
     async def permissionerror(self, ctx: commands.Context, error):

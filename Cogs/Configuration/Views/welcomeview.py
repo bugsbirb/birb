@@ -457,7 +457,7 @@ class Author(discord.ui.Modal, title='Author'):
 
 class ButtonManage(discord.ui.View):
     def __init__(self, author):
-        super().__init__(timeout=360)
+        super().__init__(timeout=None)
         self.add_item(managebuttons(author))
 
 class NoEmbeds(discord.ui.View):
