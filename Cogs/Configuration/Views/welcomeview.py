@@ -119,12 +119,16 @@ class Welcomemessage(discord.ui.Select):
                             contentresult = ""
                         await interaction.response.edit_message(
                             content=contentresult, embed=embed, view=Embeds(interaction.user))
-                    else:
+                    elif 'content' in result and result['content']:
                         contentresult = result.get('content')
                         if contentresult in ["None", None]:
                             return
                         await interaction.response.edit_message(
                             content=contentresult, embed=None, view=NoEmbeds(interaction.user))
+                    else:
+                        await interaction.response.edit_message(view=NoEmbeds(interaction.user), embed=None, content=None)
+                        
+
                 else:
                     await interaction.response.edit_message(view=NoEmbeds(interaction.user), embed=None, content=None)
 
