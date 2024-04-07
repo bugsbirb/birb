@@ -229,51 +229,50 @@ class Config(discord.ui.Select):
             staffrolemessage = "Not Configured"
             adminrolemessage = "Not Configured"
             adminroles = []
-            
             if adminroleresult:
-             for role_ids in adminroleresult.get('staffrole', []):
-                result = adminroleresult.get('staffrole', []) 
-                if not isinstance(result, list):
-                    result = [result]
-                for role_ids in result:         
-                        if not isinstance(role_ids, list):
-                            role_ids = [role_ids]                            
-                        for role_id in role_ids:
-                        
-                         role = interaction.guild.get_role(role_id)
-                         print(role)
-                         if role:
+                admin_roles = adminroleresult.get('staffrole', [])
+                if not isinstance(admin_roles, list):
+                    admin_roles = [admin_roles]
+
+                for admin_role_ids in admin_roles:
+                    if not isinstance(admin_role_ids, list):
+                        admin_role_ids = [admin_role_ids]
+
+                    for role_id in admin_role_ids:
+                        role = interaction.guild.get_role(role_id)
+
+                        if role:
                             adminroles.append(role)
-                         else:
-                            print(f"Role with ID {role_id} not found.")             
-             admin_roles_ids = adminroleresult.get('staffrole', [])
-             if not isinstance(admin_roles_ids, list):
-                admin_roles_ids = [admin_roles_ids]
-             admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
-                                    for role_id in admin_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
-             if not admin_roles_mentions:
-                adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
-             else:
-                adminrolemessage = ", ".join(admin_roles_mentions)
+                        else:
+                            print(f"Role with ID {role_id} not found.")
+            
+                admin_roles_ids = adminroleresult.get('staffrole', [])
+                if not isinstance(admin_roles_ids, list):
+                    admin_roles_ids = [admin_roles_ids]
+                admin_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
+                                        for role_id in admin_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
+                if not admin_roles_mentions:
+                    adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
+                else:
+                    adminrolemessage = ", ".join(admin_roles_mentions)
+
 
             staffroles = []
             if staffroleresult:
-                
-                result = staffroleresult.get('staffrole', []) 
-                if not isinstance(result, list):
-                    result = [result]
-                for role_ids in staffroleresult.get('staffrole', []):
-                        if not isinstance(role_ids, list):
-                            role_ids = [role_ids]
+                staff_roles = staffroleresult.get('staffrole', [])
+                if not isinstance(staff_roles, list):
+                    staff_roles = [staff_roles]
 
+                for staff_role_ids in staff_roles:
+                    if not isinstance(staff_role_ids, list):
+                        staff_role_ids = [staff_role_ids]
 
-                        for role_id in role_ids:
-                         role = interaction.guild.get_role(role_id)
-                         print(role)                     
-                         if role:
+                    for role_id in staff_role_ids:
+                        role = interaction.guild.get_role(role_id)
+
+                        if role:
                             staffroles.append(role)
-                            print(staffroles)
-                         else:
+                        else:
                             print(f"Role with ID {role_id} not found.")
                 staff_roles_ids = staffroleresult.get('staffrole', [])
                 if not isinstance(staff_roles_ids, list):
@@ -470,7 +469,7 @@ class Config(discord.ui.Select):
                             role_ids = [role_ids]
                         for role_id in role_ids:
                          role = interaction.guild.get_role(role_id)
-                         print(role)                     
+                                              
                          if role:
                             roles.append(role)
                          else:
@@ -655,7 +654,7 @@ class Config(discord.ui.Select):
                             role_ids = [role_ids]
                         for role_id in role_ids:
                          role = interaction.guild.get_role(role_id)
-                         print(role)                     
+                                              
                          if role:
                             roles.append(role)
                          else:
@@ -898,7 +897,7 @@ class Config(discord.ui.Select):
                             role_ids = [role_ids]
                         for role_id in role_ids:
                          role = interaction.guild.get_role(role_id)
-                         print(role)                     
+                                              
                          if role:
                             roles.append(role)
                          else:
@@ -1147,22 +1146,19 @@ class ConfigCog(commands.Cog):
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
         adminroles = []
-        print(staffroleresult)
-        print(adminroleresult)
+        staffroles = []
         if adminroleresult:
             result = adminroleresult.get('staffrole', []) 
             if not isinstance(result, list):
                 result = [result]
             for role_ids in result:         
-                    if not isinstance(role_ids, list):
-                        role_ids = [role_ids]                            
-                    for role_id in role_ids:
-                     
-                     role = ctx.guild.get_role(role_id)
-                     print(role)
-                     if role:
+                if not isinstance(role_ids, list):
+                    role_ids = [role_ids]                            
+                for role_id in role_ids:
+                    role = ctx.guild.get_role(role_id)
+                    if role:
                         adminroles.append(role)
-                     else:
+                    else:
                         print(f"Role with ID {role_id} not found.")                  
             admin_roles_ids = adminroleresult.get('staffrole', [])
             if not isinstance(admin_roles_ids, list):
@@ -1173,23 +1169,19 @@ class ConfigCog(commands.Cog):
                 adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
-        staffroles = []
+        
         if staffroleresult:
             result = staffroleresult.get('staffrole', []) 
             if not isinstance(result, list):
                 result = [result]
             for role_ids in result:
-                    if not isinstance(role_ids, list):
-                        role_ids = [role_ids]
-
-
-                    for role_id in role_ids:
-                     role = ctx.guild.get_role(role_id)
-                     print(role)                     
-                     if role:
+                if not isinstance(role_ids, list):
+                    role_ids = [role_ids]
+                for role_id in role_ids:
+                    role = ctx.guild.get_role(role_id)
+                    if role:
                         staffroles.append(role)
-                        print(staffroles)
-                     else:
+                    else:
                         print(f"Role with ID {role_id} not found.")
             staff_roles_ids = staffroleresult.get('staffrole', [])
             if not isinstance(staff_roles_ids, list):
