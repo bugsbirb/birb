@@ -13,16 +13,9 @@ customcommands = db['Custom Commands']
 
 
 class ToggleWelcome(discord.ui.Select):
-    def __init__(self, author):
+    def __init__(self, author, options):
         self.author = author
-        options = [
-            discord.SelectOption(label="Enable"),
-            discord.SelectOption(label="Disable"),
-            
 
-        
-            
-        ]
         super().__init__(placeholder='Module Toggle', min_values=1, max_values=1, options=options)
 
 
@@ -33,18 +26,18 @@ class ToggleWelcome(discord.ui.Select):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        if color == 'Enable':    
+        if color == 'Enabled':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'welcome': True}}, upsert=True)    
             await refreshembed(interaction)   
-        if color == 'Disable':    
+        if color == 'Disabled':  
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'welcome': False}}, upsert=True)
             await refreshembed(interaction)            
 
 class WelcomeChannel(discord.ui.ChannelSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Welcome Channel', channel_types=[discord.ChannelType.text])
+    def __init__(self, author, channels):
+        super().__init__(placeholder='Welcome Channel', channel_types=[discord.ChannelType.text], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

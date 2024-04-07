@@ -25,8 +25,8 @@ modmailping = db['modmailping']
 transcriptschannel = db['transcriptschannel']
 
 class ModmailCategory(discord.ui.ChannelSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Modmail Category', channel_types=[discord.ChannelType.category])
+    def __init__(self, author, category):
+        super().__init__(placeholder='Modmail Category', channel_types=[discord.ChannelType.category], default_values=category)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -55,8 +55,10 @@ class ModmailCategory(discord.ui.ChannelSelect):
         print(f"Channel ID: {channelid.id}")        
 
 class TranscriptChannel(discord.ui.ChannelSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Transcripts Channel', channel_types=[discord.ChannelType.text])
+    def __init__(self, author, channel):
+        
+        super().__init__(placeholder='Transcripts Channel', channel_types=[discord.ChannelType.text], default_values=channel)
+
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -90,38 +92,38 @@ class TranscriptChannel(discord.ui.ChannelSelect):
         print(f"Channel ID: {channelid.id}")          
 
 class ModmailToggle(discord.ui.Select):
-    def __init__(self, author):
+    def __init__(self, author, options):
         self.author = author
-        options = [
-            discord.SelectOption(label="Enable"),
-            discord.SelectOption(label="Disable"),
+
             
 
         
             
-        ]
+      
         super().__init__(placeholder='Module Toggle', min_values=1, max_values=1, options=options)
 
 
     async def callback(self, interaction: discord.Interaction):
+        
+
         color = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        if color == 'Enable':    
+        if color == 'Enabled':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': True}}, upsert=True)  
             await refreshembed(interaction)
-        if color == 'Disable':    
+        if color == 'Disabled':  
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': False}}, upsert=True) 
             await refreshembed(interaction)   
 
 class ModmailPing(discord.ui.RoleSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Modmail Ping', max_values=25)
+    def __init__(self, author, roles):
+        super().__init__(placeholder='Modmail Ping', max_values=25, default_values=roles)
         self.author = author
 
     async def callback(self, interaction: discord.Interaction):

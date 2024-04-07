@@ -26,8 +26,8 @@ nfractiontypes = db['infractiontypes']
 infractiontypeactions = db['infractiontypeactions']
 options = db['module options']
 class InfractionChannel(discord.ui.ChannelSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Infractions Channel', channel_types=[discord.ChannelType.text])
+    def __init__(self, author, channels):
+        super().__init__(placeholder='Infractions Channel', channel_types=[discord.ChannelType.text], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -61,16 +61,10 @@ class InfractionChannel(discord.ui.ChannelSelect):
         print(f"Channel ID: {channelid.id}")        
 
 class ToggleInfractionsDropdown(discord.ui.Select):
-    def __init__(self, author):
+    def __init__(self, author, options):
         self.author = author
-        options = [
-            discord.SelectOption(label="Enable"),
-            discord.SelectOption(label="Disable"),
-            
 
-        
-            
-        ]
+             
         super().__init__(placeholder='Module Toggle', min_values=1, max_values=1, options=options)
 
 
@@ -81,11 +75,11 @@ class ToggleInfractionsDropdown(discord.ui.Select):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        if color == 'Enable':    
+        if color == 'Enabled':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': True}}, upsert=True)  
             await refreshembed(self, interaction)
-        if color == 'Disable':    
+        if color == 'Disabled':  
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'infractions': False}}, upsert=True)            
             await refreshembed(self, interaction)
@@ -107,6 +101,7 @@ class IMoreOptions(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         selected_option = self.values[0]
+ 
         
 
         option_result = await options.find_one({'guild_id': interaction.guild.id})
@@ -451,7 +446,7 @@ class DeleteInfractionModal(discord.ui.Modal):
 
         await interaction.response.send_message(content=f"{tick} **{interaction.user.display_name}**, Infraction type deleted successfully", ephemeral=True)
         await refreshembed(self, interaction)
-async def refreshembed(self, interaction):
+async def refreshembed(self, interaction: discord.Interaction):
             infractionchannelresult = await infchannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             modulemsg = ""
@@ -479,6 +474,7 @@ async def refreshembed(self, interaction):
             embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
+            
             try:
              await interaction.message.edit(embed=embed)
             except discord.Forbidden:

@@ -153,8 +153,8 @@ class ToggleApplications(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
-            discord.SelectOption(label="Enable"),
-            discord.SelectOption(label="Disable"),
+            discord.SelectOption(label="Enabled"),
+            discord.SelectOption(label="Disabled"),
             
 
         
@@ -170,19 +170,19 @@ class ToggleApplications(discord.ui.Select):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        if color == 'Enable':    
+        if color == 'Enabled':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': True}}, upsert=True) 
             await refreshembed(interaction)   
 
-        if color == 'Disable':    
+        if color == 'Disabled':  
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Applications': False}}, upsert=True)    
             await refreshembed(interaction)        
 
 class ApplicationSubmissions(discord.ui.ChannelSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Application Submissions Channel',  channel_types=[discord.ChannelType.text])
+    def __init__(self, author, channels):
+        super().__init__(placeholder='Application Submissions Channel',  channel_types=[discord.ChannelType.text], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -885,7 +885,7 @@ class Section5(discord.ui.Modal):
                     )                                                     
         await interaction.response.edit_message(embed=embed, view=view, content=None)  
 
-async def refreshembed(interaction):
+async def refreshembed(interaction: discord.Interaction):
 
 
             applicationchannelresult = await ApplicationsChannel.find_one({'guild_id': interaction.guild.id})
@@ -935,6 +935,8 @@ async def refreshembed(interaction):
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            
+
             try:
              await interaction.message.edit(embed=embed)
             except discord.Forbidden:

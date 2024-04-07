@@ -106,9 +106,9 @@ welcome = db['welcome settings']
 ApplicationsSubChannel = db['Applications Submissions']
 options = db['module options']
 class StaffRole(discord.ui.RoleSelect):
-    def __init__(self, author):
+    def __init__(self, author, roles):
 
-        super().__init__(placeholder='Staff Roles', max_values=20)
+        super().__init__(placeholder='Staff Roles', max_values=20, default_values=roles)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -142,8 +142,8 @@ class StaffRole(discord.ui.RoleSelect):
         print(f"Select Roles {selected_role_ids}")
 
 class Adminrole(discord.ui.RoleSelect):
-    def __init__(self, author):
-        super().__init__(placeholder='Admin Roles', max_values=20)
+    def __init__(self, author, roles):
+        super().__init__(placeholder='Admin Roles', max_values=20, default_values=roles)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -215,6 +215,7 @@ class Config(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
         color = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -222,11 +223,29 @@ class Config(discord.ui.Select):
             return await interaction.followup.send(embed=embed, ephemeral=True)    
         if color == 'Settings':  # basic
             staffroleresult = scollection.find_one({'guild_id': interaction.guild.id})
+
             adminroleresult = arole.find_one({'guild_id': interaction.guild.id})
+       
             staffrolemessage = "Not Configured"
             adminrolemessage = "Not Configured"
-
+            adminroles = []
+            
             if adminroleresult:
+             for role_ids in adminroleresult.get('staffrole', []):
+                result = adminroleresult.get('staffrole', []) 
+                if not isinstance(result, list):
+                    result = [result]
+                for role_ids in result:         
+                        if not isinstance(role_ids, list):
+                            role_ids = [role_ids]                            
+                        for role_id in role_ids:
+                        
+                         role = interaction.guild.get_role(role_id)
+                         print(role)
+                         if role:
+                            adminroles.append(role)
+                         else:
+                            print(f"Role with ID {role_id} not found.")             
              admin_roles_ids = adminroleresult.get('staffrole', [])
              if not isinstance(admin_roles_ids, list):
                 admin_roles_ids = [admin_roles_ids]
@@ -237,16 +256,34 @@ class Config(discord.ui.Select):
              else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
 
+            staffroles = []
             if staffroleresult:
-             staff_roles_ids = staffroleresult.get('staffrole', [])
-             if not isinstance(staff_roles_ids, list):
-                staff_roles_ids = [staff_roles_ids]
-             staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
-                                    for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
-             if not staff_roles_mentions:
-                staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
-             else:
-                staffrolemessage = ", ".join(staff_roles_mentions)
+                
+                result = staffroleresult.get('staffrole', []) 
+                if not isinstance(result, list):
+                    result = [result]
+                for role_ids in staffroleresult.get('staffrole', []):
+                        if not isinstance(role_ids, list):
+                            role_ids = [role_ids]
+
+
+                        for role_id in role_ids:
+                         role = interaction.guild.get_role(role_id)
+                         print(role)                     
+                         if role:
+                            staffroles.append(role)
+                            print(staffroles)
+                         else:
+                            print(f"Role with ID {role_id} not found.")
+                staff_roles_ids = staffroleresult.get('staffrole', [])
+                if not isinstance(staff_roles_ids, list):
+                    staff_roles_ids = [staff_roles_ids]
+                staff_roles_mentions = [discord.utils.get(interaction.guild.roles, id=role_id).mention
+                                        for role_id in staff_roles_ids if discord.utils.get(interaction.guild.roles, id=role_id) is not None]
+                if not staff_roles_mentions:
+                    staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
+                else:
+                    staffrolemessage = ", ".join(staff_roles_mentions)
 
             embed = discord.Embed(
             title="<:Setting:1154092651193323661> Settings",
@@ -259,7 +296,7 @@ class Config(discord.ui.Select):
             embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=value, inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-            view = ConfigViewMain(self.author)        
+            view = ConfigViewMain(self.author, staffroles, adminroles)        
 
         elif color == 'Welcome':
             welcomechannelresult = welcome.find_one({'guild_id': interaction.guild.id})
@@ -284,7 +321,19 @@ class Config(discord.ui.Select):
 
             embed = discord.Embed(title="<:welcome:1218531757691764738> Welcome Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Welcome Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Welcome Channel:** {wchannelmsg}\n\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = WelcomeModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            channels = []
+            if welcomechannelresult:
+                if welcomechannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(welcomechannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]                       
+            view = WelcomeModule(self.author, options, channels)
+            
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)              
         elif color == 'Infractions':    #infractionss
@@ -307,13 +356,23 @@ class Config(discord.ui.Select):
                     infchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  infchannelmsg = channel.mention          
-
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
             infractiontypescount = len(infractiontyperesult['types'])
             if infractiontypescount == None:
                 infractiontypess = "0"
+            channels = []
+            if infractionchannelresult:
+                if infractionchannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(infractionchannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]    
             embed = discord.Embed(title="<:Infraction:1223063128275943544> Infractions Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = InfractModule(self.author)
+            view = InfractModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
 
@@ -326,8 +385,11 @@ class Config(discord.ui.Select):
                 modulemsg = f"{moduleddata['Utility']}"            
             embed = discord.Embed(title="<:Pen:1126527802255085628> Utilties Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = UtilsModule(self.author)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]              
+            view = UtilsModule(self.author, options)
 
         elif color == 'Promotions': #Promos
             promochannelresult = promochannel.find_one({'guild_id': interaction.guild.id})
@@ -345,7 +407,18 @@ class Config(discord.ui.Select):
                  promochannelmsg = channel.mention                          
             embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
-            view = PromotionModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]  
+            channels = []
+            if promochannelresult:
+                if promochannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(promochannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]                           
+            view = PromotionModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                   
         elif color == 'LOA':    #LOA
@@ -374,7 +447,35 @@ class Config(discord.ui.Select):
                  loachannelmsg = channel.mention       
             embed = discord.Embed(title=f"{loa} LOA Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> LOA Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**LOA Channel:** {loachannelmsg}\n{replybottom}**LOA Role:** {loarolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = LOAModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            channels = []
+            if loachannelresult:
+                if loachannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(loachannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+
+            roles = []
+            if loaroleresult:
+             if loaroleresult.get('staffrole'):
+                result = loaroleresult.get('staffrole', []) 
+                if not isinstance(result, list):
+                    result = [result]
+                for role_ids in result:
+                        if not isinstance(role_ids, list):
+                            role_ids = [role_ids]
+                        for role_id in role_ids:
+                         role = interaction.guild.get_role(role_id)
+                         print(role)                     
+                         if role:
+                            roles.append(role)
+                         else:
+                            print(f"Role with ID {role_id} not found.")                                
+            view = LOAModule(self.author, options, channels, roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
         elif color == 'Tags':         # Tags
@@ -389,8 +490,11 @@ class Config(discord.ui.Select):
             embed = discord.Embed(title="<:tag:1162134250414415922> Tags Module", color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Tags Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Tags Logging:** {usagechannelmsg}\n\n <:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = TagsModule(self.author)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)      
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]       
+            view = TagsModule(self.author, options)
 
         elif color == 'Message Quota':         # Tags
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
@@ -404,8 +508,11 @@ class Config(discord.ui.Select):
             embed = discord.Embed(title="<:messageup:1224722310687359106> Message Quota Module",  color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Quota:** {messagecountmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = QuotaModule(self.author)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]                    
+            view = QuotaModule(self.author, options)
 
         elif color == 'Staff Feedback':    #StaffFeed
             feedbackchannelresult = feedbackch.find_one({'guild_id': interaction.guild.id})
@@ -423,7 +530,19 @@ class Config(discord.ui.Select):
                  feedbackchannelmsg = channel.mention                
             embed = discord.Embed(title="<:Rate:1162135093129785364> Staff Feedback Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Staff Feedback Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Feedback Channel:** {feedbackchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = FeedbackModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]   
+            channels = []                     
+            if feedbackchannelresult:
+                if feedbackchannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(feedbackchannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+                
+            view = FeedbackModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
 
@@ -435,8 +554,11 @@ class Config(discord.ui.Select):
             embed = discord.Embed(title="<:Suspensions:1167093139845165229> Suspension Module", color=discord.Color.dark_embed())   
             embed.add_field(name="<:settings:1207368347931516928> Suspension Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suspension Channel:** Infraction Channel\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False) 
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = SuspensionsModule(self.author)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]                    
+            view = SuspensionsModule(self.author, options)
 
 
 
@@ -457,7 +579,19 @@ class Config(discord.ui.Select):
                  partnershipchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
             embed = discord.Embed(title="<:partnerships:1224724406144733224> Partnership Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Partnership Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Partnership Channel:** {partnershipchannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = PartnershipModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]  
+            channels = []
+            if partnershipchannelresult:
+                if partnershipchannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+                                                          
+            view = PartnershipModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
         elif color == 'Forum Utils':         # Tags
@@ -467,8 +601,11 @@ class Config(discord.ui.Select):
                 modulemsg = f"{moduleddata['Forums']}"            
             embed = discord.Embed(title="<:forum:1162134180218556497> Forum Utilites", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = ForumUtilsModule(self.author)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            view = ForumUtilsModule(self.author, options)
 
         elif color == 'Reports':    #Reports
             partnershipchannelresult = repchannel.find_one({'guild_id': interaction.guild.id})
@@ -496,7 +633,34 @@ class Config(discord.ui.Select):
                  reprolemsg = f"{role.mention}"
             embed = discord.Embed(title="<:reports:1224723845726998651> Reports Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Reports Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Reports Channel:** {partnershipchannelmsg}\n{replybottom}**Reports Moderator Role:** {reprolemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
-            view = ReportsModule(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]  
+            channels = []
+            if partnershipchannelresult:
+                if partnershipchannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+            roles = []    
+            if reportsmoderatorresult:                    
+             if reportsmoderatorresult.get('staffrole'):
+                result = reportsmoderatorresult.get('staffrole', []) 
+                if not isinstance(result, list):
+                    result = [result]
+                for role_ids in result:
+                        if not isinstance(role_ids, list):
+                            role_ids = [role_ids]
+                        for role_id in role_ids:
+                         role = interaction.guild.get_role(role_id)
+                         print(role)                     
+                         if role:
+                            roles.append(role)
+                         else:
+                            print(f"Role with ID {role_id} not found.")            
+            view = ReportsModule(self.author, options, channels ,roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
         elif color == 'Applications':            
@@ -511,6 +675,7 @@ class Config(discord.ui.Select):
             approlemsg = "Not Configured"
             subchannelmsg = "Not Configured"
             appchannelmsg = "Not Configured"
+            modulemsg = ""
 
 
             if moduleddata:
@@ -549,7 +714,16 @@ class Config(discord.ui.Select):
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-            view = AppResultModule(self.author)
+            channels = []
+            if applicationchannelresult:
+                if applicationchannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(applicationchannelresult.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+                                                                   
+            view = AppResultModule(self.author, channels)
 
         elif color == 'Connection Roles':         # 
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
@@ -557,11 +731,14 @@ class Config(discord.ui.Select):
             if moduleddata:
                 modulemsg = moduleddata.get('Connection', 'False')
             else:
-                modulemsg = 'False'        
+                modulemsg = 'False'     
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]                
             embed = discord.Embed(title="<:Role:1162074735803387944> Connection Roles Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       
-            view = ConnectionsModule(self.author)
+            view = ConnectionsModule(self.author, options)
 
 
         elif color == 'Suggestions':    # Suggestions
@@ -587,12 +764,38 @@ class Config(discord.ui.Select):
                 if channel is None:
                  smschannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
-                 smschannelmsg = channel.mention                            
+                 smschannelmsg = channel.mention                         
+
+            if moduleddata:
+                modulemsg = moduleddata.get('Connection', 'False')
+            else:
+                modulemsg = 'False'     
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+
+
             embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Suggestion Channel:** {suggestionchannelmsg}\n{replybottom}**Suggestions Management Channel:** {smschannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
-            view = SuggestionModule(self.author)
+            if suschannelresult:
+                if suschannelresult.get('channel_id'):
+                 suggestchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
+                 if suggestchannel is None:
+                     suggestchannel = []          
+                 else:
+                    suggestchannel = [suggestchannel]       
+            managementchannel = []    
+            suggestchannel = []
+            if smschannelresult:
+                if smschannelresult.get('channel_id'):
+                 managementchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
+                 if managementchannel is None:
+                     managementchannel = []          
+                 else:
+                    managementchannel = [managementchannel]                   
+            view = SuggestionModule(self.author, options, suggestchannel, managementchannel)
             try:
              await interaction.message.edit(embed=embed)     
             except discord.Forbidden:
@@ -635,8 +838,18 @@ class Config(discord.ui.Select):
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
                 embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=False)
-               
-            view = CustomCommands(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]   
+            channels = []
+            if logging:
+                if logging.get('channel_id'):
+                 channels = interaction.guild.get_channel(logging.get('channel_id'))  
+                 if channels is None:
+                     channels = []          
+                 else:
+                    channels = [channels]       
+            view = CustomCommands(self.author, options, channels)
             
         elif color =='Modmail':
             transcriptschannelresult = transcriptchannel.find_one({'guild_id': interaction.guild.id})
@@ -662,77 +875,119 @@ class Config(discord.ui.Select):
                 modmailcategorys = f"<#{modmailcategoryresult['category_id']}>"    
             embed = discord.Embed(title="<:messagereceived:1201999712593383444> Modmail",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Modmail Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Modmail Category:** {modmailcategorys}\n{replymiddle}**Modmail Pings:** {modmailroles}\n{replybottom}**Transcript Channel:** {transcriptschannels}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
-            view = Modmail(interaction.user)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            category = []
+            if modmailcategoryresult:
+             if modmailcategoryresult.get('category_id'):
+                category = discord.utils.get(interaction.guild.categories, id=modmailcategoryresult.get('category_id'))
+                if category is None:
+                    category = []
+                else:
+                    category = [category]    
+            roles = []
+            if modmailpingresult:
+
+             if modmailpingresult.get('modmailping'):
+                result = modmailpingresult.get('modmailping', []) 
+                if not isinstance(result, list):
+                    result = [result]
+                for role_ids in result:
+                        if not isinstance(role_ids, list):
+                            role_ids = [role_ids]
+                        for role_id in role_ids:
+                         role = interaction.guild.get_role(role_id)
+                         print(role)                     
+                         if role:
+                            roles.append(role)
+                         else:
+                            print(f"Role with ID {role_id} not found.")
+            channels = []
+            
+            if transcriptschannelresult:
+                if transcriptschannelresult.get('channel_id'):
+                 channels = interaction.guild.get_channel(transcriptschannelresult.get('channel_id'))
+                 if channels is None:
+                     channels = []
+                 else:
+                     channels = [channels]
+            view = Modmail(interaction.user, options, channels, category, roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+
+
+
         elif color == 'Staff Database & Panel':
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
             if moduleddata:
                 modulemsg = moduleddata.get('Staff Database', 'False')     
             embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
-
-            view = StaffDB(self.author)
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            view = StaffDB(self.author, options)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
         view.message = await interaction.edit_original_response(embed=embed, view=view)
 
 
 class StaffDB(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(StaffData(author))
+        self.add_item(StaffData(author, options))
         self.add_item(StaffCustomise(author))
         self.add_item(Config(author))
 
 
 
 class ConfigViewMain(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, staffroles, adminroles):
         super().__init__(timeout=None) 
-        self.add_item(StaffRole(author))
-        self.add_item(Adminrole(author))
+        self.add_item(StaffRole(author, staffroles))
+        self.add_item(Adminrole(author, adminroles))
         self.add_item(Config(author))
 
 
 
 class SuggestionModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author,options, suggestchannel, managementchannel):
         super().__init__(timeout=None)
-        self.add_item(ToggleSuggestions(author))        
-        self.add_item(SuggestionsChannel(author))
-        self.add_item(SuggestionsChannelManagement(author))
+        self.add_item(ToggleSuggestions(author, options))        
+        self.add_item(SuggestionsChannel(author, suggestchannel))
+        self.add_item(SuggestionsChannelManagement(author, managementchannel))
         self.add_item(Config(author))
 
 
  
 
 class CustomCommands(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
-        self.add_item(ToggleCommands(author))
+        self.add_item(ToggleCommands(author, options))
         self.add_item(CreateButtons(author))
-        self.add_item(CmdUsageChannel(author))
+        self.add_item(CmdUsageChannel(author, channels))
         self.add_item(Config(author))
 
 
 
 class Modmail(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels, category, roles):
         super().__init__(timeout=None)
-        self.add_item(ModmailToggle(author))
-        self.add_item(ModmailCategory(author))
-        self.add_item(ModmailPing(author))
-        self.add_item(TranscriptChannel(author))
+        self.add_item(ModmailToggle(author, options))
+        self.add_item(ModmailCategory(author, category))
+        self.add_item(ModmailPing(author, roles))
+        self.add_item(TranscriptChannel(author, channels))
         self.add_item(Config(author))
 
 
 
 class InfractModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
         self.author = author
-        self.add_item(ToggleInfractionsDropdown(author))         
-        self.add_item(InfractionChannel(author))
+        self.add_item(ToggleInfractionsDropdown(author, options))         
+        self.add_item(InfractionChannel(author, channels))
         self.add_item(InfractionTypes(author))   
         self.add_item(IMoreOptions(author))
         self.add_item(Config(author))        
@@ -740,20 +995,20 @@ class InfractModule(discord.ui.View):
 
 
 class UtilsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
         self.author = author
-        self.add_item(ToggleUtils(author))
+        self.add_item(ToggleUtils(author, options))
         self.add_item(Config(author))        
 
 
 
 class PromotionModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
         self.author = author
-        self.add_item(PromotionModuleToggle(author))        
-        self.add_item(Promotionchannel(author))
+        self.add_item(PromotionModuleToggle(author, options))        
+        self.add_item(Promotionchannel(author, channels))
         self.add_item(Promotionrank(author))
         self.add_item(PMoreOptions(author))
         
@@ -762,99 +1017,99 @@ class PromotionModule(discord.ui.View):
 
 
 class LOAModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels, roles):
         super().__init__(timeout=None)
-        self.add_item(ToggleLOADropdown(author))  
-        self.add_item(LOARoled(author))
-        self.add_item(LOAChannel(author))                  
+        self.add_item(ToggleLOADropdown(author, options))  
+        self.add_item(LOARoled(author, roles))
+        self.add_item(LOAChannel(author, channels))                  
         self.add_item(Config(author))    
 
 
 
 class TagsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(ToggleTags(author))      
+        self.add_item(ToggleTags(author, options))      
         self.add_item(TagsUsageChannel(author))   
         self.add_item(Config(author)) 
 
 
 
 class QuotaModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(QuotaToggle(author))            
+        self.add_item(QuotaToggle(author, options))            
         self.add_item(QuotaAmount(author))          
         self.add_item(Config(author)) 
 
 
 
 class FeedbackModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
-        self.add_item(ToggleFeedback(author))         
-        self.add_item(FeedbackChannel(author))    
+        self.add_item(ToggleFeedback(author, options))         
+        self.add_item(FeedbackChannel(author, channels))    
         self.add_item(FMoreOptions(author))      
         self.add_item(Config(author)) 
 
 
 
 class SuspensionsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(ToggleSuspensions(author))               
+        self.add_item(ToggleSuspensions(author, options))               
         self.add_item(Config(author)) 
 
  
 
 class WelcomeModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
-        self.add_item(ToggleWelcome(author))   
+        self.add_item(ToggleWelcome(author, options))   
         self.add_item(Welcomemessage(author))  
-        self.add_item(WelcomeChannel(author))            
+        self.add_item(WelcomeChannel(author, channels))            
         self.add_item(Config(author)) 
 
  
 
 class PartnershipModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
-        self.add_item(TogglePartnerships(author))          
-        self.add_item(PartnershipChannel(author))                    
+        self.add_item(TogglePartnerships(author, options))          
+        self.add_item(PartnershipChannel(author, channels))                    
         self.add_item(Config(author)) 
 
 
 class ForumUtilsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(ToggleForums(author))                          
+        self.add_item(ToggleForums(author, options))                          
         self.add_item(Config(author)) 
 
 
 
 class ReportsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options, channels, roles):
         super().__init__(timeout=None)   
-        self.add_item(ToggleReportsDropdown(author))           
-        self.add_item(ReportChannel(author))         
-        self.add_item(ReportsModeratorRole(author))          
+        self.add_item(ToggleReportsDropdown(author, options))           
+        self.add_item(ReportChannel(author, channels))         
+        self.add_item(ReportsModeratorRole(author, roles))          
         self.add_item(Config(author)) 
 
 
 
 class AppResultModule(discord.ui.View):
-    def __init__(self, author):
-        super().__init__(timeout=None)
-        self.add_item(ToggleApplications(author))       
+    def __init__(self, author, channels):
+        super().__init__(timeout=None)     
+        self.add_item(ToggleApplications(author))         
         self.add_item(ApplicationCreator(author))   
-        self.add_item(ApplicationSubmissions(author))
+        self.add_item(ApplicationSubmissions(author, channels))
         self.add_item(AMoreOptions(author))                   
         self.add_item(Config(author)) 
 class ConnectionsModule(discord.ui.View):
-    def __init__(self, author):
+    def __init__(self, author, options):
         super().__init__(timeout=None)
-        self.add_item(ToggleConnectionRoles(author))         
+        self.add_item(ToggleConnectionRoles(author, options))         
         self.add_item(Config(author)) 
 
 
@@ -891,7 +1146,24 @@ class ConfigCog(commands.Cog):
             modules.insert_one({'guild_id': ctx.guild.id, 'infractions': False, "Forums": False, "Suspensions": False, "Promotions": False, "Utility": True, "LOA": False, "Tags": False, "Partnerships": False, "Quota": False, "Feedback": False, 'Reports': False, 'Applications': False, 'StaffList': False, 'Suggestions': False, 'Connection': False  })
         staffrolemessage = "Not Configured"
         adminrolemessage = "Not Configured"
+        adminroles = []
+        print(staffroleresult)
+        print(adminroleresult)
         if adminroleresult:
+            result = adminroleresult.get('staffrole', []) 
+            if not isinstance(result, list):
+                result = [result]
+            for role_ids in result:         
+                    if not isinstance(role_ids, list):
+                        role_ids = [role_ids]                            
+                    for role_id in role_ids:
+                     
+                     role = ctx.guild.get_role(role_id)
+                     print(role)
+                     if role:
+                        adminroles.append(role)
+                     else:
+                        print(f"Role with ID {role_id} not found.")                  
             admin_roles_ids = adminroleresult.get('staffrole', [])
             if not isinstance(admin_roles_ids, list):
                 admin_roles_ids = [admin_roles_ids]
@@ -901,8 +1173,24 @@ class ConfigCog(commands.Cog):
                 adminrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 adminrolemessage = ", ".join(admin_roles_mentions)
-
+        staffroles = []
         if staffroleresult:
+            result = staffroleresult.get('staffrole', []) 
+            if not isinstance(result, list):
+                result = [result]
+            for role_ids in result:
+                    if not isinstance(role_ids, list):
+                        role_ids = [role_ids]
+
+
+                    for role_id in role_ids:
+                     role = ctx.guild.get_role(role_id)
+                     print(role)                     
+                     if role:
+                        staffroles.append(role)
+                        print(staffroles)
+                     else:
+                        print(f"Role with ID {role_id} not found.")
             staff_roles_ids = staffroleresult.get('staffrole', [])
             if not isinstance(staff_roles_ids, list):
                 staff_roles_ids = [staff_roles_ids]
@@ -912,7 +1200,7 @@ class ConfigCog(commands.Cog):
                 staffrolemessage = "<:Error:1223063223910010920> Roles weren't found, please reconfigure."
             else:
                 staffrolemessage = ", ".join(staff_roles_mentions)
-
+         
         embed = discord.Embed(
             title="<:Setting:1154092651193323661> Settings",
             description=f"",
@@ -924,7 +1212,7 @@ class ConfigCog(commands.Cog):
         embed.add_field(name="<:Permissions:1207365901956026368> Permissions", value=value)
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-        view = ConfigViewMain(ctx.author)
+        view = ConfigViewMain(ctx.author, staffroles, adminroles)
         await ctx.send(embed=embed, view=view)
 
     @config.error
