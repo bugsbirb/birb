@@ -237,7 +237,7 @@ class ApplicationResults(commands.Cog):
 
 class StartApplication(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -258,7 +258,7 @@ class StartApplication(discord.ui.View):
 
 class Section1(discord.ui.Modal):
     def __init__(self, guild, author, name, section_data):
-        super().__init__(title="Section 1")
+        super().__init__(title="Section 1", timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -305,7 +305,7 @@ class Section1(discord.ui.Modal):
                 await interaction.response.edit_message(embed=embed, view=view)   
 class Section2(discord.ui.Modal):
     def __init__(self, guild, author, name, section_data):
-        super().__init__(title="Section 2")
+        super().__init__(title="Section 2", timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -352,7 +352,7 @@ class Section2(discord.ui.Modal):
 
 class Section3(discord.ui.Modal):
     def __init__(self, guild, author, name, section_data):
-        super().__init__(title="Section 3")
+        super().__init__(title="Section 3", timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -398,7 +398,7 @@ class Section3(discord.ui.Modal):
                 await interaction.response.edit_message(embeds=embeds, view=view)
 class Section4(discord.ui.Modal):
     def __init__(self, guild, author, name, section_data):
-        super().__init__(title="Section 4")
+        super().__init__(title="Section 4", timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -446,7 +446,7 @@ class Section4(discord.ui.Modal):
 
 class Section5(discord.ui.Modal):
     def __init__(self, guild, author, name, section_data):
-        super().__init__(title="Section 5")
+        super().__init__(title="Section 5", timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -485,7 +485,7 @@ class Section5(discord.ui.Modal):
 
 class Continue(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -501,7 +501,7 @@ class Continue(discord.ui.View):
 
 class Continue2(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -517,7 +517,7 @@ class Continue2(discord.ui.View):
 
 class Continue3(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -533,7 +533,7 @@ class Continue3(discord.ui.View):
 
 class Continue4(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
@@ -551,7 +551,7 @@ class Continue4(discord.ui.View):
 
 class Finish(discord.ui.View):
     def __init__(self, guild, author, name):
-        super().__init__()
+        super().__init__(timeout=None)
         self.guild = guild
         self.author = author
         self.name = name
