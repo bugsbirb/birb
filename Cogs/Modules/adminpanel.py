@@ -1160,7 +1160,7 @@ class AdminPanel(discord.ui.View):
                 ephemeral=True,
             )
             return
-        loa = loa_collection.find_one(
+        loaa = loa_collection.find_one(
             {"user": self.user.id, "guild_id": interaction.guild.id, "active": True,  'request': {'$ne': True}}
         )
         loainactive = loa_collection.find(
@@ -1168,7 +1168,7 @@ class AdminPanel(discord.ui.View):
         )
         view = None
 
-        if loa is None:
+        if loaa is None:
             description = []
             for request in loainactive:
                 start_time = request["start_time"]
@@ -1190,9 +1190,9 @@ class AdminPanel(discord.ui.View):
             view = LOACreate(self.user, interaction.guild, self.author)
 
         else:
-            start_time = loa["start_time"]
-            end_time = loa["end_time"]
-            reason = loa["reason"]
+            start_time = loaa["start_time"]
+            end_time = loaa["end_time"]
+            reason = loaa["reason"]
 
             embed = discord.Embed(
                 title=f"Leave Of Absence",
