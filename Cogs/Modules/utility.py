@@ -154,12 +154,13 @@ class Utility(commands.Cog):
         voice = ctx.guild.voice_channels
         total_members = len(ctx.guild.members)
         human_members = sum(1 for member in ctx.guild.members if not member.bot)
-        embed = discord.Embed(title=f"**{ctx.guild.name}** in a nutshell", description=f"* **Owner:** {guild.owner.mention}\n* **Guild:** {guild.name}\n* **Guild ID:** {guild.id}\n* **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)", color=0x2b2d31)
+        embed = discord.Embed(title=f"**{ctx.guild.name}** in a nutshell", description=f"<:crown:1226668264260894832> **Owner:** {guild.owner.mention}\n<:link:1226672596284866631> **Guild:** {guild.name}\n<:ID:1226671706022740058> **Guild ID:** {guild.id}\n<:Member:1226674150463111299> **Members** {guild.member_count}\n<:pin:1226671966413389864> **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)\n<:Discord_channel:1226674545050783817> **Channels:** {len(ctx.guild.channels)}\n<:Role:1223077527984144474> **Roles:** {len(ctx.guild.roles)}" , color=0x2b2d31)
         embed.add_field(name="Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
         embed.add_field(name="Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {ctx.guild.premium_subscription_count} (Level: {ctx.guild.premium_tier})\n* **Total Roles:** {len(ctx.guild.roles)}", inline=True)         
         embed.add_field(name="Security", value=f"* **Verification Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{str(ctx.guild.explicit_content_filter).capitalize()}`")
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
+        
         await ctx.send(embed=embed)
         
     

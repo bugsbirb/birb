@@ -325,12 +325,13 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Disabled")]
             channels = []
             if welcomechannelresult:
-                if welcomechannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(welcomechannelresult.get('channel_id'))  
+                if welcomechannelresult.get('welcome_channel'):
+                 channels = interaction.guild.get_channel(welcomechannelresult.get('welcome_channel'))  
                  if channels is None:
                      channels = []          
                  else:
-                    channels = [channels]                       
+                    channels = [channels]  
+                         
             view = WelcomeModule(self.author, options, channels)
             
             embed.set_thumbnail(url=interaction.guild.icon)
