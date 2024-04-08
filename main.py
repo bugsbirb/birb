@@ -33,7 +33,7 @@ guildid = os.getenv("CUSTOM_GUILD")
 load_dotenv()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["astro"]
-print(environment)
+
 
 class client(commands.AutoShardedBot):
     def __init__(self):
@@ -44,6 +44,11 @@ class client(commands.AutoShardedBot):
          super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=False
          )
+        elif environment == 'development':
+         print(f'Development Loaded')
+         super().__init__(
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=True)            
+         intents.message_content = True
         else:
          print('Production Loaded')
          super().__init__(
@@ -116,8 +121,10 @@ class client(commands.AutoShardedBot):
          
          guild = await self.fetch_guild(guildid)
          if guild:
-            
-            await guild.chunk(cache=True)
+            try:
+             await guild.chunk(cache=True)
+            except Exception as e:
+             print(f"[❌] Failed to chunk guild {guild.name} ({guild.id})") 
             print(f"[✅] Connected to guild {guild.name} ({guild.id})")
          else:
             print('Guild not found.')
