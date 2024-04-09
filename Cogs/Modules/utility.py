@@ -273,18 +273,13 @@ class Utility(commands.Cog):
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
         embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
-        if interaction.guild:
-         for shard_id, shard_instance in self.client.shards.items():
-            shard_info = f"> **Latency:** {shard_instance.latency * 1000:.0f} ms\n"  
-            guild_count = sum(1 for guild in self.client.guilds if guild.shard_id == shard_id)
-            shard_info += f"> **Guilds:** {guild_count}\n" 
-            urguild = ""
-            if shard_id == interaction.guild.shard_id:
-                urguild = "(This Guild)"
-            embed.add_field(name=f"<:pingpong:1227283504501358715> Shard {shard_id} {urguild}", value=shard_info, inline=False)
+
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
-        await interaction.response.send_message(embed=embed)        
+        if interaction.guild:
+         await interaction.response.send_message(embed=embed, view=NetWorkPage(self.client))    
+        else:
+            await interaction.response.send_message(embed=embed)
         
 
  
@@ -393,6 +388,96 @@ class Utility(commands.Cog):
                 ret += 1
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
+class NetWorkPage(discord.ui.View):
+    def __init__(self, client):
+        super().__init__()
+        self.client = client
+
+    @discord.ui.button(
+        label="",
+        style=discord.ButtonStyle.grey,
+        emoji=f"<:chevronleft:1220806425140531321>",  
+        disabled=True)
+    async def left(self, interaction: discord.Interaction, button: discord.ui.Button):
+     pass
+
+    @discord.ui.button(
+        label="Network",
+        style=discord.ButtonStyle.blurple,
+        emoji="<:Network:1184525553294905444>")
+    async def network(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.edit_message(content="")
+
+    @discord.ui.button(
+        label="",
+        style=discord.ButtonStyle.grey,
+        emoji=f"<:chevronright:1220806430010118175>"  )
+    async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
+        server_name = "Astro Birb"
+        server_icon = self.client.user.display_avatar
+        embed = discord.Embed(title="Sharding Information", color=discord.Color.dark_embed())
+        if interaction.guild:
+         for shard_id, shard_instance in self.client.shards.items():
+            shard_info = f"> **Latency:** {shard_instance.latency * 1000:.0f} ms\n"  
+            guild_count = sum(1 for guild in self.client.guilds if guild.shard_id == shard_id)
+            shard_info += f"> **Guilds:** {guild_count}\n" 
+            urguild = ""
+            if shard_id == interaction.guild.shard_id:
+                urguild = "(This Guild)"
+            embed.add_field(name=f"<:pingpong:1227283504501358715> Shard {shard_id} {urguild}", value=shard_info, inline=False)        
+        embed.set_author(name=server_name, icon_url=server_icon)
+        embed.set_thumbnail(url=server_icon)
+        await interaction.response.edit_message(
+            embed=embed,
+            view=ShardsPage(self.client))
+
+
+class ShardsPage(discord.ui.View):
+    def __init__(self, client):
+        super().__init__()
+        self.client = client
+
+    async def check_database_connection(self):
+        try:
+
+            await db.command("ping")
+            return "Connected"
+        except Exception as e:
+            print(f"Error interacting with the database: {e}")
+            return "Not Connected"
+        
+    @discord.ui.button(
+        label="",
+        style=discord.ButtonStyle.grey,
+        emoji=f"<:chevronleft:1220806425140531321>",  
+        disabled=False)
+    async def left(self, interaction: discord.Interaction, button: discord.ui.Button,):
+        server_name = "Astro Birb"
+        server_icon = self.client.user.display_avatar
+        discord_latency = self.client.latency * 1000
+        discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
+        database_status = await self.check_database_connection()
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+
+        embed.set_author(name=server_name, icon_url=server_icon)
+        embed.set_thumbnail(url=server_icon)
+        await interaction.response.edit_message(embed=embed, view=NetWorkPage(self.client)) 
+
+    @discord.ui.button(
+        label="Shards",
+        style=discord.ButtonStyle.blurple,
+        emoji=f"<:pingpong:1227283504501358715>")
+    async def shards(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.edit_message(content="")
+
+    @discord.ui.button(
+        label="",
+        style=discord.ButtonStyle.grey,
+        emoji=f"<:chevronright:1220806430010118175>", disabled=True)
+    async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
 
 class invite(discord.ui.View):
     def __init__(self):
