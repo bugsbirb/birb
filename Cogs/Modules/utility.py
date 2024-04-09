@@ -272,10 +272,16 @@ class Utility(commands.Cog):
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
+        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
         if interaction.guild:
-         embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>\n**Shard:** {interaction.guild.shard_id}", color=0x2b2d31, timestamp=datetime.now())
-        else: 
-            embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31, timestamp=datetime.now())
+         for shard_id, shard_instance in self.client.shards.items():
+            shard_info = f"> **Latency:** {shard_instance.latency * 1000:.0f} ms\n"  
+            guild_count = sum(1 for guild in self.client.guilds if guild.shard_id == shard_id)
+            shard_info += f"> **Guilds:** {guild_count}\n" 
+            urguild = ""
+            if shard_id == interaction.guild.shard_id:
+                urguild = "(This Guild)"
+            embed.add_field(name=f"<:pingpong:1227283504501358715> Shard {shard_id} {urguild}", value=shard_info, inline=False)
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
         await interaction.response.send_message(embed=embed)        

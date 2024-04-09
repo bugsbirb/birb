@@ -47,12 +47,12 @@ class client(commands.AutoShardedBot):
         elif environment == 'development':
          print(f'Development Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=True)            
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2, chunk_guilds_at_startup=True)            
          intents.message_content = True
         else:
          print('Production Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2
          )             
         self.client = client
         self.cogslist = [
