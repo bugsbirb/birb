@@ -34,7 +34,7 @@ class Modmailevnt(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         
         if message.author.bot:
             return
@@ -56,17 +56,32 @@ class Modmailevnt(commands.Cog):
 
                 channelcreated = f"{channel.created_at.strftime('%d/%m/%Y')}"
                 
-                
+                dm_channel = await message.author.create_dm()
                 transcriptid = random.randint(100, 5000)
-                transcript = await chat_exporter.export(channel)    
+                try:
+                 transcript = await chat_exporter.export(channel)    
+                except Exception:
+                       
+                       await modmail.delete_many({'user_id': user_id})
+                       await message.author.send(f"{tick} Conversation closed.")                       
+                       return
                 transcript_file = discord.File(
                 io.BytesIO(transcript.encode()),
                 filename=f"transcript-{channel.name}.html")           
                 if channel:
+                    testchannel = self.client.get_channel(1202756318897774632)
+                    message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                    link = await chat_exporter.link(message)
+                    view = TranscriptChannel(link)                    
                     await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has closed the modmail conversation.")
-                    await channel.delete()
+                    try:
+                     await channel.delete()
+                    except Exception:
+                       await modmail.delete_many({'user_id': user_id})
+                       await dm_channel.send(f"{tick} Conversation closed.")                       
+                       return
                     await modmail.delete_many({'user_id': user_id})
-                    await message.author.send(f"{tick} Conversation closed.")
+                    await dm_channel.send(f"{tick} Conversation closed.")
                     transcriptschannelresult = await transcriptschannel.find_one({'guild_id': channel.guild.id})
                     if transcriptschannelresult:
                      transcriptchannelid = transcriptschannelresult.get('channel_id')
@@ -79,17 +94,13 @@ class Modmailevnt(commands.Cog):
                       embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=message.author.mention, inline=True)
                       embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
                       embed.add_field(name="<:reason:1202773873095868476> Reason", value="Closed by modmail author.", inline=True)
-                      await message.author.send(embed=embed)
+                      await dm_channel.send(embed=embed)
                       
-                      testchannel = self.client.get_channel(1202756318897774632)
-                      message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
-                      link = await chat_exporter.link(message)
-                      print(link)
-                      view = TranscriptChannel(link)
+
                       await transcriptchannel.send(embed=embed, view=view)
                       await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': channel.guild.id, 'closedby': message.author.id, 'reason': "Closed by modmail author.", 'author': message.author.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                 else:
-                    await message.author.send(f"{no} Modmail channel not found.")
+                    await dm_channel.send(f"{no} Modmail channel not found.")
                 return
              
 
@@ -269,6 +280,7 @@ class Modmailevnt(commands.Cog):
                       
                       await channel.send(f"{mention}\n<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
                       return
+                    await message.add_reaction('📨') 
                     embed = discord.Embed(
                         color=discord.Color.dark_embed(),
                         title=message.author,
