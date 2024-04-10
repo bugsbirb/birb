@@ -246,6 +246,8 @@ class quota(commands.Cog):
 
                 if message_quota_result:
                     message_quota = message_quota_result.get('quota', 100)
+                    message_quota = int(message_quota)
+
                 else:
                     message_quota = 100
 
