@@ -245,7 +245,7 @@ class quota(commands.Cog):
                 message_quota_result = await message_quota_collection.find_one({'guild_id': ctx.guild.id})
 
                 if message_quota_result:
-                    message_quota = message_quota_result.get('message_quota', 100)
+                    message_quota = message_quota_result.get('quota', 100)
                 else:
                     message_quota = 100
 

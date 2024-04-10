@@ -9,9 +9,11 @@ from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
+
 ReportModeratorRole = db['Report Moderator Role']
 scollection = db['staffrole']
 arole = db['adminrole']
+
 
 async def has_staff_role(ctx):
     filter = {'guild_id': ctx.guild.id}
@@ -49,6 +51,7 @@ async def has_staff_role(ctx):
          return
     await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`", allowed_mentions=discord.AllowedMentions.none())
     return False
+
 
 
 
