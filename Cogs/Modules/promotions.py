@@ -28,7 +28,8 @@ class promo(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -260,7 +261,8 @@ class promo(commands.Cog):
         else:
             await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
      for placeholder, value in replacements.items():
         if value is not None:
             message = str(message).replace(placeholder, str(value))

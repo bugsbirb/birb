@@ -23,7 +23,8 @@ class Feedback(commands.Cog):
 
 
 
-    async def staffcheck(self, ctx: commands.Context, staff):
+    @staticmethod
+    async def staffcheck(ctx: commands.Context, staff):
      filter = {
         'guild_id': ctx.guild.id
     }
@@ -41,7 +42,8 @@ class Feedback(commands.Cog):
 
      return False
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False

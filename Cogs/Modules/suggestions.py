@@ -18,7 +18,8 @@ class suggestions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -199,7 +200,8 @@ class SuggestionView(discord.ui.View):
             await self.update_embed(interaction, suggestion_data)
             await interaction.followup.send("<:DownVote:1183063097477451797> Downvoted!", ephemeral=True)
 
-    async def update_embed(self, interaction, suggestion_data):
+    @staticmethod
+    async def update_embed(interaction, suggestion_data):
         if interaction.message:
             embed = interaction.message.embeds[0]
             upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
@@ -300,7 +302,8 @@ class ManageSuggestion(discord.ui.Select):
         elif color == "Deny":
             await interaction.response.send_modal(Deny())
 
-    async def has_staff_role(self, interaction):
+    @staticmethod
+    async def has_staff_role(interaction):
         filter = {'guild_id': interaction.guild.id}
         staff_data = await scollection.find_one(filter)
 

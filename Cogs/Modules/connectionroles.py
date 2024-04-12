@@ -30,7 +30,8 @@ class ConnectionRoles(commands.Cog):
     async def connectionrole(self, ctx: commands.Context):
         pass
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
 
      if modulesdata is None:
@@ -40,8 +41,8 @@ class ConnectionRoles(commands.Cog):
      else:   
         return False
 
+    @staticmethod
     async def tag_name_autocompletion(
-        self,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

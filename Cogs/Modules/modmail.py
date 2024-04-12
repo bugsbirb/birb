@@ -28,7 +28,8 @@ class Modmail(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False

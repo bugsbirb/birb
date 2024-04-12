@@ -27,8 +27,8 @@ class ApplicationResults(commands.Cog):
     def __init__(self, client):
         self.client = client
  
+    @staticmethod
     async def applications(
-        self,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:
@@ -46,7 +46,8 @@ class ApplicationResults(commands.Cog):
 
         return choices
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -78,7 +79,8 @@ class ApplicationResults(commands.Cog):
             view = StartApplication(ctx.guild, ctx.author, application)
             await ctx.send(view=view, ephemeral=True)
 
-    async def has_required_role(self, ctx: commands.Context, name):
+    @staticmethod
+    async def has_required_role(ctx: commands.Context, name):
         filter = {
             'guild_id': ctx.guild.id,
             'name': name

@@ -22,8 +22,8 @@ class CustomCommands(commands.Cog):
         self.client = client
 
 
+    @staticmethod
     async def commands_auto_complete(
-        self,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:
@@ -261,7 +261,8 @@ class CustomCommands(commands.Cog):
 
 
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
      for placeholder, value in replacements.items():
         if value is not None:
             message = str(message).replace(placeholder, str(value))
@@ -459,7 +460,8 @@ class ButtonEmbed(discord.ui.View):
                     await interaction.response.send_message(f"{no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
                     return
         
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
      for placeholder, value in replacements.items():
         if value is not None:
             message = str(message).replace(placeholder, str(value))

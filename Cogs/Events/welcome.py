@@ -19,7 +19,8 @@ class welcome2(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
      for placeholder, value in replacements.items():
         if value is not None:
             message = str(message).replace(placeholder, str(value))
@@ -157,7 +158,8 @@ class ButtonEmbed(discord.ui.View):
         super().__init__()    
         self.name = name
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
      for placeholder, value in replacements.items():
         if value is not None:
             message = str(message).replace(placeholder, str(value))

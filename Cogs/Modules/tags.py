@@ -20,15 +20,16 @@ class Tags(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
         if modulesdata is None:
             return False
         elif modulesdata['Tags'] == True:   
             return True
 
+    @staticmethod
     async def tag_name_autocompletion(
-        self,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

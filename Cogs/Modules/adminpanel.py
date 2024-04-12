@@ -243,7 +243,8 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
         placeholder="Whats the reason for the promotion?",
     )
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
         for placeholder, value in replacements.items():
             if value is not None:
                 message = str(message).replace(placeholder, str(value))
@@ -429,7 +430,8 @@ class Reason(discord.ui.Modal, title="Reason"):
         placeholder="Whats the reason for the infraction?",
     )
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
         for placeholder, value in replacements.items():
             if value is not None:
                 message = str(message).replace(placeholder, str(value))
@@ -679,7 +681,8 @@ class InfractionOption(discord.ui.Select):
             placeholder="Action", min_values=1, max_values=1, options=options
         )
 
-    def get_infraction_types_from_db(self, guild):
+    @staticmethod
+    def get_infraction_types_from_db(guild):
         infraction_types = [
             discord.SelectOption(label="Activity Notice"),
             discord.SelectOption(label="Verbal Warning"),
@@ -793,7 +796,8 @@ class AdminPanelCog(commands.Cog):
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
 
-    async def acheck(self, ctx: commands.Context, staff):
+    @staticmethod
+    async def acheck(ctx: commands.Context, staff):
         filter = {"guild_id": ctx.guild.id}
         staff_data = arole.find_one(filter)
 
@@ -865,7 +869,8 @@ class IssuedInfraction(discord.ui.View):
         self.author = author
         self.ctx = ctx
 
-    async def InfractionModuleCheck(self, ctx: commands.Context):
+    @staticmethod
+    async def InfractionModuleCheck(ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
@@ -970,21 +975,24 @@ class AdminPanel(discord.ui.View):
         self.guild = guild
         self.author = author
 
-    async def InfractionModuleCheck(self, ctx: commands.Context):
+    @staticmethod
+    async def InfractionModuleCheck(ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
         elif modulesdata["infractions"] == True:
             return True
 
-    async def PromotionModuleCheck(self, ctx: commands.Context):
+    @staticmethod
+    async def PromotionModuleCheck(ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
         elif modulesdata["Promotions"] == True:
             return True
 
-    async def LOAModuleCheck(self, ctx: commands.Context):
+    @staticmethod
+    async def LOAModuleCheck(ctx: commands.Context):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
