@@ -325,14 +325,16 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]
             channels = []
-            if welcomechannelresult:
-                if welcomechannelresult.get('welcome_channel'):
-                 channels = interaction.guild.get_channel(welcomechannelresult.get('welcome_channel'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]  
-                         
+            if (
+                welcomechannelresult
+                and welcomechannelresult.get('welcome_channel')
+            ):
+             channels = interaction.guild.get_channel(welcomechannelresult.get('welcome_channel'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]  
+                     
             view = WelcomeModule(self.author, options, channels)
             
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -364,13 +366,15 @@ class Config(discord.ui.Select):
             if infractiontypescount == None:
                 infractiontypess = "0"
             channels = []
-            if infractionchannelresult:
-                if infractionchannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(infractionchannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]    
+            if (
+                infractionchannelresult
+                and infractionchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(infractionchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]    
             embed = discord.Embed(title="<:Infraction:1223063128275943544> Infractions Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = InfractModule(self.author, options, channels)
@@ -412,13 +416,15 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]  
             channels = []
-            if promochannelresult:
-                if promochannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(promochannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]                           
+            if (
+                promochannelresult
+                and promochannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(promochannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]                           
             view = PromotionModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                   
@@ -452,30 +458,28 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]
             channels = []
-            if loachannelresult:
-                if loachannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(loachannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
+            if loachannelresult and loachannelresult.get('channel_id'):
+             channels = interaction.guild.get_channel(loachannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
 
             roles = []
-            if loaroleresult:
-             if loaroleresult.get('staffrole'):
-                result = loaroleresult.get('staffrole', []) 
-                if not isinstance(result, list):
-                    result = [result]
-                for role_ids in result:
-                        if not isinstance(role_ids, list):
-                            role_ids = [role_ids]
-                        for role_id in role_ids:
-                         role = interaction.guild.get_role(role_id)
-                                              
-                         if role:
-                            roles.append(role)
-                         else:
-                            print(f"Role with ID {role_id} not found.")                                
+            if loaroleresult and loaroleresult.get('staffrole'):
+               result = loaroleresult.get('staffrole', []) 
+               if not isinstance(result, list):
+                   result = [result]
+               for role_ids in result:
+                       if not isinstance(role_ids, list):
+                           role_ids = [role_ids]
+                       for role_id in role_ids:
+                        role = interaction.guild.get_role(role_id)
+                                             
+                        if role:
+                           roles.append(role)
+                        else:
+                           print(f"Role with ID {role_id} not found.")                                
             view = LOAModule(self.author, options, channels, roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
@@ -535,14 +539,15 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]   
             channels = []                     
-            if feedbackchannelresult:
-                if feedbackchannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(feedbackchannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
-                
+            if (
+                feedbackchannelresult
+                and feedbackchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(feedbackchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
             view = FeedbackModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -584,14 +589,16 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]  
             channels = []
-            if partnershipchannelresult:
-                if partnershipchannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
-                                                          
+            if (
+                partnershipchannelresult
+                and partnershipchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
+                                                      
             view = PartnershipModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -638,29 +645,33 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]  
             channels = []
-            if partnershipchannelresult:
-                if partnershipchannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
+            if (
+                partnershipchannelresult
+                and partnershipchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(partnershipchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
             roles = []    
-            if reportsmoderatorresult:                    
-             if reportsmoderatorresult.get('staffrole'):
-                result = reportsmoderatorresult.get('staffrole', []) 
-                if not isinstance(result, list):
-                    result = [result]
-                for role_ids in result:
-                        if not isinstance(role_ids, list):
-                            role_ids = [role_ids]
-                        for role_id in role_ids:
-                         role = interaction.guild.get_role(role_id)
-                                              
-                         if role:
-                            roles.append(role)
-                         else:
-                            print(f"Role with ID {role_id} not found.")            
+            if (
+                reportsmoderatorresult
+                and reportsmoderatorresult.get('staffrole')
+            ):
+               result = reportsmoderatorresult.get('staffrole', []) 
+               if not isinstance(result, list):
+                   result = [result]
+               for role_ids in result:
+                       if not isinstance(role_ids, list):
+                           role_ids = [role_ids]
+                       for role_id in role_ids:
+                        role = interaction.guild.get_role(role_id)
+                                             
+                        if role:
+                           roles.append(role)
+                        else:
+                           print(f"Role with ID {role_id} not found.")            
             view = ReportsModule(self.author, options, channels ,roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -716,14 +727,16 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             channels = []
-            if applicationchannelresult:
-                if applicationchannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(applicationchannelresult.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
-                                                                   
+            if (
+                applicationchannelresult
+                and applicationchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(applicationchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
+                                                               
             view = AppResultModule(self.author, channels)
 
         elif color == 'Connection Roles':         # 
@@ -780,22 +793,20 @@ class Config(discord.ui.Select):
             embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Suggestion Channel:** {suggestionchannelmsg}\n{replybottom}**Suggestions Management Channel:** {smschannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
-            if suschannelresult:
-                if suschannelresult.get('channel_id'):
-                 suggestchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
-                 if suggestchannel is None:
-                     suggestchannel = []          
-                 else:
-                    suggestchannel = [suggestchannel]       
+            if suschannelresult and suschannelresult.get('channel_id'):
+             suggestchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
+             if suggestchannel is None:
+                 suggestchannel = []          
+             else:
+                suggestchannel = [suggestchannel]       
             managementchannel = []    
             suggestchannel = []
-            if smschannelresult:
-                if smschannelresult.get('channel_id'):
-                 managementchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
-                 if managementchannel is None:
-                     managementchannel = []          
-                 else:
-                    managementchannel = [managementchannel]                   
+            if smschannelresult and smschannelresult.get('channel_id'):
+             managementchannel = interaction.guild.get_channel(suschannelresult.get('channel_id'))  
+             if managementchannel is None:
+                 managementchannel = []          
+             else:
+                managementchannel = [managementchannel]                   
             view = SuggestionModule(self.author, options, suggestchannel, managementchannel)
             try:
              await interaction.message.edit(embed=embed)     
@@ -843,13 +854,12 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]   
             channels = []
-            if logging:
-                if logging.get('channel_id'):
-                 channels = interaction.guild.get_channel(logging.get('channel_id'))  
-                 if channels is None:
-                     channels = []          
-                 else:
-                    channels = [channels]       
+            if logging and logging.get('channel_id'):
+             channels = interaction.guild.get_channel(logging.get('channel_id'))  
+             if channels is None:
+                 channels = []          
+             else:
+                channels = [channels]       
             view = CustomCommands(self.author, options, channels)
             
         elif color =='Modmail':
@@ -880,39 +890,44 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]
             category = []
-            if modmailcategoryresult:
-             if modmailcategoryresult.get('category_id'):
-                category = discord.utils.get(interaction.guild.categories, id=modmailcategoryresult.get('category_id'))
-                if category is None:
-                    category = []
-                else:
-                    category = [category]    
+            if (
+                modmailcategoryresult
+                and modmailcategoryresult.get('category_id')
+            ):
+               category = discord.utils.get(interaction.guild.categories, id=modmailcategoryresult.get('category_id'))
+               if category is None:
+                   category = []
+               else:
+                   category = [category]    
             roles = []
-            if modmailpingresult:
-
-             if modmailpingresult.get('modmailping'):
-                result = modmailpingresult.get('modmailping', []) 
-                if not isinstance(result, list):
-                    result = [result]
-                for role_ids in result:
-                        if not isinstance(role_ids, list):
-                            role_ids = [role_ids]
-                        for role_id in role_ids:
-                         role = interaction.guild.get_role(role_id)
-                                              
-                         if role:
-                            roles.append(role)
-                         else:
-                            print(f"Role with ID {role_id} not found.")
+            if (
+                modmailpingresult
+                and modmailpingresult.get('modmailping')
+            ):
+               result = modmailpingresult.get('modmailping', []) 
+               if not isinstance(result, list):
+                   result = [result]
+               for role_ids in result:
+                       if not isinstance(role_ids, list):
+                           role_ids = [role_ids]
+                       for role_id in role_ids:
+                        role = interaction.guild.get_role(role_id)
+                                             
+                        if role:
+                           roles.append(role)
+                        else:
+                           print(f"Role with ID {role_id} not found.")
             channels = []
             
-            if transcriptschannelresult:
-                if transcriptschannelresult.get('channel_id'):
-                 channels = interaction.guild.get_channel(transcriptschannelresult.get('channel_id'))
-                 if channels is None:
-                     channels = []
-                 else:
-                     channels = [channels]
+            if (
+                transcriptschannelresult
+                and transcriptschannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(transcriptschannelresult.get('channel_id'))
+             if channels is None:
+                 channels = []
+             else:
+                 channels = [channels]
             view = Modmail(interaction.user, options, channels, category, roles)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   

@@ -114,10 +114,12 @@ class Infractions(commands.Cog):
 
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'type': 'Infractions'})
         random_string = ''.join(random.choices(string.digits, k=8))
-        if expiration:
-            if not re.match(r'^\d+[mhdws]$', expiration):
-                await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
-                return
+        if (
+            expiration
+            and not re.match(r'^\d+[mhdws]$', expiration)
+        ):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none())
+            return
 
         if expiration:
             duration_value = int(expiration[:-1])
@@ -528,20 +530,22 @@ class Infractions(commands.Cog):
      
      await ctx.send(f"{tick} **{ctx.author.display_name}**, I've voided the infraction with ID `{id}` in this guild.", allowed_mentions=discord.AllowedMentions.none())
      optionsresult = await options.find_one({'guild_id': ctx.guild.id})
-     if optionsresult:
-         if optionsresult.get('onvoid', False) == True:
-             user = self.client.get_user(infraction['staff'])
-             if user:
-                 try:
-                  await user.send(f"<:CaseRemoved:1191901322723737600> Your infraction with ID `{id}` in {ctx.guild.name} has been voided.")
-                 except discord.Forbidden:
-                     print('[⚠️] I couldn\'t dm the user about their infraction void.')
+     if (
+            optionsresult
+            and optionsresult.get('onvoid', False) == True
+        ):
+         user = self.client.get_user(infraction['staff'])
+         if user:
+             try:
+              await user.send(f"<:CaseRemoved:1191901322723737600> Your infraction with ID `{id}` in {ctx.guild.name} has been voided.")
+             except discord.Forbidden:
+                 print('[⚠️] I couldn\'t dm the user about their infraction void.')
 
-                 return
-                 
-
-
+             return
              
+
+
+         
     @infraction.command(description="Edit an existing infraction")
     @app_commands.autocomplete(action=infractiontypes)
     async def edit(self, ctx: commands.Context, id: str, action, reason: str, notes: Optional[str]):

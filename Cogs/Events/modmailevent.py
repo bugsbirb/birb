@@ -154,10 +154,9 @@ class Modmailevnt(commands.Cog):
                     response = await self.client.wait_for('message', check=check, timeout=10)
                     selected_server = mutual_servers[int(response.content) - 1]
                     blacklist = await modmailblacklists.find_one({'guild_id': selected_server.id})
-                    if blacklist:
-                        if user_id in blacklist['blacklist']:
-                            await message.author.send(f"{no} **{message.author.display_name},** You are blacklisted from using modmail in **{selected_server.name}**.")
-                            return
+                    if blacklist and user_id in blacklist['blacklist']:
+                        await message.author.send(f"{no} **{message.author.display_name},** You are blacklisted from using modmail in **{selected_server.name}**.")
+                        return
                 except asyncio.TimeoutError:
                     await message.author.send(f"{no} **{message.author.name},** the server selection expired.")
                     return

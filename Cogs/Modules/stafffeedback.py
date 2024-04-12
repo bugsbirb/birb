@@ -101,11 +101,12 @@ class Feedback(commands.Cog):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only rate staff members.", allowed_mentions=discord.AllowedMentions.none())
         return
        if optionresult:
-        if optionresult.get('multiplefeedback', False) == False:
-         
-         if existing_feedback:
-          await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
-          return
+        if (
+                optionresult.get('multiplefeedback', False) == False
+                and existing_feedback
+            ):
+         await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
+         return
        else:
          if existing_feedback:
           await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())
