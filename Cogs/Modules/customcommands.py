@@ -187,7 +187,7 @@ class CustomCommands(commands.Cog):
                     loggingchannel = self.client.get_channel(loggingdata["channel_id"])
                     if loggingchannel:
                      embed = discord.Embed(
-                        title=f"Custom Command Usage",
+                        title="Custom Command Usage",
                         description=f"Command **{command}** was used by {ctx.author.mention} in {ctx.channel.mention}",
                         color=discord.Color.dark_embed(),
                     )
@@ -234,7 +234,7 @@ class CustomCommands(commands.Cog):
                     loggingchannel = self.client.get_channel(loggingdata["channel_id"])
                     if loggingchannel:
                      embed = discord.Embed(
-                        title=f"Custom Command Usage",
+                        title="Custom Command Usage",
                         description=f"Command **{command}** was used by {ctx.author.mention} in {ctx.channel.mention}",
                         color=discord.Color.dark_embed(),
                     )

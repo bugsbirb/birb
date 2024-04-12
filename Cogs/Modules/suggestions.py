@@ -53,7 +53,7 @@ class suggestions(commands.Cog):
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
-        embed.set_footer(text=f"0 Upvotes | 0 Downvotes")
+        embed.set_footer(text="0 Upvotes | 0 Downvotes")
         view = SuggestionView()
         channeldata = await suggestschannel.find_one({"guild_id": ctx.guild.id})
         channeldata2 = await suggestschannel2.find_one({"guild_id": ctx.guild.id})
@@ -187,7 +187,7 @@ class SuggestionView(discord.ui.View):
             )
             suggestion_data = await suggestions_collection.find_one({"message_id": message_id}) 
             await self.update_embed(interaction, suggestion_data)
-            await interaction.followup.send(f"<:changed:1217610179810693130> Switched to downvote!", ephemeral=True)
+            await interaction.followup.send("<:changed:1217610179810693130> Switched to downvote!", ephemeral=True)
         else:
             await suggestions_collection.update_one(
                 {"message_id": message_id},
@@ -397,7 +397,7 @@ class Deny(discord.ui.Modal, title='Deny'):
 class PermissionsButtons(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url1 = f'https://discord.gg/DhWdgfh3hN'
+        url1 = 'https://discord.gg/DhWdgfh3hN'
         self.add_item(discord.ui.Button(label='Support Server', url=url1, style=discord.ButtonStyle.blurple))
         self.add_item(discord.ui.Button(label='Documentation', url="https://docs.astrobirb.dev/overview", style=discord.ButtonStyle.blurple))
 

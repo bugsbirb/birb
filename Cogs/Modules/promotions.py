@@ -210,7 +210,7 @@ class promo(commands.Cog):
             if custom['image']:
                 embed.set_image(url=custom['image'])
         else:
-            embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description=f"* **User:** {staff.mention}\n* **Updated Rank:** {new.mention}\n* **Reason:** {reason}")
+            embed = discord.Embed(title="Staff Promotion", color=0x2b2d31, description=f"* **User:** {staff.mention}\n* **Updated Rank:** {new.mention}\n* **Reason:** {reason}")
             embed.set_thumbnail(url=staff.display_avatar)
             
             if optionresult:

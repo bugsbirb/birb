@@ -88,7 +88,7 @@ async def has_admin_role(ctx):
 class PermissionsButtons(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url1 = f'https://discord.gg/DhWdgfh3hN'
+        url1 = 'https://discord.gg/DhWdgfh3hN'
         self.add_item(discord.ui.Button(label='Support Server', url=url1, style=discord.ButtonStyle.blurple))
         self.add_item(discord.ui.Button(label='Documentation', url="https://docs.astrobirb.dev/overview", style=discord.ButtonStyle.blurple))
 

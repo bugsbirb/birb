@@ -45,7 +45,7 @@ class client(commands.AutoShardedBot):
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=False
          )
         elif environment == 'development':
-         print(f'Development Loaded')
+         print('Development Loaded')
          super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2, chunk_guilds_at_startup=True)            
          intents.message_content = True
@@ -138,7 +138,7 @@ class client(commands.AutoShardedBot):
         print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
         try:
          await db.command("ping")
-         print(f"[✅] Successfully connected to MongoDB")
+         print("[✅] Successfully connected to MongoDB")
         except Exception as e:
          print(f"[❌] Failed to connect to MongoDB: {e}") 
 

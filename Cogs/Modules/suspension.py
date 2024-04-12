@@ -345,7 +345,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         view = RoleTakeAwayView(self.user, self.author, self.reason, self.end_time, self.start_time)
-        await interaction.response.edit_message(content=f"<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
+        await interaction.response.edit_message(content="<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
 
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
     async def No(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -437,7 +437,7 @@ class SuspensionPanel(discord.ui.View):
 
             if roles_to_return and member:
                 await interaction.response.defer()
-                await interaction.edit_original_response(content=f"<a:Loading:1167074303905386587> Loading...", embed=None, view=None)                
+                await interaction.edit_original_response(content="<a:Loading:1167074303905386587> Loading...", embed=None, view=None)                
                 try:
                     await member.add_roles(*roles_to_return)
                     await interaction.edit_original_response(content=f"{tick} Suspension has been voided. Roles have been restored.", view=None, embed=None)

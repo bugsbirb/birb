@@ -100,7 +100,7 @@ class Modmail(commands.Cog):
         modmail_data = await modmail.find_one({'channel_id': channel_id})
         mediamsg = ""
         if media:
-           mediamsg = f"**Attachment Below**"
+           mediamsg = "**Attachment Below**"
 
         if modmail_data:
             user_id = modmail_data.get('user_id')
@@ -197,7 +197,7 @@ class Modmail(commands.Cog):
         mediamsg = ""
         if ctx.message.attachments:
             media = ctx.message.attachments[0].url
-            mediamsg = f"**Attachment Below**"
+            mediamsg = "**Attachment Below**"
 
 
         if modmail_data:

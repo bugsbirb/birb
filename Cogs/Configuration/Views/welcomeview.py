@@ -541,7 +541,7 @@ class NoEmbeds(discord.ui.View):
         await welcome.update_one({"guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Success!"
-        embed.description = f"Your welcome message has been updated!"
+        embed.description = "Your welcome message has been updated!"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)   
 
@@ -678,7 +678,7 @@ class Embeds(discord.ui.View):
         await welcome.update_one({"guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Success!"
-        embed.description = f"Your welcome message has been updated!"
+        embed.description = "Your welcome message has been updated!"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)            
 
@@ -718,6 +718,6 @@ async def refreshembed(interaction):
 class Button(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url = f'https://discord.gg/DhWdgfh3hN'
+        url = 'https://discord.gg/DhWdgfh3hN'
         
         self.add_item(discord.ui.Button(label='All Variables', url="https://docs.astrobirb.dev/astro-birb/configuration/variables", style=discord.ButtonStyle.blurple, emoji="📚"))

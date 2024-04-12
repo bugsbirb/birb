@@ -80,7 +80,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
         if amount >= 25:
          embed = discord.Embed()
          embed.title = f"{redx} {amount}/25"
-         embed.description=f"You have reached the maximum amount of custom commands."
+         embed.description="You have reached the maximum amount of custom commands."
          embed.color = discord.Color.brand_red()
          await interaction.response.edit_message(embed=embed, view=None)
 
@@ -91,7 +91,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          embed = discord.Embed()
          embed.title = f"{redx} That already exists!"
          embed.color = discord.Color.brand_red()
-         embed.description=f"Please try again."
+         embed.description="Please try again."
          await interaction.response.edit_message(embed=embed, view=None)
          return           
         name = self.name.value
@@ -121,7 +121,7 @@ class EditCommand(discord.ui.Modal, title='Edit Command'):
          embed = interaction.message.embeds[0]
          if result is None:
           embed.title = f"{redx} I could not find that."
-          embed.description=f"I could not find the command you were trying to edit please try again."
+          embed.description="I could not find the command you were trying to edit please try again."
           embed.color = discord.Color.brand_red()
           embed.clear_fields()
           await interaction.response.edit_message(embed=embed, view=None)
@@ -879,7 +879,7 @@ async def refreshembed(interaction):
             embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
-            embed.add_field(name=f"<:settings:1207368347931516928> Custom Commands Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Logging Channel:** {loggingmsg}")
+            embed.add_field(name="<:settings:1207368347931516928> Custom Commands Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Logging Channel:** {loggingmsg}")
             for result in commands:
                 permissions = result.get('permissionroles', 'None')
                 if permissions == 'None':

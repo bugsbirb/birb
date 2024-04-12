@@ -73,7 +73,7 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
             channel = interaction.guild.get_channel(channel_id)
 
             if channel:
-                embed = discord.Embed(title=f"LOA Created",
+                embed = discord.Embed(title="LOA Created",
                                       description=f"* **User:** {self.user.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {self.reason}", color=discord.Color.dark_embed())
                 embed.set_author(icon_url=self.user.display_avatar, name=self.user.display_name)
                 embed.set_thumbnail(url=self.user.display_avatar)
@@ -176,7 +176,7 @@ class loamodule(commands.Cog):
                             print(f"[⚠️] Failed to get channel {channel_id}. Continuing...")
                             continue 
                         if channel:
-                            embed = discord.Embed(title=f"LOA Ended",
+                            embed = discord.Embed(title="LOA Ended",
                                                   description=f"* **User:** {user.mention}\n* **Start Date**: <t:{int(request['start_time'].timestamp())}:f>\n* **End Date:** <t:{int(request['end_time'].timestamp())}:f>\n* **Reason:** {request['reason']}",
                                                   color=discord.Color.dark_embed())
                             embed.set_author(icon_url=user.display_avatar, name=user.display_name)
@@ -242,7 +242,7 @@ class loamodule(commands.Cog):
                     f"{loa} **Previous LOA**\n{arrow}<t:{int(start_time.timestamp())}:f> - <t:{int(end_time.timestamp())}:f> • {reason}")
 
             embed = discord.Embed(title="Leave Of Absense",
-                                  description=f"\n".join(description), color=discord.Color.dark_embed())
+                                  description="\n".join(description), color=discord.Color.dark_embed())
             embed.set_thumbnail(url=user.display_avatar)
             embed.set_author(icon_url=user.display_avatar, name=user.display_name)
             view = LOACreate(user, ctx.guild, ctx.author)
@@ -253,7 +253,7 @@ class loamodule(commands.Cog):
             reason = loas['reason']
 
             embed = discord.Embed(
-                title=f"Leave Of Absence",
+                title="Leave Of Absence",
                 color=discord.Color.dark_embed(),
                 description=f"{loa} **Active LOA**\n{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}"
             )
@@ -337,7 +337,7 @@ class loamodule(commands.Cog):
 
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=duration_seconds)
-        embed = discord.Embed(title=f"LOA Request - Pending",
+        embed = discord.Embed(title="LOA Request - Pending",
                               description=f"* **User:** {ctx.author.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {reason}",
                               color=discord.Color.dark_embed())
         embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.display_name)
@@ -499,7 +499,7 @@ class Confirm(discord.ui.View):
           pass
 
     @discord.ui.button(label="Past LOAs | 0", style=discord.ButtonStyle.grey, custom_id='persistent_view:loacount',row=0,
-                       emoji=f"<:case:1214629776606887946>")
+                       emoji="<:case:1214629776606887946>")
     async def loacount(self, interaction: discord.Interaction, button: discord.ui.Button):
             loa_data = await loa_collection.find_one({'messageid': interaction.message.id})
             if loa_data:

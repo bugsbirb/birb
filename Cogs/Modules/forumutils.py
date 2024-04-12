@@ -230,11 +230,11 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
          embed = discord.Embed()
          embed.title = f"{redx} That already exists."
          embed.color = discord.Color.brand_red()
-         embed.description=f"Please try again."
+         embed.description="Please try again."
          await interaction.response.edit_message(embed=embed, view=None)
          return           
         name = self.name.value
-        embed = discord.Embed(title=f"<:tag:1162134250414415922> Forum Channel", description=f"> Okay, now select a **forum channel.**", color=discord.Color.dark_embed())
+        embed = discord.Embed(title="<:tag:1162134250414415922> Forum Channel", description="> Okay, now select a **forum channel.**", color=discord.Color.dark_embed())
         view = ForumView(self.author, name)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -389,7 +389,7 @@ class Forums(commands.Cog):
         
         if role == "" or None:
            role = None
-           rolemention = f"None"
+           rolemention = "None"
 
         else:   
             rolemention = f"<@&{role}>"

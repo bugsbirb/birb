@@ -350,7 +350,7 @@ class NoEmbeds(discord.ui.View):
         Customisation.update_one({"name": "Staff Panel", "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Updated"
-        embed.description = f"Start by using /staffpanel"
+        embed.description = "Start by using /staffpanel"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
 
@@ -472,7 +472,7 @@ class Embeds(discord.ui.View):
         await Customisation.update_one({"name": "Staff Panel", "guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
         embed = discord.Embed()
         embed.title = f"{greencheck} Succesfully Updated"
-        embed.description = f"Start by using /staff panel"
+        embed.description = "Start by using /staff panel"
         embed.color = discord.Colour.brand_green()
         await interaction.response.edit_message(content=None, embed=embed, view=None)
 
