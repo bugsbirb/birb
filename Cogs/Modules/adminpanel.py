@@ -692,7 +692,7 @@ class InfractionOption(discord.ui.Select):
             discord.SelectOption(label="Termination"),
         ]
 
-        existing_types = set(option.label for option in infraction_types)
+        existing_types = {option.label for option in infraction_types}
         additional_types = []
 
         typeresult = infractiontypes.find_one({"guild_id": guild.id})
