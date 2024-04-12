@@ -33,9 +33,7 @@ from Cogs.Configuration.Views.forumsview import ToggleForums
 from Cogs.Configuration.Views.reportview import ReportChannel
 from Cogs.Configuration.Views.reportview import ToggleReportsDropdown
 from Cogs.Configuration.Views.reportview import ReportsModeratorRole
-
-from Cogs.Configuration.Views.applicationsview import ApplicationChannel
-from Cogs.Configuration.Views.applicationsview import ApplicationsRoles, ApplicationCreator, ApplicationSubmissions, AMoreOptions
+from Cogs.Configuration.Views.applicationsview import ApplicationCreator, ApplicationSubmissions, AMoreOptions
 from Cogs.Configuration.Views.applicationsview import ToggleApplications
 
 

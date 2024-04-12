@@ -15,8 +15,6 @@ from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.staff import Staffview
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from dotenv import dotenv_values
-
 PREFIX = os.getenv("PREFIX")
 TOKEN = os.getenv("TOKEN")
 STATUS = os.getenv("STATUS")
