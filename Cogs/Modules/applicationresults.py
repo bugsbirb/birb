@@ -2,11 +2,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from emojis import *
-from discord.ui import TextInput, Modal
 from typing import Literal
 import typing
 import os
-from permissions import has_admin_role, has_staff_role
+from permissions import has_admin_role
 from motor.motor_asyncio import AsyncIOMotorClient
 
 MONGO_URL = os.getenv('MONGO_URL')
