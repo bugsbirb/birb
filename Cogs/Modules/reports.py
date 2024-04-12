@@ -182,7 +182,8 @@ class Reports(commands.Cog):
         reported_at = datetime.utcnow().timestamp()
         reported_at_format = f"<t:{int(reported_at)}:F>"
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False

@@ -118,7 +118,8 @@ class loamodule(commands.Cog):
          print(f"[❌] LOA Loop Not Started: {e}")
  
 
-    async def modulecheck(self, ctx: commands.Context):
+    @staticmethod
+    async def modulecheck(ctx: commands.Context):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
@@ -378,7 +379,8 @@ class Confirm(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    async def has_admin_role(self, interaction):
+    @staticmethod
+    async def has_admin_role(interaction):
         filter = {
             'guild_id': interaction.guild.id
         }

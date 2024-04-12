@@ -95,14 +95,16 @@ class quota(commands.Cog):
 
 
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
      elif modulesdata['Quota'] == True:   
         return True
 
-    async def modulecheck2(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck2(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False

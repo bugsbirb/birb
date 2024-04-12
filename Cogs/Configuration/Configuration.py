@@ -199,7 +199,8 @@ class Config(discord.ui.Select):
 
         super().__init__(placeholder='Config Menu', min_values=1, max_values=1, options=options)
 
-    def permissionsconfig(self, author):
+    @staticmethod
+    def permissionsconfig(author):
      actionrequired = None
     
      if not scollection.find_one({'guild_id': author.guild.id}):

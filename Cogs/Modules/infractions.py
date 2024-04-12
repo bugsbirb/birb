@@ -42,7 +42,8 @@ class Infractions(commands.Cog):
     
 
 
-    async def modulecheck(self, ctx: commands.Context): 
+    @staticmethod
+    async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
@@ -50,8 +51,8 @@ class Infractions(commands.Cog):
         return True
 
      
+    @staticmethod
     async def infractiontypes(
-    self,
     interaction: discord.Interaction,
     current: str
 ) -> typing.List[app_commands.Choice[str]]:
@@ -357,7 +358,8 @@ class Infractions(commands.Cog):
         else:
             await ctx.send(f"{Warning} **{ctx.author.display_name}**, the channel is not set up. Please run `/config`", allowed_mentions=discord.AllowedMentions.none())
 
-    async def replace_variables(self, message, replacements):
+    @staticmethod
+    async def replace_variables(message, replacements):
         for placeholder, value in replacements.items():
             if value is not None:
                 message = str(message).replace(placeholder, str(value))
