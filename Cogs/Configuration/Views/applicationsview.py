@@ -314,7 +314,7 @@ class createapp(discord.ui.Modal):
             return
         await application.insert_one({'guild_id': interaction.guild.id, 'name': self.name.value, 'saved': False})
         view = SectionButtons(author=self.author, name=self.name.value)
-        embed = discord.Embed(title=f"Application Builder", description=f"No added sections...", color=discord.Colour.dark_embed())
+        embed = discord.Embed(title="Application Builder", description="No added sections...", color=discord.Colour.dark_embed())
         embed.set_thumbnail(url=interaction.guild.icon)
         embed.set_author(
             name=interaction.user.name,
@@ -357,7 +357,7 @@ class editapp(discord.ui.Modal):
             await interaction.response.send_message(f"{no} I couldn't find the application specified.", ephemeral=True)
             return
         view = SectionButtons(author=self.author, name=self.name.value)
-        embed = discord.Embed(title=f"Application Builder", description="", color=discord.Colour.dark_embed())
+        embed = discord.Embed(title="Application Builder", description="", color=discord.Colour.dark_embed())
         embed.set_thumbnail(url=interaction.guild.icon)
         embed.set_author(
             name=interaction.user.name,
@@ -395,7 +395,7 @@ class editapp(discord.ui.Modal):
             view.section5.disabled = False    
             view.save.disabled = False
         else:  
-              embed.description = f"No sections found for this application."
+              embed.description = "No sections found for this application."
 
 
 
@@ -447,7 +447,7 @@ class SectionButtons(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section5(author=self.author, name=self.name))
 
-    @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji=f"<:Role:1162074735803387944>")
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji="<:Role:1162074735803387944>")
     async def role(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -457,7 +457,7 @@ class SectionButtons(discord.ui.View):
         view.add_item(RequiredRoles(self.author, self.name))
         await interaction.response.send_message(view=view, ephemeral=True)
     
-    @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji=f"<:Role:1162074735803387944>")
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji="<:Role:1162074735803387944>")
     async def acceptedroles(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -477,7 +477,7 @@ class SectionButtons(discord.ui.View):
         await application.update_one({'guild_id': interaction.guild.id, 'name': self.name}, {'$set': {'saved': True}})
         embed = discord.Embed(color=discord.Color.brand_green())
         embed.title =f"{greencheck} Succesfully Saved"
-        embed.description = f"Application Successfully saved!"
+        embed.description = "Application Successfully saved!"
         await interaction.response.edit_message(
             embed=embed,
             view=None

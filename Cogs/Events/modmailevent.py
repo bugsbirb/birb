@@ -43,7 +43,7 @@ class Modmailevnt(commands.Cog):
         if isinstance(message.channel, discord.DMChannel):
             user_id = message.author.id
             modmail_data = await modmail.find_one({'user_id': user_id})
-            if message.content == f"!close":
+            if message.content == "!close":
                 if not modmail_data:
                     await message.author.send(f"{no} You are not in a modmail conversation.")
                     return
@@ -211,7 +211,7 @@ class Modmailevnt(commands.Cog):
                         if modmailpingresult:
                             modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if selected_server.get_role(roleid) is not None]
                             modmailroles = ", ".join(filter(None, modmailroles))
-                        info = discord.Embed(title=f"Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
+                        info = discord.Embed(title="Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
                         if user_roles:
                             info.add_field(name=f"Roles [{rolecount}]", value=user_roles, inline=False)
                         info.set_author(name=message.author, icon_url=message.author.display_avatar)
@@ -239,7 +239,7 @@ class Modmailevnt(commands.Cog):
                                 await msg.reply("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
                                 return
                             else:
-                                await channel.send(f"<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                                await channel.send("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
                                 return
                         try:
                             await channel.send(embed=embed)

@@ -70,7 +70,7 @@ class CustomEmbeds(discord.ui.Select):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         if color == "Promotions":
-         embed = discord.Embed(title=f"Staff Promotion", color=0x2b2d31, description="* **User:** {staff.mention}\n* **Updated Rank:** {newrank}\n* **Reason:** {reason}")
+         embed = discord.Embed(title="Staff Promotion", color=0x2b2d31, description="* **User:** {staff.mention}\n* **Updated Rank:** {newrank}\n* **Reason:** {reason}")
          embed.set_author(name="Signed, {author.name}", icon_url=interaction.user.display_avatar)
          embed.set_thumbnail(url=interaction.user.display_avatar)
          view = Infraction(interaction.user, color)
@@ -81,7 +81,7 @@ class CustomEmbeds(discord.ui.Select):
          embed = discord.Embed(title="Staff Consequences & Discipline", description="* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
          embed.set_thumbnail(url=interaction.user.display_avatar)
          embed.set_author(name="Signed, {author.name}", icon_url=interaction.user.display_avatar)
-         embed.set_footer(text=f"Infraction ID | Test")
+         embed.set_footer(text="Infraction ID | Test")
          view = Infraction(interaction.user, color)
          await interaction.response.edit_message(embed=embed, view=view)
          embed = discord.Embed(title="Embed Variables", description="**Infractions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**Notes:** {notes}\n**Action:** {action}\n**Reason:** {reason}\n\n**Promotions**\n**Author Name:** {author.name}\n**Staff Name:** {staff}\n**New Rank:** {newrank}\n**Expiration:** {expiration}", color=discord.Color.dark_embed())

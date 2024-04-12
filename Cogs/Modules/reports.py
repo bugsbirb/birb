@@ -232,10 +232,10 @@ class Reports(commands.Cog):
         embed.set_thumbnail(url=member.display_avatar.url)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if message_link:
-            embed.add_field(name=f"Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replybottom}**Reason:** {reason}\n{replymiddle}**Message Link:** {message_link}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)    
+            embed.add_field(name="Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replybottom}**Reason:** {reason}\n{replymiddle}**Message Link:** {message_link}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)    
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False)        
         else:
-            embed.add_field(name=f"Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replymiddle}**Reason:** {reason}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)
+            embed.add_field(name="Report Information", value=f"{replytop}**Reported By:** {ctx.author.mention}\n{replymiddle}**Reason:** {reason}\n{replybottom}**Reported At:** {reported_at_format}", inline=False)
             embed.add_field(name="Proof", value=f"{proof_message}", inline=False) 
                    
 
@@ -366,7 +366,7 @@ class ReportPanel(discord.ui.View):
     async def case(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass              
 
-    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.red, custom_id='ignore:button', emoji=f"<:whitex:1190819175447408681>")
+    @discord.ui.button(label='Ignore', style=discord.ButtonStyle.red, custom_id='ignore:button', emoji="<:whitex:1190819175447408681>")
     async def Ignore(self, interaction: discord.Interaction, button: discord.ui.Button):
        if not await self.has_moderator_role(interaction):
          await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.\n<:Arrow:1115743130461933599>**Required:** `Reports Moderator Role`", ephemeral=True)

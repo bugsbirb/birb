@@ -129,7 +129,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
 
             if channel:
                 embed = discord.Embed(
-                    title=f"LOA Created",
+                    title="LOA Created",
                     description=f"* **User:** {self.user.mention}\n* **Start Date**: <t:{int(start_time.timestamp())}:f>\n* **End Date:** <t:{int(end_time.timestamp())}:f>\n* **Reason:** {self.reason}",
                     color=discord.Color.dark_embed(),
                 )
@@ -338,7 +338,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
         else:
 
             embed = discord.Embed(
-                title=f"Staff Promotion",
+                title="Staff Promotion",
                 color=0x2B2D31,
                 description=f"* **User:** {self.user.mention}\n* **Updated Rank:** {role.mention}\n* **Reason:** {reason}",
             )
@@ -1188,7 +1188,7 @@ class AdminPanel(discord.ui.View):
 
             embed = discord.Embed(
                 title="Leave Of Absense",
-                description=f"\n".join(description),
+                description="\n".join(description),
                 color=discord.Color.dark_embed(),
             )
             embed.set_thumbnail(url=self.user.display_avatar)
@@ -1203,7 +1203,7 @@ class AdminPanel(discord.ui.View):
             reason = loaa["reason"]
 
             embed = discord.Embed(
-                title=f"Leave Of Absence",
+                title="Leave Of Absence",
                 color=discord.Color.dark_embed(),
                 description=f"{loa} **Active LOA**\n{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
             )

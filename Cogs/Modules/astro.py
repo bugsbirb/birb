@@ -61,7 +61,7 @@ class management(commands.Cog):
         embed = discord.Embed(title="Command Analytics", description=description, color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-        embed.set_footer(text=f"Analytics started on 14th December 2024",
+        embed.set_footer(text="Analytics started on 14th December 2024",
                          icon_url="https://media.discordapp.net/ephemeral-attachments/1114281227579559998/1197680763341111377/1158064756104630294.png?ex=65bc2621&is=65a9b121&hm=9e278e5e96573663fb42396dd52e56ece56ba6af59e53f9720873ca484fabf19&=&format=webp&quality=lossless")
         await ctx.send(embed=embed)
 
@@ -124,7 +124,7 @@ class management(commands.Cog):
         embed.add_field(name=f"{Settings} Basic Settings",
                         value=f"**Admin Roles:** {adminrolemessage}\n**Staff Roles:** {staffrolemessage}")
         if modules_info:
-            embed.add_field(name=f"Modules", value=modules_info, inline=False)
+            embed.add_field(name="Modules", value=modules_info, inline=False)
         embed.set_author(name=guild.name, icon_url=guild.icon)
 
         await ctx.send(embed=embed)

@@ -211,7 +211,7 @@ class Tags(commands.Cog):
                 channel = self.client.get_channel(tagsloggingdata["channel_id"])
                 if channel:
                     embed = discord.Embed(
-                        title=f"Tag Usage",
+                        title="Tag Usage",
                         description=f"Tag **{name}** was used by {ctx.author.mention} in {ctx.channel.mention}",
                         color=discord.Color.dark_embed(),
                     )

@@ -398,7 +398,7 @@ class NetWorkPage(discord.ui.View):
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.grey,
-        emoji=f"<:chevronleft:1220806425140531321>",  
+        emoji="<:chevronleft:1220806425140531321>",  
         disabled=True)
     async def left(self, interaction: discord.Interaction, button: discord.ui.Button):
      pass
@@ -413,7 +413,7 @@ class NetWorkPage(discord.ui.View):
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.grey,
-        emoji=f"<:chevronright:1220806430010118175>"  )
+        emoji="<:chevronright:1220806430010118175>"  )
     async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -456,7 +456,7 @@ class ShardsPage(discord.ui.View):
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.grey,
-        emoji=f"<:chevronleft:1220806425140531321>",  
+        emoji="<:chevronleft:1220806425140531321>",  
         disabled=False)
     async def left(self, interaction: discord.Interaction, button: discord.ui.Button,):
         if interaction.user.id != self.author.id:
@@ -477,14 +477,14 @@ class ShardsPage(discord.ui.View):
     @discord.ui.button(
         label="Shards",
         style=discord.ButtonStyle.blurple,
-        emoji=f"<:pingpong:1227283504501358715>")
+        emoji="<:pingpong:1227283504501358715>")
     async def shards(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.edit_message(content="")
 
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.grey,
-        emoji=f"<:chevronright:1220806430010118175>", disabled=True)
+        emoji="<:chevronright:1220806430010118175>", disabled=True)
     async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
 
@@ -492,7 +492,7 @@ class ShardsPage(discord.ui.View):
 class invite(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url = f'https://discord.com/api/oauth2/authorize?client_id=1113245569490616400&permissions=1632557853697&scope=bot%20applications.commands'
+        url = 'https://discord.com/api/oauth2/authorize?client_id=1113245569490616400&permissions=1632557853697&scope=bot%20applications.commands'
         self.add_item(discord.ui.Button(label='Invite', url=url, style=discord.ButtonStyle.blurple, emoji="<:link:1206670134064717904>"))
 
 
@@ -500,7 +500,7 @@ class invite(discord.ui.View):
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url = f'https://discord.gg/DhWdgfh3hN'
+        url = 'https://discord.gg/DhWdgfh3hN'
         self.add_item(discord.ui.Button(label='Join', url=url, style=discord.ButtonStyle.blurple, emoji="<:link:1206670134064717904>"))
         self.add_item(discord.ui.Button(label='Documentation', url="https://docs.astrobirb.dev", style=discord.ButtonStyle.blurple, emoji="📚"))
 

@@ -269,7 +269,7 @@ class quota(commands.Cog):
 
                 if rank % 10 == 0:
                     embed = discord.Embed(
-                        title=f"Staff Leaderboard",
+                        title="Staff Leaderboard",
                         description=leaderboard_description,
                         color=discord.Color.dark_embed()
                     )
@@ -283,7 +283,7 @@ class quota(commands.Cog):
 
         if leaderboard_description:
             embed = discord.Embed(
-                title=f"Staff Leaderboard",
+                title="Staff Leaderboard",
                 description=leaderboard_description,
                 color=discord.Color.dark_embed()
             )
