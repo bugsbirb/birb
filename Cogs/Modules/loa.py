@@ -407,7 +407,7 @@ class Confirm(discord.ui.View):
         if loa_data:
             try:
              self.user = await interaction.guild.fetch_member(loa_data['user'])
-            except discord.HTTPException or discord.NotFound:
+            except (discord.HTTPException, discord.NotFound):
                     await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
              
                     return          
@@ -464,7 +464,7 @@ class Confirm(discord.ui.View):
         if loa_data:
             try:
              self.user = await interaction.guild.fetch_member(loa_data['user'])
-            except discord.HTTPException or discord.NotFound:
+            except (discord.HTTPException, discord.NotFound):
                     await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
                     return   
         else:
@@ -498,7 +498,7 @@ class Confirm(discord.ui.View):
 
                 try:
                  self.user = await interaction.guild.fetch_member(loa_data['user'])
-                except discord.HTTPException or discord.NotFound:
+                except (discord.HTTPException, discord.NotFound):
                     await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
                     return
             else:

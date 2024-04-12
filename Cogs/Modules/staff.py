@@ -476,7 +476,7 @@ class quota(commands.Cog):
              try:
               await ctx.channel.send(content, embed=embed, view=view)
               await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
-             except discord.errors.HTTPException or discord.errors.Forbidden:
+             except (discord.errors.HTTPException, discord.errors.Forbidden):
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return              
              return   
@@ -490,7 +490,7 @@ class quota(commands.Cog):
              try:
               await ctx.channel.send(embed=embed, view=view)
               await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
-             except discord.errors.HTTPException or discord.errors.Forbidden:
+             except (discord.errors.HTTPException, discord.errors.Forbidden):
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return
              return   
@@ -503,7 +503,7 @@ class quota(commands.Cog):
             try:
              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
              await ctx.channel.send(embed=embed, view=view)
-            except discord.errors.HTTPException or discord.errors.Forbidden:
+            except (discord.errors.HTTPException, discord.errors.Forbidden):
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return             
             return   

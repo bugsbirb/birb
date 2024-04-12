@@ -195,7 +195,7 @@ class CustomCommands(commands.Cog):
                     )
                      try:
                         await loggingchannel.send(embed=embed)
-                     except discord.Forbidden or discord.HTTPException:
+                     except (discord.Forbidden, discord.HTTPException):
                         print(
                             f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
                         )
@@ -242,7 +242,7 @@ class CustomCommands(commands.Cog):
                     )
                      try:
                         await loggingchannel.send(embed=embed)
-                     except discord.Forbidden or discord.HTTPException:
+                     except (discord.Forbidden, discord.HTTPException):
                         print(
                             f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
                         )

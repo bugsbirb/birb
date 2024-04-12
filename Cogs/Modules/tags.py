@@ -218,7 +218,7 @@ class Tags(commands.Cog):
                     )
                     try:
                         await channel.send(embed=embed)
-                    except discord.Forbidden or discord.HTTPException:
+                    except (discord.Forbidden, discord.HTTPException):
                         return print(
                             f"I could not find the channel to send the tag usage (guild: {ctx.guild.name})"
                         )
