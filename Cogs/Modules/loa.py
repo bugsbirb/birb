@@ -123,7 +123,7 @@ class loamodule(commands.Cog):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
-        elif modulesdata['LOA'] == True:
+        elif modulesdata['LOA'] is True:
             return True
 
     @commands.hybrid_group()

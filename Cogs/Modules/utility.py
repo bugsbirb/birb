@@ -128,7 +128,7 @@ class Utility(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return True
-     if modulesdata['Utility'] == True:   
+     if modulesdata['Utility'] is True:   
         return True
      else:
         return False

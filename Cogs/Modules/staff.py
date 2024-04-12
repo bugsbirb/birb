@@ -100,7 +100,7 @@ class quota(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Quota'] == True:   
+     elif modulesdata['Quota'] is True:   
         return True
 
     @staticmethod
@@ -108,7 +108,7 @@ class quota(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Staff Database', False) == True: 
+     elif modulesdata.get('Staff Database', False) is True: 
         return True
      else:   
         return False
@@ -447,7 +447,7 @@ class quota(commands.Cog):
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:
-            if custom.get('embed') == True:
+            if custom.get('embed') is True:
              embed_title = custom.get('title', None)
              embed_description = custom.get('description', None)
              embed_author = custom.get('author', None)

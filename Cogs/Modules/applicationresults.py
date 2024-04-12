@@ -52,7 +52,7 @@ class ApplicationResults(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Applications'] == True:   
+     elif modulesdata['Applications'] is True:   
         return True
     
     @commands.hybrid_command(description="Apply for a position.")
@@ -574,7 +574,7 @@ class Finish(discord.ui.View):
             else:
                 optionsresult = await options.find_one({'guild_id': interaction.guild.id})
                 if optionsresult:
-                  if optionsresult.get('acceptbuttons', False) == True:
+                  if optionsresult.get('acceptbuttons', False) is True:
                       view = AcceptAndDeny()
                   else:    
                       view = None

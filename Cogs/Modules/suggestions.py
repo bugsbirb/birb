@@ -23,7 +23,7 @@ class suggestions(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Suggestions', False) == True: 
+     elif modulesdata.get('Suggestions', False) is True: 
         return True
      else:   
         return False

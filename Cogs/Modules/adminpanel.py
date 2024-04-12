@@ -261,7 +261,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         optionresult = options.find_one({'guild_id': interaction.guild.id})
         if optionresult:
-            if optionresult.get('promotionissuer', False) == True:
+            if optionresult.get('promotionissuer', False) is True:
                 view = InfractionIssuer()
                 view.issuer.label = f"Issued By {interaction.user.display_name}"
             else:
@@ -349,7 +349,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
             )
 
             if optionresult:
-             if optionresult.get('pshowissuer', True) == False:
+             if optionresult.get('pshowissuer', True) is False:
                     embed.remove_author()
              else:
                     embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
@@ -364,7 +364,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
 
             if channel:
                 if optionresult:
-                 if optionresult.get('autorole', True) == False:
+                 if optionresult.get('autorole', True) is False:
                   pass
                  else:
                   try:
@@ -448,7 +448,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         optionresult = options.find_one({'guild_id': interaction.guild.id})
         if optionresult:
-            if optionresult.get('infractedbybutton', False) == True:
+            if optionresult.get('infractedbybutton', False) is True:
                 view = InfractionIssuer()
                 view.issuer.label = f"Issued By {interaction.user.display_name}"
             else:
@@ -505,7 +505,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             if authoricon == "None":
                 authoricon = None
 
-            if embed_author == None:
+            if embed_author is None:
                 embed_author = ""
             embed = discord.Embed(
                 title=embed_title,
@@ -519,7 +519,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             if custom["image"]:
                 embed.set_image(url=custom["image"])
             if optionresult:
-             if optionresult.get('showissuer', True) == False:
+             if optionresult.get('showissuer', True) is False:
                 embed.remove_author()
              else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
@@ -548,7 +548,7 @@ class Reason(discord.ui.Modal, title="Reason"):
             "guild_id": interaction.guild.id,
         }
         if optionresult:
-            if optionresult.get('showissuer', True) == False:
+            if optionresult.get('showissuer', True) is False:
                 embed.remove_author()
             else:
                 embed.set_author(name=f"Signed, {interaction.user.display_name}", icon_url=interaction.user.display_avatar)
@@ -874,7 +874,7 @@ class IssuedInfraction(discord.ui.View):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
-        elif modulesdata["infractions"] == True:
+        elif modulesdata["infractions"] is True:
             return True
 
     @discord.ui.button(
@@ -980,7 +980,7 @@ class AdminPanel(discord.ui.View):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
-        elif modulesdata["infractions"] == True:
+        elif modulesdata["infractions"] is True:
             return True
 
     @staticmethod
@@ -988,7 +988,7 @@ class AdminPanel(discord.ui.View):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
-        elif modulesdata["Promotions"] == True:
+        elif modulesdata["Promotions"] is True:
             return True
 
     @staticmethod
@@ -996,7 +996,7 @@ class AdminPanel(discord.ui.View):
         modulesdata = modules.find_one({"guild_id": ctx.guild.id})
         if modulesdata is None:
             return False
-        elif modulesdata["LOA"] == True:
+        elif modulesdata["LOA"] is True:
             return True
 
     @discord.ui.button(

@@ -33,7 +33,7 @@ class Modmail(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Modmail', False) == True: 
+     elif modulesdata.get('Modmail', False) is True: 
         return True
      else:   
         return False

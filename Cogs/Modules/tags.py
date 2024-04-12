@@ -25,7 +25,7 @@ class Tags(commands.Cog):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
         if modulesdata is None:
             return False
-        elif modulesdata['Tags'] == True:   
+        elif modulesdata['Tags'] is True:   
             return True
 
 

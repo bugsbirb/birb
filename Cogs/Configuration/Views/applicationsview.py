@@ -60,20 +60,20 @@ class AMoreOptions(discord.ui.Select):
             view = AccepButtons()
             option_result = await options.find_one({'guild_id': interaction.guild.id})
             if option_result:
-                    if option_result.get('acceptbuttons', False) == False:
+                    if option_result.get('acceptbuttons', False) is False:
                         view.AcceptButtons.style = discord.ButtonStyle.red
                         
-                    elif option_result.get('acceptbuttons', False) == True:
+                    elif option_result.get('acceptbuttons', False) is True:
                         view.AcceptButtons.style = discord.ButtonStyle.green            
             await interaction.response.send_message(view=view, ephemeral=True)
         elif color == ('Thread Discussion'):
             view = ResultThread()
             option_result = await options.find_one({'guild_id': interaction.guild.id})
             if option_result:
-                    if option_result.get('threaddiscussion', False) == False:
+                    if option_result.get('threaddiscussion', False) is False:
                         view.AcceptButtons.style = discord.ButtonStyle.red
                         
-                    elif option_result.get('threaddiscussion', False) == True:
+                    elif option_result.get('threaddiscussion', False) is True:
                         view.AcceptButtons.style = discord.ButtonStyle.green            
             await interaction.response.send_message(view=view, ephemeral=True)
             
@@ -126,7 +126,7 @@ class AccepButtons(discord.ui.View):
     @discord.ui.button(label="Accept/Deny Buttons", style=discord.ButtonStyle.green) 
     async def AcceptButtons(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('acceptbuttons', False) == False:
+        if optionresult.get('acceptbuttons', False) is False:
                 self.AcceptButtons.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'acceptbuttons': True}}, upsert=True)
         else:
@@ -141,7 +141,7 @@ class ResultThread(discord.ui.View):
     @discord.ui.button(label="Application Thread Discussion", style=discord.ButtonStyle.green) 
     async def AcceptButtons(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('threaddiscussion', False) == False:
+        if optionresult.get('threaddiscussion', False) is False:
                 self.AcceptButtons.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'threaddiscussion': True}}, upsert=True)
         else:

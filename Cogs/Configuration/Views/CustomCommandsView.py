@@ -128,7 +128,7 @@ class EditCommand(discord.ui.Modal, title='Edit Command'):
           return
 
                
-         if result.get('embed', False) == True:
+         if result.get('embed', False) is True:
             embed_title = result.get('title', None) 
             embed_description = result.get('description', None)   
             color_value = result.get('color', None)

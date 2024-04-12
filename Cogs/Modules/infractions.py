@@ -47,7 +47,7 @@ class Infractions(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['infractions'] == True:   
+     elif modulesdata['infractions'] is True:   
         return True
 
      
@@ -88,7 +88,7 @@ class Infractions(commands.Cog):
           await ctx.send(f"{no} **{ctx.author.display_name}**, this user can not be found.", allowed_mentions=discord.AllowedMentions.none())
           return                   
         if optionresult:
-            if optionresult.get('infractedbybutton', False) == True:
+            if optionresult.get('infractedbybutton', False) is True:
                 view = InfractionIssuer()
                 view.issuer.label = f"Issued By {ctx.author.display_name}"
             else:
@@ -190,7 +190,7 @@ class Infractions(commands.Cog):
 
             embed.set_thumbnail(url=embed_thumbnail)
             if optionresult:
-             if optionresult.get('showissuer', True) == False or anonymous == 'True':
+             if optionresult.get('showissuer', True) is False or anonymous == 'True':
                 embed.remove_author()
              else:
                 embed.set_author(name=embed_author, icon_url=authoricon)
@@ -210,7 +210,7 @@ class Infractions(commands.Cog):
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=staff.display_avatar)
             if optionresult:
-             if optionresult.get('showissuer', True) == False or anonymous == 'True':
+             if optionresult.get('showissuer', True) is False or anonymous == 'True':
                 embed.remove_author()
              else:
                 embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)
@@ -533,7 +533,7 @@ class Infractions(commands.Cog):
      optionsresult = await options.find_one({'guild_id': ctx.guild.id})
      if (
             optionsresult
-            and optionsresult.get('onvoid', False) == True
+            and optionsresult.get('onvoid', False) is True
         ):
          user = self.client.get_user(infraction['staff'])
          if user:
@@ -617,7 +617,7 @@ class Infractions(commands.Cog):
                if authoricon == "None":
                  authoricon = None   
  
-               if embed_author == None:
+               if embed_author is None:
                  embed_author = ""
                embed = discord.Embed(title=embed_title, description=embed_description , color=int(custom['color'], 16))
 

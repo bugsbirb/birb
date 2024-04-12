@@ -184,7 +184,7 @@ class Reports(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Reports'] == True:   
+     elif modulesdata['Reports'] is True:   
         return True 
 
 
