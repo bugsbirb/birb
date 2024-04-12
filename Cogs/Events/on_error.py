@@ -30,7 +30,7 @@ class On_error(commands.Cog):
             return
         error_id = ''.join(random.choices(string.digits, k=24))
         error_id = f"error-{error_id}"
-        await errors.insert_one({'guild_id': ctx.guild.id, 'error_id': error_id, 'error': str(error), 'timestamp': datetime.datetime.now(), 'guild_id': ctx.guild.id})
+        await errors.insert_one({'error_id': error_id, 'error': str(error), 'timestamp': datetime.datetime.now(), 'guild_id': ctx.guild.id})
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Contact Support", style=discord.ButtonStyle.link, url="https://discord.gg/DhWdgfh3hN"))
         embed = discord.Embed(title="<:x21:1214614676772626522> Command Error", description=f"Error ID: `{error_id}`", color=discord.Color.brand_red())
