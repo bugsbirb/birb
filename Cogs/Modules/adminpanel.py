@@ -1454,7 +1454,7 @@ class LOACreate(discord.ui.View):
             {
                 "staff": self.user.id,
                 "guild_id": interaction.guild.id,
-                "action": "Demotion", 'voided': {'$ne': True}, 'voided': {'$ne': True},
+                "action": "Demotion", 'voided': {'$ne': True},
             }
         )
         loa = loa_collection.find_one(
