@@ -64,10 +64,9 @@ class Modmail(commands.Cog):
         if not await has_admin_role(ctx):
             return
         blacklist = await modmailblacklists.find_one({'guild_id': ctx.guild.id})
-        if blacklist:
-            if member.id in blacklist['blacklist']:
-                await ctx.send(f"{no} **{member.display_name}** is already blacklisted.")
-                return
+        if blacklist and member.id in blacklist['blacklist']:
+            await ctx.send(f"{no} **{member.display_name}** is already blacklisted.")
+            return
         await modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$push': {'blacklist': member.id}}, upsert=True)
         await ctx.send(f"{tick} **{member.display_name}** has been blacklisted from using modmail.")
        
@@ -80,10 +79,9 @@ class Modmail(commands.Cog):
         if not await has_admin_role(ctx):
             return
         blacklist = await modmailblacklists.find_one({'guild_id': ctx.guild.id})
-        if blacklist:
-            if member.id not in blacklist['blacklist']:
-                await ctx.send(f"{no} **{member.display_name}** is not blacklisted.", allowed_mentions=discord.AllowedMentions.none())
-                return
+        if blacklist and member.id not in blacklist['blacklist']:
+            await ctx.send(f"{no} **{member.display_name}** is not blacklisted.", allowed_mentions=discord.AllowedMentions.none())
+            return
         await modmailblacklists.update_one({'guild_id': ctx.guild.id}, {'$pull': {'blacklist': member.id}}, upsert=True)
         await ctx.send(f"{tick} **{member.display_name}** has been unblacklisted from using modmail.", allowed_mentions=discord.AllowedMentions.none())
 

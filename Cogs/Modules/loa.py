@@ -154,9 +154,11 @@ class loamodule(commands.Cog):
                 if active and current_time >= end_time:
                     try:
                         loanotification = await consent.find_one({'user_id': user.id})
-                        if loanotification:
-                            if loanotification.get('LOAAlerts', "Enabled") == "Enabled":                        
-                             await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
+                        if (
+                            loanotification
+                            and loanotification.get('LOAAlerts', "Enabled") == "Enabled"
+                        ):                        
+                         await user.send(f"{tick} Your LOA **@{guild.name}** has ended.")
                     except discord.Forbidden:
                         print(f"[⚠️] Failed to send a DM to user {user_id}. Continuing...")
                     
@@ -439,17 +441,19 @@ class Confirm(discord.ui.View):
                      pass
  
         loanotification = await consent.find_one({'user_id': self.user.id})
-        if loanotification:
-            if loanotification.get('LOAAlerts', "Enabled") == "Enabled":
-                
+        if (
+            loanotification
+            and loanotification.get('LOAAlerts', "Enabled") == "Enabled"
+        ):
+            
   
-             try:
-              embed.remove_footer()
-              embed.remove_author()
-              await self.user.send(embed=embed)
-             except discord.Forbidden:
-              print(f"Failed to send a DM to user {self.user.id}. Continuing...")
-              pass
+         try:
+          embed.remove_footer()
+          embed.remove_author()
+          await self.user.send(embed=embed)
+         except discord.Forbidden:
+          print(f"Failed to send a DM to user {self.user.id}. Continuing...")
+          pass
 
 
 
@@ -482,15 +486,17 @@ class Confirm(discord.ui.View):
         await loa_collection.delete_one({'guild_id': interaction.guild.id, 'user': self.user.id, 'messageid': interaction.message.id})
         print(f"LOA Request @{interaction.guild.name} denied")
         loanotification = await consent.find_one({'user_id': self.user.id})
-        if loanotification:
-            if loanotification.get('LOAAlerts', "Enabled") == "Enabled":        
-             try:
+        if (
+            loanotification
+            and loanotification.get('LOAAlerts', "Enabled") == "Enabled"
+        ):        
+         try:
 
-              await self.user.send(
-                f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied.")
-             except discord.Forbidden:
-              print(f"Failed to send a DM to user {self.user.id}. Continuing...")
-              pass
+          await self.user.send(
+            f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied.")
+         except discord.Forbidden:
+          print(f"Failed to send a DM to user {self.user.id}. Continuing...")
+          pass
 
     @discord.ui.button(label="Past LOAs | 0", style=discord.ButtonStyle.grey, custom_id='persistent_view:loacount',row=0,
                        emoji=f"<:case:1214629776606887946>")
@@ -557,9 +563,11 @@ class LOAPanel(discord.ui.View):
                                                view=None, allowed_mentions=discord.AllowedMentions.none())                                           
         try:
             loanotification = await consent.find_one({'user_id': self.user.id})
-            if loanotification:
-                if loanotification.get('LOAAlerts', "Enabled") == "Enabled":            
-                 await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")
+            if (
+                loanotification
+                and loanotification.get('LOAAlerts', "Enabled") == "Enabled"
+            ):            
+             await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")
         except discord.Forbidden:
             print('Failed to send a DM to user. Continuing... (LOA Manage)')
             return
