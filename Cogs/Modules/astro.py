@@ -107,7 +107,7 @@ class management(commands.Cog):
         if all_servers_data:
             modules_info = ""
             for module, enabled in all_servers_data.items():
-                if module != '_id' and module != 'guild_id':
+                if module not in ('_id', 'guild_id'):
                     modules_info += f"**{module}:** {f'{tick}' if enabled else f'{no}'}\n"
         else:
             modules_info = "No document found in the collection."
