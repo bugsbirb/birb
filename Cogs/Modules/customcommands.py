@@ -22,8 +22,9 @@ class CustomCommands(commands.Cog):
         self.client = client
 
 
-    @staticmethod
+
     async def commands_auto_complete(
+        ctx: commands.Context,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

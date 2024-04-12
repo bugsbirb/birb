@@ -28,8 +28,9 @@ class Tags(commands.Cog):
         elif modulesdata['Tags'] == True:   
             return True
 
-    @staticmethod
+
     async def tag_name_autocompletion(
+        ctx: commands.Context,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

@@ -238,7 +238,7 @@ class ButtonEmbed(discord.ui.View):
 
             try:
                     if content or embed or view:
-                        msg = await interaction.response.send_message(content, embed=embed, view=view, ephemeral=True)
+                        await interaction.response.send_message(content, embed=embed, view=view, ephemeral=True)
 
 
                     else:
@@ -255,7 +255,7 @@ class ButtonEmbed(discord.ui.View):
 
             try:
                     if content or view:
-                        msg = await interaction.response.send_message(content, view=view, ephemeral=True)
+                        await interaction.response.send_message(content, view=view, ephemeral=True)
 
                     else:
                         await interaction.response.send_message(f"{no} **{interaction.user.display_name},** This command does not have any content or embed.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)

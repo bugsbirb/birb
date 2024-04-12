@@ -41,8 +41,9 @@ class ConnectionRoles(commands.Cog):
      else:   
         return False
 
-    @staticmethod
+
     async def tag_name_autocompletion(
+        ctx: commands.Context,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

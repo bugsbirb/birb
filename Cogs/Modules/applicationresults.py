@@ -27,8 +27,9 @@ class ApplicationResults(commands.Cog):
     def __init__(self, client):
         self.client = client
  
-    @staticmethod
+
     async def applications(
+        ctx: commands.Context,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

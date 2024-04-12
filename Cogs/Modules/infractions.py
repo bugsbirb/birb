@@ -51,11 +51,12 @@ class Infractions(commands.Cog):
         return True
 
      
-    @staticmethod
+
     async def infractiontypes(
-    interaction: discord.Interaction,
-    current: str
-) -> typing.List[app_commands.Choice[str]]:
+        ctx: commands.Context,
+        interaction: discord.Interaction,
+        current: str
+    ) -> typing.List[app_commands.Choice[str]]:
      filter = {
         'guild_id': interaction.guild_id 
     }

@@ -277,7 +277,7 @@ class Utility(commands.Cog):
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
         if interaction.guild:
-         await interaction.response.send_message(embed=embed, view=NetWorkPage(self.client))    
+         await interaction.response.send_message(embed=embed, view=NetWorkPage(self.client, interaction.user))    
         else:
             await interaction.response.send_message(embed=embed)
         
@@ -390,9 +390,10 @@ class Utility(commands.Cog):
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
 class NetWorkPage(discord.ui.View):
-    def __init__(self, client):
-        super().__init__()
+    def __init__(self, client, author):
+        super().__init__(timeout=1028)
         self.client = client
+        self.author = author
 
     @discord.ui.button(
         label="",
@@ -414,6 +415,10 @@ class NetWorkPage(discord.ui.View):
         style=discord.ButtonStyle.grey,
         emoji=f"<:chevronright:1220806430010118175>"  )
     async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
         server_name = "Astro Birb"
         server_icon = self.client.user.display_avatar
         embed = discord.Embed(title="Sharding Information", color=discord.Color.dark_embed())
@@ -430,13 +435,14 @@ class NetWorkPage(discord.ui.View):
         embed.set_thumbnail(url=server_icon)
         await interaction.response.edit_message(
             embed=embed,
-            view=ShardsPage(self.client))
+            view=ShardsPage(self.client, self.author))
 
 
 class ShardsPage(discord.ui.View):
-    def __init__(self, client):
+    def __init__(self, client, author):
         super().__init__()
         self.client = client
+        self.author = author
 
     async def check_database_connection(self):
         try:
@@ -453,6 +459,10 @@ class ShardsPage(discord.ui.View):
         emoji=f"<:chevronleft:1220806425140531321>",  
         disabled=False)
     async def left(self, interaction: discord.Interaction, button: discord.ui.Button,):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)        
         server_name = "Astro Birb"
         server_icon = self.client.user.display_avatar
         discord_latency = self.client.latency * 1000
@@ -462,7 +472,7 @@ class ShardsPage(discord.ui.View):
 
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
-        await interaction.response.edit_message(embed=embed, view=NetWorkPage(self.client)) 
+        await interaction.response.edit_message(embed=embed, view=NetWorkPage(self.client, self.author)) 
 
     @discord.ui.button(
         label="Shards",

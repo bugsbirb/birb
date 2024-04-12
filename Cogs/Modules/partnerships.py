@@ -25,8 +25,9 @@ class Partnerships(commands.Cog):
 
 
 
-    @staticmethod
+
     async def servers_autocomplete(
+        ctx: commands.Context,
         interaction: discord.Interaction,
         current: str
     ) -> typing.List[app_commands.Choice[str]]:

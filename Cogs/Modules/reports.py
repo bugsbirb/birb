@@ -179,9 +179,6 @@ class Reports(commands.Cog):
     def __init__(self, bot):
         self.client = bot
 
-        reported_at = datetime.utcnow().timestamp()
-        reported_at_format = f"<t:{int(reported_at)}:F>"
-
     @staticmethod
     async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
