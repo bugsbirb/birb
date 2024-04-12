@@ -52,7 +52,7 @@ class Partnerships(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Partnerships'] == True:   
+     elif modulesdata['Partnerships'] is True:   
         return True
 
     @partnership.command(description="Log a partnership")

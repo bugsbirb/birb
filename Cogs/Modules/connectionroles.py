@@ -36,7 +36,7 @@ class ConnectionRoles(commands.Cog):
 
      if modulesdata is None:
         return False
-     elif modulesdata.get('Connection', False) == True: 
+     elif modulesdata.get('Connection', False) is True: 
         return True
      else:   
         return False

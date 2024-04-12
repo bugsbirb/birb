@@ -363,7 +363,7 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]
             infractiontypescount = len(infractiontyperesult['types'])
-            if infractiontypescount == None:
+            if infractiontypescount is None:
                 infractiontypess = "0"
             channels = []
             if (

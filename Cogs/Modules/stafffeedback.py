@@ -47,7 +47,7 @@ class Feedback(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Feedback'] == True:   
+     elif modulesdata['Feedback'] is True:   
         return True
 
 
@@ -102,7 +102,7 @@ class Feedback(commands.Cog):
         return
        if optionresult:
         if (
-                optionresult.get('multiplefeedback', False) == False
+                optionresult.get('multiplefeedback', False) is False
                 and existing_feedback
             ):
          await ctx.send(f"{no} **{ctx.author.display_name},** You have already rated this staff member.", allowed_mentions=discord.AllowedMentions.none())

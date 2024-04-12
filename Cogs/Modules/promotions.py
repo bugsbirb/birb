@@ -33,7 +33,7 @@ class promo(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Promotions'] == True:   
+     elif modulesdata['Promotions'] is True:   
         return True
 
 
@@ -140,7 +140,7 @@ class promo(commands.Cog):
 
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
         if optionresult:
-                if optionresult.get('promotionissuer', False) == True:
+                if optionresult.get('promotionissuer', False) is True:
                     view = PromotionIssuer()
                     view.issuer.label = f"Issued By {ctx.author.display_name}"
                 else:
@@ -214,7 +214,7 @@ class promo(commands.Cog):
             embed.set_thumbnail(url=staff.display_avatar)
             
             if optionresult:
-                if optionresult.get('pshowissuer', True) == False:
+                if optionresult.get('pshowissuer', True) is False:
                     embed.remove_author()
                 else:
                     embed.set_author(name=f"Signed, {ctx.author.display_name}", icon_url=ctx.author.display_avatar)

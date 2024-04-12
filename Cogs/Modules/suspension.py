@@ -33,7 +33,7 @@ class Suspensions(commands.Cog):
         modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
         if modulesdata is None:
             return False
-        elif modulesdata['Suspensions'] == True:   
+        elif modulesdata['Suspensions'] is True:   
             return True
 
     @commands.hybrid_command(description="Suspend a staff member")

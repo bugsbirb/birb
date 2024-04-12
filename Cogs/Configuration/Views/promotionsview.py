@@ -206,10 +206,10 @@ class PMoreOptions(discord.ui.Select):
                 view = AutoRole()
                 embed = discord.Embed(title='Auto Role', description="If you **disable** this it will no longer give the user the rank automatically.", color=discord.Colour.dark_embed())
                 if option_result:
-                    if option_result.get('Auto Role', True) == False:
+                    if option_result.get('Auto Role', True) is False:
                         view.bybuttontoggle.style = discord.ButtonStyle.red
                         
-                    elif option_result.get('Auto Role', True) == True:
+                    elif option_result.get('Auto Role', True) is True:
                         view.bybuttontoggle.style = discord.ButtonStyle.green
                         
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
@@ -217,10 +217,10 @@ class PMoreOptions(discord.ui.Select):
         elif selected_option == 'Show Issuer':
                 view = PShowIssuer()
                 embed = discord.Embed(title='Show Issuer', description="If you **disable** this it will make all promotions annonymous. This doesn't work with customisation embeds and it removes the embed author so if the `Promotion Issuer Button` is enabled the button will still appear.", color=discord.Colour.dark_embed())
-                if option_result.get('pshowissuer', True) == False:
+                if option_result.get('pshowissuer', True) is False:
                         view.bybuttontoggle.style = discord.ButtonStyle.red
                          
-                elif option_result.get('pshowissuer', True) == True:
+                elif option_result.get('pshowissuer', True) is True:
                         view.bybuttontoggle.style = discord.ButtonStyle.green
                         
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)                    
@@ -230,10 +230,10 @@ class PMoreOptions(discord.ui.Select):
                 embed = discord.Embed(title='Promotion Issuer Button', description="", color=discord.Colour.dark_embed())
                 embed.set_image(url="https://cdn.discordapp.com/attachments/1119278127772860489/1218957171560153098/image.png?ex=66098d54&is=65f71854&hm=dfa18ebbb548fc18cf2c4f640d28ff29e392d42e208ed8574ba04e5ebbcbef0f&")
                 if option_result:
-                    if option_result.get('promotionissuer', False) == False:
+                    if option_result.get('promotionissuer', False) is False:
                         view.bybuttontoggle.style = discord.ButtonStyle.red
                         
-                    elif option_result.get('promotionissuer', False) == True:
+                    elif option_result.get('promotionissuer', False) is True:
                         view.bybuttontoggle.style = discord.ButtonStyle.green
                         
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)   
@@ -245,7 +245,7 @@ class AutoRole(discord.ui.View):
     @discord.ui.button(label="Autorole", style=discord.ButtonStyle.green) 
     async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('autorole', True) == False:
+        if optionresult.get('autorole', True) is False:
                 self.bybuttontoggle.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'autorole': True}}, upsert=True)
         else:
@@ -259,7 +259,7 @@ class PShowIssuer(discord.ui.View):
     @discord.ui.button(label="Show Issuer", style=discord.ButtonStyle.green) 
     async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('pshowissuer', True) == False:
+        if optionresult.get('pshowissuer', True) is False:
                 self.bybuttontoggle.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'pshowissuer': True}}, upsert=True)
         else:
@@ -274,7 +274,7 @@ class PromotionByButton(discord.ui.View):
     @discord.ui.button(label="Issuer Button Display", style=discord.ButtonStyle.red) 
     async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('promotionissuer', False) == False:
+        if optionresult.get('promotionissuer', False) is False:
                 self.bybuttontoggle.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'promotionissuer': True}}, upsert=True)
         else:

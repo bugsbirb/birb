@@ -34,7 +34,7 @@ class messageevent(commands.Cog):
             return
         module = await modules.find_one({'guild_id': message.guild.id})
         if module:
-         if module.get('Quota', False) == False:
+         if module.get('Quota', False) is False:
             return
         else:
            return 

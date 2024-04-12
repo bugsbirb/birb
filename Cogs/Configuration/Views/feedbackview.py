@@ -87,7 +87,7 @@ class MultipleFeedback(discord.ui.View):
     @discord.ui.button(label="Multiple Feedback", style=discord.ButtonStyle.red) 
     async def bybuttontoggle(self, interaction: discord.Interaction, button: discord.ui.Button):
         optionresult = await options.find_one({'guild_id': interaction.guild.id})
-        if optionresult.get('multiplefeedback', False) == False:
+        if optionresult.get('multiplefeedback', False) is False:
                 self.bybuttontoggle.style = discord.ButtonStyle.green
                 await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'multiplefeedback': True}}, upsert=True)
         else:
@@ -122,10 +122,10 @@ class FMoreOptions(discord.ui.Select):
                 embed = discord.Embed(title='Multiple Feedbacks', description="Allows you give someone feedback more then once.", color=discord.Colour.dark_embed())
 
                 if option_result:
-                    if option_result.get('multiplefeedback', False) == False:
+                    if option_result.get('multiplefeedback', False) is False:
                         view.bybuttontoggle.style = discord.ButtonStyle.red
                         
-                    elif option_result.get('multiplefeedback', False) == True:
+                    elif option_result.get('multiplefeedback', False) is True:
                         view.bybuttontoggle.style = discord.ButtonStyle.green
                         
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)

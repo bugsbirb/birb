@@ -331,7 +331,7 @@ class Forums(commands.Cog):
      modulesdata = modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Forums'] == True:   
+     elif modulesdata['Forums'] is True:   
         return True
     @forums.command(description="Lock a forum thread")        
     async def lock(self, ctx: commands.Context):
