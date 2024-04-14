@@ -48,6 +48,62 @@ class SetMessages(discord.ui.Modal, title='Set Message Count'):
         await mccollection.update_one(filter, update_data, upsert=True)
         await interaction.response.edit_message(content=f'{tick} **{interaction.user.display_name}**, I have set the users message count as `{message_count_value}`.', embed=None, view=None)
 
+
+class AddMessage(discord.ui.Modal, title='Add Messages'):
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+
+
+
+    message_count = discord.ui.TextInput(
+        label='Added Message Count',
+        placeholder='Will add onto their current message count',
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        result = await mccollection.find_one({'guild_id': interaction.guild.id, 'user_id': self.user_id})
+        message_count_value = int(self.message_count.value)
+        guild_id = interaction.guild.id
+        if result:
+            message_count = int(result['message_count']) + message_count_value
+            filter = {'guild_id': guild_id, 'user_id': self.user_id}
+            await mccollection.update_one(filter, {'$set': {'message_count': message_count}})
+            await interaction.response.edit_message(content=f'{tick} **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the users message count.', embed=None, view=None)
+        else:
+            message_count = message_count_value
+            await mccollection.insert_one({'guild_id': guild_id, 'user_id': self.user_id, 'message_count': message_count})
+
+
+class RemovedMessage(discord.ui.Modal, title='Remove Messages'):
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+
+
+
+    message_count = discord.ui.TextInput(
+        label='Removed Message Count',
+        placeholder='Will remove from their current message count',
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        result = await mccollection.find_one({'guild_id': interaction.guild.id, 'user_id': self.user_id})
+        message_count_value = int(self.message_count.value)
+        guild_id = interaction.guild.id
+        if result:
+            message_count = int(result['message_count']) - message_count_value
+            filter = {'guild_id': guild_id, 'user_id': self.user_id}
+            await mccollection.update_one(filter, {'$set': {'message_count': message_count}})
+            await interaction.response.edit_message(content=f'{tick} **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the users message count.', embed=None, view=None)
+        else:
+            message_count = message_count_value
+            await mccollection.insert_one({'guild_id': guild_id, 'user_id': self.user_id, 'message_count': 0})
+
+
+
+
+
 class StaffManage(discord.ui.View):
     def __init__(self, staff_id, author):
         super().__init__(timeout=None)
@@ -55,7 +111,34 @@ class StaffManage(discord.ui.View):
         self.staff_id = staff_id        
         self.author = author
 
-    @discord.ui.button(label='Reset Messages', style=discord.ButtonStyle.grey)
+
+
+    @discord.ui.button(label="Add Messages", style=discord.ButtonStyle.green,emoji="<:Add:1163095623600447558>", row=1)
+    async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
+       if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True) 
+       await interaction.response.send_modal(AddMessage(self.staff_id))      
+    @discord.ui.button(label="Subtract Messages", style=discord.ButtonStyle.red, emoji="<:Subtract:1229040262161109003>", row=1)
+    async def subtract(self, interaction: discord.Interaction, button: discord.ui.Button):
+       if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True) 
+       await interaction.response.send_modal(RemovedMessage(self.staff_id))     
+
+    @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.blurple, row=2, emoji="<:Pen:1126527802255085628>")
+    async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
+       if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)            
+       await interaction.response.send_modal(SetMessages(self.staff_id))      
+
+
+
+    @discord.ui.button(label='Reset Messages', style=discord.ButtonStyle.red, row=2, emoji="<:bin:1160543529542635520>")
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
        staff_id = self.staff_id
        if interaction.user.id != self.author.id:
@@ -67,15 +150,9 @@ class StaffManage(discord.ui.View):
        await mccollection.update_one(filter, update)
 
        await interaction.response.edit_message(content=f'**{tick} {interaction.user.display_name}**, I have resetted the staffs message count.', embed=None, view=None)
+    
 
 
-    @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.grey)
-    async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
-       if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
-                                  color=discord.Colour.brand_red())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)            
-       await interaction.response.send_modal(SetMessages(self.staff_id))      
 
 
 
@@ -95,20 +172,18 @@ class quota(commands.Cog):
 
 
 
-    @staticmethod
-    async def modulecheck(ctx: commands.Context): 
+    async def modulecheck(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata['Quota'] is True:   
+     elif modulesdata.get('Quota', False) == True:   
         return True
 
-    @staticmethod
-    async def modulecheck2(ctx: commands.Context): 
+    async def modulecheck2(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Staff Database', False) is True: 
+     elif modulesdata.get('Staff Database', False) == True: 
         return True
      else:   
         return False
@@ -117,28 +192,14 @@ class quota(commands.Cog):
     async def staff(self, ctx: commands.Context):
         return
 
-    @commands.command()
-    async def staffcommand(self, ctx: commands.Context):
-        if await has_staff_role(ctx):
-            await ctx.send("Worked")
-        else:
-            await ctx.send("You don't have the staff role.")
-
-
-
-    @commands.command()
-    async def checkadmin(self, ctx: commands.Context):
-        if await has_admin_role(ctx):
-            await ctx.send("You have an admin role!")
-        else:
-            await ctx.send("You don't have an admin role.")
-
-
             
+    @staff.group(name="manage")
+    async def manage(self, ctx: commands.Context):
+        pass
 
-
-    @staff.command(name="manage", description="Manage your staffs messages.")    
-    async def manage(self, ctx: commands.Context, staff: discord.Member):
+    @manage.command(name="messages", description="Manage a staffs messages count.")
+    async def messages(self, ctx: commands.Context, staff: discord.Member):
+     await ctx.defer()
 
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
@@ -147,17 +208,35 @@ class quota(commands.Cog):
             return                      
      mccollection = dbq["messages"]
      message_data = await mccollection.find_one({'guild_id': ctx.guild.id, 'user_id': staff.id})
-    
+     loa_role_data = await lcollection.find_one({'guild_id': ctx.guild.id})
      if message_data:
         message_count = message_data.get('message_count', 0)
      else:
         message_count = 0
+     message_quota_result = await message_quota_collection.find_one({'guild_id': ctx.guild.id})
+
+     if loa_role_data:
+                    loa_role_id = loa_role_data.get('staffrole')
+                    has_loa_role = any(role.id == loa_role_id for role in staff.roles)
+     else:
+                    has_loa_role = False
+
+     if message_quota_result:
+                    message_quota = message_quota_result.get('quota', 100)
+                    message_quota = int(message_quota)
+
+     else:
+                    message_quota = 100
 
      view = StaffManage(staff.id, ctx.author)
+     if message_count >= message_quota:
+                    emoji = "`LOA`" if has_loa_role else "<:Confirmed:1122636234255253545>"
+     else:
+                    emoji = "`LOA`" if has_loa_role else "<:Cancelled:1122637466353008810>"     
 
      embed = discord.Embed(
-        title=f"{staff.display_name}",
-        description=f"* **Messages:** {message_count}",
+        title=f"<:messagereceived:1201999712593383444> {staff.display_name}'s Activity Stats",
+        description=f"{replytop} **Messages:** {message_count}\n{replybottom} **Passed:** {emoji}",
         color=discord.Color.dark_embed()
     )
      embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
@@ -165,31 +244,6 @@ class quota(commands.Cog):
     
      await ctx.send(embed=embed, view=view)
 
-
-    @commands.hybrid_group(name="leaderboard")
-    async def leader(self, ctx: commands.Context):
-        return
-
-    @leader.command(name="reset", description="Reset the message quota leaderboard")
-    async def reset_staff_message_counts(self, ctx: commands.Context):
-
-
-        await ctx.defer()
-        if not await self.modulecheck(ctx):
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
-         return                    
-        if not await has_admin_role(ctx):
-            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
-            return  
-            
-        mccollection = dbq["messages"]
-        await mccollection.delete_many({'guild_id': ctx.guild.id})
-        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
-        try:
-                owner = ctx.guild.owner
-                await owner.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
-        except Exception as e:
-                 await ctx.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
 
 
     @staff.command(name="messages", description="Display the amount the message count of a staff member.")
@@ -269,7 +323,7 @@ class quota(commands.Cog):
 
                 if rank % 10 == 0:
                     embed = discord.Embed(
-                        title="Staff Leaderboard",
+                        title=f"Staff Leaderboard",
                         description=leaderboard_description,
                         color=discord.Color.dark_embed()
                     )
@@ -283,7 +337,7 @@ class quota(commands.Cog):
 
         if leaderboard_description:
             embed = discord.Embed(
-                title="Staff Leaderboard",
+                title=f"Staff Leaderboard",
                 description=leaderboard_description,
                 color=discord.Color.dark_embed()
             )
@@ -310,6 +364,30 @@ class quota(commands.Cog):
         )
 
         await paginator.start(ctx, pages=pages)
+    
+    
+
+    @staff.command(name="leaderboard-reset", description="Reset the message quota leaderboard")
+    async def reset_staff_message_counts(self, ctx: commands.Context):
+
+
+        await ctx.defer()
+        if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
+         return                    
+        if not await has_admin_role(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`")
+            return  
+            
+        mccollection = dbq["messages"]
+        await mccollection.update_many({'guild_id': ctx.guild.id, '$set': {'message_count': 0}})
+        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
+        try:
+                owner = ctx.guild.owner
+                await owner.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
+        except Exception as e:
+                 pass
+
 
 
 # Staff Panel ------
@@ -447,7 +525,7 @@ class quota(commands.Cog):
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:
-            if custom.get('embed') is True:
+            if custom.get('embed') == True:
              embed_title = custom.get('title', None)
              embed_description = custom.get('description', None)
              embed_author = custom.get('author', None)
@@ -478,7 +556,7 @@ class quota(commands.Cog):
              try:
               await ctx.channel.send(content, embed=embed, view=view)
               await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
-             except (discord.errors.HTTPException, discord.errors.Forbidden):
+             except discord.errors.HTTPException or discord.errors.Forbidden:
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return              
              return   
@@ -492,7 +570,7 @@ class quota(commands.Cog):
              try:
               await ctx.channel.send(embed=embed, view=view)
               await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
-             except (discord.errors.HTTPException, discord.errors.Forbidden):
+             except discord.errors.HTTPException or discord.errors.Forbidden:
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return
              return   
@@ -505,7 +583,7 @@ class quota(commands.Cog):
             try:
              await ctx.send(f"{tick} **{ctx.author.display_name},** staff panel sent successfully.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
              await ctx.channel.send(embed=embed, view=view)
-            except (discord.errors.HTTPException, discord.errors.Forbidden):
+            except discord.errors.HTTPException or discord.errors.Forbidden:
                 await ctx.send(f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.", allowed_mentions=discord.AllowedMentions.none()) 
                 return             
             return   
