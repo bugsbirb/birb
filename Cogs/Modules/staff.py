@@ -369,8 +369,6 @@ class quota(commands.Cog):
 
     @staff.command(name="leaderboard-reset", description="Reset the message quota leaderboard")
     async def reset_staff_message_counts(self, ctx: commands.Context):
-
-
         await ctx.defer()
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the quota module isn't enabled.")
@@ -380,13 +378,14 @@ class quota(commands.Cog):
             return  
             
         mccollection = dbq["messages"]
-        await mccollection.update_many({'guild_id': ctx.guild.id, '$set': {'message_count': 0}})
+        await mccollection.update_many({'guild_id': ctx.guild.id}, {'$set': {'message_count': 0}})
         await ctx.send(f"{tick} **{ctx.author.display_name}**, I've reset the entire staff team's message count.")                    
         try:
                 owner = ctx.guild.owner
                 await owner.send(f"{tick} **{ctx.guild.owner.display_name}**, `{ctx.author.display_name}` has reset the staff leaderboard.")
         except Exception as e:
-                 pass
+                 print('Yeah I couldn\'t dm the owner but oh well.')
+                 return
 
 
 
