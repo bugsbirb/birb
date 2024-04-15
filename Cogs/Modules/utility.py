@@ -166,8 +166,17 @@ class Utility(commands.Cog):
         embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
         
         await ctx.send(embed=embed)
-        
-    
+
+    @app_commands.command(description="Support Astro Birb!")    
+    @app_commands.allowed_installs(guilds=True, users=True)
+    @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)    
+    async def donate(self, interaction: discord.Interaction):
+        view = discord.ui.View()
+        view.add_item(discord.ui.Button(label="Ko-fi Donation", url="https://ko-fi.com/astrobird#", emoji="<:kofi:1229499870193258556>"))
+        view.add_item(discord.ui.Button(label="Patreon (Monthly Donations)", url="https://www.patreon.com/astrobirb", emoji="<:Patreon:1229499944533233695>"))    
+        embed = discord.Embed(title='<a:dancebirb:1181758263113551912> Donations', description="> Your support helps us keep Astro Birb running smoothly and enables us to continue improving our services.", color=discord.Color.dark_embed())
+        embed.set_thumbnail(url=self.client.user.display_avatar)
+        await interaction.response.send_message(embed=embed,view=view)
         
     @app_commands.command(description="View someones avatar")
     @app_commands.allowed_installs(guilds=False, users=True)
