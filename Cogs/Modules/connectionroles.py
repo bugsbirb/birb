@@ -51,7 +51,7 @@ class ConnectionRoles(commands.Cog):
             'guild_id': interaction.guild_id 
         }
 
-        tag_names = connectionroles.distinct("name", filter)
+        tag_names = await connectionroles.distinct("name", filter)
 
         filtered_names = [name for name in tag_names if current.lower() in name.lower()]
 

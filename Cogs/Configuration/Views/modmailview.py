@@ -57,7 +57,7 @@ class ModmailCategory(discord.ui.ChannelSelect):
 class TranscriptChannel(discord.ui.ChannelSelect):
     def __init__(self, author, channel):
         
-        super().__init__(placeholder='Transcripts Channel', channel_types=[discord.ChannelType.text], default_values=channel)
+        super().__init__(placeholder='Transcripts Channel', channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channel)
 
         self.author = author
     async def callback(self, interaction: discord.Interaction):

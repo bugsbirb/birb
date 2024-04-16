@@ -54,7 +54,8 @@ class welcome2(commands.Cog):
                 return
 
             if channel:
-                replacements = {
+                try:
+                 replacements = {
                     '{user}': member.name,
                     '{user.id}': str(member.id),
                     '{user.mention}': member.mention,
@@ -65,7 +66,10 @@ class welcome2(commands.Cog):
                     '{guild.owner.id}': str(guild.owner.id),
                     '{guild.owner.mention}': guild.owner.mention,
                     '{membercount}': int(guild.member_count)
-                }
+                 }
+                except:
+                    print('[❌] Failed to replace variables in welcome message.')
+                    return 
                 command_data = result
                 if 'buttons' in command_data and command_data['buttons'] == "Link Button":
                     view = URL(command_data['url'], command_data['button_label'])

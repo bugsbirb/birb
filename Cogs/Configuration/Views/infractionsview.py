@@ -27,7 +27,7 @@ infractiontypeactions = db['infractiontypeactions']
 options = db['module options']
 class InfractionChannel(discord.ui.ChannelSelect):
     def __init__(self, author, channels):
-        super().__init__(placeholder='Infractions Channel', channel_types=[discord.ChannelType.text], default_values=channels)
+        super().__init__(placeholder='Infractions Channel', channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -226,7 +226,7 @@ class InfractionTypesAction(discord.ui.Select):
 
 class TypeChannel(discord.ui.ChannelSelect):
     def __init__(self, author, name, selected):
-        super().__init__(placeholder='Infractions Type Channel', channel_types=[discord.ChannelType.text])
+        super().__init__(placeholder='Infractions Type Channel', channel_types=[discord.ChannelType.text, discord.ChannelType.news])
         self.author = author
         self.name = name
         self.selected = selected

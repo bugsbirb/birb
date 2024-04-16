@@ -151,7 +151,7 @@ class client(commands.AutoShardedBot):
             print("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
 
 
-    async def on_disconnect():
+    async def on_disconnect(self):
         print("[⚠️] Disconnected from Discord Gateway!")
 
     async def is_owner(self, user: discord.User):

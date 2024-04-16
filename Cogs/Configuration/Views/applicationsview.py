@@ -182,7 +182,7 @@ class ToggleApplications(discord.ui.Select):
 
 class ApplicationSubmissions(discord.ui.ChannelSelect):
     def __init__(self, author, channels):
-        super().__init__(placeholder='Application Submissions Channel',  channel_types=[discord.ChannelType.text], default_values=channels)
+        super().__init__(placeholder='Application Submissions Channel',  channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -218,7 +218,7 @@ class ApplicationSubmissions(discord.ui.ChannelSelect):
 
 class ApplicationChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Application Results Channel',  channel_types=[discord.ChannelType.text])
+        super().__init__(placeholder='Application Results Channel',  channel_types=[discord.ChannelType.text, discord.ChannelType.news])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

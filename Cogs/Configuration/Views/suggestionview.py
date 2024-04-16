@@ -25,7 +25,7 @@ suggestschannel = db["suggestion channel"]
 suggestschannel2 = db["Suggestion Management Channel"]
 class SuggestionsChannel(discord.ui.ChannelSelect):
     def __init__(self, author, channel):
-        super().__init__(placeholder='Suggestion Channel',   channel_types=[discord.ChannelType.text], default_values=channel)
+        super().__init__(placeholder='Suggestion Channel',   channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channel)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
@@ -60,7 +60,7 @@ class SuggestionsChannel(discord.ui.ChannelSelect):
 
 class SuggestionsChannelManagement(discord.ui.ChannelSelect):
     def __init__(self, author, channels):
-        super().__init__(placeholder='Suggestions Management Channel',   channel_types=[discord.ChannelType.text], default_values=channels)
+        super().__init__(placeholder='Suggestions Management Channel',   channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels)
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:

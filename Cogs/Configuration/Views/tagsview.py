@@ -49,7 +49,7 @@ class ToggleTags(discord.ui.Select):
 
 class TagsUsageChannel(discord.ui.ChannelSelect):
     def __init__(self, author):
-        super().__init__(placeholder='Tags Usage Logging', channel_types=[discord.ChannelType.text])
+        super().__init__(placeholder='Tags Usage Logging', channel_types=[discord.ChannelType.text, discord.ChannelType.news])
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
