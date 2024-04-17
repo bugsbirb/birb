@@ -6,9 +6,9 @@ import os
 import random
 import Paginator
 import chat_exporter
+import typing
 import io   
 from datetime import datetime
-
 from motor.motor_asyncio import AsyncIOMotorClient
 from discord import app_commands
 MONGO_URL = os.getenv('MONGO_URL')
@@ -20,9 +20,11 @@ modmail = db['modmail']
 modmailalerts = db['modmailalerts']
 modmailblacklists = db['modmailblacklists']
 modmailcategory = db['modmailcategory']
+modmailsnippets = db['Modmail Snippets']
 transcriptschannel = db['transcriptschannel']
 transcripts = db['Transcripts']
 modules = db['Modules']
+options = db['module options']
 from permissions import has_admin_role, has_staff_role
 class Modmail(commands.Cog):
     def __init__(self, client):
@@ -37,6 +39,23 @@ class Modmail(commands.Cog):
         return True
      else:   
         return False
+     
+    async def snippet_autocomplete(
+        ctx: commands.Context,
+        interaction: discord.Interaction,
+        current: str
+    ) -> typing.List[app_commands.Choice[str]]:
+        filter = {
+            'guild_id': interaction.guild_id 
+        }
+
+        tag_names = await modmailsnippets.distinct("name", filter)
+
+        filtered_names = [name for name in tag_names if current.lower() in name.lower()]
+
+        choices = [app_commands.Choice(name=name, value=name) for name in filtered_names]
+
+        return choices
 
 
 
@@ -56,6 +75,7 @@ class Modmail(commands.Cog):
         await modmailalerts.update_one({'channel_id': ctx.channel.id}, {'$set': {'alert': ctx.author.id}}, upsert=True)     
 
     @modmail.command(description="Blacklist someone from using modmail")
+
     @app_commands.describe(member = "The member you want to blacklist from using modmail")
     async def blacklist(self, ctx: commands.Context, member: discord.Member):
         if not await self.modulecheck(ctx):
@@ -111,23 +131,210 @@ class Modmail(commands.Cog):
                 user = await self.client.fetch_user(user_id)
 
                 if selected_server and user:
+
+
                     embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{content}```\n{mediamsg}")
                     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
                     embed.set_thumbnail(url=ctx.guild.icon)
                     embed.set_image(url=media)
-                    await user.send(embed=embed)
+
 
                     channel = self.client.get_channel(channel_id)
                     
                     try:
                      await ctx.send(f"{tick} Response sent.", ephemeral=True)
+                     option = await options.find_one({'guild_id': ctx.guild.id})
+                     if option:
+                            if option.get('MessageFormatting') == 'Messages':
+                                await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
+                                await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
+                                return   
+
+                     await user.send(embed=embed)
                      await channel.send(embed=embed)
                     except discord.Forbidden: 
                         await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)
                     return
-        await ctx.send(f"{no} No active modmail channel found for that user.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
      else:
-        await ctx.send(f"{no} You can only use the reply command in a modmail channel")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
+
+    @modmail.group()
+    async def snippets(self ,ctx):
+       pass
+
+    @snippets.command(description="Create a modmail snippet")
+    @app_commands.describe(
+       name =  "The name of the snippet", 
+       content = "The content of the snippet"
+    )
+    async def create(self, ctx: commands.Context, *, name, content):
+       await ctx.defer()
+       if not await has_admin_role(ctx):
+            return          
+       result = await modmailsnippets.find_one({'guild_id': ctx.guild.id, 'name': name})
+       if result:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, a snippet with that name already exists.",  allowed_mentions=discord.AllowedMentions.none())
+           return
+       await modmailsnippets.insert_one({'guild_id': ctx.guild.id, 'name': name, 'content': content})
+       await ctx.send(f"{tick} **{ctx.author.display_name}**, I've created the snippet succesfully!", allowed_mentions=discord.AllowedMentions.none())
+
+
+
+    @snippets.command(description="Delete a modmail snippet")
+    @app_commands.describe(
+       name =  "The name of the snippet")    
+    @app_commands.autocomplete(name=snippet_autocomplete)    
+    async def delete(self, ctx: commands.Context, *, name):
+       await ctx.defer()
+       if not await has_admin_role(ctx):
+            return       
+       result = await modmailsnippets.find_one({'guild_id': ctx.guild.id, 'name': name})
+       if not result:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",  allowed_mentions=discord.AllowedMentions.none())
+           return
+       await modmailsnippets.insert_one({'guild_id': ctx.guild.id, 'name': name})
+       await ctx.send(f"{tick} **{ctx.author.display_name}**, I've deleted the snippet succesfully!", allowed_mentions=discord.AllowedMentions.none())
+       
+    @snippets.command(description="Edit a modmail snippet")
+    @app_commands.describe(
+       name =  "The name of the snippet", 
+       content = "The new content of the snippet"
+    )
+    @app_commands.autocomplete(name=snippet_autocomplete)    
+    async def edit(self, ctx: commands.Context, *, name, content):
+       await ctx.defer()
+       if not await has_admin_role(ctx):
+          return
+       result = await modmailsnippets.find_one({'guild_id': ctx.guild.id, 'name': name})
+       if not result:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",  allowed_mentions=discord.AllowedMentions.none())
+           return       
+       await modmailsnippets.update_one({'guild_id': ctx.guild.id, 'name': name}, {'$set': {'content': content}})
+       await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the snippet succesfully!", allowed_mentions=discord.AllowedMentions.none())
+
+    @snippets.command()
+    @app_commands.describe(
+       name =  "The name of the snippet"
+    )    
+    @app_commands.autocomplete(name=snippet_autocomplete)        
+    async def send(self, ctx: commands.Context, *, name):
+        await ctx.defer(ephemeral=True)
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return              
+        if not await has_staff_role(ctx):
+            return       
+        result = await modmailsnippets.find_one({'guild_id': ctx.guild.id, 'name': name})
+        if not result:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",  allowed_mentions=discord.AllowedMentions.none())
+            return                  
+        if isinstance(ctx.channel, discord.TextChannel):
+            channel_id = ctx.channel.id
+            modmail_data = await modmail.find_one({'channel_id': channel_id})
+            media = None
+            mediamsg = ""
+            if ctx.message.attachments:
+                media = ctx.message.attachments[0].url
+                mediamsg = "**Attachment Below**"
+
+
+            if modmail_data:
+                user_id = modmail_data.get('user_id')
+                selected_server_id = modmail_data.get('guild_id')
+
+                if user_id and selected_server_id:
+                    selected_server = discord.utils.get(self.client.guilds, id=selected_server_id)
+                    user = await self.client.fetch_user(user_id)
+
+                    if selected_server and user:
+                        embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {ctx.author}", description=f"```{result.get('content', 'No content provided.')}```\n{mediamsg}")
+                        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                        embed.set_thumbnail(url=ctx.guild.icon)
+                        embed.set_image(url=media)
+
+
+                        channel = self.client.get_channel(channel_id)
+                        option = await options.find_one({'guild_id': ctx.guild.id})
+                        if option:
+                            if option.get('MessageFormatting') == 'Messages':
+                                await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {result.get('content')}")
+                                await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {result.get('content')}")
+                                return                         
+                        try:
+                         await user.send(embed=embed)                         
+                         await channel.send(embed=embed)
+                        except discord.Forbidden: 
+                            await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)           
+                        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've sent the snippet to the user.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
+                 
+                        return
+                        
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the snippet command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
+        else:
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the snippet command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
+    @snippets.command(description="List all available modmail snippets")
+    async def all(self, ctx: commands.Context):
+        await ctx.defer()
+        if not await self.modulecheck(ctx):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+            return                 
+        if not await has_staff_role(ctx):
+            return               
+        
+        filter = {
+            'guild_id': ctx.guild.id
+        }
+
+        result = modmailsnippets.find(filter)
+        result = await result.to_list(length=750)
+        if result is None:
+            await ctx.send(f"{no} {ctx.author.display_name}, there are no snippets in the server.", allowed_mentions=discord.AllowedMentions.none())
+            return
+
+        embeds = []
+        embed = discord.Embed(title="Snippets List", color=discord.Color.dark_embed())
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.set_thumbnail(url=ctx.guild.icon)
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
+
+        count = 0
+        
+        for snippet in result:
+            name = snippet['name']
+            content = snippet['content']
+
+            embed.add_field(name=name, value=content, inline=False)
+            count += 1
+
+            if count % 9 == 0 or count == len(result):
+                embeds.append(embed)
+                embed = discord.Embed(title="Snippets List", color=discord.Color.dark_embed())
+                embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+                embed.set_thumbnail(url=ctx.guild.icon)
+                embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
+                
+        PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
+        NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
+        FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
+        LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
+        if len(embeds) <= 1:
+            PreviousButton.disabled = True
+            NextButton.disabled = True
+            FirstPageButton.disabled = True
+            LastPageButton.disabled = True
+        InitialPage = 0
+        timeout = 42069
+        paginator = Paginator.Simple(
+            PreviousButton=PreviousButton,
+            NextButton=NextButton,
+            FirstEmbedButton=FirstPageButton,
+            LastEmbedButton=LastPageButton,
+            InitialPage=InitialPage,
+            timeout=timeout
+        )
+
+        await paginator.start(ctx, pages=embeds)
 
     @modmail.command(description="View the modmail logs for a member")
     @app_commands.describe(member = "The member you want to view the modmail logs for")
@@ -142,17 +349,16 @@ class Modmail(commands.Cog):
         if not result:
             await ctx.send(f"{no} No modmail logs found for this user.")
             return
-
+        embed = discord.Embed(title=f"{(member.name).capitalize()}'s Modmail Logs", color=discord.Color.dark_embed())
+        embed.set_thumbnail(url=member.display_avatar)
+        embed.set_author(name=member.name, icon_url=member.display_avatar)
         embeds = []
+        embeds.append(embed)
         for i, logs in enumerate(result):
-            embed = discord.Embed(title=f"{(member.name).capitalize()}'s Modmail Logs", color=discord.Color.dark_embed())
-            embed.set_thumbnail(url=member.display_avatar)
-            embed.set_author(name=member.name, icon_url=member.display_avatar)
             value = f"<:arrow:1166529434493386823>**Transcript:** [View Online]({logs.get('transcriptlink')})\n<:arrow:1166529434493386823>**Closed By:** <@{logs.get('closedby')}>\n<:arrow:1166529434493386823>**Date:** <t:{int(logs.get('timestamp').timestamp())}:d>\n<:arrow:1166529434493386823>**Closure Reason:** {logs.get('reason')}"
             if len(value) > 1024:
                 value = value[:1021] + "..."
             embed.add_field(name=f"#{logs.get('transcriptid')}", value=value, inline=False)
-            embeds.append(embed)
 
             if (i + 1) % 9 == 0:
                 embeds.append(embed)
@@ -213,11 +419,18 @@ class Modmail(commands.Cog):
                     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
                     embed.set_thumbnail(url=ctx.guild.icon)
                     embed.set_image(url=media)
-                    await user.send(embed=embed)
+                    
 
                     channel = self.client.get_channel(channel_id)
-                    
+                    option = await options.find_one({'guild_id': ctx.guild.id})
+                    if option:
+                         if option.get('MessageFormatting') == 'Messages':
+                            await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
+                            await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
+                            return     
+                                        
                     try:
+                     await user.send(embed=embed)  
                      await channel.send(embed=embed)
                     except discord.Forbidden: 
                         await ctx.send(f"{no} I can't find or see this channel.", ephemeral=True)
@@ -225,9 +438,9 @@ class Modmail(commands.Cog):
                     
                     return
                     
-        await ctx.send(f"{no} No active modmail channel found for that user.")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
      else:
-        await ctx.send(f"{no} You can only use the reply command in a modmail channel")
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
     @commands.command(description="Close a modmail channel.", name="mclose")
     async def close2(self, ctx: commands.Context, *, reason = None):
      if not await self.modulecheck(ctx):
@@ -309,9 +522,9 @@ class Modmail(commands.Cog):
             else:
                 await ctx.send(f"{Warning} Selected server not found.")
         else:
-            await ctx.send(f"{no} No active modmail channel found for this channel.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the close command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
      else:
-        await ctx.send(f"{no} You can only use the close command in a modmail channel.") 
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the close command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
         
 
     @modmail.command(description="Close a modmail channel.")
@@ -397,9 +610,9 @@ class Modmail(commands.Cog):
             else:
                 await ctx.send(f"{Warning} Selected server not found.")
         else:
-            await ctx.send(f"{no} No active modmail channel found for this channel.")
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the close command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
      else:
-        await ctx.send(f"{no} You can only use the close command in a modmail channel.") 
+        await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the close command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
         
 
 

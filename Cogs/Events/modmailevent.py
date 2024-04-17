@@ -24,6 +24,7 @@ modmailblacklists = db['modmailblacklists']
 transcriptschannel = db['transcriptschannel']
 modmailping = db['modmailping']
 modmailalerts = db['modmailalerts']
+options = db['module options']
 
 class Modmailevnt(commands.Cog):
     def __init__(self, client):
@@ -279,6 +280,7 @@ class Modmailevnt(commands.Cog):
                       await channel.send(f"{mention}\n<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
                       return
                     await message.add_reaction('📨') 
+                    
                     embed = discord.Embed(
                         color=discord.Color.dark_embed(),
                         title=message.author,
@@ -286,6 +288,11 @@ class Modmailevnt(commands.Cog):
                     )
                     embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                     embed.set_thumbnail(url=message.author.display_avatar)
+                    option = await options.find_one({'guild_id': channel.guild.id})
+                    if option:
+                            if option.get('MessageFormatting') == 'Messages':
+                                await channel.send(f"{mention}\n<:messagereceived:1201999712593383444> **{message.author.name}**: {message.content}")
+                                return                         
                     await channel.send(mention, embed=embed)
 
     @commands.Cog.listener()

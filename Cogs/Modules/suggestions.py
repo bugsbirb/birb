@@ -31,15 +31,17 @@ class suggestions(commands.Cog):
 
     @commands.hybrid_command(description="Submit a suggestion for improvement")
     @app_commands.describe(suggestion="The suggestion to make.")
-    async def suggest(self, ctx: commands.Context, suggestion: str):
+    async def suggest(self, ctx: commands.Context, suggestion: str, image: discord.Attachment = None):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the suggestion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return    
-
+        if image:
+           image = image.url
         suggestion_data = {
             "author_id": ctx.author.id,
             "suggestion": suggestion,
+            "image": image,
             "upvotes": 0,
             "downvotes": 0,
             "upvoters": [],
@@ -52,6 +54,8 @@ class suggestions(commands.Cog):
         embed = discord.Embed(title="", description=f"**Submitter**\n {ctx.author.mention} \n\n**Suggestion**\n{suggestion}", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
+        if image:
+            embed.set_image(url=image.url)
         embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
         embed.set_footer(text="0 Upvotes | 0 Downvotes")
         view = SuggestionView()
@@ -285,9 +289,12 @@ class ManageSuggestion(discord.ui.Select):
             embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"**Submitter**\n<@{submitter}>\n\n**Suggestion**\n{suggestion}", color=discord.Color.brand_green())
             if suser:
              embed.set_thumbnail(url=suser.display_avatar)
+
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
             embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
-            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")    
+            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")   
+            if suggestiondata.get('image', None) is not None:
+             embed.set_image(url=suggestiondata.get('image'))             
             view = SuggestionView()
             view.view_voters.disabled = False
             view.No.disabled = True
@@ -378,7 +385,9 @@ class Deny(discord.ui.Modal, title='Deny'):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
             embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
             embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")      
-            embed.add_field(name="Denied Reason", value=self.reason.value, inline=False)      
+            embed.add_field(name="Denied Reason", value=self.reason.value, inline=False)   
+            if suggestiondata.get('image') is not None:
+             embed.set_image(url=suggestiondata.get('image'))               
             view = SuggestionView()
             view.view_voters.disabled = False
             view.No.disabled = True

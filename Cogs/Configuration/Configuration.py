@@ -51,7 +51,7 @@ from Cogs.Configuration.Views.CustomCommandsView  import CreateButtons
 from Cogs.Configuration.Views.CustomCommandsView  import ToggleCommands
 from Cogs.Configuration.Views.modmailview import ModmailCategory
 from Cogs.Configuration.Views.modmailview import ModmailPing
-from Cogs.Configuration.Views.modmailview import TranscriptChannel
+from Cogs.Configuration.Views.modmailview import TranscriptChannel, MMoreOptions
 from Cogs.Configuration.Views.modmailview import ModmailToggle
 
 from Cogs.Configuration.Views.staffpanel import StaffData
@@ -990,7 +990,7 @@ class Modmail(discord.ui.View):
         super().__init__(timeout=None)
         self.add_item(ModmailToggle(author, options))
         self.add_item(ModmailCategory(author, category))
-        self.add_item(ModmailPing(author, roles))
+        self.add_item(MMoreOptions(author, roles))
         self.add_item(TranscriptChannel(author, channels))
         self.add_item(Config(author))
 

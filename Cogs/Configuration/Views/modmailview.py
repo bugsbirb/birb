@@ -23,7 +23,7 @@ modules = db['Modules']
 modmailcategory = db['modmailcategory']
 modmailping = db['modmailping']
 transcriptschannel = db['transcriptschannel']
-
+options = db['module options']
 class ModmailCategory(discord.ui.ChannelSelect):
     def __init__(self, author, category):
         super().__init__(placeholder='Modmail Category', channel_types=[discord.ChannelType.category], default_values=category)
@@ -120,6 +120,46 @@ class ModmailToggle(discord.ui.Select):
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
             await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Modmail': False}}, upsert=True) 
             await refreshembed(interaction)   
+
+class MMoreOptions(discord.ui.Select):
+    def __init__(self, author, roles):
+        self.author = author
+        self.roles = roles
+        options = [
+        discord.SelectOption(label='Modmail Ping'),
+        discord.SelectOption(label='Message Formatting')
+    ]           
+
+        super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)     
+    async def callback(self, interaction: discord.Interaction):
+        view = discord.ui.View()
+        selected = self.values[0]       
+        if selected == 'Modmail Ping':
+            view.add_item(ModmailPing(self.author, self.roles))
+        else:
+            view.add_item(MessageFormatting())
+        
+        await interaction.response.send_message(view=view, ephemeral=True)    
+        await interaction.response.edit_message(content='')
+
+class MessageFormatting(discord.ui.Select):
+    def __init__(self):
+        options = {
+        discord.SelectOption(label='Embeds', description="Embeds are messages that are embedded."),
+        discord.SelectOption(label='Messages', description="Messages are like normal text messages instead of embeds")            
+        }
+        super().__init__(placeholder='Message Formatting', min_values=1, max_values=1, options=options)   
+
+    async def callback(self, interaction: discord.Interaction):
+        selected = self.values[0]   
+        if selected == 'Embeds':
+            await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'MessageFormatting': 'Embeds'}}, upsert=True)
+        else:
+            await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'MessageFormatting': 'Messages'}}, upsert=True)
+        await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've succesfully changed message formatting to {selected}",  view=None)
+
+
+
 
 class ModmailPing(discord.ui.RoleSelect):
     def __init__(self, author, roles):
