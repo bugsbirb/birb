@@ -213,7 +213,7 @@ class Modmail(commands.Cog):
        await modmailsnippets.update_one({'guild_id': ctx.guild.id, 'name': name}, {'$set': {'content': content}})
        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the snippet succesfully!", allowed_mentions=discord.AllowedMentions.none())
 
-    @snippets.command()
+    @snippets.command(description="Send a modmail snippet in a modmail")
     @app_commands.describe(
        name =  "The name of the snippet"
     )    
