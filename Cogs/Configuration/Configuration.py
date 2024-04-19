@@ -182,7 +182,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
         discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:quota:1230677565098950696>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
-        discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
+        discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:announcement:1192867080408682526>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
         discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
@@ -787,7 +787,7 @@ class Config(discord.ui.Select):
               discord.SelectOption(label="Disabled")]
 
 
-            embed = discord.Embed(title="<:suggestion:1207370004379607090> Suggestions Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:announcement:1192867080408682526> Suggestions Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Suggestions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Suggestion Channel:** {suggestionchannelmsg}\n{replybottom}**Suggestions Management Channel:** {smschannelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   

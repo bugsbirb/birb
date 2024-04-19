@@ -107,7 +107,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not re.match(r'^\d+[smhdw]$', duration):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none(), ephmeral=True)
+                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.", allowed_mentions=discord.AllowedMentions.none(), ephemeral=True)
             return
         duration_value = int(duration[:-1])
         duration_unit = duration[-1]

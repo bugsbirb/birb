@@ -71,7 +71,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
         discord.SelectOption(label="Quota", value="Quota", emoji="<:quota:1230677565098950696>"), #
-        discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:UpVote:1183063056834646066>"),  #
+        discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:announcement:1192867080408682526>"),  #
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
         discord.SelectOption(label="Forums Autopost + Utils", value="Forums Autopost + Utils", emoji="<:forum:1162134180218556497>"), #
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>"),  #

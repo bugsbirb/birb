@@ -51,13 +51,14 @@ class suggestions(commands.Cog):
         result = await suggestions_collection.insert_one(suggestion_data)
         suggestion_id = result.inserted_id
 
-        embed = discord.Embed(title="", description=f"**Submitter**\n {ctx.author.mention} \n\n**Suggestion**\n{suggestion}", color=discord.Color.dark_embed())
+        embed = discord.Embed(title="", description=f"<:Member:1226674150463111299> {ctx.author.mention}", color=discord.Color.yellow())
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         if image:
             embed.set_image(url=image.url)
-        embed.set_author(icon_url=ctx.guild.icon, name=ctx.guild.name)
-        embed.set_footer(text="0 Upvotes | 0 Downvotes")
+        embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
+        embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.name)
+        embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value="0 <:UpVote:1183063056834646066> | 0 <:DownVote:1183063097477451797>")
         view = SuggestionView()
         channeldata = await suggestschannel.find_one({"guild_id": ctx.guild.id})
         channeldata2 = await suggestschannel2.find_one({"guild_id": ctx.guild.id})
@@ -82,7 +83,6 @@ class suggestions(commands.Cog):
             if channel2: 
              
              view = SuggestionManageView()
-             embed.title = "Suggestion Manage"
              msg = await channel2.send(embed=embed, view=view)
              await suggestions_collection.update_one({"_id": suggestion_id}, {"$set": {"mgt_message_id": msg.id}})
           except discord.Forbidden: 
@@ -98,12 +98,7 @@ class suggestions(commands.Cog):
 
 
 
-    async def update_embed(self, interaction: discord.Interaction):
-        suggestion_data = await suggestions_collection.find_one({"_id": self.suggestion_id})
-        embed = interaction.message.embeds[0]
-        upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
-        embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")
-        await interaction.message.edit(embed=embed)
+
 
 class SuggestionView(discord.ui.View):
     def __init__(self):
@@ -205,15 +200,25 @@ class SuggestionView(discord.ui.View):
             await interaction.followup.send("<:DownVote:1183063097477451797> Downvoted!", ephemeral=True)
 
     @staticmethod
-    async def update_embed(interaction, suggestion_data):
-        if interaction.message:
-            embed = interaction.message.embeds[0]
-            upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
-            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")
-            await interaction.message.edit(embed=embed)
-        else:
-            return
-
+    async def update_embed(interaction: discord.Interaction, suggestion_data):
+        embed = interaction.message.embeds[0]
+        
+           
+        upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
+        upvote_emoji = "<:UpVote:1183063056834646066>"
+        downvote_emoji = "<:DownVote:1183063097477451797>"
+        value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
+        if not embed.fields: 
+           user = f"<@{suggestion_data['author_id']}>"
+           embed.description = f"<:Member:1226674150463111299> {user}"
+           embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion_data["suggestion"])
+           embed.color = discord.Color.yellow()
+           embed.remove_footer()
+           embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")
+        embed.set_field_at(1, name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")
+        
+        
+        await interaction.message.edit(embed=embed)
     @button(label='Voters List', style=discord.ButtonStyle.gray, custom_id="view_voters_button", emoji="<:List:1179470251860185159>")
     async def view_voters(self, interaction: discord.Interaction, button):
         await interaction.response.defer(ephemeral=True)
@@ -286,13 +291,18 @@ class ManageSuggestion(discord.ui.Select):
             upvotes = suggestiondata.get("upvotes")
             downvotes = suggestiondata.get("downvotes")
 
-            embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"**Submitter**\n<@{submitter}>\n\n**Suggestion**\n{suggestion}", color=discord.Color.brand_green())
+            embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"<:Member:1226674150463111299> {suser.mention}", color=discord.Color.brand_green())
             if suser:
              embed.set_thumbnail(url=suser.display_avatar)
 
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
-            embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
-            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")   
+            embed.set_author(icon_url=suser.display_avatar, name=suser.name)
+            upvote_emoji = "<:UpVote:1183063056834646066>"
+            downvote_emoji = "<:DownVote:1183063097477451797>"
+            value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
+            embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
+            embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")
+
             if suggestiondata.get('image', None) is not None:
              embed.set_image(url=suggestiondata.get('image'))             
             view = SuggestionView()
@@ -379,12 +389,16 @@ class Deny(discord.ui.Modal, title='Deny'):
             upvotes = suggestiondata.get("upvotes")
             downvotes = suggestiondata.get("downvotes")
 
-            embed = discord.Embed(title=f"{redx} Suggestion Denied", description=f"**Submitter**\n<@{submitter}>\n\n**Suggestion**\n{suggestion}", color=discord.Color.brand_red())
+            embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"<:Member:1226674150463111299> {suser.mention}", color=discord.Color.brand_green())
             if suser:
              embed.set_thumbnail(url=suser.display_avatar)
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
-            embed.set_author(icon_url=interaction.guild.icon, name=interaction.guild.name)
-            embed.set_footer(text=f"{upvotes} Upvotes | {downvotes} Downvotes")      
+            embed.set_author(icon_url=suser.display_avatar, name=suser.name)
+            upvote_emoji = "<:UpVote:1183063056834646066>"
+            downvote_emoji = "<:DownVote:1183063097477451797>"
+            value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
+            embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
+            embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")
             embed.add_field(name="Denied Reason", value=self.reason.value, inline=False)   
             if suggestiondata.get('image') is not None:
              embed.set_image(url=suggestiondata.get('image'))               
