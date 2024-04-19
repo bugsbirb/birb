@@ -26,7 +26,7 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
             discord.SelectOption(label="Tags", emoji="<:tags:1230676625226727424>"),
-            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
+            discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="LOA", emoji=f"{loa}"),

@@ -75,7 +75,7 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
         discord.SelectOption(label="Forums Autopost + Utils", value="Forums Autopost + Utils", emoji="<:forum:1162134180218556497>"), #
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>"),  #
-        discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), #
+        discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>"), #
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1230677088181420153>"), #
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"), #
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>"), 
