@@ -22,18 +22,18 @@ class SetupGuide(discord.ui.Select):
         self.author = author
         options = [
             discord.SelectOption(label="Basic Settings", emoji="<:Help:1184535847513624586>"),
-            discord.SelectOption(label="Message Quota", emoji="<:messageup:1224722310687359106>"),
+            discord.SelectOption(label="Message Quota", emoji="<:quota:1230677565098950696>"),
             discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
-            discord.SelectOption(label="Tags", emoji="<:tag:1162134250414415922>"),
+            discord.SelectOption(label="Tags", emoji="<:tags:1230676625226727424>"),
             discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:Role:1162074735803387944>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="LOA", emoji=f"{loa}"),
-            discord.SelectOption(label="Staff Feedback", emoji="<:Rate:1162135093129785364>"),         
+            discord.SelectOption(label="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>"),         
             discord.SelectOption(label="Partnerships", emoji="<:partnerships:1224724406144733224>"),   
             discord.SelectOption(label="Applications Results", emoji="<:Application:1224722901328986183>"), 
-            discord.SelectOption(label="Suspensions", emoji="<:Suspensions:1167093139845165229>"),
+            discord.SelectOption(label="Suspensions", emoji="<:suspensions:1230677088181420153>"),
         ]
         super().__init__(placeholder="Setup Guides", options=options)
 
@@ -52,7 +52,7 @@ class SetupGuide(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
         elif category == 'Modmail':
-            embed = discord.Embed(title="<:Help:1184535847513624586> Modmail Instructions", description="**1)** Run `/modmail config` \n**2)** Fill the `category` argurement this is the category where the modmail channels will be created.\n**3)** Now dm the bot and test it out.", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Help:1184535847513624586> Modmail Instructions", description="**1)** Run `/config` \n**2)** Fill the `category` argurement this is the category where the modmail channels will be created.\n**3)** Now dm the bot and test it out.", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)            
         elif category == 'Forums':
@@ -155,7 +155,7 @@ class Utility(commands.Cog):
         total_members = len(ctx.guild.members)
         human_members = sum(1 for member in ctx.guild.members if not member.bot)
         embed = discord.Embed(title=f"**{ctx.guild.name}** in a nutshell", description=f"<:crown:1226668264260894832> **Owner:** {guild.owner.mention}\n<:link:1226672596284866631> **Guild:** {guild.name}\n<:ID:1226671706022740058> **Guild ID:** {guild.id}\n<:Member:1226674150463111299> **Members** {guild.member_count}\n<:pin:1226671966413389864> **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)\n<:Discord_channel:1226674545050783817> **Channels:** {len(ctx.guild.channels)}\n<:Role:1223077527984144474> **Roles:** {len(ctx.guild.roles)}" , color=0x2b2d31)
-        embed.add_field(name="<:tag:1162134250414415922> Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
+        embed.add_field(name="<:tags:1230676625226727424> Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
         embed.add_field(name="<:poll:1192866397043306586> Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {ctx.guild.premium_subscription_count} (Level {ctx.guild.premium_tier})\n* **Total Roles:** {len(ctx.guild.roles)}", inline=True)         
         if str(ctx.guild.explicit_content_filter).capitalize() == 'All_members':
             content_filter = 'Everyone'

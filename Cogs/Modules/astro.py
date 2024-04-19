@@ -116,6 +116,7 @@ class management(commands.Cog):
             owner = "Unknown"
         else:
             owner = guild.owner.display_name
+            
         embed = discord.Embed(title=f"{guild.name}", description=f"**Owner:** {owner}\n**Guild ID:** {guild.id}\n**Roles:** {len(guild.roles)}\n**Created:** <t:{guild.created_at.timestamp():.0f}:D>",
                               color=discord.Color.dark_embed())
         embed.set_thumbnail(url=guild.icon)
