@@ -389,7 +389,7 @@ class Deny(discord.ui.Modal, title='Deny'):
             upvotes = suggestiondata.get("upvotes")
             downvotes = suggestiondata.get("downvotes")
 
-            embed = discord.Embed(title=f"{greencheck} Suggestion Accepted", description=f"<:Member:1226674150463111299> {suser.mention}", color=discord.Color.brand_green())
+            embed = discord.Embed(title=f"{redx} Suggestion Denied", description=f"<:Member:1226674150463111299> {suser.mention}", color=discord.Color.brand_red())
             if suser:
              embed.set_thumbnail(url=suser.display_avatar)
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
