@@ -58,10 +58,12 @@ from Cogs.Configuration.Views.staffpanel import StaffData
 from Cogs.Configuration.Views.staffpanel import StaffCustomise
 
 from Cogs.Configuration.Views.CustomCommandsView import CmdUsageChannel
-
+from Cogs.Configuration.Views.qotdview import QOTDChannel, PingRole, ToggleQOTD
 from Cogs.Configuration.Views.welcomeview import WelcomeChannel, Welcomemessage, ToggleWelcome
 
 MONGO_URL = os.getenv('MONGO_URL')
+
+
 
 mongo = MongoClient(MONGO_URL)
 
@@ -103,6 +105,7 @@ commandslogging = db['Commands Logging']
 welcome = db['welcome settings']
 ApplicationsSubChannel = db['Applications Submissions']
 options = db['module options']
+qotds = db['qotd']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author, roles):
 
@@ -184,6 +187,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:quota:1230677565098950696>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:announcement:1192867080408682526>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
         discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1162134180218556497>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
+        discord.SelectOption(label="Daily Questions", value="Daily Questions", emoji="<:qotd:1231270156647403630>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'QOTD': True}) else "Disabled"),
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1230677088181420153>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
@@ -295,6 +299,7 @@ class Config(discord.ui.Select):
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             view = ConfigViewMain(self.author, staffroles, adminroles)        
+        
 
         elif color == 'Welcome':
             welcomechannelresult = welcome.find_one({'guild_id': interaction.guild.id})
@@ -943,6 +948,60 @@ class Config(discord.ui.Select):
             view = StaffDB(self.author, options)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
+        elif color == 'Daily Questions':
+            roles = []
+            qotd = qotds.find_one({'guild_id': interaction.guild.id})
+            if qotd and qotd.get('pingrole'):
+               result = qotd.get('pingrole', []) 
+               if not isinstance(result, list):
+                   result = [result]
+               for role_ids in result:
+                       if not isinstance(role_ids, list):
+                           role_ids = [role_ids]
+                       for role_id in role_ids:
+                        role = interaction.guild.get_role(role_id)
+                                             
+                        if role:
+                           roles.append(role)
+                        else:
+                           print(f"Role with ID {role_id} not found.")  
+
+            channels = []
+            
+            if (
+                qotd
+                and qotd.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(qotd.get('channel_id', None))
+             if channels is None:
+                 channels = []
+             else:
+                 channels = [channels]
+            moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            pingmsg = "Not Configured"
+            channelmsg = "Not Configured"
+
+            if (
+                qotd
+                and qotd.get('channel_id')
+            ):
+             channelmsg = f"<#{qotd.get('channel_id')}>"
+            if (
+                qotd
+                and qotd.get('pingrole')
+            ):
+                pingmsg = f"<@&{qotd.get('pingrole')}>"
+
+
+            if moduleddata:
+                modulemsg = moduleddata.get('QOTD', 'False')     
+            embed = discord.Embed(title="<:qotd:1231270156647403630> Daily Questions", description=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Channel:** {channelmsg}\n{replybottom}**Ping:** {pingmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+            options = [
+              discord.SelectOption(label="Enabled"),
+              discord.SelectOption(label="Disabled")]
+            view = QOTDMODULE(self.author, options, roles, channels)
+            embed.set_thumbnail(url=interaction.guild.icon)
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                    
         view.message = await interaction.edit_original_response(embed=embed, view=view)
 
 
@@ -1038,7 +1097,13 @@ class LOAModule(discord.ui.View):
         self.add_item(LOAChannel(author, channels))                  
         self.add_item(Config(author))    
 
-
+class QOTDMODULE(discord.ui.View):
+    def __init__(self, author, options, roles, channels):
+        super().__init__(timeout=None)
+        self.add_item(ToggleQOTD(author, options))
+        self.add_item(QOTDChannel(author, channels))
+        self.add_item(PingRole(author, roles))       
+        self.add_item(Config(author))  
 
 class TagsModule(discord.ui.View):
     def __init__(self, author, options):

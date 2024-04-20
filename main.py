@@ -14,6 +14,7 @@ from Cogs.Modules.loa import Confirm
 from Cogs.Modules.customcommands import Voting
 from Cogs.Modules.staff import Staffview
 from motor.motor_asyncio import AsyncIOMotorClient
+from Cogs.Events.qotd import *
 
 PREFIX = os.getenv("PREFIX")
 TOKEN = os.getenv("TOKEN")
@@ -87,7 +88,8 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.analytics",
             "Cogs.Events.welcome",
             "Cogs.Modules.datamanage",
-            "Cogs.Events.on_error"
+            "Cogs.Events.on_error",
+            'Cogs.Events.qotd'
 
         ]
 
@@ -109,6 +111,7 @@ class client(commands.AutoShardedBot):
         self.add_view(AcceptAndDeny())
         
         self.loop.create_task(self.load_jishaku())
+
 
         for ext in self.cogslist:
             await self.load_extension(ext)
@@ -181,4 +184,4 @@ async def update_channel_name():
 
 if __name__ == "__main__": 
     client.run(TOKEN)
-    
+
