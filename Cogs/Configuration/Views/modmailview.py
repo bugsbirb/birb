@@ -140,7 +140,6 @@ class MMoreOptions(discord.ui.Select):
             view.add_item(MessageFormatting())
         
         await interaction.response.send_message(view=view, ephemeral=True)    
-        await interaction.response.edit_message(content='')
 
 class MessageFormatting(discord.ui.Select):
     def __init__(self):

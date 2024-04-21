@@ -195,6 +195,7 @@ class Utility(commands.Cog):
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def user(self, interaction: discord.Interaction, user: Optional[discord.User] = None) -> None:
         """Displays users information"""        
+        await interaction.response.defer()
         if user is None:
             user = interaction.user
         user_badges = badges.find({'user_id': user.id})            
@@ -211,7 +212,8 @@ class Utility(commands.Cog):
             "early_supporter": "<:early:1221444939733536868>",
             "verified_bot": "<:Twitter_VerifiedBadge:1221450046625812591>",
             "verified_developer": "<:verified:1221450133997097052>",
-            "active_developer": "<:Active_Developer_Badge:1221444993873477714>"
+            "active_developer": "<:Active_Developer_Badge:1221444993873477714>",
+            "booster": "<:boost:1231403830390816808>"
         }
         badgecount = 0
         async for badge_data in user_badges:
@@ -219,7 +221,26 @@ class Utility(commands.Cog):
          badge_values += f"{badge}\n"
          badgecount += 1 
         member = None 
+
         if interaction.guild: 
+         guild = await self.client.fetch_guild(1092976553752789054)
+         print(guild)
+         if guild:
+             if await guild.fetch_member(user.id):
+                 booster = guild.get_role(1160541890035339264) # Booster
+                 donator = guild.get_role(1229172969830617199) # Ko-fi
+                 donator2 = guild.get_role(1182011116650496031) # Normal
+                 member = await guild.fetch_member(user.id)
+                 if donator2 in member.roles:
+                     badge_values += f"<:Patreon:1229499944533233695> [Patreon Donator](https://www.patreon.com/astrobirb)\n"
+                     badgecount += 1    
+                 if donator in member.roles:
+                     badge_values += f"<:kofi:1229499870193258556> [Ko-fi Donator](https://ko-fi.com/astrobird#)\n"
+                     badgecount += 1
+                 if booster in member.roles:   
+                     badge_values += f"{public_flags_emojis['booster']} Astro Birb Booster\n"
+                     badgecount += 1    
+                 
          try:
           member = await interaction.guild.fetch_member(user.id)
          except discord.HTTPException:
@@ -248,7 +269,7 @@ class Utility(commands.Cog):
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
         rolecount = len(user.roles) - 1
         embed.add_field(name=f"**Roles** [{rolecount}]", value=user_roles, inline=False)        
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
     async def fetch_birb_image(self):
         birb_api_url = "https://api.alexflipnote.dev/birb"
