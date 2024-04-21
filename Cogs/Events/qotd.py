@@ -42,10 +42,9 @@ class qotd(commands.Cog):
             "music", "vacation", "sports", "workout", "movie", "memory", "hobby", "book", "recipe", "getaway",
             "career", "cuisine", "fashion", "TV", "lyrics", "playlist", "home", "business", "season", "video game",
             "adventure", "artist", "pet", "era", "game", "quote", "activity", "art", "genre", "team", "routine", "style", "show", "song", "idea", "work",
-            # Added words related to a general question of the day
+
             "inspiration", "challenge", "creativity", "reflection", "motivation", "achievement", "growth", "exploration", "journey",
             "goal", "success", "experience", "wisdom", "perspective", "discovery", "imagination", "aspiration", "learning",
-            # Additional words
             "nature", "friendship", "health", "family", "dream", "passion", "advice", "confidence", "memory", "travel",
             "celebration", "culture", "entertainment", "achievement", "technology", "innovation", "happiness", "love", "insight",
             "community", "opportunity", "challenge", "resilience", "victory", "celebration", "effort", "tradition", "spirituality",
@@ -183,7 +182,7 @@ class qotd(commands.Cog):
                 ]
         word_array = list(set(word_array))
 
-        for _ in range(5):
+        for _ in range(2):
          try:
           topic = random.choice(word_array)
           response = clientapi.completions.create(
@@ -224,7 +223,7 @@ class qotd(commands.Cog):
                         model="gpt-3.5-turbo-instruct",
                         prompt = f"Make a question of the day about {topic} and make it personal! And make these questions based towards a teenage/children audience",
                         temperature=0.7,
-                        max_tokens=200,
+                        max_tokens=100,
                     )
                     text = str(response.choices[0].text).lstrip('"')
                     text = text.rstrip('"')
