@@ -187,7 +187,7 @@ class qotd(commands.Cog):
           topic = random.choice(word_array)
           response = clientapi.completions.create(
             model="gpt-3.5-turbo-instruct",
-            prompt = f"Make a question of the day about {topic} and make it personal! And make these questions based towards a teenage/children audience",
+            prompt = f"Make a question of the day about {topic} and make it a personal opinionated question! And make these questions based towards a teenage/children audience.",
             temperature=0.7,
             max_tokens=200)
           text = str(response.choices[0].text).lstrip('"')
@@ -221,7 +221,7 @@ class qotd(commands.Cog):
                     topic = random.choice(word_array)
                     response = clientapi.completions.create(
                         model="gpt-3.5-turbo-instruct",
-                        prompt = f"Make a question of the day about {topic} and make it personal! And make these questions based towards a teenage/children audience",
+                        prompt = f"Make a question of the day about {topic} and make it a personal opinionated question! And make these questions based towards a teenage/children audience",
                         temperature=0.7,
                         max_tokens=100,
                     )
