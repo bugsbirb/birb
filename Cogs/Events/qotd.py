@@ -26,7 +26,7 @@ class qotd(commands.Cog):
 
         
     
-    @tasks.loop(hours=6)
+    @tasks.loop(hours=3)
     async def sendqotd(self) -> None:
         print("[👀] Checking QOTD")
         
