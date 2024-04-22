@@ -225,8 +225,11 @@ class Utility(commands.Cog):
         if interaction.guild: 
          guild = await self.client.fetch_guild(1092976553752789054)
          print(guild)
-         if guild:
-             if await guild.fetch_member(user.id):
+         try:
+          if guild:
+
+              if await guild.fetch_member(user.id):
+ 
                  booster = guild.get_role(1160541890035339264) # Booster
                  donator = guild.get_role(1229172969830617199) # Ko-fi
                  donator2 = guild.get_role(1182011116650496031) # Normal
@@ -241,10 +244,14 @@ class Utility(commands.Cog):
                      badge_values += f"{public_flags_emojis['booster']} Astro Birb Booster\n"
                      badgecount += 1    
                  
-         try:
-          member = await interaction.guild.fetch_member(user.id)
-         except discord.HTTPException:
+          try:
+           member = await interaction.guild.fetch_member(user.id)
+          except discord.HTTPException:
             member = None 
+         except (discord.HTTPException, discord.NotFound):
+            print('Not in guild')
+            pass
+
         userFlags = user.public_flags.all()
         for flag in userFlags:
             flag_name = flag.name
@@ -259,7 +266,7 @@ class Utility(commands.Cog):
             if userFlags or badge_values:
                 embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}")
             embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
             return
         embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=discord.Color.dark_embed())
         if userFlags or badge_values:
@@ -312,22 +319,6 @@ class Utility(commands.Cog):
             await interaction.response.send_message(embed=embed)
         
 
- 
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def divider(self, ctx: commands.Context, * ,rolename):
-        guild = ctx.guild
-        if len(rolename) > 100:
-            await ctx.send("Role name is too long. Please provide a name with 100 characters or fewer.")
-            return
-
-        rolewidth = 19
-        divider_text = "\u200b" + "​ " * ((rolewidth - len(rolename)) // 2) + rolename + "​ " * ((rolewidth - len(rolename)) // 2) + "\u200b"
-        try:
-            role = await guild.create_role(name=divider_text)
-            await ctx.send(f"Role divider created: {role.name}")
-        except discord.HTTPException as e:
-            await ctx.send(f"Failed to create role divider: {e}")
 
 
 

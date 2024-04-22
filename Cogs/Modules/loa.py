@@ -97,14 +97,14 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
                             except discord.Forbidden:
                                 await interaction.response.edit_message(content=f"{no} I don't have permission to add roles.")
                                 return
-
-                await interaction.response.edit_message(content=f"{tick} Created LOA for **@{self.user.display_name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
-                await loa_collection.insert_one(loadata)
                 try:
                     await channel.send(f"<:Add:1163095623600447558> LOA was created by **@{interaction.user.display_name}**", embed=embed, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
                 except discord.Forbidden:
                     await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.")
                     return
+                await interaction.response.edit_message(content=f"{tick} Created LOA for **@{self.user.display_name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
+                await loa_collection.insert_one(loadata)
+
                 try:
                     await self.user.send(f"<:Add:1163095623600447558> A LOA was created for you **@{interaction.guild.name}**", embed=embed)
                 except discord.Forbidden:

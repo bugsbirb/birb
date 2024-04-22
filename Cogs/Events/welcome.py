@@ -36,11 +36,13 @@ class welcome2(commands.Cog):
         if modulesresult.get('welcome', False) is False:
             return
         result = await welcome.find_one({'guild_id': member.guild.id})
+        if result is None:
+            return
+
         if result.get('welcome_channel', None) is None:
             return
         
-        if result is None:
-            return
+
 
         target_guild_id = member.guild.id
         guild_on_join = self.client.get_guild(target_guild_id)
