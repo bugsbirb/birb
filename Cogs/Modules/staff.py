@@ -188,6 +188,32 @@ class quota(commands.Cog):
      else:   
         return False
 
+    async def check_admin_and_staff(self, ctx: commands.Context, user: discord.User):
+        filter = {'guild_id': ctx.guild.id}
+        staff_data = await scollection.find_one(filter)
+        if staff_data and 'staffrole' in staff_data:
+            staff_role_ids = staff_data['staffrole']
+            staff_role_ids = staff_role_ids if isinstance(staff_role_ids, list) else [staff_role_ids]
+            admin_data = await arole.find_one(filter)
+            if not admin_data:
+             return False
+            else:
+                if 'staffrole' in admin_data:
+                    admin_role_ids = admin_data['staffrole']
+                    admin_role_ids = admin_role_ids if isinstance(admin_role_ids, list) else [admin_role_ids]
+
+                    if any(role.id in staff_role_ids + admin_role_ids for role in user.roles):
+                        return True
+                    else:
+                        return False
+            if any(role.id in staff_role_ids for role in user.roles):
+                return True
+            else:
+                return False
+        else:
+            return False
+
+
     @commands.hybrid_group(name="staff")
     async def staff(self, ctx: commands.Context):
         return
@@ -298,6 +324,10 @@ class quota(commands.Cog):
             loa_role_data = await lcollection.find_one({'guild_id': ctx.guild.id})
 
             if member:
+                if not await self.check_admin_and_staff(ctx, member):
+                    continue
+
+
                 message_quota_result = await message_quota_collection.find_one({'guild_id': ctx.guild.id})
 
                 if message_quota_result:
@@ -354,6 +384,11 @@ class quota(commands.Cog):
         LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
         timeout = 42069
+        if len(pages) <= 1:
+            PreviousButton.disabled = True
+            NextButton.disabled = True
+            FirstPageButton.disabled = True
+            LastPageButton.disabled = True           
         paginator = Paginator.Simple(
             PreviousButton=PreviousButton,
             NextButton=NextButton,
