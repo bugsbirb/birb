@@ -41,18 +41,20 @@ class client(commands.AutoShardedBot):
         if environment == "custom":
          print('Custom Branding Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=1, chunk_guilds_at_startup=False
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=0, chunk_guilds_at_startup=False
          )
+         intents.message_content = True
         elif environment == 'development':
          print('Development Loaded')
          super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2, chunk_guilds_at_startup=True)            
-         intents.message_content = True
+
         else:
          print('Production Loaded')
          super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2
          )             
+         intents.message_content = True
         self.client = client
         self.cogslist = [
             "Cogs.Modules.astro",
@@ -152,6 +154,7 @@ class client(commands.AutoShardedBot):
 
         else:
             print("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
+        
 
 
     async def on_disconnect(self):

@@ -128,7 +128,7 @@ class MMoreOptions(discord.ui.Select):
         options = [
         discord.SelectOption(label='Modmail Ping'),
         discord.SelectOption(label='Message Formatting'),
-        # discord.SelectOption(label="Auto Message", description="No commands you can just message in the modmail channel.")
+        discord.SelectOption(label="Auto Message", description="No commands you can just message in the modmail channel.")
     ]           
 
         super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)     
