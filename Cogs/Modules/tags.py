@@ -52,7 +52,7 @@ class Tags(commands.Cog):
 
     @tags.command(description="Create a tag")    
     @app_commands.describe(name = "The name of the tag", content = "The content of the tag.")
-    async def create(self, ctx: commands.Context, name: str, content: str):
+    async def create(self, ctx: commands.Context, name: str, *, content: str):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return                 
@@ -70,7 +70,7 @@ class Tags(commands.Cog):
 
     @tags.command(description="Edit a tag")
     @app_commands.describe(name = "The name of the tag", content = "The content of the tag.")
-    async def edit(self, ctx: commands.Context, name: str, content: str):
+    async def edit(self, ctx: commands.Context, name: str, *, content: str):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -158,7 +158,7 @@ class Tags(commands.Cog):
     @tags.command(description="Information about a tag")
     @app_commands.autocomplete(name=tag_name_autocompletion)
     @app_commands.describe(name = "The name of the tag")
-    async def info(self, ctx: commands.Context, name:  discord.ext.commands.Range[str, 1, 50]):
+    async def info(self, ctx: commands.Context, *,name:  discord.ext.commands.Range[str, 1, 50]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -187,7 +187,7 @@ class Tags(commands.Cog):
     @tags.command(description="Send a existing tag to this channel.")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     @app_commands.describe(name = "The name of the tag")    
-    async def send(self, ctx: commands.Context, name:  discord.ext.commands.Range[str, 1, 50]):
+    async def send(self, ctx: commands.Context, *,name:  discord.ext.commands.Range[str, 1, 50]):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
@@ -234,7 +234,7 @@ class Tags(commands.Cog):
     @tags.command(description="Delete a existing tag")        
     @app_commands.autocomplete(name=tag_name_autocompletion)
     @app_commands.describe(name = "The name of the tag")    
-    async def delete(self, ctx: commands.Context, name:  discord.ext.commands.Range[str, 1, 50]):
+    async def delete(self, ctx: commands.Context, *, name:  discord.ext.commands.Range[str, 1, 50]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the tags module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

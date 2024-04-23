@@ -82,7 +82,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          embed.title = f"{redx} {amount}/25"
          embed.description="You have reached the maximum amount of custom commands."
          embed.color = discord.Color.brand_red()
-         await interaction.response.edit_message(embed=embed, view=None)
+         await interaction.response.send_message(embed=embed, ephemeral=True)
 
          return
         result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
@@ -92,7 +92,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          embed.title = f"{redx} That already exists!"
          embed.color = discord.Color.brand_red()
          embed.description="Please try again."
-         await interaction.response.edit_message(embed=embed, view=None)
+         await interaction.response.send_message(embed=embed,  ephemeral=True)
          return           
         name = self.name.value
         view = NoEmbeds(self.author, name)
@@ -124,7 +124,7 @@ class EditCommand(discord.ui.Modal, title='Edit Command'):
           embed.description="I could not find the command you were trying to edit please try again."
           embed.color = discord.Color.brand_red()
           embed.clear_fields()
-          await interaction.response.edit_message(embed=embed, view=None)
+          await interaction.response.send_message(embed=embed, ephemeral=True)
           return
 
                
@@ -191,13 +191,13 @@ class DeleteCommand(discord.ui.Modal, title='Delete Command'):
         embed.description = "I couldn't find the command you were trying to delete please try again."
         embed.color = discord.Color.brand_red()
         embed.clear_fields()
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.response.send_message(embed=embed,  ephemeral=True)
         return
        customcommands.delete_one({"name": self.name.value, "guild_id": interaction.guild.id})
        embed = discord.Embed(description="Succesfully deleted the command.")
        embed.title = f"{greencheck} Command Deleted"
        embed.color = discord.Color.brand_green()
-       await interaction.response.edit_message(embed=embed, view=None)
+       await interaction.response.send_message(embed=embed,  ephemeral=True)
 
 class CustomButton(discord.ui.Modal, title='Button Embed'):
     def __init__(self, author, names):
@@ -375,18 +375,22 @@ class CreateButtons(discord.ui.Select):
 
 
 class Title(discord.ui.Modal, title='Title'):
-    def __init__(self):
+    def __init__(self, title):
         super().__init__()
+        self.title = title
 
 
 
 
-    Titles = discord.ui.TextInput(
-        label='title',
-        placeholder='What is the title?',
-        required=False,
-        max_length=256
-    )
+        self.Titles = discord.ui.TextInput(
+            label='title',
+            placeholder='What is the title?',
+            required=False,
+            max_length=256,
+            default=self.title
+        )
+        self.add_item(self.Titles)
+
 
 
 
@@ -401,38 +405,45 @@ class Title(discord.ui.Modal, title='Title'):
 
 
 class Description(discord.ui.Modal, title='Description'):
-    def __init__(self):
+    def __init__(self, description):
         super().__init__()
+        self.descriptions = description
+
+
+    
+        self.description = discord.ui.TextInput(
+            label='Description',
+            placeholder='What is the description?',
+            style=discord.TextStyle.long,
+            max_length=4000,
+            required=False,
+            default=self.descriptions
+
+        )
 
 
 
-    description = discord.ui.TextInput(
-        label='Description',
-        placeholder='What is the description?',
-        style=discord.TextStyle.long,
-        max_length=4000,
-        required=False
-    )
-
-
-
-
+        self.add_item(self.description)
     async def on_submit(self, interaction: discord.Interaction):
         embed = interaction.message.embeds[0]
         embed.description = self.description.value
+
         await interaction.response.edit_message(embed=embed)
 
 class Colour(discord.ui.Modal, title='Colour'):
-    def __init__(self):
+    def __init__(self, color):
         super().__init__()
 
 
 
-    color = discord.ui.TextInput(
+        self.color = discord.ui.TextInput(
         label='Colour',
         placeholder='Do not include the hashtag',
         max_length=6,
-    )
+        default=color
+        )
+        self.add_item(self.color)
+
 
 
 
@@ -451,19 +462,23 @@ class Colour(discord.ui.Modal, title='Colour'):
         await interaction.response.edit_message(embed=embed)
 
 class Context(discord.ui.Modal, title='Content'):
-    def __init__(self):
+    def __init__(self, content):
         super().__init__()
+        self.content = content
 
 
 
-    color = discord.ui.TextInput(
-        label='Content',
-        placeholder='What do you want the content to be?',
-        
-        required=False,
-        style=discord.TextStyle.long,
-        max_length=2000
-    )
+        self.color = discord.ui.TextInput(
+            label='Content',
+            placeholder='What do you want the content to be?',
+            
+            required=False,
+            style=discord.TextStyle.long,
+            max_length=2000,
+            default=self.content
+        )
+        self.add_item(self.color)
+
 
 
 
@@ -475,20 +490,20 @@ class Context(discord.ui.Modal, title='Content'):
 
 
 class Thumbnail(discord.ui.Modal, title='Thumbnail'):
-    def __init__(self):
+    def __init__(self, thumb):
         super().__init__()
+        self.thumb =thumb
 
 
 
-    Thumbnaile = discord.ui.TextInput(
-        label='Thumbnail',
-        placeholder='Whats the thumbnail URL?',
-        required= False,
-        max_length=2048
-    )
-
-
-
+        self.Thumbnaile = discord.ui.TextInput(
+            label='Thumbnail',
+            placeholder='Whats the thumbnail URL?',
+            required= False,
+            max_length=2048,
+            default=self.thumb
+        )
+        self.add_item(self.Thumbnaile)
 
     async def on_submit(self, interaction: discord.Interaction):
         embed = interaction.message.embeds[0]
@@ -500,17 +515,21 @@ class Thumbnail(discord.ui.Modal, title='Thumbnail'):
            return
 
 class Image(discord.ui.Modal, title='Image'):
-    def __init__(self):
+    def __init__(self, ima):
         super().__init__()
+        self.ima = ima
 
 
 
-    Thumbnaile = discord.ui.TextInput(
-        label='Image',
-        placeholder='Whats the image URL?',
-        required=False,
-        max_length=2048
-    )
+        self.Thumbnaile = discord.ui.TextInput(
+            label='Image',
+            placeholder='Whats the image URL?',
+            required=False,
+            max_length=2048,
+            default=self.ima
+        )
+        self.add_item(self.Thumbnaile)
+
 
 
 
@@ -525,24 +544,28 @@ class Image(discord.ui.Modal, title='Image'):
            return
 
 class Author(discord.ui.Modal, title='Author'):
-    def __init__(self):
+    def __init__(self, authotext, iconurl):
         super().__init__()
+        self.authotext = authotext
+        self.iconurl = iconurl
 
-    authortext = discord.ui.TextInput(
-        label='Author Name',
-        placeholder='Whats the author name?',
-        required=False,
-        max_length=256
-    )
+        self.authortext = discord.ui.TextInput(
+            label='Author Name',
+            placeholder='Whats the author name?',
+            required=False,
+            max_length=256,
+            default=self.authotext
+        )
 
-    iconUrl = discord.ui.TextInput(
-        label='Icon URL',
-        placeholder='Whats the icon URL?',
-        required=False,
-        max_length=2048
-    )
-
-
+        self.iconUrl = discord.ui.TextInput(
+            label='Icon URL',
+            placeholder='Whats the icon URL?',
+            required=False,
+            max_length=2048,
+            default=self.iconurl
+        )
+        self.add_item(self.authortext)
+        self.add_item(self.iconUrl)
 
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -589,8 +612,15 @@ class NoEmbeds(discord.ui.View):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)            
-        await interaction.response.send_modal(Context())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('content'):
+            default = result.get('content')
+        else:
+            default = None
+
+        await interaction.response.send_modal(Context(default))
 
 
 
@@ -694,8 +724,13 @@ class Embeds(discord.ui.View):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)            
-        await interaction.response.send_modal(Context())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)   
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('content'):
+            default = result.get('content')
+        else:
+            default = None                 
+        await interaction.response.send_modal(Context(default))
 
     @discord.ui.button(label='Buttons', style=discord.ButtonStyle.blurple, emoji="<:Button:1223063359184830494>")
     async def Buttons(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -735,8 +770,14 @@ class Embeds(discord.ui.View):
         if interaction.user.id != author:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
-            return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Title())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('title'):
+            default = result.get('title')
+        else:
+            default = None
+        
+        await interaction.response.send_modal(Title(default))
 
     @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -745,7 +786,13 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Description())
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('description'):
+            default = result.get('description')
+        else:
+            default = None
+
+        await interaction.response.send_modal(Description(default))
 
     @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -754,7 +801,13 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Thumbnail())
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('thumbnail'):
+            default = result.get('thumbnail')
+        else:
+            default = None
+        
+        await interaction.response.send_modal(Thumbnail(default))
 
     @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:Image:1195058849741295748>")
     async def photo(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -763,7 +816,14 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Image())
+            
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('image'):
+            default = result.get('image')
+        else:
+            default = None
+
+        await interaction.response.send_modal(Image(default))
 
     @discord.ui.button(label='Author', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
     async def Author(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -772,7 +832,19 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Author())
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('author'):
+            default = result.get('author')
+        else:
+            default = None
+        if result and result.get('author_icon'):
+            default_url = result.get('author_icon')
+        else:
+            default_url = None
+        
+
+
+        await interaction.response.send_modal(Author(default, default_url))
 
     @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -781,7 +853,13 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        await interaction.response.send_modal(Colour())        
+        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
+        if result and result.get('color'):
+            default = result.get('color')
+        else:
+            default = None
+        
+        await interaction.response.send_modal(Colour(default))        
 
     @discord.ui.button(label='Finish', style=discord.ButtonStyle.green, emoji=f"{tick}", row=2)
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
