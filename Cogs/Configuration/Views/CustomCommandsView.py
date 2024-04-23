@@ -614,11 +614,11 @@ class NoEmbeds(discord.ui.View):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('content'):
-            default = result.get('content')
+        if interaction.message.content:
+            default = interaction.message.content
         else:
             default = None
+
 
         await interaction.response.send_modal(Context(default))
 
@@ -771,9 +771,10 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('title'):
-            default = result.get('title')
+        embed = interaction.message.embeds[0]
+
+        if embed and embed.title:
+            default = embed.title
         else:
             default = "Untitled Embed"
         
@@ -786,9 +787,10 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('description'):
-            default = result.get('description')
+        embed = interaction.message.embeds[0]
+
+        if embed and embed.description:
+            default = embed.description
         else:
             default = None
 
@@ -801,11 +803,13 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('thumbnail'):
-            default = result.get('thumbnail')
+        embed = interaction.message.embeds[0]
+
+        if embed and embed.thumbnail:
+            default = embed.thumbnail.url
         else:
             default = None
+
         
         await interaction.response.send_modal(Thumbnail(default))
 
@@ -817,9 +821,10 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
             
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('image'):
-            default = result.get('image')
+        embed = interaction.message.embeds[0]
+
+        if embed and embed.image:
+            default = embed.image.url
         else:
             default = None
 
@@ -833,12 +838,14 @@ class Embeds(discord.ui.View):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('author'):
-            default = result.get('author')
+        embed = interaction.message.embeds[0]
+
+        if embed and embed.author.name:
+            default = embed.author.name
         else:
             default = None
-        if result and result.get('author_icon'):
-            default_url = result.get('author_icon')
+        if embed and embed.author.icon_url:
+            default_url = embed.author.icon_url
         else:
             default_url = None
         
@@ -853,9 +860,9 @@ class Embeds(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
-        result = await customcommands.find_one({'guild_id': interaction.guild.id, 'name': self.name})
-        if result and result.get('color'):
-            default = result.get('color')
+        
+        if interaction.message.embeds[0].color:
+            default = interaction.message.embeds[0].color()
         else:
             default = None
         
