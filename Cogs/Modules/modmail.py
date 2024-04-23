@@ -141,11 +141,16 @@ class Modmail(commands.Cog):
 
                     channel = self.client.get_channel(channel_id)
                     
+                    
                     try:
                      await ctx.send(f"{tick} Response sent.", ephemeral=True)
                      option = await options.find_one({'guild_id': ctx.guild.id})
                      if option:
+
                             if option.get('MessageFormatting') == 'Messages':
+                                if media is None:
+                                   media = ""
+                               
                                 await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
                                 await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {ctx.author.name}: {content}\n{media}")
                                 return   
