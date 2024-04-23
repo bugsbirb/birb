@@ -306,7 +306,7 @@ class loamodule(commands.Cog):
 
     @loa.command(description="Request a Leave Of Absence")
     @app_commands.describe(duration="How long do you want the LOA for? (m/h/d/w)", reason="What is the reason for this LOA?")
-    async def request(self, ctx: commands.Context, duration: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
+    async def request(self, ctx: commands.Context, duration: discord.ext.commands.Range[str, 1, 20], *,reason: discord.ext.commands.Range[str, 1, 2000]):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the loa module isn't enabled.")

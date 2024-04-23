@@ -38,7 +38,7 @@ class Suspensions(commands.Cog):
 
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
-    async def suspend(self, ctx: commands.Context, staff: discord.Member, length: app_commands.Range[str, 1, 20], reason: app_commands.Range[str, 1, 2000]):
+    async def suspend(self, ctx: commands.Context, staff: discord.Member, length:   discord.ext.commands.Range[str, 1, 20],  reason: discord.ext.commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            

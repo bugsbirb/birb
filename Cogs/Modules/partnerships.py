@@ -57,7 +57,7 @@ class Partnerships(commands.Cog):
 
     @partnership.command(description="Log a partnership")
     @app_commands.describe(respresentive="The partnership respresentive of the server", server="The name of the server", invite="The invite link to the server")
-    async def log(self, ctx: commands.Context, respresentive: discord.User, server: app_commands.Range[str, 1, 400], invite: app_commands.Range[str, 1, 100]):
+    async def log(self, ctx: commands.Context, respresentive: discord.User, server:  discord.ext.commands.Range[str, 1, 400],  invite: discord.ext.commands.Range[str, 1, 100]):
         await ctx.defer()
         if respresentive is None:
           await ctx.send(f"{no} **{ctx.author.display_name}**, this user can not be found.", allowed_mentions=discord.AllowedMentions.none())
@@ -120,7 +120,7 @@ class Partnerships(commands.Cog):
          
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
-    async def terminate(self, ctx: commands.Context, server, reason: app_commands.Range[str, 1, 2000]):
+    async def terminate(self, ctx: commands.Context, server, reason:  discord.ext.commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            

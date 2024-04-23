@@ -125,7 +125,7 @@ class promo(commands.Cog):
         new='What is the role you are awarding them with?',
         reason='What makes them deserve the promotion?'
     ) 
-    async def promote(self, ctx: commands.Context, staff: discord.User, new: discord.Role, reason: app_commands.Range[str, 1, 2000]):
+    async def promote(self, ctx: commands.Context, staff: discord.User, new: discord.Role, reason:  discord.ext.commands.Range[str, 1, 2000]):
         await ctx.defer()
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the promotion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

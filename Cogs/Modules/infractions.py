@@ -81,7 +81,7 @@ class Infractions(commands.Cog):
     @commands.hybrid_command(description="Infract staff members")
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(staff="The staff member to infract", action="The action to take", reason="The reason for the action", notes="Additional notes", expiration="The expiration date of the infraction (m/h/d/w)", anonymous="Whether to send the infraction anonymously")
-    async def infract(self, ctx: commands.Context, staff: discord.User, action: app_commands.Range[str, 1, 200], reason: app_commands.Range[str, 1, 2000], notes: Optional[app_commands.Range[str, 1, 2000]], expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
+    async def infract(self, ctx: commands.Context, staff: discord.User, action: discord.ext.commands.Range[str, 1, 200], *, reason: discord.ext.commands.Range[str, 1, 2000], notes="", expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
         optionresult = await options.find_one({'guild_id': ctx.guild.id})
         typeactions = await infractiontypeactions.find_one({'guild_id': ctx.guild.id, 'name': action})
         if staff is None:
@@ -204,7 +204,7 @@ class Infractions(commands.Cog):
             if custom['image']:
                 embed.set_image(url=custom['image'])
         else:
-            if notes:
+            if not notes == "" or None:
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}\n* **Notes:** {notes}", color=discord.Color.dark_embed())
             else:
                 embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {staff.mention}\n* **Action:** {action}\n* **Reason:** {reason}", color=discord.Color.dark_embed())
