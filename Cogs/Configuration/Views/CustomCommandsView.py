@@ -775,7 +775,7 @@ class Embeds(discord.ui.View):
         if result and result.get('title'):
             default = result.get('title')
         else:
-            default = None
+            default = "Untitled Embed"
         
         await interaction.response.send_modal(Title(default))
 
