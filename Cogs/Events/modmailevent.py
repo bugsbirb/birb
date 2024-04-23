@@ -251,6 +251,9 @@ class Modmailevnt(commands.Cog):
                 channel_id = modmail_data['channel_id']
                 channel = self.client.get_channel(channel_id)
                 mention = ""
+
+
+
                 if channel:
                     modmailalertsresult = await modmailalerts.find_one({'channel_id': channel.id})
                     if modmailalertsresult:
@@ -294,7 +297,51 @@ class Modmailevnt(commands.Cog):
                                 await channel.send(f"{mention}\n<:messagereceived:1201999712593383444> **{message.author.name}**: {message.content}")
                                 return                         
                     await channel.send(mention, embed=embed)
+        elif isinstance(message.channel, discord.TextChannel):
+         if message.guild is None:
+            return
+         option = await options.find_one({'guild_id': message.guild.id})
+         media = ""
+         if option and option.get('automessage') == True:
+          modmail_data = await modmail.find_one({'channel_id': message.channel.id})
+          if modmail_data:
+                    channel = message.channel
+                    if modmail_data.get('user_id'):
+                        user_id = modmail_data.get('user_id')
+                        user = await self.client.fetch_user(user_id)
+                        if message.attachments:
+                            media = message.attachments[0].url
+                            mediamsg = "**Attachment Below**"                    
+                        if option:
+                                if option.get('MessageFormatting') == 'Messages':
+                                 try: 
+                                  await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}\n{media}")
+                                  await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}\n{media}")
+                                  try:
+                                   await message.delete()
+                                  except discord.Forbidden:
+                                     print('Couldn\'t delete the modmail message from a staff!') 
+                                     return
 
+                                 except discord.Forbidden: 
+                                  print('I can\'t see the channel message in modmail.')                            
+                                return        
+                        else:
+                            embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {message.author.name}", description=f"```{message.content}```\n{mediamsg}")
+                            embed.set_author(name=message.guild.name, icon_url=message.guild.icon)
+                            embed.set_thumbnail(url=message.guild.icon)
+                            embed.set_image(url=media)                            
+                                
+                            try:
+                             await user.send(embed=embed)  
+                             await channel.send(embed=embed)
+                            except discord.Forbidden: 
+                                print('I can\'t see the channel message in modmail.')
+                            try:
+                                   await message.delete()
+                            except discord.Forbidden:
+                                     print('Couldn\'t delete the modmail message from a staff!') 
+                                     return
     @commands.Cog.listener()
     async def on_command(self, ctx: commands.Context):
         if isinstance(ctx.channel, discord.DMChannel):

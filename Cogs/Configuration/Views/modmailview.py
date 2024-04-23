@@ -127,7 +127,8 @@ class MMoreOptions(discord.ui.Select):
         self.roles = roles
         options = [
         discord.SelectOption(label='Modmail Ping'),
-        discord.SelectOption(label='Message Formatting')
+        discord.SelectOption(label='Message Formatting'),
+        discord.SelectOption(label="Auto Message", description="No commands you can just message in the modmail channel.")
     ]           
 
         super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)     
@@ -136,10 +137,27 @@ class MMoreOptions(discord.ui.Select):
         selected = self.values[0]       
         if selected == 'Modmail Ping':
             view.add_item(ModmailPing(self.author, self.roles))
+        elif selected == 'Auto Message':
+            view = AutoMessage()
         else:
             view.add_item(MessageFormatting())
         
         await interaction.response.send_message(view=view, ephemeral=True)    
+
+class AutoMessage(discord.ui.View):    
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Auto Message", style=discord.ButtonStyle.red) 
+    async def automessage(self, interaction: discord.Interaction, button: discord.ui.Button):
+        optionresult = await options.find_one({'guild_id': interaction.guild.id})
+        if optionresult.get('automessage', False) is False:
+                self.automessage.style = discord.ButtonStyle.green
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'automessage': True}}, upsert=True)
+        else:
+                self.automessage.style = discord.ButtonStyle.red        
+                await options.update_one({'guild_id': interaction.guild.id}, {'$set': {'automessage': False}}, upsert=True)
+        await interaction.response.edit_message(content="", view=self)     
 
 class MessageFormatting(discord.ui.Select):
     def __init__(self):
