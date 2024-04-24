@@ -34,7 +34,7 @@ class qotd(commands.Cog):
                     soup = BeautifulSoup(html, "html.parser")
                     question_element = soup.find("div", id="random_word")
                     question = question_element.text.strip()
-                    print(question)
+                    print(f"[❓] {question}")
                     return question
                 else:
                     print("Failed to fetch the question. Status code:", response.status)
@@ -50,19 +50,20 @@ class qotd(commands.Cog):
         if not result:
             return
         responses = []
-        for _ in range(2):
+        for _ in range(5):
          try:
+          await asyncio.sleep(0.5)
           question = await self.fetch_question()
+          
           
           responses.append(question)
          except Exception as e:
             print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
             continue
 
-        
+        selected_response = random.choice(responses) 
         for results in result:
             postdate = results.get('nextdate', None)
-            selected_response = random.choice(responses)
             moduleddata = await modules.find_one({'guild_id': results.get('guild_id')})
             if moduleddata is None:
                 continue
@@ -72,9 +73,24 @@ class qotd(commands.Cog):
              if postdate and postdate <= datetime.datetime.now():
                 
                 print("[👀] Sending QOTD")
+                
+                if selected_response in results.get('messages', []):
+                        print('[❓QOTD] This has already been sent before ffs.')
+                        for _ in range(5):
+                            try:
+                             await asyncio.sleep(0.5)
+                             question = await self.fetch_question()
+                             
+                            
+                             responses.append(question)                        
+                            except Exception as e:
+                                print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
+                                continue     
+                selected_response = random.choice(responses)         
+                                                      
 
 
-        
+                
                 await questiondb.update_one(
                     {'guild_id': int(results['guild_id'])},
                     {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1)},
