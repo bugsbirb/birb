@@ -38,12 +38,12 @@ class client(commands.AutoShardedBot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
+        intents.message_content = True
         if environment == "custom":
          print('Custom Branding Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=0, chunk_guilds_at_startup=False
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=None, chunk_guilds_at_startup=False
          )
-         intents.message_content = True
         elif environment == 'development':
          print('Development Loaded')
          super().__init__(
@@ -54,7 +54,7 @@ class client(commands.AutoShardedBot):
          super().__init__(
             command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2
          )             
-         intents.message_content = True
+         
         self.client = client
         self.cogslist = [
             "Cogs.Modules.astro",
