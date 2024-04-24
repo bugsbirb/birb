@@ -431,8 +431,9 @@ class Description(discord.ui.Modal, title='Description'):
         await interaction.response.edit_message(embed=embed)
 
 class Colour(discord.ui.Modal, title='Colour'):
-    def __init__(self, color):
+    def __init__(self, colour):
         super().__init__()
+        self.colour = colour
 
 
 
@@ -440,7 +441,7 @@ class Colour(discord.ui.Modal, title='Colour'):
         label='Colour',
         placeholder='Do not include the hashtag',
         max_length=6,
-        default=color
+        default=self.colour
         )
         self.add_item(self.color)
 
@@ -862,7 +863,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         
         if interaction.message.embeds[0].color:
-            default = interaction.message.embeds[0].color()
+            default = f"{interaction.message.embeds[0].color.value:06x}"
         else:
             default = None
         

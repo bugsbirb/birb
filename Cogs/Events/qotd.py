@@ -63,7 +63,9 @@ class qotd(commands.Cog):
         for results in result:
             postdate = results.get('nextdate', None)
             selected_response = random.choice(responses)
-            moduleddata = await modules.find_one({'guild_id': int(results.get('guild_id', None))})
+            moduleddata = await modules.find_one({'guild_id': results.get('guild_id')})
+            if moduleddata is None:
+                continue
             if moduleddata.get('QOTD', False) == False:
                     continue
             if postdate:
