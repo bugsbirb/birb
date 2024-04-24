@@ -12,3 +12,4 @@ validators
 aiohttp
 chat_exporter
 openai
+bs4
