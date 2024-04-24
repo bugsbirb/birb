@@ -39,6 +39,7 @@ class client(commands.AutoShardedBot):
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
+        print(environment)
         if environment == "custom":
          print('Custom Branding Loaded')
          super().__init__(
@@ -47,7 +48,7 @@ class client(commands.AutoShardedBot):
         elif environment == 'development':
          print('Development Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2, chunk_guilds_at_startup=True)            
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=None, chunk_guilds_at_startup=True)            
 
         else:
          print('Production Loaded')
