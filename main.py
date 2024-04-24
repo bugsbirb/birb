@@ -102,17 +102,7 @@ class client(commands.AutoShardedBot):
         print("[🔄] Jishaku Loaded")
 
     async def setup_hook(self):
-        if environment == 'custom':
-         
-         guild = await self.fetch_guild(guildid)
-         if guild:
-            try:
-             await guild.chunk(cache=True)
-            except Exception as e:
-             print(f"[❌] Failed to chunk guild {guild.name} ({guild.id})") 
-            print(f"[✅] Connected to guild {guild.name} ({guild.id})")
-         else:
-            print('Guild not found.')        
+    
         update_channel_name.start()
 
         self.add_view(SuggestionView())
@@ -133,7 +123,17 @@ class client(commands.AutoShardedBot):
             print(f"[✅] {ext} loaded")
 
     async def on_ready(self):
-
+        if environment == 'custom':
+         
+         guild = await self.fetch_guild(guildid)
+         if guild:
+            try:
+             await guild.chunk(cache=True)
+            except Exception as e:
+             print(f"[❌] Failed to chunk guild {guild.name} ({guild.id})") 
+            print(f"[✅] Connected to guild {guild.name} ({guild.id})")
+         else:
+            print('Guild not found.')    
         
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
         prfx = f"[📖] {prfx}"
