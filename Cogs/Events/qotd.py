@@ -40,7 +40,7 @@ class qotd(commands.Cog):
                     print("Failed to fetch the question. Status code:", response.status)
                     return None
     
-    @tasks.loop(hours=3)
+    @tasks.loop(hours=1)
     async def sendqotd(self) -> None:
         print("[👀] Checking QOTD")
         
