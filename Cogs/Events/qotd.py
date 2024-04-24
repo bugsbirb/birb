@@ -12,6 +12,8 @@ import os
 import re
 import random
 import asyncio
+import aiohttp
+from bs4 import BeautifulSoup
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
@@ -24,7 +26,19 @@ class qotd(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-        
+    async def fetch_question(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://randomword.com/question") as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, "html.parser")
+                    question_element = soup.find("div", id="random_word")
+                    question = question_element.text.strip()
+                    print(question)
+                    return question
+                else:
+                    print("Failed to fetch the question. Status code:", response.status)
+                    return None
     
     @tasks.loop(hours=3)
     async def sendqotd(self) -> None:
@@ -36,53 +50,14 @@ class qotd(commands.Cog):
         if not result:
             return
         responses = []
-
-        word_array = []
-        word_array += [
-            "concert", "music festival", "streetwear", "sneaker culture", "skateboarding", "surfing", "snowboarding", 
-            "gaming", "esports",  "karaoke", "party", "hangout", "selfie", "vlog", 
-            "blog", "podcast", "playlist", "tattoo", "piercing", "hairstyle", "makeup", "video game", "streaming", 
-            "social media", "viral", "challenge", "memes", "jokes", "prank", "dance", "hip-hop", "rap", "rock", 
-            "pop", "indie", "alternative", "graffiti", "street art", "skate park", "parkour", "extreme sports", 
-            "biking", "outdoor adventure", "urban exploration", "thrill-seeking", "travel", "wanderlust", 
-            "technology", "coding", "gadgets", "smartphones", "apps", "virtual reality", "augmented reality", 
-            "gaming console", "PC gaming", "social networking", "texting", "emojis", "hashtags", "tiktok", 
-            "instagram", "snapchat", "twitter", "reddit", "discord", "youtube", "spotify", "netflix", "amazon prime", 
-            "binge-watching", "photography", "graphic design", "fashion design", "street photography", "digital art", 
-            "skateboard design", "music production", "beatboxing", "songwriting", "dance choreography", "DJing", 
-            "painting", "drawing", "creative writing", "poetry", "short stories", "novel writing", "filmmaking", 
-            "video editing", "animation", "web development", "app development", "game development", "coding bootcamp",
-            "rollerblading", "board games", "card games", "arcade games", "video game tournaments", "online communities", 
-            "fan fiction", "urban fashion", "sneaker collecting", "comic books", "meme culture", "internet trends", 
-            "street performance", "graffiti art", "photography challenges", "DIY crafts", "DIY fashion", 
-            "DIY home decor", "DIY projects", "thrifting", "exploring abandoned places", "photography scavenger hunts", 
-            "concert photography", "food challenges", "food blogging", "street food", "food festivals", 
-            "cooking competitions", "food photography", "baking", "DIY cooking videos", "online gaming communities", 
-            "LAN parties", "retro gaming", "board game cafes", "arcade bars", "escape rooms", "paintball", 
-            "laser tag", "trampoline parks", "water parks", "amusement parks", "concert merchandise", "festival fashion"
-        ]
-
-        word_array = list(set(word_array))
-
         for _ in range(2):
          try:
-          topic = random.choice(word_array)
-          response = clientapi.completions.create(
-            model="gpt-3.5-turbo-instruct",
-            prompt = f"Make a short simple question of the day about {topic} and make it a personal opinionated question! And make these questions based towards a child audience. Also don't assume people have done stuff.  And don't make the question too complicated keep it simple. Do not assume people like stuff or have stuff or use stuff or assume anything about anyone!",
-            temperature=0.7,
-            max_tokens=200)
-          text = str(response.choices[0].text).lstrip('"')
-          text = text.rstrip('"')
-          text = text.replace('"', "")
-          responses.append(text)
+          question = await self.fetch_question()
+          
+          responses.append(question)
          except Exception as e:
             print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
             continue
-
-        
-         
-        
 
         
         for results in result:
@@ -95,25 +70,6 @@ class qotd(commands.Cog):
              if postdate and postdate <= datetime.datetime.now():
                 
                 print("[👀] Sending QOTD")
-                messages = results.get('messages')
-                if not isinstance(messages, list):
-                    messages = [messages]
-                if selected_response in messages:
-                    print("Bruh")
-                    topic = random.choice(word_array)
-                    response = clientapi.completions.create(
-                        model="gpt-3.5-turbo-instruct",
-                        prompt = f"Make a short simple of the day about {topic} and make it a personal opinionated question! And make these questions based towards a children audience.  Also don't assume people have done stuff. And don't make the question too complicated keep it simple.",
-                        temperature=0.7,
-                        max_tokens=100,
-                    )
-                    text = str(response.choices[0].text).lstrip('"')
-                    text = text.rstrip('"')
-                    text = text.replace('"', "")               
-                    selected_response = text
-                    
-        
-
 
 
         
