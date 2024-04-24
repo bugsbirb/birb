@@ -113,6 +113,7 @@ class client(commands.AutoShardedBot):
         self.add_view(AcceptAndDeny())
         
         self.loop.create_task(self.load_jishaku())
+        print('hi')
 
 
         for ext in self.cogslist:
