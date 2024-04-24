@@ -112,6 +112,7 @@ class qotd(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        self.sendqotd.stop()
         self.sendqotd.start()
         
 
