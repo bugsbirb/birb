@@ -174,6 +174,16 @@ class Modmailevnt(commands.Cog):
                         channel = self.client.get_channel(channel_id)
 
                         if channel:
+                            option = await options.find_one({'guild_id': selected_server.id})
+                            if option:
+                                    if option.get('MessageFormatting') == 'Messages':
+                                     try:
+                                        await channel.send(f"{mention}\n<:messagereceived:1201999712593383444> **{message.author.name}**: {message.content}")
+                                        return  
+                                     except discord.Forbidden:
+                                      await message.reply(f"{no} **{message.author.name},** Please contact server admins I can't see the modmail channel.")                                    
+                                      return
+
                             embed = discord.Embed(
                                 color=discord.Color.dark_embed(),
                                 title=message.author,
@@ -218,6 +228,15 @@ class Modmailevnt(commands.Cog):
                         info.set_thumbnail(url=message.author.display_avatar)
                         info.set_footer(text=f"ID: {message.author.id}")
                         await channel.send(f"{modmailroles}\n<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.", embed=info)
+                        option = await options.find_one({'guild_id': selected_server.id})
+                        if option:
+                                    if option.get('MessageFormatting') == 'Messages':
+                                     try:
+                                        await channel.send(f"<:messagereceived:1201999712593383444> **{message.author.name}**: {message.content}")
+                                        return  
+                                     except discord.Forbidden:
+                                      await message.reply(f"{no} **{message.author.name},** Please contact server admins I can't see the modmail channel.")                                    
+                                      return                        
                         embed = discord.Embed(
                                     color=discord.Color.dark_embed(),
                                     title=message.author,
@@ -309,11 +328,12 @@ class Modmailevnt(commands.Cog):
                     if modmail_data.get('user_id'):
                         user_id = modmail_data.get('user_id')
                         user = await self.client.fetch_user(user_id)
+                        mediamsg = ""
                         if message.attachments:
                             media = message.attachments[0].url
                             mediamsg = "**Attachment Below**"                    
-                        if option:
-                                if option.get('MessageFormatting') == 'Messages':
+                        
+                        if option and option.get('MessageFormatting') == 'Messages':
                                  try: 
                                   await channel.send(f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}\n{media}")
                                   await user.send(f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}\n{media}")
@@ -325,7 +345,7 @@ class Modmailevnt(commands.Cog):
 
                                  except discord.Forbidden: 
                                   print('I can\'t see the channel message in modmail.')                            
-                                return        
+                                  return        
                         else:
                             embed = discord.Embed(color=discord.Color.dark_embed(), title=f"**(Staff)** {message.author.name}", description=f"```{message.content}```\n{mediamsg}")
                             embed.set_author(name=message.guild.name, icon_url=message.guild.icon)

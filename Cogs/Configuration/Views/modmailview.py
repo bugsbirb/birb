@@ -133,12 +133,23 @@ class MMoreOptions(discord.ui.Select):
 
         super().__init__(placeholder='More Options', min_values=1, max_values=1, options=options)     
     async def callback(self, interaction: discord.Interaction):
+        option_result = await options.find_one({'guild_id': interaction.guild.id})
+        if option_result is None:
+            await options.insert_one({'guild_id': interaction.guild.id})
         view = discord.ui.View()
         selected = self.values[0]       
         if selected == 'Modmail Ping':
             view.add_item(ModmailPing(self.author, self.roles))
         elif selected == 'Auto Message':
             view = AutoMessage()
+            
+
+            if option_result:
+                    if option_result.get('automessage', False) is False:
+                        view.automessage.style = discord.ButtonStyle.red
+                        
+                    elif option_result.get('automessage', False) is True:
+                        view.automessage.style = discord.ButtonStyle.green            
         else:
             view.add_item(MessageFormatting())
         

@@ -1,18 +1,16 @@
 
-from openai import OpenAI
 import os
-apikey = os.getenv('OPENAI_API_KEY')
-clientapi = OpenAI(api_key="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")
-from utils.questions import list_of_questions
+
+
 import discord
 from discord.ext import commands, tasks
 import datetime
 from emojis import *
 import os
-
 import random
 import asyncio
-
+import aiohttp
+from bs4 import BeautifulSoup
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
@@ -25,7 +23,19 @@ class qotd(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
-
+    async def fetch_question(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://randomword.com/question") as response:
+                if response.status == 200:
+                    html = await response.text()
+                    soup = BeautifulSoup(html, "html.parser")
+                    question_element = soup.find("div", id="random_word")
+                    question = question_element.text.strip()
+                    print(f"[❓] {question}")
+                    return question
+                else:
+                    print("Failed to fetch the question. Status code:", response.status)
+                    return None
     
     @tasks.loop(hours=1)
     async def sendqotd(self) -> None:
@@ -39,15 +49,16 @@ class qotd(commands.Cog):
         responses = []
         for _ in range(5):
          try:
-          responses = random.choice(list_of_questions) 
-          print(f"[❓] {responses}")
-
-        
+          await asyncio.sleep(0.5)
+          question = await self.fetch_question()
+          
+          
+          responses.append(question)
          except Exception as e:
             print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
             continue
-        selected_response = random.choice(responses)
-        
+
+        selected_response = random.choice(responses) 
         for results in result:
             postdate = results.get('nextdate', None)
             moduleddata = await modules.find_one({'guild_id': results.get('guild_id')})
@@ -59,20 +70,23 @@ class qotd(commands.Cog):
              if postdate and postdate <= datetime.datetime.now():
                 
                 print("[👀] Sending QOTD")
-                
-                if selected_response in results.get('messages', []):
+                for results in result.get('messages'):
+                 if selected_response in results:
                         print('[❓QOTD] This has already been sent before ffs.')
                         for _ in range(5):
                             try:
-                             responses = random.choice(list_of_questions)  
-                             print(responses)
+                             await asyncio.sleep(1)
+                             question = await self.fetch_question()
+                             
+                            
+                             responses.append(question)                        
                             except Exception as e:
                                 print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
                                 continue     
-                selected_response = random.choice(responses)
-                            
- 
-                                            
+                selected_response = random.choice(responses)         
+                                                      
+
+
                 
                 await questiondb.update_one(
                     {'guild_id': int(results['guild_id'])},
