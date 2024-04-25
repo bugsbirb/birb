@@ -70,8 +70,8 @@ class qotd(commands.Cog):
              if postdate and postdate <= datetime.datetime.now():
                 
                 print("[👀] Sending QOTD")
-                for results in result.get('messages'):
-                 if selected_response in results:
+                for results in results.get('messages'):
+                 if selected_response in results.get('messages'):
                         print('[❓QOTD] This has already been sent before ffs.')
                         for _ in range(5):
                             try:
