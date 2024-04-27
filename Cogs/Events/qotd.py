@@ -13,7 +13,7 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 questiondb = db['qotd']
 modules = db['Modules']
-questionsa = db['Questions Database']
+questionsa = db['Question Database']
 
 class qotd(commands.Cog):
     def __init__(self, client: commands.Bot):
