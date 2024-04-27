@@ -93,6 +93,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Modules.datamanage",
             "Cogs.Events.on_error",
             'Cogs.Events.qotd',
+            'api'
 
 
         ]
