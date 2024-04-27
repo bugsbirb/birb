@@ -17,25 +17,22 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 questiondb = db['qotd']
 modules = db['Modules']
-
+questionsa = db['Questions Database']
 
 class qotd(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
     async def fetch_question(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://randomword.com/question") as response:
-                if response.status == 200:
-                    html = await response.text()
-                    soup = BeautifulSoup(html, "html.parser")
-                    question_element = soup.find("div", id="random_word")
-                    question = question_element.text.strip()
-                    print(f"[❓] {question}")
-                    return question
-                else:
-                    print("Failed to fetch the question. Status code:", response.status)
-                    return None
+        questionresult = await questionsa.find({}).to_list(
+            length=None
+        )
+        if not questionresult:
+            return
+        question = random.choice(questionresult)
+        return question.get('question', None)
+
+        
     
     @tasks.loop(hours=1)
     async def sendqotd(self) -> None:
@@ -49,8 +46,8 @@ class qotd(commands.Cog):
         responses = []
         for _ in range(5):
          try:
-          await asyncio.sleep(0.5)
           question = await self.fetch_question()
+          print(f"[❓QOTD] {question}")
           
           
           responses.append(question)
@@ -74,9 +71,8 @@ class qotd(commands.Cog):
                         print('[❓QOTD] This has already been sent before ffs.')
                         for _ in range(5):
                             try:
-                             await asyncio.sleep(1)
                              question = await self.fetch_question()
-                             
+                             print(f"[❓QOTD Again] {question}")                             
                             
                              responses.append(question)                        
                             except Exception as e:
