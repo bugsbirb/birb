@@ -195,14 +195,15 @@ class Reports(commands.Cog):
         member='Who are you reporting?',
         reason='What is the reason for reporting this user',
         message_link='Do you have proof of this person doing this?')
-    async def report(self, ctx: commands.Context, member: discord.User, *, reason: discord.ext.commands.Range[str, 10, 750], message_link: Optional[str] = None, proof: discord.Attachment = None, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
+    async def report(self, ctx: commands.Context, member: discord.User, *, reason: discord.ext.commands.Range[str, 10, 750], message_link: Optional[str] = None, proof: discord.Attachment, proof2: discord.Attachment = None, proof3: discord.Attachment = None, proof4: discord.Attachment = None, proof5: discord.Attachment = None, proof6: discord.Attachment = None, proof7: discord.Attachment = None, proof8: discord.Attachment = None, proof9: discord.Attachment = None):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the report module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return         
-
-        proof_urls = [proof.url]
-
+        
+        proof_urls = []
+        if proof:
+         proof_urls.append(proof.url)
         if proof2:
          proof_urls.append(proof2.url)
         if proof3:

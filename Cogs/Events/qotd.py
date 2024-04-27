@@ -91,6 +91,12 @@ class qotd(commands.Cog):
                 if guild is None:
                     print('QOTD Guild is none aborting')
                     continue
+                await questiondb.update_one(
+                    {'guild_id': int(results['guild_id'])},
+                    {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1)},
+                    '$push': {'messages': selected_response}
+                    }, upsert=True
+)                
                 channel = guild.get_channel(int(results.get('channel_id', None)))
                 if channel is None:
                     print('QOTD Channel is none aborting')
