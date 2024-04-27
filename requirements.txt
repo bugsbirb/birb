@@ -12,5 +12,5 @@ validators
 aiohttp
 chat_exporter
 threading
-uvicorn
+Uvicorn
 fastapi
