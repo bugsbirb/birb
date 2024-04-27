@@ -20,7 +20,7 @@ db = client['astro']
 suspensions = db['Suspensions']
 infchannel = db['infraction channel']
 modules = db['Modules']
-
+suschannel = db['Suspension Channel']
 
 class Suspensions(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -39,6 +39,7 @@ class Suspensions(commands.Cog):
     @commands.hybrid_command(description="Suspend a staff member")
     @app_commands.describe(staff="What user are you suspending?",length="e.g 1w (m/h/d/w)", reason="What is the reason for this suspension?")
     async def suspend(self, ctx: commands.Context, staff: discord.Member, length:   discord.ext.commands.Range[str, 1, 20],  reason: discord.ext.commands.Range[str, 1, 2000]):
+        await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the suspension module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return            
@@ -243,15 +244,17 @@ class Suspensions(commands.Cog):
 
 
 class Suspension(discord.ui.RoleSelect):
-    def __init__(self, user, author, reason, end_time, start_time):
-        super().__init__(placeholder='Removed Roles', max_values=10)
-        self.user = user
-        self.author = author
-        self.reason = reason
-        self.end_time = end_time
-        self.start_time = start_time
+  def __init__(self, user, author, reason, end_time, start_time):
+    super().__init__(placeholder='Removed Roles', max_values=10)
+    self.user = user
+    self.author = author
+    self.reason = reason
+    self.end_time = end_time
+    self.start_time = start_time
 
-    async def callback(self, interaction: discord.Interaction):
+  async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
                 description=f"**{interaction.user.global_name},** this is not your view",
@@ -261,12 +264,13 @@ class Suspension(discord.ui.RoleSelect):
 
         selected_role_ids = [role.id for role in self.values]
 
+
         infract_data = {
             'guild_id': interaction.guild.id,
             'management': interaction.user.id,
             'staff': self.user.id,
             'action': "Suspension",
-            'start_time': self.start_time,
+            'start_time': self.start_time,      
             'end_time': self.end_time,
             'roles_removed': selected_role_ids,
             'reason': self.reason,
@@ -282,52 +286,59 @@ class Suspension(discord.ui.RoleSelect):
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
 
-        data = await infchannel.find_one({'guild_id': interaction.guild.id})
-        if data:
-            channel_id = data['channel_id']
-            channel = interaction.guild.get_channel(channel_id)
+        try:
+            suschl_data = await suschannel.find_one({'guild_id': interaction.guild.id})
+            sus_channel_id = suschl_data['channel_id'] if suschl_data else None
+            data = await infchannel.find_one({'guild_id': interaction.guild.id})
+            data_channel_id = data['channel_id'] if data else None
+        except Exception as e:
+            await interaction.edit_original_response(content=f"{no} An error occurred. Please try again later.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
+            return
 
-            if channel:
-                roles_to_remove = []
+        channel = interaction.guild.get_channel(sus_channel_id) or interaction.guild.get_channel(data_channel_id)
 
-                for role_id in selected_role_ids:
-                    role = discord.utils.get(interaction.guild.roles, id=role_id)
-                    if role:
-                        roles_to_remove.append(role)
-
-                try:
-                    await channel.send(f"{self.user.mention}", embed=embed)
-                except discord.Forbidden:
-                    await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
-                    return
-
-                try:
-                    await self.user.remove_roles(*roles_to_remove, reason=self.reason)
-                except discord.Forbidden:
+        if channel:
+            try:
+                 await channel.send(f"{self.user.mention}", embed=embed, view=None, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+            except discord.Forbidden:
                     await interaction.response.edit_message(
-                        content=f"{no} {interaction.user.display_name}, I don't have permission to add roles.",
+                        content=f"{no} **{interaction.user.display_name}**, I couldn't send the suspension message in the channel please make sure I have the required permissions.",
                         view=None,
                         embed=None
-                        , allowed_mentions=discord.AllowedMentions.none()
-                    )
+                    ) 
                     return
-  
-                try:
-                 await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
-                except:
-                 print('Failed to send suspension message to user')
-                 pass
 
+            roles_to_remove = []
+            for role_id in selected_role_ids:
+                role = discord.utils.get(interaction.guild.roles, id=role_id)
+                if role:
+                    roles_to_remove.append(role)
 
-                await suspensions.insert_one(infract_data)
-                await interaction.response.edit_message(
-                    content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**",
+            try:
+                await self.user.remove_roles(*roles_to_remove, reason=self.reason)
+            except discord.Forbidden:
+                await interaction.edit_original_response(
+                    content=f"{no} {interaction.user.display_name}, I don't have permission to add roles.",
                     view=None,
-                    embed=None
+                    embed=None,
+                    allowed_mentions=discord.AllowedMentions.none()
                 )
-            else:
-                await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not set up. Please run `/config`.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
+                return
 
+            try:
+                await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None, allowed_mentions=discord.AllowedMentions.none())
+            except:
+                print('Failed to send suspension message to user')
+                pass
+
+            await suspensions.insert_one(infract_data)
+            await interaction.edit_original_response(
+                content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**",
+                view=None,
+                embed=None
+            )
+        else:
+            await interaction.edit_original_response(content=f"{no} **{interaction.user.display_name}**, the channel is not set up. Please run `/config`.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
 
 class RoleTakeAwayYesOrNo(discord.ui.View):
     def __init__(self, user, author, reason, end_time, start_time):
@@ -353,53 +364,57 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
-        infract_data = {'guild_id': interaction.guild.id,
-        'management': interaction.user.id,
-        'staff': self.user.id,
-        'action': "Suspension",
-        'start_time': self.start_time,
-        'end_time': self.end_time,
-        'reason': self.reason,
-        'active': True,
-        'notes': "`N/A`"
+        infract_data = {
+            'guild_id': interaction.guild.id,
+            'management': interaction.user.id,
+            'staff': self.user.id,
+            'action': "Suspension",
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'reason': self.reason,
+            'active': True,
+            'notes': "`N/A`"
         }     
 
-        embed = discord.Embed(title="Staff Consequences & Discipline", description=f"* **Staff Member:** {self.user.mention}\n* **Action:** Suspension\n* **Reason:** {self.reason}\n* **Duration:** <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>", color=discord.Color.dark_embed())
+        embed = discord.Embed(
+            title="Staff Consequences & Discipline",
+            description=f"* **Staff Member:** {self.user.mention}\n* **Action:** Suspension\n* **Reason:** {self.reason}\n* **Duration:** <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
+            color=discord.Color.dark_embed()
+        )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.set_author(name=f"Signed, {self.author.display_name}", icon_url=self.author.display_avatar)
 
+        try:
+            data = await infchannel.find_one({'guild_id': interaction.guild.id}) 
+            suschl = await suschannel.find_one({'guild_id': interaction.guild.id})
+            channel_id = suschl.get('channel_id') if suschl else None 
+            data_channel_id = data['channel_id'] if data else None
 
+            channel = interaction.guild.get_channel(channel_id) or interaction.guild.get_channel(data_channel_id)
 
-
-
-
-        data = await infchannel.find_one({'guild_id': interaction.guild.id})       
-        if data:
-         channel_id = data['channel_id']
-         channel = interaction.guild.get_channel(channel_id)
-
-         if channel:
-
-            
-            
-            try:
-             await channel.send(f"{self.user.mention}", embed=embed, view=None, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
-            except discord.Forbidden: 
-             await interaction.response.edit_message(content=f"{no} I don't have permission to view that channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())             
-             return
-
-
-            await suspensions.insert_one(infract_data)
-            await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())        
-            try:
-                await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None)
-            except:
-                print('Failed to send suspension message to user')
-                pass                
-         else:
-            await interaction.response.edit_message(content=f"{no} {interaction.user.display_name}, I don't have permission to view this channel.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
-        else:
-          await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, the channel is not setup please run `/config`", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
+            if channel:
+                try:
+                 await channel.send(f"{self.user.mention}", embed=embed, view=None, allowed_mentions=discord.AllowedMentions(users=True, everyone=False, roles=False, replied_user=False))
+                except discord.Forbidden:
+                    await interaction.response.edit_message(
+                        content=f"{no} **{interaction.user.display_name}**, I couldn't send the suspension message in the channel please make sure I have the required permissions.",
+                        view=None,
+                        embed=None
+                    ) 
+                    return
+                await suspensions.insert_one(infract_data)
+                await interaction.response.edit_message(content=f"{tick} **{interaction.user.display_name}**, I've suspended **@{self.user.display_name}**", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())        
+                try:
+                    await self.user.send(f"{smallarrow} From **{interaction.guild.name}**", embed=embed, view=None)
+                except:
+                    print('Failed to send suspension message to user')
+                    pass                
+            else:
+                await interaction.response.edit_message(content=f"{no} **{interaction.user.display_name}**, I couldn't find  the suspension channel. Please re-configure them using `/config`!", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
+        except Exception as e:
+            print("An error occurred:", e)
+            await interaction.response.edit_message(content=f"{no} An error occurred. Please try again later.", view=None, embed=None, allowed_mentions=discord.AllowedMentions.none())
+          
 
 class RoleTakeAwayView(discord.ui.View):
     def __init__(self, user, author, reason, end_time, start_time):

@@ -23,7 +23,7 @@ from Cogs.Configuration.Views.quotaview import QuotaAmount
 from Cogs.Configuration.Views.feedbackview import FeedbackChannel, FMoreOptions
 from Cogs.Configuration.Views.feedbackview import ToggleFeedback
 
-from Cogs.Configuration.Views.suspensionsview import ToggleSuspensions
+from Cogs.Configuration.Views.suspensionsview import ToggleSuspensions, SuspensionChannel
 
 from Cogs.Configuration.Views.partnershipsview import PartnershipChannel
 from Cogs.Configuration.Views.partnershipsview import TogglePartnerships
@@ -88,7 +88,7 @@ ApplicationsChannel = db['Applications Channel']
 ApplicationsRolesDB = db['Applications Roles']
 ReportModeratorRole = db['Report Moderator Role']
 suggestschannel2 = db["Suggestion Management Channel"]
-
+suschannel = db['Suspension Channel']
 mongo2 = MongoClient(MONGO_URL)
 db2 = mongo2['quotab']
 scollection2 = db2['staffrole']
@@ -560,14 +560,55 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Suspensions']}"            
+
+            suspensionchannelresult = suschannel.find_one({'guild_id': interaction.guild.id})
+            channelmsg = "Not Configured"
+            infractionchannelresult = infchannel.find_one({'guild_id': interaction.guild.id})
+            channels = None
+            if (
+                suspensionchannelresult
+                and suspensionchannelresult.get('channel_id')
+            ):
+             channels = interaction.guild.get_channel(suspensionchannelresult.get('channel_id'))  
+             if channels is None:
+                 channels = None      
+             else:
+                channels = [channels]  
+            else:    
+
+                if (
+                    infractionchannelresult
+                    and infractionchannelresult.get('channel_id')
+                ):
+                 channels = interaction.guild.get_channel(infractionchannelresult.get('channel_id'))  
+                if channels is None:
+                    channels = None          
+                else:
+                    channels = [channels]  
+
+            if suspensionchannelresult:    
+                channelid = suspensionchannelresult['channel_id']
+                channel = interaction.guild.get_channel(channelid)
+                if channel is None:
+                    channelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
+                else:    
+                 channelmsg = channel.mention     
+            else:
+                if infractionchannelresult:     
+                    channelid = infractionchannelresult['channel_id']
+                    channel = interaction.guild.get_channel(channelid)
+                    if channel is None:
+                        channelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
+                    else:    
+                     channelmsg = channel.mention   
             embed = discord.Embed(title="<:suspensions:1230677088181420153> Suspension Module", color=discord.Color.dark_embed())   
-            embed.add_field(name="<:settings:1207368347931516928> Suspension Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suspension Channel:** Infraction Channel\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False) 
+            embed.add_field(name="<:settings:1207368347931516928> Suspension Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suspension Channel:** {channelmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False) 
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
+            embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                      
             options = [
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]                    
-            view = SuspensionsModule(self.author, options)
+            view = SuspensionsModule(self.author, options, channels)
 
 
 
@@ -1134,9 +1175,10 @@ class FeedbackModule(discord.ui.View):
 
 
 class SuspensionsModule(discord.ui.View):
-    def __init__(self, author, options):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
-        self.add_item(ToggleSuspensions(author, options))               
+        self.add_item(ToggleSuspensions(author, options))         
+        self.add_item(SuspensionChannel(author, channels))          
         self.add_item(Config(author)) 
 
  

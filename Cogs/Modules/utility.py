@@ -304,6 +304,7 @@ class Utility(commands.Cog):
     @app_commands.allowed_installs(guilds=True, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def ping(self, interaction: discord.Interaction):
+        await interaction.response.defer()
         server_name = "Astro Birb"
         server_icon = self.client.user.display_avatar
         discord_latency = self.client.latency * 1000
@@ -314,9 +315,9 @@ class Utility(commands.Cog):
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
         if interaction.guild:
-         await interaction.response.send_message(embed=embed, view=NetWorkPage(self.client, interaction.user))    
+         await interaction.followup.send(embed=embed, view=NetWorkPage(self.client, interaction.user))    
         else:
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
         
 
 
