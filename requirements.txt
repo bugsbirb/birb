@@ -11,4 +11,3 @@ topggpy
 validators
 aiohttp
 chat_exporter
-bs4

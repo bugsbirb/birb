@@ -1,7 +1,5 @@
 
 import os
-
-
 import discord
 from discord.ext import commands, tasks
 import datetime
@@ -9,8 +7,6 @@ from emojis import *
 import os
 import random
 import asyncio
-import aiohttp
-from bs4 import BeautifulSoup
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
