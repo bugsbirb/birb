@@ -11,3 +11,6 @@ topggpy
 validators
 aiohttp
 chat_exporter
+threading
+uvicorn
+fastapi
