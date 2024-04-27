@@ -444,7 +444,7 @@ class SuspensionPanel(discord.ui.View):
                     await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})                    
                     
                 except discord.Forbidden:
-                    await interaction.edit_original_response(content=f"{no} Failed to restore roles due to insufficient permissions.", ephemeral=True)
+                    await interaction.edit_original_response(content=f"{no} Failed to restore roles due to insufficient permissions.", view=None, embed=None)
                     return
                 try:
                  await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
