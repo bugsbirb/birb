@@ -33,6 +33,21 @@ class Api(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
+    @app.get("/checkguild/{guild_id}")
+    async def check_guild(guild_id):
+        if Api.instance.client.is_ready(): 
+            guild = Api.instance.client.get_guild(int(guild_id))
+            print(guild)
+            if guild is not None:
+                return {"message": True}
+            else:
+                return {"message": False}
+        else:
+            return {"message": "Discord client is not ready"}
+            
+
+        
+    
    
     @staticmethod
     @app.get("/ping")
