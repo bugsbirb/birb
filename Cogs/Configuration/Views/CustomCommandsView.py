@@ -85,8 +85,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
           embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1167083259444875264> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
           embed.color = discord.Color.brand_red()
           await interaction.response.send_message(embed=embed, ephemeral=True)
-
-         return
+          return
         result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
         embed = interaction.message.embeds[0]
         if result:
