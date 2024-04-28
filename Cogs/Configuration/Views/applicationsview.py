@@ -26,6 +26,10 @@ ApplicationsSubChannel = db['Applications Submissions']
 ApplicationsRolesDB = db['Applications Roles']
 application = db['applications']
 options = db['module options']
+premium = db['premium']
+
+
+
 class AMoreOptions(discord.ui.Select):
     def __init__(self, author):
         self.author = author
@@ -309,9 +313,18 @@ class createapp(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
         result = await application.find_one({'guild_id': interaction.guild.id, 'name': self.name.value})
+
         if result:
             await interaction.response.send_message(f"{no} **{interaction.user.display_name},** This application already exists!", ephemeral=True)
             return
+        results = await application.find({'guild_id': interaction.guild.id}).to_list(length=None)
+        premiumresult = await premium.find_one({"guild_id": interaction.guild.id})
+        if not premiumresult:        
+         if len(results) >= 3:
+            await interaction.response.send_message(f"{no} **{interaction.user.display_name},** You can only have 3 applications!\nYou can upgrade your plan to have more applications", ephemeral=True, view=PRemium())
+            return
+            
+
         await application.insert_one({'guild_id': interaction.guild.id, 'name': self.name.value, 'saved': False})
         view = SectionButtons(author=self.author, name=self.name.value)
         embed = discord.Embed(title="Application Builder", description="No added sections...", color=discord.Colour.dark_embed())
@@ -893,6 +906,8 @@ async def refreshembed(interaction: discord.Interaction):
 
             staffroleresult = await ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
             moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
+            applications = await application.find({'guild_id': interaction.guild.id}).to_list(length=None)
+
 
             approlemsg = "Not Configured"
             subchannelmsg = "Not Configured"
@@ -926,12 +941,18 @@ async def refreshembed(interaction: discord.Interaction):
                     appchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:
                     appchannelmsg = channel.mention
+            premiumresult = await premium.find_one({'guild_id': interaction.guild.id})
+            if premiumresult:
+                premiummsg = "∞"
+            else:
+                premiummsg = 3
+
 
             embed = discord.Embed(title="<:Application:1224722901328986183> Applications Module",
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
-                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replymiddle}**Application Roles:** {approlemsg}\n{replybottom}**Applications:** {len(applications)}/{premiummsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -941,3 +962,7 @@ async def refreshembed(interaction: discord.Interaction):
              await interaction.message.edit(embed=embed)
             except discord.Forbidden:
                 print("Couldn't edit module due to missing permissions.") 
+class PRemium(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership/membership"))

@@ -25,7 +25,7 @@ modules = db['Modules']
 customcommands = db['Custom Commands']
 commandslogging = db['Commands Logging']
 
-
+premium = db['premium']
 class CmdUsageChannel(discord.ui.ChannelSelect):
     def __init__(self, author, channels):
         super().__init__(placeholder='Command Usage Logging', channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels)
@@ -77,12 +77,14 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
 
     async def on_submit(self, interaction: discord.Interaction):
         amount = await customcommands.count_documents({"guild_id": interaction.guild.id})
-        if amount >= 25:
-         embed = discord.Embed()
-         embed.title = f"{redx} {amount}/25"
-         embed.description="You have reached the maximum amount of custom commands."
-         embed.color = discord.Color.brand_red()
-         await interaction.response.send_message(embed=embed, ephemeral=True)
+        premiumresult = await premium.find_one({"guild_id": interaction.guild.id})
+        if not premiumresult:
+         if amount >= 10:
+          embed = discord.Embed()
+          embed.title = f"{redx} {amount}/10"
+          embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1167083259444875264> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
+          embed.color = discord.Color.brand_red()
+          await interaction.response.send_message(embed=embed, ephemeral=True)
 
          return
         result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})

@@ -22,7 +22,7 @@ partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
 options = db['module options']
 promotionroles = db['promotion roles']
-
+premium = db['premium']
 class Promotionchannel(discord.ui.ChannelSelect):
     def __init__(self, author, channels):
         super().__init__(placeholder='Promotion Channel',   channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels)
@@ -71,8 +71,16 @@ class Promotionrank(discord.ui.Select):
 
 
     async def callback(self, interaction: discord.Interaction):
+        ranks = await promotionroles.find({'guild_id': interaction.guild.id}).to_list(length=None)
+
         selected = self.values[0]
         if selected == 'Create':
+             premiumresult = await premium.find_one({'guild_id': interaction.guild.id})
+             if not premiumresult:
+              if len(ranks) >= 10:
+                  view = PRemium()
+                  return await interaction.response.send_message(content=f"{no} {interaction.user.display_name}, you can only have 10 promotion ranks to upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!", view=view)
+                
              view = discord.ui.View(timeout=None)
              view.add_item(PromotionRanks(self.author))
              await interaction.response.send_message(content=f"{dropdown} Now select the rank you want to manage.", view=view, ephemeral=True)
@@ -81,16 +89,21 @@ class Promotionrank(discord.ui.Select):
              view.add_item(DeleteRank(self.author))
              await interaction.response.send_message(content=f"{dropdown} Now select the rank you want to delete.", view=view, ephemeral=True)
         elif selected == 'View':
-            ranks = promotionroles.find({'guild_id': interaction.guild.id})
             
-            embed = discord.Embed(title="Promotion Ranks")
-            embed.set_thumbnail(url=interaction.guild.icon)
+            
+            amount = len(ranks)
+            premiumresult = await premium.find_one({'guild_id': interaction.guild.id})
+            if premiumresult:
+                maxamount = "∞"
+            else:
+                maxamount = "10"    
 
+            embed = discord.Embed(title=f"Promotion Ranks [{amount}/{maxamount}]")
+            embed.set_thumbnail(url=interaction.guild.icon)            
             if ranks is None:
-                embed.description = "There is no current promotion ranks."
-            ranks = await ranks.to_list(None)       
+                embed.description = "There is no current promotion ranks."             
             if ranks:         
-             for rank in ranks:
+             for rank in ranks[:25]:
                 role = interaction.guild.get_role(rank['rank'])
                 roles = [interaction.guild.get_role(role_id) for role_id in rank['promotionranks'] if interaction.guild.get_role(role_id)]
                 if roles:
@@ -102,6 +115,10 @@ class Promotionrank(discord.ui.Select):
 
              
                   
+class PRemium(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership"))
 
 class PromotionRanks(discord.ui.RoleSelect):
     def __init__(self, author):

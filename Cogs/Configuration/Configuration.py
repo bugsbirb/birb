@@ -62,7 +62,7 @@ from Cogs.Configuration.Views.qotdview import QOTDChannel, PingRole, ToggleQOTD
 from Cogs.Configuration.Views.welcomeview import WelcomeChannel, Welcomemessage, ToggleWelcome
 
 MONGO_URL = os.getenv('MONGO_URL')
-
+import pymongo
 
 
 mongo = MongoClient(MONGO_URL)
@@ -76,7 +76,7 @@ repchannel = db['report channel']
 loachannel = db['loa channel']
 promochannel = db['promo channel']
 feedbackch = db['Staff Feedback Channel']
-
+application = db['applications']
 appealable = db['Appeal Toggle']
 appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
@@ -106,6 +106,7 @@ welcome = db['welcome settings']
 ApplicationsSubChannel = db['Applications Submissions']
 options = db['module options']
 qotds = db['qotd']
+premium = db['premium']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author, roles):
 
@@ -378,8 +379,13 @@ class Config(discord.ui.Select):
                  channels = []          
              else:
                 channels = [channels]    
+            premiumresult = premium.find_one({'guild_id': interaction.guild.id})
+            if premiumresult:
+                maxamount = "∞"
+            else:
+                maxamount = "15"
             embed = discord.Embed(title="<:Infraction:1223063128275943544> Infractions Module",  color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/{maxamount}]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             view = InfractModule(self.author, options, channels)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                 
@@ -727,6 +733,7 @@ class Config(discord.ui.Select):
 
             staffroleresult = ApplicationsRolesDB.find_one({'guild_id': interaction.guild.id})
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})
+            applications = application.find({'guild_id': interaction.guild.id})
 
             approlemsg = "Not Configured"
             subchannelmsg = "Not Configured"
@@ -761,12 +768,19 @@ class Config(discord.ui.Select):
                     appchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:
                     appchannelmsg = channel.mention
-
+            premiumresult = premium.find_one({'guild_id': interaction.guild.id})
+            if premiumresult:
+                premiummsg = "∞"
+            else:
+                premiummsg = 3
             embed = discord.Embed(title="<:Application:1224722901328986183> Applications Module",
                                    description=f"",
                                    color=discord.Color.dark_embed())
+            applications_count = len(list(applications.sort('field', pymongo.ASCENDING)))
+
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
-                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replybottom}**Application Roles:** {approlemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            
+                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replymiddle}**Application Roles:** {approlemsg}\n{replybottom}**Applications:** {applications_count}/{premiummsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -866,6 +880,7 @@ class Config(discord.ui.Select):
         elif color == 'Custom Commands':
             commands = customcommands.find({'guild_id': interaction.guild.id})
             moduledata = modules.find_one({'guild_id': interaction.guild.id})
+            premiumresult = premium.find_one({'guild_id': interaction.guild.id})
             modulemsg = 'False'
             if moduledata:
                 modulemsg = moduledata.get('customcommands', 'False')
@@ -881,9 +896,12 @@ class Config(discord.ui.Select):
 
 
 
-
+            if premiumresult:
+                maxamount = "∞"
+            else:
+                maxamount = "25"    
             amount = customcommands.count_documents({'guild_id': interaction.guild.id})
-            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
+            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/{maxamount})", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             embed.add_field(name="<:settings:1207368347931516928> Custom Commands Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Logging Channel:** {loggingmsg}")
@@ -893,7 +911,9 @@ class Config(discord.ui.Select):
                     permissions = "None"
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=False)
+                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=True)
+                if len(embed.fields) >= 25:
+                    break
             options = [
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]   
