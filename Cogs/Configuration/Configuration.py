@@ -899,7 +899,7 @@ class Config(discord.ui.Select):
             if premiumresult:
                 maxamount = "∞"
             else:
-                maxamount = "25"    
+                maxamount = "10"    
             amount = customcommands.count_documents({'guild_id': interaction.guild.id})
             embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/{maxamount})", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
