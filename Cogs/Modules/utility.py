@@ -15,7 +15,7 @@ db = mongo['astro']
 badges = db['User Badges']
 modules = db['Modules']
 
-
+premium = db['premium']
 
 class SetupGuide(discord.ui.Select):
     def __init__(self, author):
@@ -359,6 +359,44 @@ class Utility(commands.Cog):
     async def invite(self, interaction: discord.Interaction):
      view = invite()
      await interaction.response.send_message(view=view)
+    
+
+
+    @commands.hybrid_command(description="Buy or manage your premium!")
+    async def premium(self, ctx: commands.Context):
+        await ctx.defer(ephemeral=True)
+
+        result = await premium.find_one({'user_id': ctx.author.id})
+        if result is None:
+            embed = discord.Embed(title="", description="## 🎁Premium Benefits\n* More infraction Types\n* More Promotion Ranks\n* More Custom Commands\n* /infraction multiple command (You can infract multiple staff members using one command which is good for activity strikes.)\n* Premium Badge on /user\n* More Applications\n* Premium Hangout\n\nWith more to come....", color=discord.Color.dark_embed())
+            embed.set_thumbnail(url=self.client.user.display_avatar)
+            view = PRemium()
+            await ctx.send(embed=embed, view=view)
+            return
+        view = PremiumButtons()        
+        server_name = "None"
+        guild_id = result.get('guild_id')
+        if guild_id:
+            view.disable.disabled = False
+            view.enable.disabled = True
+            guild = self.client.get_guild(guild_id)
+            if guild:
+                server_name = guild.name
+                
+
+
+        embed = discord.Embed(title="Premium Portal", description=f"* **Server**: {server_name}", color=discord.Color.dark_embed())
+        embed.set_thumbnail(url=ctx.author.display_avatar)
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar)
+
+
+
+        
+        await ctx.send(embed=embed, view=view)
+
+
+
+
 
 
     @app_commands.command(name='vote',description="❤️ Support Astro Birb!")
@@ -410,6 +448,44 @@ class Utility(commands.Cog):
                 ret += 1
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
+class PremiumButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+
+    @discord.ui.button(label="Upgrade a server", emoji="<:sparkle:1233931758089666695>", style=discord.ButtonStyle.blurple)
+    async def enable(self, interaction: discord.Interaction, button: discord.Button):
+        await interaction.response.send_modal(EnableAServer())
+
+    @discord.ui.button(label="Deactive Premium Server", style=discord.ButtonStyle.danger, disabled=True)    
+    async def disable(self, interaction: discord.Interaction, button: discord.Button):
+        await premium.update_one({'user_id': interaction.user.id}, {'$set': {'guild_id': None}})
+        await interaction.response.edit_message(content=f"{tick} I've deactivated the servers premium for you!", embed=None, view=None)
+     
+        
+
+class EnableAServer(discord.ui.Modal):
+    def __init__(self):
+        super().__init__(title="Upgrade A Server")
+
+    serverid = discord.ui.TextInput(label="Whats the server ID?")   
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        server_id = int(self.serverid.value)
+        result = await premium.find_one({'guild_id': server_id, 'user_id': interaction.user.id})
+        if result:
+            await interaction.response.send_message(f"{no} This server already has premium!")
+            return
+        await premium.update_one({'user_id': interaction.user.id}, {'$set': {'guild_id': server_id}})
+        await interaction.response.edit_message(content=f"{tick} Successfully upgraded the server!", embed=None, view=None)
+
+        
+
+
+class PRemium(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb"))
+
 
 class NetWorkPage(discord.ui.View):
     def __init__(self, client, author):

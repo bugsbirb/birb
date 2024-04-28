@@ -21,6 +21,7 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
+premium = db['premium']
 
 nfractiontypes = db['infractiontypes']
 infractiontypeactions = db['infractiontypeactions']
@@ -386,8 +387,11 @@ class CreateInfractionModal(discord.ui.Modal):
         infractiontypesresult = await nfractiontypes.find_one({'guild_id': interaction.guild.id})
 
         infractiontypescount = len(infractiontypesresult['types'])
-        if infractiontypescount >= 15:
-            return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, You have reached the maximum amount of infraction types (15)", ephemeral=True)
+        premiumresult = await premium.find_one({'guild_id': interaction.guild.id})
+
+        if not premiumresult:
+         if infractiontypescount >= 15:
+            return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, You have reached the maximum amount of infraction types (15) but to upgrade you can [**buy premium**](https://patreon.com/astrobirb/membership)!", ephemeral=True)
         if types:
             return await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, Infraction type already exists", ephemeral=True)
 
@@ -470,8 +474,13 @@ async def refreshembed(self, interaction: discord.Interaction):
             infractiontypescount = len(infractiontyperesult['types'])
             if infractiontypescount is None:
                 infractiontypess = "0"
+            premiumresult = await premium.find_one({'guild_id': interaction.guild.id})
+            if premiumresult:
+                maxamount = "∞"
+            else:
+                maxamount = "15"                
             embed = discord.Embed(title="<:Infraction:1223063128275943544> Infractions Module",  color=discord.Color.dark_embed())
-            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/15]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
+            embed.add_field(name="<:settings:1207368347931516928> Infractions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Infraction Channel:** {infchannelmsg}\n{replybottom}**Infraction Types [{infractiontypescount}/{maxamount}]** {infractiontypess}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    
             

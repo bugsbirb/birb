@@ -18,6 +18,7 @@ reports = db['Reports']
 ReportModeratorRole = db['Report Moderator Role']
 scollection = db['staffrole']
 arole = db['adminrole']
+premium = db['premium']
 
 class MuteReason(discord.ui.Modal, title='Reason'):
     def __init__(self, embed, messageid, message):
@@ -382,6 +383,7 @@ class ReportPanel(discord.ui.View):
        embed.color = discord.Color.brand_red()
        embed.set_footer(text=f"Ignored by {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
        await interaction.response.edit_message(embed=embed, view=None)
+
 
 
 

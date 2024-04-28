@@ -18,7 +18,7 @@ blacklists = db['blacklists']
 modules = db['Modules']
 customroles = db['customroles']
 modules = db['Modules']
-
+premium = db['premium']
 
 class management(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -44,8 +44,21 @@ class management(commands.Cog):
         await badges.delete_one(badge)
         await ctx.send(f"{tick} removed **`{badge}`** to **@{user.display_name}**")
 
+    @commands.command()
+    @commands.is_owner()
+    async def givepremium(self, ctx, user: discord.User):
+        await premium.insert_one({'user_id': user.id})
+        await ctx.send(f"{tick} I've succesfully given {user.display_name} premium!")
 
-    
+    @commands.command()
+    @commands.is_owner()
+    async def removepremium(self, ctx, user: discord.User):
+        result = await premium.delete_one({'user_id': user.id})
+        if result.deleted_count == 0:
+            await ctx.send(f"{no} this user does not have premium.")
+            return
+        await ctx.send(f"{tick} I've removed premium from **@{user.display_name}**")   
+         
     @commands.command()
     @commands.is_owner()
     async def analytics(self, ctx: commands.Context):

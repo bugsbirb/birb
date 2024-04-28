@@ -13,6 +13,8 @@ db = mongo['astro']
 ReportModeratorRole = db['Report Moderator Role']
 scollection = db['staffrole']
 arole = db['adminrole']
+premiums = db['premium']
+
 
 
 async def has_staff_role(ctx):
@@ -51,6 +53,16 @@ async def has_staff_role(ctx):
          return
     await ctx.send(f"{no} **{ctx.author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`", allowed_mentions=discord.AllowedMentions.none())
     return False
+
+
+async def premium(ctx):
+    result = await premiums.find_one({'guild_id': ctx.guild.id})
+    if result:
+        return True
+    else:
+        return False
+
+
 
 
 
