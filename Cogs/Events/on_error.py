@@ -15,12 +15,17 @@ class On_error(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
     
+
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         if isinstance(error, commands.CommandNotFound):
-            pass
-        else:
-            print("[INFO] Not a command.")
+            return
+        if isinstance(error, commands.NotOwner):
+            return
+        if isinstance(error, commands.MemberNotFound):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, that member isn't in the server.")
+            return
         if isinstance(error, commands.MissingPermissions):
             return
         if isinstance(error, commands.MissingRequiredArgument):
@@ -28,6 +33,7 @@ class On_error(commands.Cog):
             return
         if isinstance(error, commands.BadArgument):
             return
+
         if ctx.guild is None:
             return
         error_id = ''.join(random.choices(string.digits, k=24))
@@ -38,7 +44,9 @@ class On_error(commands.Cog):
         embed = discord.Embed(title="<:x21:1214614676772626522> Command Error", description=f"Error ID: `{error_id}`", color=discord.Color.brand_red())
         await ctx.send(embed=embed, view=view)
         return
-        
+           
+
+
 
 
 

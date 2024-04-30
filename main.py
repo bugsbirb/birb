@@ -96,6 +96,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.analytics",
             "Cogs.Events.welcome",
             "Cogs.Modules.datamanage",
+            "Cogs.Events.on_error",
 
             'Cogs.Events.qotd',
             'api'
@@ -109,6 +110,10 @@ class client(commands.AutoShardedBot):
         print("[🔄] Jishaku Loaded")
 
     async def get_prefix(self, message: discord.Message) -> tasks.List[str] | str:
+        if message.guild is None:
+           return '!!'
+        if message.author.bot:
+           return None
         prefixdb = db['prefixes']
         prefixresult = await prefixdb.find_one({'guild_id': message.guild.id})
         if prefixresult:
