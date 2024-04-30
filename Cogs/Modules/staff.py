@@ -346,7 +346,7 @@ class quota(commands.Cog):
                 if message_count >= message_quota:
                     emoji = "`LOA`" if has_loa_role else "<:Confirmed:1122636234255253545>"
                 else:
-                    emoji = "`LOA`" if has_loa_role else "<:Cancelled:1122637466353008810>"
+                    emoji = "`LOA`" if has_loa_role else f"{redxbox}"
 
                 leaderboard_description += f"* `{rank}` • {member.display_name} • {message_count} messages\n> **Passed:** {emoji}\n\n"
                 rank += 1
