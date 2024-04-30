@@ -220,7 +220,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1234998406938755122>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
         discord.SelectOption(label="Utility", value="Utility", emoji="<:utility:1234994834763419769>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
-        discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
+        discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1235000485208002610>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
         discord.SelectOption(label="Reports", value="Reports", emoji="<:reports:1224723845726998651>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Reports': True}) else "Disabled"),
         discord.SelectOption(label="Applications", value="Applications", emoji="<:Application:1224722901328986183>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Applications': True}) else "Disabled")
@@ -423,7 +423,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Utility']}"            
-            embed = discord.Embed(title="<:Pen:1126527802255085628> Utilties Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:Pen:1235001839036923996> Utilties Module", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
             options = [
@@ -568,7 +568,7 @@ class Config(discord.ui.Select):
                     feedbackchannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else:    
                  feedbackchannelmsg = channel.mention                
-            embed = discord.Embed(title="<:stafffeedback:1230678746864947240> Staff Feedback Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:stafffeedback:1235000485208002610> Staff Feedback Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Staff Feedback Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Feedback Channel:** {feedbackchannelmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             options = [
               discord.SelectOption(label="Enabled"),

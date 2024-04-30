@@ -474,7 +474,7 @@ class NoEmbeds(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=view)
      
 
-    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
+    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1235001839036923996>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -550,7 +550,7 @@ class Embeds(discord.ui.View):
         super().__init__()     
         self.author = author
 
-    @discord.ui.button(label='Remove Embed', style=discord.ButtonStyle.blurple, emoji="<:bin:1160543529542635520>")
+    @discord.ui.button(label='Remove Embed', style=discord.ButtonStyle.blurple, emoji="<:bin:1235001855721865347>")
     async def removeembed(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -559,7 +559,7 @@ class Embeds(discord.ui.View):
 
         await interaction.response.edit_message(embed=None, view=NoEmbeds(interaction.user))        
 
-    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1126527802255085628>")
+    @discord.ui.button(label='Content', style=discord.ButtonStyle.blurple, emoji="<:Pen:1235001839036923996>")
     async def context(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",

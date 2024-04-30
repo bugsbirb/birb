@@ -462,7 +462,7 @@ class SuspensionPanel(discord.ui.View):
                     await interaction.edit_original_response(content=f"{no} Failed to restore roles due to insufficient permissions.", view=None, embed=None)
                     return
                 try:
-                 await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
+                 await member.send(f"<:bin:1235001855721865347> Your suspension has been voided **@{interaction.guild.name}**")
                 except discord.Forbidden: 
                     print('Failed to send suspension message to user')
                     pass 
@@ -471,7 +471,7 @@ class SuspensionPanel(discord.ui.View):
             await suspensions.delete_one({'guild_id': interaction.guild.id, 'staff': self.user.id})
             await interaction.response.edit_message(content=f"{tick} Suspension has been voided.", embed=None, view=None)
             try:
-             await member.send(f"<:bin:1160543529542635520> Your suspension has been voided **@{interaction.guild.name}**")
+             await member.send(f"<:bin:1235001855721865347> Your suspension has been voided **@{interaction.guild.name}**")
              print('Failed to send suspension message to user')
             except discord.Forbidden: 
                 pass

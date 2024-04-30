@@ -570,7 +570,7 @@ class LOAPanel(discord.ui.View):
                 loanotification
                 and loanotification.get('LOAAlerts', "Enabled") == "Enabled"
             ):            
-             await user.send(f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided.")
+             await user.send(f"<:bin:1235001855721865347> Your LOA **@{self.guild.name}** has been voided.")
         except discord.Forbidden:
             print('Failed to send a DM to user. Continuing... (LOA Manage)')
             return

@@ -845,7 +845,7 @@ class AdminPanelCog(commands.Cog):
         )
 
         embed = discord.Embed(
-            title=f"<:stats:1199023533938970827> {ctx.author.display_name}'s Stats",
+            title=f"<:stats:1235000500747898892> {ctx.author.display_name}'s Stats",
             description=f"",
             color=discord.Color.dark_embed(),
         )
@@ -1230,7 +1230,7 @@ class Return(discord.ui.View):
     @discord.ui.button(
         label="Return",
         style=discord.ButtonStyle.grey,
-        emoji="<:Return:1166514220960063568>",
+        emoji="<:Return:1235001628952887418>",
         row=2
     )
     async def Return77(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -1329,7 +1329,7 @@ class LOAPanel(discord.ui.View):
                         return
         try:
             await user.send(
-                f"<:bin:1160543529542635520> Your LOA **@{self.guild.name}** has been voided."
+                f"<:bin:1235001855721865347> Your LOA **@{self.guild.name}** has been voided."
             )
         except discord.Forbidden:
             pass
@@ -1348,7 +1348,7 @@ class LOAPanel(discord.ui.View):
     @discord.ui.button(
         label="Return",
         style=discord.ButtonStyle.grey,
-        emoji="<:Return:1166514220960063568>",
+        emoji="<:Return:1235001628952887418>",
     )
     async def Return2(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1433,7 +1433,7 @@ class LOACreate(discord.ui.View):
     @discord.ui.button(
         label="Return",
         style=discord.ButtonStyle.grey,
-        emoji="<:Return:1166514220960063568>",
+        emoji="<:Return:1235001628952887418>",
     )
     async def Return3(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1501,7 +1501,7 @@ class RevokeInfraction(discord.ui.View):
     @discord.ui.button(
         label="Void Infraction",
         style=discord.ButtonStyle.grey,
-        emoji="<:bin:1160543529542635520>",
+        emoji="<:bin:1235001855721865347>",
     )
     async def InfractionRevoke(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1526,7 +1526,7 @@ class RevokeInfraction(discord.ui.View):
     @discord.ui.button(
         label="Return",
         style=discord.ButtonStyle.grey,
-        emoji="<:Return:1166514220960063568>",
+        emoji="<:Return:1235001628952887418>",
     )
     async def Return3(
         self, interaction: discord.Interaction, button: discord.ui.Button

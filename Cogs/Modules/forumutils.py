@@ -444,7 +444,7 @@ class ForumsManage(discord.ui.View):
        
         
 
-    @discord.ui.button(label='Delete', style=discord.ButtonStyle.red,  emoji="<:bin:1160543529542635520>")
+    @discord.ui.button(label='Delete', style=discord.ButtonStyle.red,  emoji="<:bin:1235001855721865347>")
     async def Delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:

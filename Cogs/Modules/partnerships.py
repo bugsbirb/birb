@@ -102,7 +102,7 @@ class Partnerships(commands.Cog):
           guild_id = "Unknown" if guild is None or guild.id is None else guild.id
           icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
           invite = "Unknown" if guild is None or invited.url is None else invited.url
-          embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {respresentive.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
+          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {respresentive.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
           embed.set_author(name=guild_name, icon_url=icon_url)
           embed.set_thumbnail(url=guild.icon.url)
           try:
@@ -164,7 +164,7 @@ class Partnerships(commands.Cog):
           icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
 
           invite = "Unknown" if guild is None or invite.url is None else invite.url
-          embed = discord.Embed(title="<:Partner:1162135285031772300> Partnership Terminated", description=f"\n**Logged By:** {admin.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}\n**Reason:** {reason}", color=discord.Color.dark_embed())
+          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Terminated", description=f"\n**Logged By:** {admin.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}\n**Reason:** {reason}", color=discord.Color.dark_embed())
           embed.set_author(name=guild_name, icon_url=icon_url)
           embed.set_thumbnail(url=icon_url)
           try:
@@ -217,7 +217,7 @@ class Partnerships(commands.Cog):
          admin_mention = "Unknown" if admin is None or admin.mention is None else admin.mention
          owner_mention = "Unknown" if owner is None or owner.mention is None else owner.mention
          embed = discord.Embed(
-            title="<:Partner:1162135285031772300> Partnership Logged",
+            title="<:Partner:1235001453861535825> Partnership Logged",
             description=f"\n**Logged By:** {admin_mention}\n"
                         f"**Owner:** {owner_mention}\n"
                         f"**Server:** {guild_name}\n"

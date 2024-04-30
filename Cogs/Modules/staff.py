@@ -128,7 +128,7 @@ class StaffManage(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True) 
        await interaction.response.send_modal(RemovedMessage(self.staff_id))     
 
-    @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.blurple, row=2, emoji="<:Pen:1126527802255085628>")
+    @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.blurple, row=2, emoji="<:Pen:1235001839036923996>")
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
        if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -138,7 +138,7 @@ class StaffManage(discord.ui.View):
 
 
 
-    @discord.ui.button(label='Reset Messages', style=discord.ButtonStyle.red, row=2, emoji="<:bin:1160543529542635520>")
+    @discord.ui.button(label='Reset Messages', style=discord.ButtonStyle.red, row=2, emoji="<:bin:1235001855721865347>")
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
        staff_id = self.staff_id
        if interaction.user.id != self.author.id:

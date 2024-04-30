@@ -30,7 +30,7 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
             discord.SelectOption(label="LOA", emoji=f"{loa}"),
-            discord.SelectOption(label="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>"),         
+            discord.SelectOption(label="Staff Feedback", emoji="<:stafffeedback:1235000485208002610>"),         
             discord.SelectOption(label="Partnerships", emoji="<:partnerships:1224724406144733224>"),   
             discord.SelectOption(label="Applications Results", emoji="<:Application:1224722901328986183>"), 
             discord.SelectOption(label="Suspensions", emoji="<:suspensions:1234998406938755122>"),
@@ -528,7 +528,7 @@ class NetWorkPage(discord.ui.View):
             urguild = ""
             if shard_id == interaction.guild.shard_id:
                 urguild = "(This Guild)"
-            embed.add_field(name=f"<:pingpong:1227283504501358715> Shard {shard_id} {urguild}", value=shard_info, inline=False)        
+            embed.add_field(name=f"<:pingpong:1235001064294449232> Shard {shard_id} {urguild}", value=shard_info, inline=False)        
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
         await interaction.response.edit_message(
@@ -575,7 +575,7 @@ class ShardsPage(discord.ui.View):
     @discord.ui.button(
         label="Shards",
         style=discord.ButtonStyle.blurple,
-        emoji="<:pingpong:1227283504501358715>")
+        emoji="<:pingpong:1235001064294449232>")
     async def shards(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.edit_message(content="")
 
