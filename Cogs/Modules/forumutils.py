@@ -381,7 +381,7 @@ class Forums(commands.Cog):
     @commands.has_guild_permissions(administrator=True)
 
     async def manage(self, ctx: commands.Context):   
-       embed = discord.Embed(title="<:forum:1162134180218556497> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
+       embed = discord.Embed(title="<:forum:1223062562782838815> Forum Message Manager", description="When an individual opens a forum post, a forum message is automatically posted", color=discord.Color.dark_embed())
        async for result in forumsconfig.find({"guild_id": ctx.guild.id}):
         role = result['role']
         
@@ -466,7 +466,7 @@ class Embed(discord.ui.View):
 
 
 
-    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
+    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1223062929709203487>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -476,7 +476,7 @@ class Embed(discord.ui.View):
         await interaction.response.send_modal(Title())
 
 
-    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
+    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1223062677572812920>")
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -485,7 +485,7 @@ class Embed(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Description())
 
-    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -494,7 +494,7 @@ class Embed(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Thumbnail())
 
-    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Images(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -512,7 +512,7 @@ class Embed(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Colour())        
 
-    @discord.ui.button(label='Ping', style=discord.ButtonStyle.grey, emoji="<:Role:1162074735803387944>")
+    @discord.ui.button(label='Ping', style=discord.ButtonStyle.grey, emoji="<:Role:1223077527984144474>")
     async def Ping(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:

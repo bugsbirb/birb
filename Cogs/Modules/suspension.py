@@ -83,9 +83,9 @@ class Suspensions(commands.Cog):
 
         start_time = datetime.now()
         end_time = start_time + timedelta(seconds=duration_seconds)
-        embed = discord.Embed(title="", description="<:Tip:1167083259444875264> **TIP:** Make sure the bot has permissions to send messages to the channel & to removes roles.", color=discord.Color.light_embed())
+        embed = discord.Embed(title="", description="<:Tip:1223062864793702431> **TIP:** Make sure the bot has permissions to send messages to the channel & to removes roles.", color=discord.Color.light_embed())
         view = RoleTakeAwayYesOrNo(staff, ctx.author, reason, end_time, start_time)
-        await ctx.send("<:Role:1162074735803387944> Would you like to **remove roles** from this person? Don't worry the roles will be **returned** after suspension.", view=view, embed=embed)
+        await ctx.send("<:Role:1223077527984144474> Would you like to **remove roles** from this person? Don't worry the roles will be **returned** after suspension.", view=view, embed=embed)
 
     @commands.hybrid_group()    
     async def suspension(self, ctx: commands.Context):
@@ -356,7 +356,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         view = RoleTakeAwayView(self.user, self.author, self.reason, self.end_time, self.start_time)
-        await interaction.response.edit_message(content="<:Role:1162074735803387944> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
+        await interaction.response.edit_message(content="<:Role:1223077527984144474> Select the **roles** that will be removed & then given back after the suspension is over.", embed=None, view=view, allowed_mentions=discord.AllowedMentions.none())
 
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
     async def No(self, interaction: discord.Interaction, button: discord.ui.Button):

@@ -460,7 +460,7 @@ class SectionButtons(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section5(author=self.author, name=self.name))
 
-    @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji="<:Role:1162074735803387944>")
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji="<:Role:1223077527984144474>")
     async def role(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -470,7 +470,7 @@ class SectionButtons(discord.ui.View):
         view.add_item(RequiredRoles(self.author, self.name))
         await interaction.response.send_message(view=view, ephemeral=True)
     
-    @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji="<:Role:1162074735803387944>")
+    @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji="<:Role:1223077527984144474>")
     async def acceptedroles(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
@@ -952,7 +952,7 @@ async def refreshembed(interaction: discord.Interaction):
                                    description=f"",
                                    color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
-                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replymiddle}**Application Roles:** {approlemsg}\n{replybottom}**Applications:** {len(applications)}/{premiummsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+                            value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replymiddle}**Application Roles:** {approlemsg}\n{replybottom}**Applications:** {len(applications)}/{premiummsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
@@ -965,4 +965,4 @@ async def refreshembed(interaction: discord.Interaction):
 class PRemium(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership/membership"))
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1223062864793702431>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership/membership"))

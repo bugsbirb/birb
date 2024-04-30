@@ -23,8 +23,8 @@ class SetupGuide(discord.ui.Select):
         options = [
             discord.SelectOption(label="Basic Settings", emoji="<:Help:1184535847513624586>"),
             discord.SelectOption(label="Message Quota", emoji="<:quota:1230677565098950696>"),
-            discord.SelectOption(label="Modmail", emoji="<:Mail:1162134038614650901>"),
-            discord.SelectOption(label="Forums", emoji="<:forum:1162134180218556497>"),
+            discord.SelectOption(label="Modmail", emoji="<:Mail:1223063198740250774>"),
+            discord.SelectOption(label="Forums", emoji="<:forum:1223062562782838815>"),
             discord.SelectOption(label="Tags", emoji="<:tags:1230676625226727424>"),
             discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
@@ -310,7 +310,7 @@ class Utility(commands.Cog):
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+        embed = discord.Embed(title="<:Network:1223063016677838878> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
 
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
@@ -484,7 +484,7 @@ class EnableAServer(discord.ui.Modal):
 class PRemium(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb"))
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1223062864793702431>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb"))
 
 
 class NetWorkPage(discord.ui.View):
@@ -504,7 +504,7 @@ class NetWorkPage(discord.ui.View):
     @discord.ui.button(
         label="Network",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Network:1184525553294905444>")
+        emoji="<:Network:1223063016677838878>")
     async def network(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.edit_message(content="")
 
@@ -566,7 +566,7 @@ class ShardsPage(discord.ui.View):
         discord_latency = self.client.latency * 1000
         discord_latency_message = f"**Latency:** {discord_latency:.0f}ms"
         database_status = await self.check_database_connection()
-        embed = discord.Embed(title="<:Network:1184525553294905444> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
+        embed = discord.Embed(title="<:Network:1223063016677838878> Network Information", description=f"{discord_latency_message}\n**Database:** {database_status}\n**Uptime:** <t:{int(self.client.launch_time.timestamp())}:R>", color=0x2b2d31)
 
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)

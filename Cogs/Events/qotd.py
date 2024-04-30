@@ -95,7 +95,7 @@ class qotd(commands.Cog):
                 if results.get('pingrole'):
                     pingmsg = f"<@&{results.get('pingrole')}>"
 
-                embed = discord.Embed(title="<:Tip:1167083259444875264> Question of the Day", description=f"{selected_response}", color=discord.Color.yellow(), timestamp=datetime.datetime.now())
+                embed = discord.Embed(title="<:Tip:1223062864793702431> Question of the Day", description=f"{selected_response}", color=discord.Color.yellow(), timestamp=datetime.datetime.now())
                 embed.set_footer(text=f"Day #{len(results.get('messages', ['none']))}", icon_url="https://cdn.discordapp.com/emojis/1231270156647403630.webp?size=96&quality=lossless")
                 try:
                  msg = await channel.send(pingmsg, embed=embed)

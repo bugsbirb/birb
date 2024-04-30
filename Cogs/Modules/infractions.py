@@ -88,7 +88,7 @@ class Infractions(commands.Cog):
     async def infraction_multiple(self, ctx: commands.Context,  action: discord.ext.commands.Range[str, 1, 200], *, reason: discord.ext.commands.Range[str, 1, 2000], notes="", expiration: Optional[str] = None, anonymous: Optional[Literal['True']] = None):
        if not await premium(ctx):
           view = PRemium()
-          return await ctx.send(f"<:Tip:1167083259444875264> **{ctx.author.display_name}**, you need to buy premium to use this feature!", allowed_mentions=discord.AllowedMentions.none(), view=view)
+          return await ctx.send(f"<:Tip:1223062864793702431> **{ctx.author.display_name}**, you need to buy premium to use this feature!", allowed_mentions=discord.AllowedMentions.none(), view=view)
        if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the infraction module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
 
@@ -1030,7 +1030,7 @@ class InfractionMultiple(discord.ui.UserSelect):
 class PRemium(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1167083259444875264>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership"))
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1223062864793702431>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb/membership"))
 
 
        
@@ -1039,7 +1039,7 @@ class InfractionIssuer(discord.ui.View):
         super().__init__()
 
 
-    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1166508151290462239>")
+    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1223062579346145402>")
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
            

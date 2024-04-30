@@ -275,7 +275,7 @@ class PromotionIssuer(discord.ui.View):
         super().__init__()
 
 
-    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1166508151290462239>")
+    @discord.ui.button(label=f"", style=discord.ButtonStyle.grey, disabled=True, emoji="<:flag:1223062579346145402>")
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
 async def setup(client: commands.Bot) -> None:

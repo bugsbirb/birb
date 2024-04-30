@@ -58,7 +58,7 @@ class suggestions(commands.Cog):
             embed.set_image(url=image.url)
         embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
         embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.name)
-        embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value="0 <:UpVote:1183063056834646066> | 0 <:DownVote:1183063097477451797>")
+        embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value="0 <:UpVote:1183063056834646066> | 0 <:DownVote:1223063241433939989>")
         view = SuggestionView()
         channeldata = await suggestschannel.find_one({"guild_id": ctx.guild.id})
         channeldata2 = await suggestschannel2.find_one({"guild_id": ctx.guild.id})
@@ -153,7 +153,7 @@ class SuggestionView(discord.ui.View):
             await self.update_embed(interaction, suggestion_data)
             await interaction.followup.send("<:UpVote:1183063056834646066> Upvoted!", ephemeral=True)
 
-    @button(label='Downvote', style=discord.ButtonStyle.red, custom_id="downvote_button", emoji="<:DownVote:1183063097477451797>")
+    @button(label='Downvote', style=discord.ButtonStyle.red, custom_id="downvote_button", emoji="<:DownVote:1223063241433939989>")
     async def No(self, interaction: discord.Interaction, button):
         await interaction.response.defer()
         message_id = interaction.message.id
@@ -197,7 +197,7 @@ class SuggestionView(discord.ui.View):
             )
             suggestion_data = await suggestions_collection.find_one({"message_id": message_id})  
             await self.update_embed(interaction, suggestion_data)
-            await interaction.followup.send("<:DownVote:1183063097477451797> Downvoted!", ephemeral=True)
+            await interaction.followup.send("<:DownVote:1223063241433939989> Downvoted!", ephemeral=True)
 
     @staticmethod
     async def update_embed(interaction: discord.Interaction, suggestion_data):
@@ -206,7 +206,7 @@ class SuggestionView(discord.ui.View):
            
         upvotes, downvotes = suggestion_data["upvotes"], suggestion_data["downvotes"]
         upvote_emoji = "<:UpVote:1183063056834646066>"
-        downvote_emoji = "<:DownVote:1183063097477451797>"
+        downvote_emoji = "<:DownVote:1223063241433939989>"
         value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
         if not embed.fields: 
            user = f"<@{suggestion_data['author_id']}>"
@@ -236,7 +236,7 @@ class SuggestionView(discord.ui.View):
 
         embed = discord.Embed(title="", color=discord.Color.dark_embed())
         embed.add_field(name="<:UpVote:1183063056834646066> Upvoters", value="\n".join(upvoters_mentions) or "No upvoters")
-        embed.add_field(name="<:DownVote:1183063097477451797> Downvoters", value="\n".join(downvoters_mentions) or "No downvoters")
+        embed.add_field(name="<:DownVote:1223063241433939989> Downvoters", value="\n".join(downvoters_mentions) or "No downvoters")
         embed.set_thumbnail(url=interaction.guild.icon)
         embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
 
@@ -298,7 +298,7 @@ class ManageSuggestion(discord.ui.Select):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
             embed.set_author(icon_url=suser.display_avatar, name=suser.name)
             upvote_emoji = "<:UpVote:1183063056834646066>"
-            downvote_emoji = "<:DownVote:1183063097477451797>"
+            downvote_emoji = "<:DownVote:1223063241433939989>"
             value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
             embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
             embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")
@@ -395,7 +395,7 @@ class Deny(discord.ui.Modal, title='Deny'):
             embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
             embed.set_author(icon_url=suser.display_avatar, name=suser.name)
             upvote_emoji = "<:UpVote:1183063056834646066>"
-            downvote_emoji = "<:DownVote:1183063097477451797>"
+            downvote_emoji = "<:DownVote:1223063241433939989>"
             value_field = f"{upvotes} {upvote_emoji} | {downvotes} {downvote_emoji}"
             embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
             embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value=f"{value_field}")

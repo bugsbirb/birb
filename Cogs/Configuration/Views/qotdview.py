@@ -121,7 +121,7 @@ async def refreshembed(interaction):
 
             if moduleddata:
                 modulemsg = moduleddata.get('QOTD', 'False')     
-            embed = discord.Embed(title="<:qotd:1231270156647403630> Daily Questions", description=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Channel:** {channelmsg}\n{replybottom}**Ping:** {pingmsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:qotd:1231270156647403630> Daily Questions", description=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Channel:** {channelmsg}\n{replybottom}**Ping:** {pingmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                       
             try:

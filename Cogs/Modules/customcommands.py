@@ -64,14 +64,14 @@ class CustomCommands(commands.Cog):
             
         if prefix is None:
             
-            await ctx.send(f"<:command1:1199456319363633192> **{ctx.author.display_name},** the prefix is `{currentprefix}`", allowed_mentions=discord.AllowedMentions.none()) 
+            await ctx.send(f"<:command1:1223062616872583289> **{ctx.author.display_name},** the prefix is `{currentprefix}`", allowed_mentions=discord.AllowedMentions.none()) 
         else:
             if ctx.author.guild_permissions.manage_guild:
 
              await prefixdb.update_one({'guild_id': ctx.guild.id}, {'$set': {'prefix': prefix}}, upsert=True)
              await ctx.send(f"<:whitecheck:1190819388941668362> **{ctx.author.display_name},** I've set the prefix to `{prefix}`", allowed_mentions=discord.AllowedMentions.none())
             else:
-                  await ctx.send(f"<:command1:1199456319363633192> **{ctx.author.display_name},** the prefix is `{currentprefix}`", allowed_mentions=discord.AllowedMentions.none()) 
+                  await ctx.send(f"<:command1:1223062616872583289> **{ctx.author.display_name},** the prefix is `{currentprefix}`", allowed_mentions=discord.AllowedMentions.none()) 
 
 
 

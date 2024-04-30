@@ -360,7 +360,7 @@ class Modmail(commands.Cog):
         embeds = []
         embeds.append(embed)
         for i, logs in enumerate(result):
-            value = f"<:arrow:1166529434493386823>**Transcript:** [View Online]({logs.get('transcriptlink')})\n<:arrow:1166529434493386823>**Closed By:** <@{logs.get('closedby')}>\n<:arrow:1166529434493386823>**Date:** <t:{int(logs.get('timestamp').timestamp())}:d>\n<:arrow:1166529434493386823>**Closure Reason:** {logs.get('reason')}"
+            value = f"<:arrow:1223062767255293972>**Transcript:** [View Online]({logs.get('transcriptlink')})\n<:arrow:1223062767255293972>**Closed By:** <@{logs.get('closedby')}>\n<:arrow:1223062767255293972>**Date:** <t:{int(logs.get('timestamp').timestamp())}:d>\n<:arrow:1223062767255293972>**Closure Reason:** {logs.get('reason')}"
             if len(value) > 1024:
                 value = value[:1021] + "..."
             embed.add_field(name=f"#{logs.get('transcriptid')}", value=value, inline=False)

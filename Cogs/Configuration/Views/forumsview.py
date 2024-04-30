@@ -51,7 +51,7 @@ async def refreshembed(interaction):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Forums']}"            
-            embed = discord.Embed(title="<:forum:1162134180218556497> Forum Utilites", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:forum:1223062562782838815> Forum Utilites", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())    
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             try:    

@@ -378,7 +378,7 @@ class Embeds(discord.ui.View):
         await interaction.response.send_modal(Context())
 
 
-    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
+    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1223062929709203487>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -388,7 +388,7 @@ class Embeds(discord.ui.View):
         await interaction.response.send_modal(Title())
 
 
-    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
+    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1223062677572812920>")
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -397,7 +397,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Description())
 
-    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -415,7 +415,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Image())
 
-    @discord.ui.button(label='Author', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Author', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Author(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -481,7 +481,7 @@ async def refreshembed(interaction):
             moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
             if moduleddata:
                 modulemsg = moduleddata.get('Staff Database', 'False')     
-            embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1167083259444875264> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:staffdb:1206253848298127370> Staff Database & Panel", description=f"**Enabled:** {modulemsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon) 
             try:

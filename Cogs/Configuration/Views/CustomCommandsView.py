@@ -84,7 +84,7 @@ class CreateCommand(discord.ui.Modal, title='CreateCommand'):
          if amount >= 10:
           embed = discord.Embed()
           embed.title = f"{redx} {amount}/10"
-          embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1167083259444875264> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
+          embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1223062864793702431> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
           embed.color = discord.Color.brand_red()
           await interaction.response.send_message(embed=embed, ephemeral=True)
           return
@@ -436,7 +436,7 @@ class ImportCommand(discord.ui.Modal, title='Import'):
          if amount >= 10:
           embed = discord.Embed()
           embed.title = f"{redx} {amount}/10"
-          embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1167083259444875264> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
+          embed.description="You have reached the maximum amount of custom commands.\n<:Tip:1223062864793702431> To upgrade [**buy premium**](https://patreon.com/astrobirb/membership)!"
           embed.color = discord.Color.brand_red()
           await interaction.response.send_message(embed=embed, ephemeral=True)
           return
@@ -926,7 +926,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_message(content=f"{tick} Please select the required roles for this command.", ephemeral=True, view=PermissionsView(self.author, self.name))
 
-    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1193192444938956800>")
+    @discord.ui.button(label='Title', style=discord.ButtonStyle.grey, emoji="<:abc:1223062929709203487>")
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -942,7 +942,7 @@ class Embeds(discord.ui.View):
         
         await interaction.response.send_modal(Title(default))
 
-    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1193192044307415040>")
+    @discord.ui.button(label='Description', style=discord.ButtonStyle.grey, emoji="<:description:1223062677572812920>")
     async def Description(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -958,7 +958,7 @@ class Embeds(discord.ui.View):
 
         await interaction.response.send_modal(Description(default))
 
-    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Thumbnail', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Thumbnail(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -992,7 +992,7 @@ class Embeds(discord.ui.View):
 
         await interaction.response.send_modal(Image(default))
 
-    @discord.ui.button(label='Author', style=discord.ButtonStyle.grey, emoji="<:image:1193191680690630706>")
+    @discord.ui.button(label='Author', style=discord.ButtonStyle.grey, emoji="<:image:1223062544135094363>")
     async def Author(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -1123,7 +1123,7 @@ async def refreshembed(interaction):
             
             amount = await customcommands.count_documents({'guild_id': interaction.guild.id})
             commands = await commands.to_list(length=amount)
-            embed = discord.Embed(title=f"<:command1:1199456319363633192> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
+            embed = discord.Embed(title=f"<:command1:1223062616872583289> Custom Commands ({amount}/25)", description="", color=discord.Color.dark_embed())
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             embed.add_field(name="<:settings:1207368347931516928> Custom Commands Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Logging Channel:** {loggingmsg}")
@@ -1133,7 +1133,7 @@ async def refreshembed(interaction):
                     permissions = "None"
                 else:
                     permissions = ", ".join([f"<@&{roleid}>" for roleid in permissions])
-                embed.add_field(name=f"<:command1:1199456319363633192> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=False)
+                embed.add_field(name=f"<:command1:1223062616872583289> {result['name']}", value=f"{arrow} **Created By:** <@{result['creator']}>\n{arrow} **Required Permissions:** {permissions}", inline=False)
             try:    
              await interaction.message.edit(embed=embed)
             except:
