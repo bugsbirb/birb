@@ -32,10 +32,15 @@ guildid = os.getenv("CUSTOM_GUILD")
 load_dotenv()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["astro"]
-
+prefixdb = db['prefixes']
 
 class client(commands.AutoShardedBot):
     def __init__(self):
+    
+
+
+   
+    
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
@@ -43,7 +48,7 @@ class client(commands.AutoShardedBot):
         if environment == "custom":
          print('Custom Branding Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=None, chunk_guilds_at_startup=False
+            command_prefix=commands.when_mentioned_or(self.get_prefix), intents=intents, shard_count=None, chunk_guilds_at_startup=False
          )
         elif environment == 'development':
          print('Development Loaded')
@@ -103,6 +108,15 @@ class client(commands.AutoShardedBot):
         await self.load_extension("jishaku")
         print("[🔄] Jishaku Loaded")
 
+    async def get_prefix(self, message: discord.Message) -> tasks.List[str] | str:
+        prefixdb = db['prefixes']
+        prefixresult = await prefixdb.find_one({'guild_id': message.guild.id})
+        if prefixresult:
+            prefix = prefixresult.get('prefix', '!!')
+        else:
+             prefix = PREFIX
+        return commands.when_mentioned_or(prefix)(self, message)
+
     async def setup_hook(self):
     
         update_channel_name.start()
@@ -123,7 +137,9 @@ class client(commands.AutoShardedBot):
         for ext in self.cogslist:
             await self.load_extension(ext)
             print(f"[✅] {ext} loaded")
+    
 
+       
     async def on_ready(self):
         if environment == 'custom':
          

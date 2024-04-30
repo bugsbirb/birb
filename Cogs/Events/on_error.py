@@ -18,7 +18,9 @@ class On_error(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         if isinstance(error, commands.CommandNotFound):
-            return
+            pass
+        else:
+            print("[INFO] Not a command.")
         if isinstance(error, commands.MissingPermissions):
             return
         if isinstance(error, commands.MissingRequiredArgument):

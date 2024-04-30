@@ -107,6 +107,7 @@ ApplicationsSubChannel = db['Applications Submissions']
 options = db['module options']
 qotds = db['qotd']
 premium = db['premium']
+prefixdb = db['prefixes']
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author, roles):
 
@@ -170,6 +171,31 @@ class Adminrole(discord.ui.RoleSelect):
 
         print(f"Select Roles {selected_role_ids}")
 
+
+class PrefixSelection(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+        
+        options = [
+        discord.SelectOption(label="!"),
+        discord.SelectOption(label=">"),
+        discord.SelectOption(label="?"),
+        discord.SelectOption(label="!!"),
+        discord.SelectOption(label="=")
+            ]
+
+
+
+        super().__init__(placeholder='Prefix', min_values=1, max_values=1, options=options)
+        
+    async def callback(self, interaction: discord.Interaction):    
+        color = self.values[0]
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.followup.send(embed=embed, ephemeral=True)   
+        prefixdb.update_one({'guild_id': interaction.guild.id}, {'$set': {'prefix': color}}, upsert=True)
+        await interaction.response.edit_message(content=None)
 
 class Config(discord.ui.Select):
     def __init__(self, author):
@@ -1080,6 +1106,7 @@ class ConfigViewMain(discord.ui.View):
         super().__init__(timeout=None) 
         self.add_item(StaffRole(author, staffroles))
         self.add_item(Adminrole(author, adminroles))
+        self.add_item(PrefixSelection(author))
         self.add_item(Config(author))
 
 

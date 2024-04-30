@@ -3,6 +3,8 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 import validators
+import string
+import random
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = AsyncIOMotorClient(MONGO_URL)
@@ -350,6 +352,9 @@ class CreateButtons(discord.ui.Select):
             discord.SelectOption(label="Create", emoji=f"{add}"),
             discord.SelectOption(label="Delete", emoji=f"{bin}"),
             discord.SelectOption(label="Edit", emoji=f"{pen}"),
+            discord.SelectOption(label="Export", emoji=f"<:whiteupdate:1192866714879283200>"),
+            discord.SelectOption(label="Import", emoji=f"<:welcome:1218531757691764738>")
+
             
 
         
@@ -373,6 +378,148 @@ class CreateButtons(discord.ui.Select):
 
         elif color == 'Edit':
             await interaction.response.send_modal(EditCommand(self.author))    
+        elif color == 'Export':
+            await interaction.response.send_modal(ExportCommand(self.author))    
+        elif color == 'Import':
+            await interaction.response.send_modal(ImportCommand(self.author))    
+
+
+class ExportCommand(discord.ui.Modal, title='Export'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+    
+    name = discord.ui.TextInput(
+            label='Name',
+            placeholder='What is the name of the command?',
+            required=True,
+            max_length=256,
+        )
+    async def on_submit(self, interaction: discord.Interaction):
+      result = await customcommands.find_one({"name": self.name.value, "guild_id": interaction.guild.id})
+      embed = interaction.message.embeds[0] 
+      if result is None:
+          embed.title = f"{redx} I could not find that."
+          embed.description="I could not find the command you were trying to export."
+          embed.color = discord.Color.brand_red()
+          embed.clear_fields()
+          await interaction.response.send_message(embed=embed, ephemeral=True)
+          return
+      exportid = ''.join(random.choices(string.digits, k=8))
+      await customcommands.update_one({'name': self.name.value, 'guild_id': interaction.guild.id}, {'$set': {'exportid': exportid}})
+      embed = discord.Embed(title=f"{greencheck} Succesfully exported!", description=f"The custom command id is `{exportid}`!", color=discord.Color.brand_green())
+      embed.set_footer(text="If you forget the id you can always export again.")
+      await interaction.response.send_message(embed=embed, ephemeral=True)
+      
+
+          
+    
+
+
+class ImportCommand(discord.ui.Modal, title='Import'):
+    def __init__(self, author):
+        super().__init__()
+        self.author = author
+    
+    name = discord.ui.TextInput(
+            label='ID',
+            placeholder='What is the import id?',
+            required=True,
+            max_length=256,
+        )
+    
+    async def on_submit(self, interaction: discord.Interaction):
+         result = await customcommands.find_one({"exportid": self.name.value})
+         embed = interaction.message.embeds[0]
+         if result is None:
+          embed.title = f"{redx} I could not find that."
+          embed.description="I could not find the command you were trying to import."
+          embed.color = discord.Color.brand_red()
+          embed.clear_fields()
+          await interaction.response.send_message(embed=embed, ephemeral=True)
+          return
+          
+               
+         if result.get('embed', False) is True:
+            embed_title = result.get('title', None) 
+            embed_description = result.get('description', None)   
+            color_value = result.get('color', None)
+            embed_author = result.get('author', None)
+
+            colors = discord.Colour(int(color_value, 16)) if color_value else discord.Colour.dark_embed()               
+            embed = discord.Embed(
+                title=embed_title,
+                description=embed_description, color=colors)
+            if 'image' in result:
+                embed.set_image(url=result['image'])
+            if 'thumbnail' in result:
+                embed.set_thumbnail(url=result['thumbnail'])
+
+
+            if embed_author in ["None", None]:
+                embed_author = ""
+
+            if 'author' in result:
+                embed.set_author(name=embed_author, icon_url=result['author_icon'])
+                if 'author_icon' in result:
+                    embed.set_author(name=embed_author, icon_url=result['author_icon'])
+            if 'content' in result:
+                contentmsg = result['content']    
+            else:
+                contentmsg = ""    
+         
+            await interaction.response.edit_message(content=contentmsg, embed=embed, view=Embeds(self.author, result.get('name', None)))
+         else:
+
+            if 'content' in result:
+                contentmsg = result['content']    
+            else:
+                contentmsg = ""               
+            await interaction.response.edit_message(content=contentmsg, embed=None, view=NoEmbeds(self.author, self.name.value))   
+         message = interaction.message
+         messagecontent = None
+
+
+
+         if not embed:
+                print(result.get('name'))
+                embed_data = {
+                "name": result.get('name', None),
+                "embed": False,
+                "guild_id": interaction.guild.id,
+                "content": message.content
+
+                }        
+         else: 
+                color_hex = f"{embed.color.value:06x}" if embed.color else None
+                print(result.get('name'))
+                embed_data = {
+                "title": embed.title,
+                "embed": True,
+                "name": result.get('name', None),
+                "description": embed.description,
+                "color": color_hex,
+                "author": embed.author.name if embed.author else None,
+                "author_icon": embed.author.icon_url if embed.author else None,
+                "thumbnail": embed.thumbnail.url if embed.thumbnail else None,
+                "image": embed.image.url if embed.image else None,
+                "guild_id": interaction.guild.id,
+                "content": messagecontent
+                }
+                if result.get('buttons'):
+                    embed_data['buttons'] = result.get('buttons')
+                elif result.get('button_label'):
+                    embed_data['button_label'] = result.get('button_label')
+                elif result.get('url'):
+                    embed_data['url'] = result.get('url')
+         print(embed_data)           
+         print2 = await customcommands.update_one({"guild_id": interaction.guild.id}, {"$set": embed_data}, upsert=True)
+         print(print2)
+
+
+
+    
+
 
 
 class Title(discord.ui.Modal, title='Title'):

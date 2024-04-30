@@ -76,16 +76,6 @@ class qotd(commands.Cog):
                                 continue     
                 selected_response = random.choice(responses)         
                                                       
-
-
-                
-                await questiondb.update_one(
-                    {'guild_id': int(results['guild_id'])},
-                    {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1)},
-                    '$push': {'messages': selected_response}
-                    }, upsert=True
-)
-                
             
                 guild = self.client.get_guild(int(results.get('guild_id', None)))
                 if guild is None:
