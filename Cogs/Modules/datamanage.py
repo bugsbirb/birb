@@ -253,7 +253,7 @@ class Infractions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await infractions.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Infractions have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Infractions have been erased.", ephemeral=True)
 
 
     @discord.ui.button(label="Reset Infraction Types", style=discord.ButtonStyle.red, row=1)
@@ -266,7 +266,7 @@ class Infractions(discord.ui.View):
         await interaction.response.defer()
         await infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice', 'Verbal Warning', 'Warning', 'Strike', 'Demotion', 'Termination']}}, upsert=True)
         await infractiontypeactions.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Infractions types have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Infractions types have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Infraction Configuration", style=discord.ButtonStyle.red, row=2)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -282,7 +282,7 @@ class Infractions(discord.ui.View):
         await infchannel.delete_many({'guild_id': int(interaction.guild.id)})
         await infractiontypes.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'types': ['Activity Notice, Verbal Warning, Warning, Strike, Demotion, Termination']}}, upsert=True)
         await infractiontypeactions.delete_many({'guild_id': int(interaction.guild.id)})   
-        await interaction.followup.send("<:greencheck:1190814894463930480> Infractions configuration have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Infractions configuration have been erased.", ephemeral=True)
 
 
 
@@ -300,7 +300,7 @@ class Partnerships(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)             
         await interaction.response.defer()
         await partnerships.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Infractions configuration have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Infractions configuration have been erased.", ephemeral=True)
 
 
         
@@ -317,7 +317,7 @@ class Partnerships(discord.ui.View):
         except:
             pass
         await partnershipch.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Partnership configuration have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Partnership configuration have been erased.", ephemeral=True)
 class Welcome(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -336,7 +336,7 @@ class Welcome(discord.ui.View):
         except:
             pass
         await welcome.delete_one({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Welcome configuration have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Welcome configuration have been erased.", ephemeral=True)
 
 class LOAs(discord.ui.View):
     def __init__(self, author):
@@ -352,7 +352,7 @@ class LOAs(discord.ui.View):
         
         await interaction.response.defer()
         await loa_collection.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> LOAs have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> LOAs have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase LOA Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self,interaction: discord.Interaction,  button: discord.ui.Button):
@@ -367,7 +367,7 @@ class LOAs(discord.ui.View):
             pass
         await loachannel.delete_many({'guild_id': int(interaction.guild.id)})
         await LOARole.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> LOA configuration have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> LOA configuration have been erased.", ephemeral=True)
 class CustomCommands(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -382,7 +382,7 @@ class CustomCommands(discord.ui.View):
         
         await interaction.response.defer()
         await customcommands.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Custom commands have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Custom commands have been erased.", ephemeral=True)
 
 class Modmail(discord.ui.View):
     def __init__(self, author):
@@ -403,7 +403,7 @@ class Modmail(discord.ui.View):
         await transcriptchannel.delete_many({'guild_id': int(interaction.guild.id)})
         await modmailcategory.delete_many({'guild_id': int(interaction.guild.id)})
         await modmailping.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Modmail Configuration Reset", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Modmail Configuration Reset", ephemeral=True)
 
 class Quota(discord.ui.View):
     def __init__(self, author):
@@ -418,7 +418,7 @@ class Quota(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await mccollection.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Message Quota has been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Message Quota has been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Quota Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -432,7 +432,7 @@ class Quota(discord.ui.View):
         except:
             pass
         await message_quota_collection.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Quota Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Quota Configuration Reset", ephemeral=True)    
 
 class Suggestions(discord.ui.View):
     def __init__(self, author):
@@ -447,7 +447,7 @@ class Suggestions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await suggestions_collection.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Suggestions have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Suggestions have been erased.", ephemeral=True)
         
     @discord.ui.button(label="Erase Suggestions Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -461,7 +461,7 @@ class Suggestions(discord.ui.View):
         except:
             pass
         await suggestschannel.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Suggestions Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Suggestions Configuration Reset", ephemeral=True)    
 
 class Forums(discord.ui.View):
     def __init__(self, author):
@@ -476,7 +476,7 @@ class Forums(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await forumsconfig.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Forums Autoposts have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Forums Autoposts have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Forums Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -490,7 +490,7 @@ class Forums(discord.ui.View):
         except:
             pass
 
-        await interaction.followup.send("<:greencheck:1190814894463930480> Forums Configuration Reset", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Forums Configuration Reset", ephemeral=True)
     
 class Tags(discord.ui.View):
     def __init__(self, author):
@@ -506,7 +506,7 @@ class Tags(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await tags.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Tags have been erased.", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Tags have been erased.", ephemeral=True)    
 
     @discord.ui.button(label="Erase Tags Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -519,7 +519,7 @@ class Tags(discord.ui.View):
          await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Tags': False}})
         except:
             pass
-        await interaction.followup.send("<:greencheck:1190814894463930480> Tags Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Tags Configuration Reset", ephemeral=True)    
 
 class ConnectionRoles(discord.ui.View):
     def __init__(self, author):
@@ -534,7 +534,7 @@ class ConnectionRoles(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await connectionroles.delete_many({'guild': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Connection Roles have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Connection Roles have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Connection Roles Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -547,7 +547,7 @@ class ConnectionRoles(discord.ui.View):
          await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Connection': False}})
         except:
             pass
-        await interaction.followup.send("<:greencheck:1190814894463930480> Connection Roles Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Connection Roles Configuration Reset", ephemeral=True)    
      
 class Suspensions(discord.ui.View):
     def __init__(self, author):
@@ -562,7 +562,7 @@ class Suspensions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await suspensions.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Suspensions have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Suspensions have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Suspensions Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -575,7 +575,7 @@ class Suspensions(discord.ui.View):
          await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Suspensions': False}})
         except:
             pass
-        await interaction.followup.send("<:greencheck:1190814894463930480> Suspensions Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Suspensions Configuration Reset", ephemeral=True)    
 
 class StaffFeedback(discord.ui.View):
     def __init__(self, author):
@@ -590,7 +590,7 @@ class StaffFeedback(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await stafffeedback.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Feedback have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Staff Feedback have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Staff Feedback Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -603,7 +603,7 @@ class StaffFeedback(discord.ui.View):
          await modules.update_one({'guild_id': int(interaction.guild.id)}, {'$set': {'Feedback': False}})
         except:
             pass
-        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Feedback Configuration Reset", ephemeral=True)        
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Staff Feedback Configuration Reset", ephemeral=True)        
 
 class Reports(discord.ui.View):
     def __init__(self, author):
@@ -618,7 +618,7 @@ class Reports(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await reports.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Reports have been erased.", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Reports have been erased.", ephemeral=True)    
 
     @discord.ui.button(label="Erase Reports Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -633,7 +633,7 @@ class Reports(discord.ui.View):
             pass
         await repchannel.delete_many({'guild_id': int(interaction.guild.id)})
         await ReportModeratorRole.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Reports Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Reports Configuration Reset", ephemeral=True)    
 
 class Applications(discord.ui.View):
     def __init__(self, author):
@@ -654,7 +654,7 @@ class Applications(discord.ui.View):
             pass
         await ApplicationsChannel.delete_many({'guild_id': int(interaction.guild.id)})
         await ApplicationsRolesDB.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Applications Configuration Reset", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Applications Configuration Reset", ephemeral=True)
 
 class Promotions(discord.ui.View):
     def __init__(self, author):
@@ -669,7 +669,7 @@ class Promotions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await promotionroles.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Promotions have been erased.", ephemeral=True)
     
     @discord.ui.button(label="Erase Promotions Ranks", style=discord.ButtonStyle.red, row=0)
     async def erasepromotionroles(self, interaction: discord.Interaction,  button: discord.ui.Button):
@@ -679,7 +679,7 @@ class Promotions(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await promotions.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions roles have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Promotions roles have been erased.", ephemeral=True)
 
     @discord.ui.button(label="Erase Promotions Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -693,7 +693,7 @@ class Promotions(discord.ui.View):
         except:
             pass
         await promochannel.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Promotions Configuration Reset", ephemeral=True)    
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Promotions Configuration Reset", ephemeral=True)    
 
 class StaffPanel(discord.ui.View):
     def __init__(self, author):
@@ -712,7 +712,7 @@ class StaffPanel(discord.ui.View):
         except Exception as e:
             print(f"Failed to reset Staff Database Configuration: {e}")
 
-        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Database Configuration Reset", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Staff Database Configuration Reset", ephemeral=True)
 
     @discord.ui.button(label="Erase Staff Database", style=discord.ButtonStyle.red, row=1)
     async def erasestaff(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -722,7 +722,7 @@ class StaffPanel(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
         await staffdb.delete_many({'guild_id': int(interaction.guild.id)})
-        await interaction.followup.send("<:greencheck:1190814894463930480> Staff Database have been erased.", ephemeral=True)
+        await interaction.followup.send("<:whitecheck:1223062421212631211> Staff Database have been erased.", ephemeral=True)
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(datamanage(client))     
