@@ -74,7 +74,10 @@ class qotd(commands.Cog):
                             except Exception as e:
                                 print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
                                 continue     
-                selected_response = random.choice(responses)         
+                selected_response = random.choice(responses)     
+                if results.get('guild_id') is None:
+                    continue    
+
                                                       
             
                 guild = self.client.get_guild(int(results.get('guild_id', None)))
@@ -85,9 +88,13 @@ class qotd(commands.Cog):
                     {'guild_id': int(results['guild_id'])},
                     {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1)},
                     '$push': {'messages': selected_response}
-                    }, upsert=True
-)                
-                channel = guild.get_channel(int(results.get('channel_id', None)))
+                    }, upsert=True)
+                
+                channelid = results.get('channel_id', None)
+                if channelid is None:
+                    continue
+                channelid = int(channelid)
+                channel = guild.get_channel(channelid)
                 if channel is None:
                     print('QOTD Channel is none aborting')
                     continue
