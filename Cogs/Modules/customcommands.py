@@ -90,7 +90,6 @@ class CustomCommands(commands.Cog):
                 if message.content.startswith(prefix):
                     command = message.content[len(prefix):]
                     command = re.sub(r'^[^a-zA-Z0-9]+', '', command)
-                    print(command)
                     break
             else:
                 
