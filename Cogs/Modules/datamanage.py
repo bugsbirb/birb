@@ -65,8 +65,8 @@ class DataSelector(discord.ui.Select):
     def __init__(self, author):
         self.author = author
         options = [
-        discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"), #
-        discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"), #
+        discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Infraction:1223063128275943544>"), #
+        discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promotion:1234997026677198938>"), #
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1223062616872583289>"), #
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1234994848856150057>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  

@@ -314,7 +314,7 @@ async def refreshembed(interaction):
                  promochannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
-            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Promotion:1234997026677198938> Promotions Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)    

@@ -204,8 +204,8 @@ class Config(discord.ui.Select):
         
         options = [
         discord.SelectOption(label="Settings", value="Settings", emoji="<:Setting:1223062944187813918>", description=self.permissionsconfig(author)),
-        discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'infractions': True}) else "Disabled"),
-        discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
+        discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Infraction:1223063128275943544>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'infractions': True}) else "Disabled"),
+        discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promotion:1234997026677198938>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
         discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1223063306131210322>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1223062616872583289>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
         discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1234994848856150057>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
@@ -217,7 +217,7 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Daily Questions", value="Daily Questions", emoji="<:qotd:1234994772796772432>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'QOTD': True}) else "Disabled"),
         discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1234994806829355169>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
-        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1234998406938755122>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
+        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:partnerships:1224724406144733224>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
         discord.SelectOption(label="Utility", value="Utility", emoji="<:utility:1234994834763419769>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1235000485208002610>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
@@ -445,7 +445,7 @@ class Config(discord.ui.Select):
                  promochannelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                 else: 
                  promochannelmsg = channel.mention                          
-            embed = discord.Embed(title="<:Promote:1162134864594735315> Promotions Module", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:Promotion:1234997026677198938> Promotions Module", color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Promotions Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Promotion Channel:** {promochannelmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)\n\n<:Information:1115338749728002089> **What are Promotion Ranks?:** Promotion ranks enable you to choose a primary role and automatically include any additional selected roles. When you use the command /promote and select a rank, it will assign the chosen primary role along with any additional roles you've selected.", inline=False)
             options = [
               discord.SelectOption(label="Enabled"),
