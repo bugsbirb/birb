@@ -89,7 +89,7 @@ async def refreshembed(interaction):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Tags']}"            
-            embed = discord.Embed(title="<:tags:1230676625226727424> Tags Module", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:tags:1234994806829355169> Tags Module", color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Tags Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Tags Logging:** {usagechannelmsg}\n\n <:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   

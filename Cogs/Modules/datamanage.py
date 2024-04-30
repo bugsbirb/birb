@@ -68,15 +68,15 @@ class DataSelector(discord.ui.Select):
         discord.SelectOption(label="Infractions", value="Infractions", emoji="<:Remove:1162134605885870180>"), #
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>"), #
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1223062616872583289>"), #
-        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>"), #
+        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1234994848856150057>"), #
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>"), #  
-        discord.SelectOption(label="Quota", value="Quota", emoji="<:quota:1230677565098950696>"), #
+        discord.SelectOption(label="Quota", value="Quota", emoji="<:quota:1234994790056198175>"), #
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:announcement:1192867080408682526>"),  #
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>"),
         discord.SelectOption(label="Forums Autopost + Utils", value="Forums Autopost + Utils", emoji="<:forum:1223062562782838815>"), #
-        discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>"),  #
+        discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1234994806829355169>"),  #
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>"), #
-        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1230677088181420153>"), #
+        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1234998406938755122>"), #
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}"), #
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>"), 
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>"), #

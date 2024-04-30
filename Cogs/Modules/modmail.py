@@ -486,7 +486,7 @@ class Modmail(commands.Cog):
                     await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
                 testchannel = self.client.get_channel(1202756318897774632)
-                message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                message = await testchannel.send("<:infractionssearch:1234997448641085520> **HTML Transcript**", file=transcript_file)
                 link = await chat_exporter.link(message)  
                 user_id = modmail_data.get('user_id')
                 if user_id:
@@ -574,7 +574,7 @@ class Modmail(commands.Cog):
                     await ctx.send(f"{no} **{ctx.author.display_name},** I can't delete this channel please contact the server admins.", allowed_mentions=discord.AllowedMentions.none())
                     return                               
                 testchannel = self.client.get_channel(1202756318897774632)
-                message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                message = await testchannel.send("<:infractionssearch:1234997448641085520> **HTML Transcript**", file=transcript_file)
                 link = await chat_exporter.link(message)   
                 user_id = modmail_data.get('user_id')
                 if user_id:

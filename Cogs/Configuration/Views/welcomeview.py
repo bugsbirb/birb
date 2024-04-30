@@ -485,7 +485,7 @@ class NoEmbeds(discord.ui.View):
    
          
 
-    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1179470251860185159>")
+    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1223063187063308328>")
     async def Var(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -567,7 +567,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         await interaction.response.send_modal(Context())
 
-    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1179470251860185159>")
+    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1223063187063308328>")
     async def Var(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -611,7 +611,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Thumbnail())
 
-    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:Image:1195058849741295748>")
+    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:Image:1223063095417765938>")
     async def photo(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -629,7 +629,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Author())
 
-    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
+    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1234998802948034721>")
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -707,7 +707,7 @@ async def refreshembed(interaction):
                  else:    
                   wchannelmsg = channel.mention          
 
-            embed = discord.Embed(title="<:welcome:1218531757691764738> Welcome Module",  color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:welcome:1234994848856150057> Welcome Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Welcome Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Welcome Channel:** {wchannelmsg}\n\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)       

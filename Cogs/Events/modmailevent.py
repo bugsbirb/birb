@@ -70,7 +70,7 @@ class Modmailevnt(commands.Cog):
                 filename=f"transcript-{channel.name}.html")           
                 if channel:
                     testchannel = self.client.get_channel(1202756318897774632)
-                    message = await testchannel.send("<:infractionssearch:1200479190118576158> **HTML Transcript**", file=transcript_file)
+                    message = await testchannel.send("<:infractionssearch:1234997448641085520> **HTML Transcript**", file=transcript_file)
                     link = await chat_exporter.link(message)
                     view = TranscriptChannel(link)                    
                     await channel.send(f"<:Messages:1148610048151523339> **{message.author.display_name}** has closed the modmail conversation.")
@@ -255,10 +255,10 @@ class Modmailevnt(commands.Cog):
                                 embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                                 embed.set_thumbnail(url=message.author.display_avatar)
                                 msg = await channel.send(embed=embed)
-                                await msg.reply("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                                await msg.reply("<:Image:1223063095417765938> **Attachment(s)** sent by the user.", files=files)
                                 return
                             else:
-                                await channel.send("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                                await channel.send("<:Image:1223063095417765938> **Attachment(s)** sent by the user.", files=files)
                                 return
                         try:
                             await channel.send(embed=embed)
@@ -295,11 +295,11 @@ class Modmailevnt(commands.Cog):
                       embed.set_author(name=message.author, icon_url=message.author.display_avatar)
                       embed.set_thumbnail(url=message.author.display_avatar)
                       msg = await channel.send(mention, embed=embed)
-                      await msg.reply("<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                      await msg.reply("<:Image:1223063095417765938> **Attachment(s)** sent by the user.", files=files)
                       return
                      else:
                       
-                      await channel.send(f"{mention}\n<:Image:1195058849741295748> **Attachment(s)** sent by the user.", files=files)
+                      await channel.send(f"{mention}\n<:Image:1223063095417765938> **Attachment(s)** sent by the user.", files=files)
                       return
                     await message.add_reaction('📨') 
                     

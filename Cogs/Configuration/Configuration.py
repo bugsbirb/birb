@@ -208,17 +208,17 @@ class Config(discord.ui.Select):
         discord.SelectOption(label="Promotions", value="Promotions", emoji="<:Promote:1162134864594735315>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Promotions': True}) else "Disabled"),
         discord.SelectOption(label="Customisation", value="Customisation", emoji="<:Customisation:1223063306131210322>"),
         discord.SelectOption(label="Custom Commands", value="Custom Commands", emoji="<:command1:1223062616872583289>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'customcommands': True}) else "Disabled"),
-        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1218531757691764738>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
+        discord.SelectOption(label="Welcome", value="Welcome", emoji="<:welcome:1234994848856150057>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'welcome': True}) else "Disabled"),         
         discord.SelectOption(label="Staff Database & Panel", value="Staff Database & Panel", emoji="<:staffdb:1206253848298127370>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Staff Database': True}) else "Disabled"), 
         discord.SelectOption(label="Modmail", value="Modmail", emoji="<:messagereceived:1201999712593383444>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Modmail': True}) else "Disabled"),
-        discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:quota:1230677565098950696>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
+        discord.SelectOption(label="Message Quota", value="Message Quota", emoji="<:quota:1234994790056198175>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Quota': True}) else "Disabled"),
         discord.SelectOption(label="Suggestions", value="Suggestions", emoji="<:announcement:1192867080408682526>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suggestions': True}) else "Disabled"),
         discord.SelectOption(label="Forums Utils", value="Forum Utils", emoji="<:forum:1223062562782838815>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Forums': True}) else "Disabled"),
-        discord.SelectOption(label="Daily Questions", value="Daily Questions", emoji="<:qotd:1231270156647403630>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'QOTD': True}) else "Disabled"),
-        discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1230676625226727424>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
+        discord.SelectOption(label="Daily Questions", value="Daily Questions", emoji="<:qotd:1234994772796772432>",description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'QOTD': True}) else "Disabled"),
+        discord.SelectOption(label="Tags", value="Tags", emoji="<:tags:1234994806829355169>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Tags': True}) else "Disabled"),
         discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Connection': True}) else "Disabled"),
-        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1230677088181420153>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
-        discord.SelectOption(label="Utility", value="Utility", emoji="<:utility:1230678074949898321>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
+        discord.SelectOption(label="Suspensions", value="Suspensions", emoji="<:suspensions:1234998406938755122>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Suspensions': True}) else "Disabled"),
+        discord.SelectOption(label="Utility", value="Utility", emoji="<:utility:1234994834763419769>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Utility': True}) else "Disabled"),
         discord.SelectOption(label="LOA", value="LOA", emoji=f"{loa}", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'LOA': True}) else "Disabled"),
         discord.SelectOption(label="Staff Feedback", value="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Feedback': True}) else "Disabled"),
         discord.SelectOption(label="Partnerships", value="Partnerships", emoji="<:partnerships:1224724406144733224>", description="Enabled" if modules.find_one({'guild_id': author.guild.id, 'Partnerships': True}) else "Disabled"),
@@ -349,7 +349,7 @@ class Config(discord.ui.Select):
                  else:    
                   wchannelmsg = channel.mention          
 
-            embed = discord.Embed(title="<:welcome:1218531757691764738> Welcome Module",  color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:welcome:1234994848856150057> Welcome Module",  color=discord.Color.dark_embed())
             embed.add_field(name="<:settings:1207368347931516928> Welcome Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Welcome Channel:** {wchannelmsg}\n\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             options = [
               discord.SelectOption(label="Enabled"),
@@ -527,7 +527,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Tags']}"            
-            embed = discord.Embed(title="<:tags:1230676625226727424> Tags Module", color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:tags:1234994806829355169> Tags Module", color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Tags Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Tags Logging:** {usagechannelmsg}\n\n <:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)")
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)      
@@ -545,7 +545,7 @@ class Config(discord.ui.Select):
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Quota']}"            
-            embed = discord.Embed(title="<:quota:1230677565098950696> Message Quota Module",  color=discord.Color.dark_embed())    
+            embed = discord.Embed(title="<:quota:1234994790056198175> Message Quota Module",  color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Quota:** {messagecountmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)   
@@ -633,7 +633,7 @@ class Config(discord.ui.Select):
                         channelmsg = "<:Error:1223063223910010920> Channel wasn't found please reconfigure."
                     else:    
                      channelmsg = channel.mention   
-            embed = discord.Embed(title="<:suspensions:1230677088181420153> Suspension Module", color=discord.Color.dark_embed())   
+            embed = discord.Embed(title="<:suspensions:1234998406938755122> Suspension Module", color=discord.Color.dark_embed())   
             embed.add_field(name="<:settings:1207368347931516928> Suspension Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Suspension Channel:** {channelmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False) 
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)                      
@@ -1082,7 +1082,7 @@ class Config(discord.ui.Select):
 
             if moduleddata:
                 modulemsg = moduleddata.get('QOTD', 'False')     
-            embed = discord.Embed(title="<:qotd:1231270156647403630> Daily Questions", description=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Channel:** {channelmsg}\n{replybottom}**Ping:** {pingmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
+            embed = discord.Embed(title="<:qotd:1234994772796772432> Daily Questions", description=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Channel:** {channelmsg}\n{replybottom}**Ping:** {pingmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", color=discord.Color.dark_embed())
             options = [
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]

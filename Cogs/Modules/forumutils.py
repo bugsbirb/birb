@@ -233,7 +233,7 @@ class CreateForum(discord.ui.Modal, title='Create Forum Message'):
          await interaction.response.edit_message(embed=embed, view=None)
          return           
         name = self.name.value
-        embed = discord.Embed(title="<:tag:1162134250414415922> Forum Channel", description="> Okay, now select a **forum channel.**", color=discord.Color.dark_embed())
+        embed = discord.Embed(title="<:tag:1234998802948034721> Forum Channel", description="> Okay, now select a **forum channel.**", color=discord.Color.dark_embed())
         view = ForumView(self.author, name)
         await interaction.response.edit_message(embed=embed, view=view)
 
@@ -396,7 +396,7 @@ class Forums(commands.Cog):
         if len(description) > 1024:
             description = description[:1021] + "..."
               
-        embed.add_field(name=f"<:Document:1166803559422107699> {result['name']}", value=description, inline=False)
+        embed.add_field(name=f"<:Document:1223063264322125844> {result['name']}", value=description, inline=False)
 
 
        embed.set_thumbnail(url=ctx.guild.icon)
@@ -503,7 +503,7 @@ class Embed(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         await interaction.response.send_modal(Image())
 
-    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
+    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1234998802948034721>")
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:

@@ -84,7 +84,7 @@ class promo(commands.Cog):
             if len(value) > 1024:
                 value = value[:1021] + "..."
             embed.add_field(
-                name=f"<:Document:1166803559422107699> Promotion | {promotion['random_string']}",
+                name=f"<:Document:1223063264322125844> Promotion | {promotion['random_string']}",
                 value=value,
                 inline=False
             )

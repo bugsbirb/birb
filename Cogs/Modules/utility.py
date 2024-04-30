@@ -22,10 +22,10 @@ class SetupGuide(discord.ui.Select):
         self.author = author
         options = [
             discord.SelectOption(label="Basic Settings", emoji="<:Help:1184535847513624586>"),
-            discord.SelectOption(label="Message Quota", emoji="<:quota:1230677565098950696>"),
+            discord.SelectOption(label="Message Quota", emoji="<:quota:1234994790056198175>"),
             discord.SelectOption(label="Modmail", emoji="<:Mail:1223063198740250774>"),
             discord.SelectOption(label="Forums", emoji="<:forum:1223062562782838815>"),
-            discord.SelectOption(label="Tags", emoji="<:tags:1230676625226727424>"),
+            discord.SelectOption(label="Tags", emoji="<:tags:1234994806829355169>"),
             discord.SelectOption(label="Connection Roles", value="Connection Roles", emoji="<:link:1206670134064717904>"), 
             discord.SelectOption(label="Infractions", emoji="<:Remove:1162134605885870180>"),
             discord.SelectOption(label="Promotions", emoji="<:Promote:1162134864594735315>"),
@@ -33,7 +33,7 @@ class SetupGuide(discord.ui.Select):
             discord.SelectOption(label="Staff Feedback", emoji="<:stafffeedback:1230678746864947240>"),         
             discord.SelectOption(label="Partnerships", emoji="<:partnerships:1224724406144733224>"),   
             discord.SelectOption(label="Applications Results", emoji="<:Application:1224722901328986183>"), 
-            discord.SelectOption(label="Suspensions", emoji="<:suspensions:1230677088181420153>"),
+            discord.SelectOption(label="Suspensions", emoji="<:suspensions:1234998406938755122>"),
         ]
         super().__init__(placeholder="Setup Guides", options=options)
 
@@ -155,13 +155,13 @@ class Utility(commands.Cog):
         total_members = len(ctx.guild.members)
         human_members = sum(1 for member in ctx.guild.members if not member.bot)
         embed = discord.Embed(title=f"**{ctx.guild.name}** in a nutshell", description=f"<:crown:1226668264260894832> **Owner:** {guild.owner.mention}\n<:link:1226672596284866631> **Guild:** {guild.name}\n<:ID:1226671706022740058> **Guild ID:** {guild.id}\n<:Member:1226674150463111299> **Members** {guild.member_count}\n<:pin:1226671966413389864> **Created:** <t:{guild.created_at.timestamp():.0f}:D> (<t:{guild.created_at.timestamp():.0f}:R>)\n<:Discord_channel:1226674545050783817> **Channels:** {len(ctx.guild.channels)}\n<:Role:1223077527984144474> **Roles:** {len(ctx.guild.roles)}" , color=0x2b2d31)
-        embed.add_field(name="<:tags:1230676625226727424> Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
+        embed.add_field(name="<:tags:1234994806829355169> Channels", value=f"* **Categories:** {len(ctx.guild.categories)}\n* **Text:** {len(text)}\n* **Forums:** {len(ctx.guild.forums)}\n* **Voice:** {len(voice)}", inline=True)
         embed.add_field(name="<:poll:1192866397043306586> Stats", value=f"* **Total Members:** {total_members}\n* **Members:** {human_members}\n* **Bots:** {find_bots}\n* **Boosts:** {ctx.guild.premium_subscription_count} (Level {ctx.guild.premium_tier})\n* **Total Roles:** {len(ctx.guild.roles)}", inline=True)         
         if str(ctx.guild.explicit_content_filter).capitalize() == 'All_members':
             content_filter = 'Everyone'
         else:
             content_filter = {str(ctx.guild.explicit_content_filter).capitalize()}    
-        embed.add_field(name="<:Promotion:1162134864594735315> Security", value=f"* **Verifiy Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{content_filter}`")
+        embed.add_field(name="<:Promotion:1234997026677198938> Security", value=f"* **Verifiy Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{content_filter}`")
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
         
@@ -405,7 +405,7 @@ class Utility(commands.Cog):
     async def vote(self, interaction: discord.Interaction):
         embed = discord.Embed(title="🚀 Support Astro Birb", description="Hi there! If you enjoy using **Astro Birb**, consider upvoting it on the following platforms to help us grow and reach more servers. Your support means a lot! 🌟", color=discord.Color.dark_embed())
         button = discord.ui.Button(label="Upvote", url="https://top.gg/bot/1113245569490616400/vote", emoji="<:topgg:1206665848408776795>", style=discord.ButtonStyle.blurple)
-        button2 = discord.ui.Button(label="Upvote", url="https://wumpus.store/bot/1113245569490616400/vote", emoji="<:wumpus_store:1206665807011258409>", style=discord.ButtonStyle.blurple)
+        button2 = discord.ui.Button(label="Upvote", url="https://wumpus.store/bot/1113245569490616400/vote", emoji="<:wumpus_store:1234994868049149983>", style=discord.ButtonStyle.blurple)
         button3 = discord.ui.Button(label="Upvote", url="https://discords.com/bots/bot/1113245569490616400/vote", emoji="<:Discords_noBG:1206666304107446352>", style=discord.ButtonStyle.blurple)
         embed.set_thumbnail(url=self.client.user.display_avatar)
         embed.set_author(name=self.client.user.display_name, icon_url=self.client.user.display_avatar)

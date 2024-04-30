@@ -353,7 +353,7 @@ class CreateButtons(discord.ui.Select):
             discord.SelectOption(label="Delete", emoji=f"{bin}"),
             discord.SelectOption(label="Edit", emoji=f"{pen}"),
             discord.SelectOption(label="Export", emoji=f"<:whiteupdate:1192866714879283200>"),
-            discord.SelectOption(label="Import", emoji=f"<:welcome:1218531757691764738>")
+            discord.SelectOption(label="Import", emoji=f"<:welcome:1234994848856150057>")
 
             
 
@@ -795,7 +795,7 @@ class NoEmbeds(discord.ui.View):
         await interaction.response.send_message(view= ButtonsSelection(self.author, self.name), ephemeral=True)     
          
 
-    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1179470251860185159>")
+    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1223063187063308328>")
     async def Var(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -902,7 +902,7 @@ class Embeds(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         await interaction.response.send_message(view= ButtonsSelection(self.author, self.name), ephemeral=True)     
 
-    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1179470251860185159>")
+    @discord.ui.button(label='Variables', style=discord.ButtonStyle.blurple, emoji="<:List:1223063187063308328>")
     async def Var(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
@@ -975,7 +975,7 @@ class Embeds(discord.ui.View):
         
         await interaction.response.send_modal(Thumbnail(default))
 
-    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:Image:1195058849741295748>")
+    @discord.ui.button(label='Image', style=discord.ButtonStyle.grey, emoji="<:Image:1223063095417765938>")
     async def photo(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:
@@ -1015,7 +1015,7 @@ class Embeds(discord.ui.View):
 
         await interaction.response.send_modal(Author(default, default_url))
 
-    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1162134250414415922>")
+    @discord.ui.button(label='Color', style=discord.ButtonStyle.grey, emoji="<:tag:1234998802948034721>")
     async def Color(self, interaction: discord.Interaction, button: discord.ui.Button):
         author = self.author.id
         if interaction.user.id != author:

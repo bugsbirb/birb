@@ -201,9 +201,9 @@ class InfractionTypesAction(discord.ui.Select):
         self.author = author
         self.name = name
         options = [
-            discord.SelectOption(label="Send to channel", emoji="<:tag:1162134250414415922>"),
-            discord.SelectOption(label="Give Roles", emoji="<:Promotion:1162134864594735315>"),
-            discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1162134605885870180>")
+            discord.SelectOption(label="Send to channel", emoji="<:tag:1234998802948034721>"),
+            discord.SelectOption(label="Give Roles", emoji="<:Promotion:1234997026677198938>"),
+            discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1223063128275943544>")
         ]
         super().__init__(placeholder='Infraction Type Action', min_values=1, max_values=3, options=options, row=0)
         

@@ -99,7 +99,7 @@ class Infractions(commands.Cog):
        view = discord.ui.View()
 
        view.add_item(InfractionMultiple(action, reason, notes, expiration, anonymous))
-       await ctx.send(f"<:List:1179470251860185159> **{ctx.author.display_name}**, select the users you want to infraction!", view=view)
+       await ctx.send(f"<:List:1223063187063308328> **{ctx.author.display_name}**, select the users you want to infraction!", view=view)
        
        
 
@@ -492,7 +492,7 @@ class Infractions(commands.Cog):
             if len(value) > 1024:
              value = value[:1021] + "..."
             embed.add_field(
-                name=f"<:Document:1166803559422107699> Infraction | {infraction['random_string']} {voided}",
+                name=f"<:Document:1223063264322125844> Infraction | {infraction['random_string']} {voided}",
                 value=value,
                 inline=False
             )

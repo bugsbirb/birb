@@ -784,7 +784,7 @@ class AdminPanelCog(commands.Cog):
             color=discord.Color.dark_embed(),
         )
         embed.add_field(
-            name="<:data:1166529224094523422> Staff Data",
+            name="<:data:1223062662510936155> Staff Data",
             value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         embed.set_author(name=staff.name, icon_url=staff.display_avatar)
@@ -883,7 +883,7 @@ class IssuedInfraction(discord.ui.View):
     @discord.ui.button(
         label="View Issued Infractions",
         style=discord.ButtonStyle.grey,
-        emoji="<:infractionssearch:1200479190118576158>",
+        emoji="<:infractionssearch:1234997448641085520>",
     )
     async def InfractionsView(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -942,7 +942,7 @@ class IssuedInfraction(discord.ui.View):
                 )
 
             embed.add_field(
-                name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+                name=f"<:Document:1223063264322125844> Infraction | {infraction_info['id']}",
                 value=f"{arrow}**Infracted User:** <@{infraction_info['staff']}>\n{arrow}**Action:** {infraction_info['action']}\n{arrow}**Reason:** {infraction_info['reason']}\n{arrow}**Notes:** {infraction_info['notes']}",
                 inline=False,
             )
@@ -1005,7 +1005,7 @@ class AdminPanel(discord.ui.View):
     @discord.ui.button(
         label="Promote",
         style=discord.ButtonStyle.grey,
-        emoji="<:Promotion:1162134864594735315>",
+        emoji="<:Promotion:1234997026677198938>",
     )
     async def Promote(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1067,7 +1067,7 @@ class AdminPanel(discord.ui.View):
     @discord.ui.button(
         label="Search",
         style=discord.ButtonStyle.grey,
-        emoji="<:Search:1166509265951932546>",
+        emoji="<:Search:1234998631078297651>",
     )
     async def Search(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -1147,7 +1147,7 @@ class AdminPanel(discord.ui.View):
                     expiration = f"\n{arrow}**Expiration:** <t:{int(infraction_info['expiration'].timestamp())}:D> **(Infraction Expired)**"
             management = f"<@{infraction_info['management']}>"
             embed.add_field(
-                name=f"<:Document:1166803559422107699> Infraction | {infraction_info['id']}",
+                name=f"<:Document:1223063264322125844> Infraction | {infraction_info['id']}",
                 value=f"{arrow}**Infracted By:** {management}\n{arrow}**Action:** {infraction_info['action']}\n{arrow}**Reason:** {infraction_info['reason']}\n{arrow}**Notes:** {infraction_info['notes']}{expiration}{jump_url}",
                 inline=False,
             )
@@ -1277,7 +1277,7 @@ class Return(discord.ui.View):
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
-            name="<:data:1166529224094523422> Staff Data",
+            name="<:data:1223062662510936155> Staff Data",
             value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
@@ -1396,7 +1396,7 @@ class LOAPanel(discord.ui.View):
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
-            name="<:data:1166529224094523422> Staff Data",
+            name="<:data:1223062662510936155> Staff Data",
             value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
@@ -1481,7 +1481,7 @@ class LOACreate(discord.ui.View):
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
-            name="<:data:1166529224094523422> Staff Data",
+            name="<:data:1223062662510936155> Staff Data",
             value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
@@ -1577,7 +1577,7 @@ class RevokeInfraction(discord.ui.View):
         )
         embed.set_thumbnail(url=self.user.display_avatar)
         embed.add_field(
-            name="<:data:1166529224094523422> Staff Data",
+            name="<:data:1223062662510936155> Staff Data",
             value=f"{arrow}**Infractions:** {infractions}\n{arrow}**Demotions:** {demotions}\n{arrow}**Leave Of Absence:** {loamsg}",
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
