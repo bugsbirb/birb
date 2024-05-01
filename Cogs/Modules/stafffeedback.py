@@ -79,7 +79,7 @@ class Feedback(commands.Cog):
 
     @feedback.command(description="Rate a staff member", name="give")
     @app_commands.describe(staff="The staff member you want to rate.", rating="The rating you want to give (1-10).", feedback="The feedback you want to give.")
-    async def feedback2(self, ctx: commands.Context, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], feedback:  discord.ext.commands.Range[str, 1, 2000]):
+    async def feedback2(self, ctx: commands.Context, staff: discord.Member, rating: Literal['1/10', '2/10', '3/10', '4/10', '5/10', '6/10', '7/10', '8/10', '9/10', '10/10'], *,feedback:  discord.ext.commands.Range[str, 1, 2000]):
        await ctx.defer(ephemeral=True)
        existing_feedback = await stafffeedback.find_one({'guild_id': ctx.guild.id, 'staff': staff.id, 'author': ctx.author.id})
        optionresult = await options.find_one({'guild_id': ctx.guild.id})

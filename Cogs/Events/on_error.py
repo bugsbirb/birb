@@ -23,6 +23,9 @@ class On_error(commands.Cog):
             return
         if isinstance(error, commands.NotOwner):
             return
+        if isinstance(error, commands.BadLiteralArgument):
+            await ctx.send(f"{no} **{ctx.author.display_name}**, you have used an invalid argument.")
+            return
         if isinstance(error, commands.MemberNotFound):
             await ctx.send(f"{no} **{ctx.author.display_name}**, that member isn't in the server.")
             return

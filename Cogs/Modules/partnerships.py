@@ -120,7 +120,7 @@ class Partnerships(commands.Cog):
          
     @partnership.command(description="Terminate a server partnership")     
     @app_commands.autocomplete(server=servers_autocomplete)    
-    async def terminate(self, ctx: commands.Context, server, reason:  discord.ext.commands.Range[str, 1, 2000]):
+    async def terminate(self, ctx: commands.Context, server, *,reason:  discord.ext.commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return            

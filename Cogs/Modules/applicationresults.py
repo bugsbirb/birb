@@ -56,7 +56,7 @@ class ApplicationResults(commands.Cog):
     
     @commands.hybrid_command(description="Apply for a position.")
     @app_commands.autocomplete(application=applications)
-    async def apply(self, ctx: commands.Context, application: str):
+    async def apply(self, ctx: commands.Context, *,application: str):
         if not await self.has_required_role(ctx, application):
             return
         
@@ -111,7 +111,7 @@ class ApplicationResults(commands.Cog):
     
     @application.command(description="Blacklist a user from applying from an application.")
     @app_commands.autocomplete(application=applications)
-    async def blacklist(self, ctx: commands.Context, user: discord.Member, application: str):
+    async def blacklist(self, ctx: commands.Context, user: discord.Member, *,application: str):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
@@ -135,7 +135,7 @@ class ApplicationResults(commands.Cog):
 
     @application.command(description="Unblacklist a user from applying from an application.")
     @app_commands.autocomplete(application=applications)
-    async def unblacklist(self, ctx: commands.Context, user: discord.Member, application: str):
+    async def unblacklist(self, ctx: commands.Context, user: discord.Member, *,application: str):
         if not await self.modulecheck(ctx):
             await ctx.send(f"{no} **{ctx.author.display_name}**, the applications module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
             return
