@@ -24,16 +24,21 @@ class webGuildJoins(commands.Cog):
 
         if channel:
             webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
-
-            await webhook.send(f"<:join:1140670830792159373> I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
-        async for entry in guild.audit_logs(action=discord.AuditLogAction.bot_add):
-            if entry.target.id == client.user.id:
-                inviter = entry.user
+            try:
+             await webhook.send(f"<:join:1140670830792159373> I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
+            except discord.HTTPException:
+                print('[ERROR] Can\'t send guild join message its too long.')
+                pass 
+            inviter = None
+            async for entry in guild.audit_logs(action=discord.AuditLogAction.bot_add):
+                if entry.target.id == self.client.user.id:
+                    inviter = entry.user
+                    break
+            if inviter:
                 try:
-                    await inviter.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1223063384946249789> Guild `#{len(client.guilds)}`")
+                    await inviter.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1163171628050563153> Guild `#{len(self.client.guilds)}`")
                 except discord.Forbidden:
                     print("[⚠️] I couldn't DM the owner of the guild for the guild join.")
-                break
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()
