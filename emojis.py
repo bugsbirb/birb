@@ -7,7 +7,7 @@ pen = "<:Pen:1235001839036923996>"
 tagsemoji = "<:tag:1234998802948034721>"
 infractions = "<:Infraction:1223063128275943544> "
 promotions = "<:Promotion:1234997026677198938>"
-dropdown = "<:ArrowDropDown:1223063384946249789> "
+dropdown = "<:ArrowDropDown:1163171628050563153>"
 
 greencheck = "<:check312:1214614441812041838>"
 redx = "<:cxk123:1214614818951266314>"

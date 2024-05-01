@@ -1,5 +1,5 @@
 from discord.ext import commands
-
+import discord
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
@@ -14,9 +14,9 @@ mongo = AsyncIOMotorClient(MONGO_URL)
 
 
 db2 = mongo['quotab']
-
+ignoredchannels = db2['Ignored Quota Channels']
 mccollection = db2["messages"]
-
+ignoredchannels = db2['Ignored Quota Channels']
 MONGO_URL = os.getenv('MONGO_URL')
 astro = AsyncIOMotorClient(MONGO_URL)
 db = astro['astro']
@@ -29,10 +29,11 @@ class messageevent(commands.Cog):
         self.client = client
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.guild is None:
             return
         module = await modules.find_one({'guild_id': message.guild.id})
+
         if module:
          if module.get('Quota', False) is False:
             return
@@ -47,6 +48,11 @@ class messageevent(commands.Cog):
 
         staff_data = await scollection2.find_one({'guild_id': message.guild.id})
         admin_data = await arole.find_one({'guild_id': message.guild.id})
+        ignoredchannelsresult = await ignoredchannels.find_one({'guild_id': message.guild.id})
+        if ignoredchannelsresult:
+         if message.channel.id in ignoredchannelsresult.get('channel_ids', []):
+           return
+
         if staff_data is None or 'staffrole' not in staff_data:
             return
         if admin_data is None or 'staffrole' not in admin_data:
@@ -56,6 +62,7 @@ class messageevent(commands.Cog):
         admin_role_ids = admin_data['staffrole']
         if not isinstance(staff_role_ids, list):
             staff_role_ids = [staff_role_ids]
+        
 
         if any(role.id in staff_role_ids for role in message.author.roles):
              

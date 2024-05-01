@@ -18,7 +18,8 @@ from Cogs.Configuration.Views.tagsview import ToggleTags
 from Cogs.Configuration.Views.tagsview import TagsUsageChannel
 
 from Cogs.Configuration.Views.quotaview import QuotaToggle
-from Cogs.Configuration.Views.quotaview import QuotaAmount
+from Cogs.Configuration.Views.quotaview import QuotaAmount, IgnoredChannel
+
 
 from Cogs.Configuration.Views.feedbackview import FeedbackChannel, FMoreOptions
 from Cogs.Configuration.Views.feedbackview import ToggleFeedback
@@ -108,6 +109,8 @@ options = db['module options']
 qotds = db['qotd']
 premium = db['premium']
 prefixdb = db['prefixes']
+ignoredchannels = db2['Ignored Quota Channels']
+
 class StaffRole(discord.ui.RoleSelect):
     def __init__(self, author, roles):
 
@@ -539,12 +542,20 @@ class Config(discord.ui.Select):
         elif color == 'Message Quota':         # Tags
             moduleddata = modules.find_one({'guild_id': interaction.guild.id})            
             messagequotdata = message_quota_collection.find_one({'guild_id': interaction.guild.id})
+            ignoredchannelsresult = ignoredchannels.find_one({'guild_id': interaction.guild.id})
             messagecountmsg = "Not Configured"
             if messagequotdata:
                 messagecountmsg = f"{messagequotdata['quota']}"
             modulemsg = "True"
             if moduleddata:
                 modulemsg = f"{moduleddata['Quota']}"            
+            channels = []
+            if ignoredchannelsresult and ignoredchannelsresult.get('channels'):
+             for channel_id in ignoredchannelsresult.get('channels', []):
+                channel = interaction.guild.get_channel(channel_id)
+                if channel:
+                    channels.append(channel)
+
             embed = discord.Embed(title="<:quota:1234994790056198175> Message Quota Module",  color=discord.Color.dark_embed())    
             embed.add_field(name="<:settings:1207368347931516928> Message Quota Configuration", value=f"{replytop}**Enabled:** {modulemsg}\n{replybottom}**Quota:** {messagecountmsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)", inline=False)
             embed.set_thumbnail(url=interaction.guild.icon)
@@ -552,7 +563,7 @@ class Config(discord.ui.Select):
             options = [
               discord.SelectOption(label="Enabled"),
               discord.SelectOption(label="Disabled")]                    
-            view = QuotaModule(self.author, options)
+            view = QuotaModule(self.author, options, channels)
 
         elif color == 'Staff Feedback':    #StaffFeed
             feedbackchannelresult = feedbackch.find_one({'guild_id': interaction.guild.id})
@@ -1203,10 +1214,11 @@ class TagsModule(discord.ui.View):
 
 
 class QuotaModule(discord.ui.View):
-    def __init__(self, author, options):
+    def __init__(self, author, options, channels):
         super().__init__(timeout=None)
         self.add_item(QuotaToggle(author, options))            
         self.add_item(QuotaAmount(author))          
+        self.add_item(IgnoredChannel(author, channels))
         self.add_item(Config(author)) 
 
 

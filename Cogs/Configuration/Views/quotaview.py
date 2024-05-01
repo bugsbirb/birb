@@ -8,6 +8,8 @@ mongo = AsyncIOMotorClient(MONGO_URL)
 dbq = mongo['quotab']
 message_quota_collection = dbq["message_quota"]
 
+ignoredchannels = dbq['Ignored Quota Channels']
+
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 modules = db['Modules']
@@ -25,6 +27,10 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
+
+
+
+
 
 class QuotaToggle(discord.ui.Select):
     def __init__(self, author, options):
@@ -50,6 +56,33 @@ class QuotaToggle(discord.ui.Select):
             modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': False}}, upsert=True) 
             await refreshembed(interaction)
 
+
+class IgnoredChannel(discord.ui.ChannelSelect):
+    def __init__(self, author, channels):
+        super().__init__(placeholder='Ignored Channels', channel_types=[discord.ChannelType.text, discord.ChannelType.news], default_values=channels, max_values=25)
+        self.author = author
+    
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+                  
+        channelids = [channel.id for channel in self.values]
+
+        filter = {
+            'guild_id': interaction.guild.id
+        }
+
+        try:
+            await ignoredchannels.update_one(filter, {'$set': {'channel_ids': channelids}}, upsert=True)
+            await refreshembed(interaction)
+            await interaction.edit_original_response(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel IDs: {channelids}")
 
 class QuotaAmount(discord.ui.Select):
     def __init__(self, author):
