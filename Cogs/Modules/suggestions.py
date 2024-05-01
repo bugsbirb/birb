@@ -31,12 +31,12 @@ class suggestions(commands.Cog):
 
     @commands.hybrid_command(description="Submit a suggestion for improvement")
     @app_commands.describe(suggestion="The suggestion to make.")
-    async def suggest(self, ctx: commands.Context, suggestion: str, image: discord.Attachment = None):
+    async def suggest(self, ctx: commands.Context, *,suggestion: str, image: discord.Attachment = None):
         await ctx.defer(ephemeral=True)
         if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the suggestion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return    
-        if image:
+        if not image is None:
            image = image.url
         suggestion_data = {
             "author_id": ctx.author.id,
