@@ -501,7 +501,7 @@ class Modmail(commands.Cog):
                          embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
                          embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=ctx.author.mention, inline=True)
                          embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
-                         embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
+                         embed.add_field(name="<:reason:1235000513477738576> Reason", value=reason, inline=True)
                          await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
                          await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': ctx.guild.id, 'closedby': ctx.author.id, 'reason': reason, 'author': user.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                         except discord.Forbidden:
@@ -519,7 +519,7 @@ class Modmail(commands.Cog):
                      embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
                      embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=ctx.author.mention, inline=True)
                      embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
-                     embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
+                     embed.add_field(name="<:reason:1235000513477738576> Reason", value=reason, inline=True)
 
                      print(link)
                      view = TranscriptChannel(link)
@@ -589,7 +589,7 @@ class Modmail(commands.Cog):
                          embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
                          embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=ctx.author.mention, inline=True)
                          embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
-                         embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
+                         embed.add_field(name="<:reason:1235000513477738576> Reason", value=reason, inline=True)
                          await user.send(f"{tick} Your modmail channel has been closed.", embed=embed) 
                          await transcripts.insert_one({'transcriptid': transcriptid ,'guild_id': ctx.guild.id, 'closedby': ctx.author.id, 'reason': reason, 'author': user.id,'timestamp': datetime.now(), 'transcriptlink': link})  
                         except discord.Forbidden:
@@ -607,7 +607,7 @@ class Modmail(commands.Cog):
                      embed.add_field(name="<:Add:1163095623600447558> Opened", value=user.mention, inline=True)
                      embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=ctx.author.mention, inline=True)
                      embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
-                     embed.add_field(name="<:reason:1202773873095868476> Reason", value=reason, inline=True)
+                     embed.add_field(name="<:reason:1235000513477738576> Reason", value=reason, inline=True)
 
                      print(link)
                      view = TranscriptChannel(link)

@@ -93,7 +93,7 @@ class Modmailevnt(commands.Cog):
                       embed.add_field(name="<:Add:1163095623600447558> Opened", value=message.author.mention, inline=True)
                       embed.add_field(name="<:Exterminate:1223063042246443078> Closed", value=message.author.mention, inline=True)
                       embed.add_field(name="<:casewarningwhite:1191903691750514708> Time Created", value=channelcreated, inline=True)
-                      embed.add_field(name="<:reason:1202773873095868476> Reason", value="Closed by modmail author.", inline=True)
+                      embed.add_field(name="<:reason:1235000513477738576> Reason", value="Closed by modmail author.", inline=True)
                       await dm_channel.send(embed=embed)
                       
 
@@ -198,6 +198,7 @@ class Modmailevnt(commands.Cog):
                              return
                     else:
                         try:
+                        
                          channel = await category.create_text_channel(f'modmail-{message.author.name}')
                         except discord.Forbidden: 
                             await message.reply(f"{no} **{message.author.name},** please contact the server admins I can't create a channel.")
@@ -208,26 +209,31 @@ class Modmailevnt(commands.Cog):
                             'channel_id': channel.id
                         }
 
-                        modmail.insert_one(modmail_data)
-        
-                        await message.author.send(f"{tick} Conversation started.\n{dropdown} Use `!close` to close the conversation.")
-                        user = await selected_server.fetch_member(user_id)
-                        user_roles = " ".join([role.mention for role in user.roles if role != selected_server.default_role][:20])
-                        rolecount = len(user.roles) - 1 if selected_server.default_role in user.roles else len(user.roles)
+                        await modmail.insert_one(modmail_data)
+                        try:
+                         
+                         user = await selected_server.fetch_member(user_id)
+                         user_roles = " ".join([role.mention for role in user.roles if role != selected_server.default_role][:20])
+                         rolecount = len(user.roles) - 1 if selected_server.default_role in user.roles else len(user.roles)
 
                         
-                        modmailpingresult = await modmailping.find_one({'guild_id': selected_server.id})
-                        modmailroles = ""
-                        if modmailpingresult:
+                         modmailpingresult = await modmailping.find_one({'guild_id': selected_server.id})
+                         modmailroles = ""
+                         if modmailpingresult:
                             modmailroles = [f'<@&{roleid}>' for sublist in modmailpingresult['modmailping'] for roleid in sublist if selected_server.get_role(roleid) is not None]
                             modmailroles = ", ".join(filter(None, modmailroles))
-                        info = discord.Embed(title="Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
-                        if user_roles:
+                         info = discord.Embed(title="Member Information", description=f"* **User:** {message.author.mention}\n* **Joined:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>",timestamp=datetime.utcnow(), color=discord.Color.dark_embed())
+                         if user_roles:
                             info.add_field(name=f"Roles [{rolecount}]", value=user_roles, inline=False)
-                        info.set_author(name=message.author, icon_url=message.author.display_avatar)
-                        info.set_thumbnail(url=message.author.display_avatar)
-                        info.set_footer(text=f"ID: {message.author.id}")
-                        await channel.send(f"{modmailroles}\n<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.", embed=info)
+                         info.set_author(name=message.author, icon_url=message.author.display_avatar)
+                         info.set_thumbnail(url=message.author.display_avatar)
+                         info.set_footer(text=f"ID: {message.author.id}")
+                         await channel.send(f"{modmailroles}\n<:Messages:1148610048151523339> **{message.author.display_name}** has started a modmail conversation.", embed=info)
+                         await message.author.send(f"{tick} Conversation started.\n{dropdown} Use `!close` to close the conversation.")
+                        except discord.Forbidden:
+                            await modmail.delete_one(modmail_data)
+                            await message.reply(f'{crisis} **{message.author.name},** Please contact the server admins I can\'t send a message in the modmail channel.')
+                            return
                         option = await options.find_one({'guild_id': selected_server.id})
                         if option:
                                     if option.get('MessageFormatting') == 'Messages':
