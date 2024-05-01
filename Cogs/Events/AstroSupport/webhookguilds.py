@@ -26,13 +26,14 @@ class webGuildJoins(commands.Cog):
             webhook = discord.utils.get(await channel.webhooks(), name="Public Bot Logs")
 
             await webhook.send(f"<:join:1140670830792159373> I am now in {len(self.client.guilds)} guilds.", username=guild.name, avatar_url=guild.icon)
-        owner = guild.owner
-        view = Support()
-        try:
-         await owner.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1223063384946249789> Guild `#{len(self.client.guilds)}`", view=view)
-        except discord.Forbidden:
-            print("[⚠️] I couldn't dm the owner of the guild for the guild join.")
-            return
+        async for entry in guild.audit_logs(action=discord.AuditLogAction.bot_add):
+            if entry.target.id == client.user.id:
+                inviter = entry.user
+                try:
+                    await inviter.send(f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1223063384946249789> Guild `#{len(client.guilds)}`")
+                except discord.Forbidden:
+                    print("[⚠️] I couldn't DM the owner of the guild for the guild join.")
+                break
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()

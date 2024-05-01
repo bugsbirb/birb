@@ -46,7 +46,12 @@ class ForumCreaton(commands.Cog):
 
             mention = f"<@&{role_id}>" if role else ""
             msg = await thread.send(content=f"{mention}", embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
-            await msg.pin()
+            try:
+             await msg.pin()
+            except discord.Forbidden:
+                print('[ERROR] Unable to pin message.')
+            except discord.HTTPException:
+                print('[ERROR] Unable to pin message.') 
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ForumCreaton(client))   
