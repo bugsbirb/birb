@@ -30,6 +30,8 @@ Customisation = db['Customisation']
 infractiontypes = db['infractiontypes']
 infractiontypeactions = db['infractiontypeactions']
 options = db['module options']
+staffdb = db['staff database']
+
 class Infractions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -284,6 +286,10 @@ class Infractions(commands.Cog):
                         pass
                     except discord.HTTPException:
                         pass
+            if typeactions.get('dbremoval', False) == True:
+                await staffdb.delete_one({"staff_id": staff.id})
+
+                       
  
 
 
@@ -920,7 +926,8 @@ class InfractionMultiple(discord.ui.UserSelect):
                             except discord.HTTPException:
                                 pass
  
-
+                    if typeactions.get('dbremoval', False) == True:
+                        await staffdb.delete_one({"staff_id": user.id})
 
               
                     if typeactions.get('channel'):  

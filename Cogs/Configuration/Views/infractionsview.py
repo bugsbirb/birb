@@ -203,7 +203,8 @@ class InfractionTypesAction(discord.ui.Select):
         options = [
             discord.SelectOption(label="Send to channel", emoji="<:tag:1234998802948034721>"),
             discord.SelectOption(label="Give Roles", emoji="<:Promotion:1234997026677198938>"),
-            discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1223063128275943544>")
+            discord.SelectOption(label='Remove Roles', emoji="<:Infraction:1223063128275943544>"),
+            discord.SelectOption(label="Staff Database Removal",emoji="<:staffdb:1206253848298127370>" )
         ]
         super().__init__(placeholder='Infraction Type Action', min_values=1, max_values=3, options=options, row=0)
         
@@ -211,6 +212,16 @@ class InfractionTypesAction(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         options = self.values
         view = discord.ui.View()
+        filter = {
+            'guild_id': interaction.guild.id,
+            'name': self.name
+        }     
+        if 'Staff Database Removal' in options:
+            await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'dbremoval': True}}, upsert=True)     
+        if not 'Send to channel' and 'Give Roles' and 'Remove Roles' in options:
+            await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
+            return
+                
         if 'Send to channel' in options:
             view.add_item(TypeChannel(self.author, self.name, options))  
             await interaction.response.edit_message(view=view)
@@ -224,6 +235,7 @@ class InfractionTypesAction(discord.ui.Select):
                 Removeroles(self.author, self.name, options))   
             await interaction.response.edit_message(view=view)
             return         
+
 
 class TypeChannel(discord.ui.ChannelSelect):
     def __init__(self, author, name, selected):
@@ -257,6 +269,7 @@ class TypeChannel(discord.ui.ChannelSelect):
                 view = discord.ui.View()
                 view.add_item(Removeroles(self.author, self.name, self.selected))
                 await interaction.response.edit_message(content=f"{tick} Succesfully set channel, now set the removed roles!", view=view)
+       
         else:        
             await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
 
@@ -338,7 +351,7 @@ class InfractionTypes(discord.ui.Select):
 class EditInfractionModal(discord.ui.Modal):
     def __init__(self, author):
         self.author = author
-        super().__init__(title="Create Infraction Type")
+        super().__init__(title="Edit Infraction Type")
 
     type_input = discord.ui.TextInput(
             label='Type',
