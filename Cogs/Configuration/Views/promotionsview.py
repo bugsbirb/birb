@@ -303,6 +303,7 @@ class PromotionByButton(discord.ui.View):
 async def refreshembed(interaction):
             promochannelresult = await promochannel.find_one({'guild_id': interaction.guild.id})
             moduleddata = await modules.find_one({'guild_id': interaction.guild.id})
+            
             modulemsg = ""
             promochannelmsg = "Not Configured"
             if moduleddata:

@@ -217,10 +217,12 @@ class InfractionTypesAction(discord.ui.Select):
             'name': self.name
         }     
         if 'Staff Database Removal' in options:
-            await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'dbremoval': True}}, upsert=True)     
-        if not 'Send to channel' and 'Give Roles' and 'Remove Roles' in options:
+            await infractiontypeactions.update_one(filter, {'$set': {'name': self.name, 'dbremoval': True}}, upsert=True) 
+
+        if 'Send to channel' not in options and 'Give Roles' not in options and 'Remove Roles' not in options:
             await interaction.response.edit_message(content=f"{tick} Succesfully setup Infraction type.", view=None)
             return
+
                 
         if 'Send to channel' in options:
             view.add_item(TypeChannel(self.author, self.name, options))  
