@@ -36,7 +36,6 @@ class Api(commands.Cog):
     @app.get("/checkguild/{guild_id}")
     async def check_guild(guild_id):
             guild = Api.instance.client.get_guild(int(guild_id))
-            print(guild)
             if guild is not None:
                 return {"message": True}
             else:
@@ -49,20 +48,18 @@ class Api(commands.Cog):
     @staticmethod
     @app.get("/ping")
     async def ping():
-        if Api.instance.client.is_ready(): 
             discord_latency = f"{Api.instance.client.latency * 1000:.0f}ms" 
+            if not discord_latency:
+                return {"message": "Discord client is not ready"}
             
             return {"latency": discord_latency}
-        else:
-            return {"message": "Discord client is not ready"}
+
     
     @staticmethod
     @app.get("/stats")
-    async def stats():
-        if Api.instance.client.is_ready(): 
+    async def stats(): 
             return {"users": len(Api.instance.client.users), "guilds": len(Api.instance.client.guilds)}
-        else:
-            return {"message": "Discord client is not ready"}
+      
 
         
         

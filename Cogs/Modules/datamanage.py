@@ -88,7 +88,7 @@ class DataSelector(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         data_type = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -248,7 +248,7 @@ class Infractions(discord.ui.View):
     @discord.ui.button(label="Erase Infractions", style=discord.ButtonStyle.red, row=0)
     async def eraseinfractions(self, interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -259,7 +259,7 @@ class Infractions(discord.ui.View):
     @discord.ui.button(label="Reset Infraction Types", style=discord.ButtonStyle.red, row=1)
     async def erasetypes(self, interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
@@ -271,7 +271,7 @@ class Infractions(discord.ui.View):
     @discord.ui.button(label="Erase Infraction Configuration", style=discord.ButtonStyle.red, row=2)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)     
         await interaction.response.defer()   
@@ -295,7 +295,7 @@ class Partnerships(discord.ui.View):
     @discord.ui.button(label="Erase Partnerships", style=discord.ButtonStyle.red, row=0)
     async def erasepartnerships(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)             
         await interaction.response.defer()
@@ -308,7 +308,7 @@ class Partnerships(discord.ui.View):
     @discord.ui.button(label="Erase Partnership Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)             
         await interaction.response.defer()        
@@ -327,7 +327,7 @@ class Welcome(discord.ui.View):
     @discord.ui.button(label="Erase Welcome Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self,interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -346,7 +346,7 @@ class LOAs(discord.ui.View):
     @discord.ui.button(label="Erase LOAs ", style=discord.ButtonStyle.red, row=0)
     async def eraseloa(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         
@@ -357,7 +357,7 @@ class LOAs(discord.ui.View):
     @discord.ui.button(label="Erase LOA Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self,interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -376,7 +376,7 @@ class CustomCommands(discord.ui.View):
     @discord.ui.button(label="Erase Commands", style=discord.ButtonStyle.red, row=0)
     async def erasecommands(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         
@@ -392,7 +392,7 @@ class Modmail(discord.ui.View):
     @discord.ui.button(label="Erase Modmail Configuration", style=discord.ButtonStyle.red, row=0)
     async def erasemodmail(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -413,7 +413,7 @@ class Quota(discord.ui.View):
     @discord.ui.button(label="Erase Message Count", style=discord.ButtonStyle.red, row=0)
     async def erasequota(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -423,7 +423,7 @@ class Quota(discord.ui.View):
     @discord.ui.button(label="Erase Quota Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -442,7 +442,7 @@ class Suggestions(discord.ui.View):
     @discord.ui.button(label="Erase Suggestions", style=discord.ButtonStyle.red, row=0)
     async def erasesuggestions(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -452,7 +452,7 @@ class Suggestions(discord.ui.View):
     @discord.ui.button(label="Erase Suggestions Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -471,7 +471,7 @@ class Forums(discord.ui.View):
     @discord.ui.button(label="Erase Forums Autopost", style=discord.ButtonStyle.red, row=0)
     async def eraseforums(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -481,7 +481,7 @@ class Forums(discord.ui.View):
     @discord.ui.button(label="Erase Forums Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -501,7 +501,7 @@ class Tags(discord.ui.View):
     @discord.ui.button(label="Erase Tags", style=discord.ButtonStyle.red, row=0)
     async def erasetags(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -511,7 +511,7 @@ class Tags(discord.ui.View):
     @discord.ui.button(label="Erase Tags Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -529,7 +529,7 @@ class ConnectionRoles(discord.ui.View):
     @discord.ui.button(label="Erase Connection Roles", style=discord.ButtonStyle.red, row=0)    
     async def eraseconnectionroles(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -539,7 +539,7 @@ class ConnectionRoles(discord.ui.View):
     @discord.ui.button(label="Erase Connection Roles Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -557,7 +557,7 @@ class Suspensions(discord.ui.View):
     @discord.ui.button(label="Erase Suspensions", style=discord.ButtonStyle.red, row=0)
     async def erasesuspensions(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -567,7 +567,7 @@ class Suspensions(discord.ui.View):
     @discord.ui.button(label="Erase Suspensions Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -585,7 +585,7 @@ class StaffFeedback(discord.ui.View):
     @discord.ui.button(label="Erase Staff Feedback", style=discord.ButtonStyle.red, row=0)
     async def erasestafffeedback(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -595,7 +595,7 @@ class StaffFeedback(discord.ui.View):
     @discord.ui.button(label="Erase Staff Feedback Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -613,7 +613,7 @@ class Reports(discord.ui.View):
     @discord.ui.button(label="Erase Reports", style=discord.ButtonStyle.red, row=0)
     async def erasereports(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -623,7 +623,7 @@ class Reports(discord.ui.View):
     @discord.ui.button(label="Erase Reports Configuration", style=discord.ButtonStyle.red, row=1)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -644,7 +644,7 @@ class Applications(discord.ui.View):
     @discord.ui.button(label="Erase Applications Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -664,7 +664,7 @@ class Promotions(discord.ui.View):
     @discord.ui.button(label="Erase Promotions", style=discord.ButtonStyle.red, row=0)
     async def eraseinfractions(self, interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -674,7 +674,7 @@ class Promotions(discord.ui.View):
     @discord.ui.button(label="Erase Promotions Ranks", style=discord.ButtonStyle.red, row=0)
     async def erasepromotionroles(self, interaction: discord.Interaction,  button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -684,7 +684,7 @@ class Promotions(discord.ui.View):
     @discord.ui.button(label="Erase Promotions Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -703,7 +703,7 @@ class StaffPanel(discord.ui.View):
     @discord.ui.button(label="Erase Staff Database Configuration", style=discord.ButtonStyle.red, row=0)
     async def eraseconfig(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()
@@ -717,7 +717,7 @@ class StaffPanel(discord.ui.View):
     @discord.ui.button(label="Erase Staff Database", style=discord.ButtonStyle.red, row=1)
     async def erasestaff(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view.",
+            embed = discord.Embed(description=f"**{interaction.user.display_namee},** this is not your view.",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         await interaction.response.defer()

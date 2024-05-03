@@ -116,14 +116,14 @@ class StaffManage(discord.ui.View):
     @discord.ui.button(label="Add Messages", style=discord.ButtonStyle.green,emoji="<:Add:1163095623600447558>", row=1)
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True) 
        await interaction.response.send_modal(AddMessage(self.staff_id))      
     @discord.ui.button(label="Subtract Messages", style=discord.ButtonStyle.red, emoji="<:Subtract:1229040262161109003>", row=1)
     async def subtract(self, interaction: discord.Interaction, button: discord.ui.Button):
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True) 
        await interaction.response.send_modal(RemovedMessage(self.staff_id))     
@@ -131,7 +131,7 @@ class StaffManage(discord.ui.View):
     @discord.ui.button(label='Set Messages', style=discord.ButtonStyle.blurple, row=2, emoji="<:Pen:1235001839036923996>")
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
        await interaction.response.send_modal(SetMessages(self.staff_id))      
@@ -142,7 +142,7 @@ class StaffManage(discord.ui.View):
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
        staff_id = self.staff_id
        if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                 
        filter = {'guild_id': interaction.guild.id, 'user_id': staff_id}

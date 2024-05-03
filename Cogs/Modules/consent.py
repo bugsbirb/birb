@@ -66,7 +66,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Infractions Alerts', style=discord.ButtonStyle.grey)
     async def toggle_infractions(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.consent_data['infractionalert'] = "Enabled" if self.consent_data['infractionalert'] == "Disabled" else "Disabled"
@@ -77,7 +77,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='Promotion Alerts', style=discord.ButtonStyle.grey)
     async def toggle_promotions(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.consent_data['PromotionAlerts'] = "Enabled" if self.consent_data['PromotionAlerts'] == "Disabled" else "Disabled"
@@ -87,7 +87,7 @@ class Confirm(discord.ui.View):
     @discord.ui.button(label='LOA Alerts', style=discord.ButtonStyle.grey)
     async def toggle_loa(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view!",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view!",
                                 color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         consent = self.consent_data.get('LOAAlerts', "Enabled")

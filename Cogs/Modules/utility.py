@@ -39,7 +39,7 @@ class SetupGuide(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)           
         category = self.values[0]
@@ -514,7 +514,7 @@ class NetWorkPage(discord.ui.View):
         emoji="<:chevronright:1220806430010118175>"  )
     async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         server_name = "Astro Birb"
@@ -558,7 +558,7 @@ class ShardsPage(discord.ui.View):
         disabled=False)
     async def left(self, interaction: discord.Interaction, button: discord.ui.Button,):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         server_name = "Astro Birb"

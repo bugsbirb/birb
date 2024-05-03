@@ -46,7 +46,7 @@ class LOA(discord.ui.Modal, title='Create Leave Of Absence'):
         duration = self.Duration.value
         reason = self.reason.value
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if not re.match(r'^\d+[smhdw]$', duration):
@@ -543,7 +543,7 @@ class LOAPanel(discord.ui.View):
         user = self.user
         author = self.author.id
         if interaction.user.id != author:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         loa = await loa_collection.find_one({"user": self.user.id, "guild_id": interaction.guild.id, 'active': True})
@@ -587,7 +587,7 @@ class LOACreate(discord.ui.View):
                        custom_id='persistent_view:cancel', emoji="<:Add:1163095623600447558>")
     async def CreateLOA(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.response.send_modal(LOA(self.user, self.guild, self.author))

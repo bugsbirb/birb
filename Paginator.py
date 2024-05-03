@@ -99,7 +99,7 @@ class Simple(discord.ui.View):
 
     async def next_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await self.next()
@@ -107,7 +107,7 @@ class Simple(discord.ui.View):
 
     async def previous_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await self.previous()
@@ -115,7 +115,7 @@ class Simple(discord.ui.View):
         
     async def start_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.current_page = 0
@@ -125,7 +125,7 @@ class Simple(discord.ui.View):
 
     async def end_button_callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.ctx.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         self.current_page = self.total_page_count - 1

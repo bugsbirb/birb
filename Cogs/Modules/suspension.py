@@ -257,7 +257,7 @@ class Suspension(discord.ui.RoleSelect):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view",
+                description=f"**{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.dark_embed()
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -352,7 +352,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
     @discord.ui.button(label='Yes', style=discord.ButtonStyle.green)
     async def Yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         view = RoleTakeAwayView(self.user, self.author, self.reason, self.end_time, self.start_time)
@@ -361,7 +361,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
     @discord.ui.button(label='No', style=discord.ButtonStyle.red)
     async def No(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)   
         infract_data = {

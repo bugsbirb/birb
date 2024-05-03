@@ -54,7 +54,7 @@ class VoidInf(discord.ui.Modal, title="Void Infraction"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view",
+                description=f"**{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -101,7 +101,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
         reason = self.reason.value
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view",
+                description=f"**{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -204,7 +204,7 @@ class PromotionRole(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view",
+                description=f"**{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -258,7 +258,7 @@ class PromotionReason(discord.ui.Modal, title="Reason"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -445,7 +445,7 @@ class Reason(discord.ui.Modal, title="Reason"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -794,7 +794,7 @@ class AdminPanelCog(commands.Cog):
         )
         embed.set_thumbnail(url=staff.display_avatar)
         embed.set_image(
-            url="https://astrobirb.dev/assets/img/logos/invisible.png"
+            url="https://astrobirb.dev/assets/invisible.png"
         )
         view = AdminPanel(staff, ctx.guild, ctx.author)
         await ctx.send(embed=embed, view=view)
@@ -890,7 +890,7 @@ class IssuedInfraction(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view.",
+                description=f"**{interaction.user.display_name},** this is not your view.",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1012,7 +1012,7 @@ class AdminPanel(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1043,7 +1043,7 @@ class AdminPanel(discord.ui.View):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1072,7 +1072,7 @@ class AdminPanel(discord.ui.View):
     async def Search(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view.",
+                description=f"**{interaction.user.display_name},** this is not your view.",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1236,7 +1236,7 @@ class Return(discord.ui.View):
     async def Return77(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1282,7 +1282,7 @@ class Return(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://astrobirb.dev/assets/img/logos/invisible.png"
+            url="https://astrobirb.dev/assets/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
@@ -1305,7 +1305,7 @@ class LOAPanel(discord.ui.View):
         author = self.author.id
         if interaction.user.id != author:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1355,7 +1355,7 @@ class LOAPanel(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1401,7 +1401,7 @@ class LOAPanel(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://astrobirb.dev/assets/img/logos/invisible.png"
+            url="https://astrobirb.dev/assets/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 
@@ -1424,7 +1424,7 @@ class LOACreate(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1440,7 +1440,7 @@ class LOACreate(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1508,7 +1508,7 @@ class RevokeInfraction(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1533,7 +1533,7 @@ class RevokeInfraction(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"**{interaction.user.global_name},** this is not your view!",
+                description=f"**{interaction.user.display_name},** this is not your view!",
                 color=discord.Colour.dark_embed(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1582,7 +1582,7 @@ class RevokeInfraction(discord.ui.View):
         )
         view = AdminPanel(self.user, interaction.guild, self.author)
         embed.set_image(
-            url="https://astrobirb.dev/assets/img/logos/invisible.png"
+            url="https://astrobirb.dev/assets/invisible.png"
         )
         await interaction.response.edit_message(embed=embed, view=view, content=None)
 

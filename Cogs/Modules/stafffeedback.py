@@ -200,7 +200,7 @@ class ViewRatings(discord.ui.View):
     @discord.ui.button(label='View Ratings', style=discord.ButtonStyle.grey, emoji="<:stafffeedback:1235000485208002610>")
     async def Ratings(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)        
         if self.scope == "global":

@@ -290,7 +290,7 @@ class Section1(discord.ui.Modal):
         embed = discord.Embed(title="Section 1", description="", color=discord.Color.dark_embed())
         embed.set_author(name=f"{self.author.display_name}s Application", icon_url=self.author.display_avatar)
         embed.set_thumbnail(url=self.author.display_avatar)
-        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
         embed.set_footer(text=f"{(self.name).capitalize()} Application")
         for question_label, response in input_responses.items():
             embed.description += f"### **{question_label}**\n{response}\n"
@@ -335,7 +335,7 @@ class Section2(discord.ui.Modal):
             if isinstance(question, discord.ui.TextInput):
                 input_responses[question.label] = question.value
         embed = discord.Embed(title="Section 2", description="", color=discord.Color.dark_embed())
-        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
 
         for question_label, response in input_responses.items():
             embed.description += f"### **{question_label}**\n{response}\n"
@@ -382,7 +382,7 @@ class Section3(discord.ui.Modal):
             if isinstance(question, discord.ui.TextInput):
                 input_responses[question.label] = question.value
         embed = discord.Embed(title="Section 3", description="", color=discord.Color.dark_embed())
-        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
 
         for question_label, response in input_responses.items():
             embed.description += f"### **{question_label}**\n{response}\n"
@@ -429,7 +429,7 @@ class Section4(discord.ui.Modal):
             if isinstance(question, discord.ui.TextInput):
                 input_responses[question.label] = question.value
         embed = discord.Embed(title="Section 4", description="", color=discord.Color.dark_embed())
-        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
 
         for question_label, response in input_responses.items():
             embed.description += f"### **{question_label}**\n{response}\n"
@@ -475,7 +475,7 @@ class Section5(discord.ui.Modal):
             if isinstance(question, discord.ui.TextInput):
                 input_responses[question.label] = question.value
         embed = discord.Embed(title="Section 5", description="", color=discord.Color.dark_embed())
-        embed.set_image(url="https://astrobirb.dev/assets/img/logos/invisible.png")
+        embed.set_image(url="https://astrobirb.dev/assets/invisible.png")
 
         for question_label, response in input_responses.items():
             embed.description += f"### **{question_label}**\n{response}\n"

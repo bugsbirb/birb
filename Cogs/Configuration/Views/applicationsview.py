@@ -49,7 +49,7 @@ class AMoreOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
         if color == 'Application Roles':
@@ -89,7 +89,7 @@ class RequiredRoles(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
@@ -110,7 +110,7 @@ class AcceptedRoles(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
@@ -170,7 +170,7 @@ class ToggleApplications(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
@@ -190,7 +190,7 @@ class ApplicationSubmissions(discord.ui.ChannelSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
@@ -226,7 +226,7 @@ class ApplicationChannel(discord.ui.ChannelSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
@@ -262,7 +262,7 @@ class ApplicationsRoles(discord.ui.RoleSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.global_name},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
@@ -423,7 +423,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(label="Section 1", style=discord.ButtonStyle.primary, custom_id="section1")
     async def section1(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)  
         await interaction.response.send_modal(Section1(author=self.author, name=self.name))
@@ -431,7 +431,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(label="Section 2", style=discord.ButtonStyle.primary, custom_id="section2", disabled=True)
     async def section2(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section2(author=self.author, name=self.name))
@@ -439,7 +439,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(label="Section 3", style=discord.ButtonStyle.primary, custom_id="section3", disabled=True)
     async def section3(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section3(author=self.author, name=self.name))
@@ -447,7 +447,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(label="Section 4", style=discord.ButtonStyle.primary, custom_id="section4", disabled=True)
     async def section4(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section4(author=self.author, name=self.name))
@@ -455,7 +455,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(label="Section 5", style=discord.ButtonStyle.primary, custom_id="section5", disabled=True)
     async def section5(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await interaction.response.send_modal(Section5(author=self.author, name=self.name))
@@ -463,7 +463,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(style=discord.ButtonStyle.gray, label="Required Roles", emoji="<:Role:1223077527984144474>")
     async def role(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)         
         view = discord.ui.View()
@@ -473,7 +473,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(style=discord.ButtonStyle.gray, label="Accepted Roles", emoji="<:Role:1223077527984144474>")
     async def acceptedroles(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)  
         view = discord.ui.View()
@@ -484,7 +484,7 @@ class SectionButtons(discord.ui.View):
     @discord.ui.button(style=discord.ButtonStyle.success, emoji="<:Save:1223293419678470245>", custom_id="save", disabled=True)
     async def save(self, interaction: discord.Interaction, button:discord.ui.Button):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"**{interaction.user.global_name},** this is not your view",
+            embed = discord.Embed(description=f"**{interaction.user.display_name},** this is not your view",
                                   color=discord.Colour.dark_embed())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         await application.update_one({'guild_id': interaction.guild.id, 'name': self.name}, {'$set': {'saved': True}})
