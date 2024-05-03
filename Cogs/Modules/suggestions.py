@@ -37,7 +37,12 @@ class suggestions(commands.Cog):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the suggestion module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
          return    
         if not image is None:
-           image = image.url
+            if isinstance(image, str):
+                image = image
+            else:
+                image = image.url
+        else:
+            image = None
         suggestion_data = {
             "author_id": ctx.author.id,
             "suggestion": suggestion,
@@ -55,7 +60,7 @@ class suggestions(commands.Cog):
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_image(url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png")
         if image:
-            embed.set_image(url=image.url)
+            embed.set_image(url=image)
         embed.add_field(name="<:pin:1226671966413389864> Suggestion", value=suggestion)
         embed.set_author(icon_url=ctx.author.display_avatar, name=ctx.author.name)
         embed.add_field(name="<:messageforward1:1230919023361921165> Opinions", value="0 <:UpVote:1223062893096996934> | 0 <:DownVote:1223063241433939989>")
