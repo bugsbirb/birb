@@ -191,6 +191,13 @@ class client(commands.AutoShardedBot):
             return True
 
         return await super().is_owner(user)
+    
+    async def on_shard_ready(self, shard_id):
+        print(f"[✅] Shard {shard_id} is ready.")
+
+    async def on_shard_disconnect(self, shard_id):
+        print(f"[⚠️] Shard {shard_id} disconnected.")
+
 
 
 client = client()

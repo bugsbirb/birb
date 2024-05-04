@@ -415,12 +415,12 @@ class Confirm(discord.ui.View):
             try:
              self.user = await interaction.guild.fetch_member(loa_data['user'])
             except (discord.HTTPException, discord.NotFound):
-                    await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
+                    await interaction.followup.send(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
              
                     return          
 
         else:
-                await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
+                await interaction.followup.send(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
                 return           
         user = self.user
 
@@ -474,11 +474,11 @@ class Confirm(discord.ui.View):
             try:
              self.user = await interaction.guild.fetch_member(loa_data['user'])
             except (discord.HTTPException, discord.NotFound):
-                    await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
+                    await interaction.followup.send(content=f"{no} **{interaction.user.display_name}**, I can't find this user.", ephemeral=True)
                     return   
         else:
 
-                await interaction.response.send_message(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
+                await interaction.followup.send(content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.", ephemeral=True)
                 return    
 
         embed = interaction.message.embeds[0]
