@@ -39,55 +39,33 @@ class qotd(commands.Cog):
         )
         if not result:
             return
-        responses = []
-        for _ in range(5):
-         try:
-          question = await self.fetch_question()
-          print(f"[❓QOTD] {question}")
-          
-          
-          responses.append(question)
-         except Exception as e:
-            print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
-            continue
 
-        selected_response = random.choice(responses) 
         for results in result:
             postdate = results.get('nextdate', None)
             moduleddata = await modules.find_one({'guild_id': results.get('guild_id')})
             if moduleddata is None:
                 continue
-            if moduleddata.get('QOTD', False) == False:
-                    continue
-            if postdate:
-             if postdate and postdate <= datetime.datetime.now():
-                
+            if not moduleddata.get('QOTD', False):
+                continue
+            if postdate and postdate <= datetime.datetime.now():
                 print("[👀] Sending QOTD")
-                if selected_response in results.get( 'messages', []):
-                        print('[❓QOTD] This has already been sent before ffs.')
-                        for _ in range(5):
-                            try:
-                             question = await self.fetch_question()
-                             print(f"[❓QOTD Again] {question}")                             
-                            
-                             responses.append(question)                        
-                            except Exception as e:
-                                print(f'CODE RED!!! QOTD GENERATION DID NOT WORK {e}') 
-                                continue     
-                selected_response = random.choice(responses)     
-                if results.get('guild_id') is None:
-                    continue    
-
-                                                      
-            
+                messages = []
+                messages = results.get('messages', [])
+                question = await self.fetch_question()
+                while question in messages:
+                    question = await self.fetch_question()
+                messages.append(question)
+                print(f"[👀] {question}")
+                
                 guild = self.client.get_guild(int(results.get('guild_id', None)))
                 if guild is None:
-                    print('QOTD Guild is none aborting')
+                    print('[👀] QOTD Guild is none, aborting')
                     continue
+
                 await questiondb.update_one(
                     {'guild_id': int(results['guild_id'])},
-                    {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1)},
-                    '$push': {'messages': selected_response}
+                    {'$set': {'nextdate': datetime.datetime.now() + datetime.timedelta(days=1),
+                              'messages': messages}
                     }, upsert=True)
                 
                 channelid = results.get('channel_id', None)
@@ -96,24 +74,29 @@ class qotd(commands.Cog):
                 channelid = int(channelid)
                 channel = guild.get_channel(channelid)
                 if channel is None:
-                    print('QOTD Channel is none aborting')
+                    print('QOTD Channel is none, aborting')
                     continue
+
                 pingmsg = ""
                 if results.get('pingrole'):
                     pingmsg = f"<@&{results.get('pingrole')}>"
 
-                embed = discord.Embed(title="<:Tip:1223062864793702431> Question of the Day", description=f"{selected_response}", color=discord.Color.yellow(), timestamp=datetime.datetime.now())
-                embed.set_footer(text=f"Day #{len(results.get('messages', ['none']))}", icon_url="https://cdn.discordapp.com/emojis/1231270156647403630.webp?size=96&quality=lossless")
+                embed = discord.Embed(title="<:Tip:1223062864793702431> Question of the Day",
+                                      description=f"{question}",
+                                      color=discord.Color.yellow(),
+                                      timestamp=datetime.datetime.now())
+                embed.set_footer(text=f"Day #{len(messages)}",
+                                 icon_url="https://cdn.discordapp.com/emojis/1231270156647403630.webp?size=96&quality=lossless")
                 try:
-                 msg = await channel.send(pingmsg, embed=embed)
+                    msg = await channel.send(pingmsg, embed=embed)
                 except Exception as e:
-                    print(f"I could not send the qotd message to {guild.name}")
-                    continue           
+                    print(f"I could not send the QOTD message to {guild.name}")
+                    continue
                 try:  
-                 await msg.create_thread(name="QOTD Discussion")
+                    await msg.create_thread(name="QOTD Discussion")
                 except Exception as e:
-                    print(f"I could not create a thread to the qotd message in {guild.name}")
-                    continue      
+                    print(f"I could not create a thread for the QOTD message in {guild.name}")
+                    continue
                 await asyncio.sleep(2)
                 
 

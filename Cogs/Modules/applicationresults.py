@@ -46,6 +46,9 @@ class ApplicationResults(commands.Cog):
 
         return choices
 
+
+    
+ 
     @staticmethod
     async def modulecheck(ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
