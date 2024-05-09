@@ -307,7 +307,6 @@ class quota(commands.Cog):
         await ctx.defer()
         if not await has_staff_role(ctx):
             return
-
         filter = {'guild_id': ctx.guild.id}
         cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(750)
 
@@ -316,12 +315,21 @@ class quota(commands.Cog):
         pages = []
         rank = 1
         leaderboard_description = ""
-
         for user_data in user_data_list:
             user_id = user_data['user_id']
             message_count = user_data['message_count']
             member = ctx.guild.get_member(user_id)
             loa_role_data = await lcollection.find_one({'guild_id': ctx.guild.id})
+            if not member:
+                
+                try:
+                 member = await ctx.guild.fetch_member(user_id)
+                except (discord.HTTPException, discord.NotFound):
+                    
+                    continue 
+                if not member:
+                    continue
+                print(f"[ERROR] Cache ERROR (member not found) Using FETCH Instead.")
 
             if member:
                 if not await self.check_admin_and_staff(ctx, member):

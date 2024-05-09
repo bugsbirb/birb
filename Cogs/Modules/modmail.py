@@ -521,7 +521,7 @@ class Modmail(commands.Cog):
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
      else:
         await ctx.send(f"{no} **{ctx.author.display_name}**, you can only use the reply command in a modmail channel", allowed_mentions=discord.AllowedMentions.none())
-    @commands.command(description="Close a modmail channel.", name="mclose")
+    @commands.command(description="Close a modmail channel.", name="mclose", aliases=['c'])
     async def close2(self, ctx: commands.Context, *, reason = None):
      if not await self.modulecheck(ctx):
          await ctx.send(f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())

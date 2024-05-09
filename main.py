@@ -123,9 +123,7 @@ class client(commands.AutoShardedBot):
         return commands.when_mentioned_or(prefix)(self, message)
 
     async def setup_hook(self):
-    
         update_channel_name.start()
-
         self.add_view(SuggestionView())
         self.add_view(SuggestionManageView())
         self.add_view(ReportPanel())
@@ -136,7 +134,6 @@ class client(commands.AutoShardedBot):
         self.add_view(AcceptAndDeny())
         
         self.loop.create_task(self.load_jishaku())
-        print('hi')
 
 
         for ext in self.cogslist:
@@ -195,12 +192,17 @@ class client(commands.AutoShardedBot):
     async def on_shard_ready(self, shard_id):
         print(f"[✅] Shard {shard_id} is ready.")
 
+    async def on_shard_connect(self, shard_id):
+        print(f"[✅] Shard {shard_id} connected.")
+
+
     async def on_shard_disconnect(self, shard_id):
         print(f"[⚠️] Shard {shard_id} disconnected.")
 
 
 
 client = client()
+
 
 
 
