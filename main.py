@@ -58,7 +58,7 @@ class client(commands.AutoShardedBot):
         else:
          print('Production Loaded')
          super().__init__(
-            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2 chunk_guilds_at_startup=True
+            command_prefix=commands.when_mentioned_or(PREFIX), intents=intents, shard_count=2, chunk_guilds_at_startup=True
          )             
          
         self.client = client
