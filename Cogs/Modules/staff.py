@@ -322,8 +322,6 @@ class quota(commands.Cog):
             user_id = user_data['user_id']
             message_count = user_data['message_count']
             member = ctx.guild.get_member(user_id)
-            if not member:
-                member = await ctx.guild.fetch_member(user_id)
                 
             loa_role_data = await lcollection.find_one({'guild_id': ctx.guild.id})
 
