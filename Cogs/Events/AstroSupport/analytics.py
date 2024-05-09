@@ -17,9 +17,10 @@ class analyticss(commands.Cog):
      start_execution_time = time.perf_counter()
      prfx = (time.strftime("%H:%M:%S GMT", time.gmtime()))
 
-
+     
      if ctx.guild is None:
         return
+
      prfx = f"[🤖] {prfx}"
      await analytics.update_one({}, {'$inc': {f'{ctx.command.qualified_name}': 1}}, upsert=True)
 
