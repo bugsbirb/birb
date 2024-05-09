@@ -136,8 +136,7 @@ class promo(commands.Cog):
         try:
          member = await ctx.guild.fetch_member(staff.id)
         except (discord.NotFound, discord.HTTPException):
-            print('[CHUNKING ISSUE] FETCHING INSTEAD')
-            return 
+            print('Member not found')
         if member is None:
             await ctx.send(f"{no} **{ctx.author.display_name}**, this user isn't in the server how are you gonna promote them?", allowed_mentions=discord.AllowedMentions.none())
             return       
@@ -164,11 +163,11 @@ class promo(commands.Cog):
                 if await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id}):
                     promotionroleresult = await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id})
                     for role in promotionroleresult.get('promotionranks'):
-                        role = staff.guild.get_role(role)
+                        role = member.guild.get_role(role)
                         if role is None:
                             continue
-                        await staff.add_roles(role)
-                await staff.add_roles(new)
+                        await member.add_roles(role)
+                await member.add_roles(new)
             except discord.Forbidden:
                 await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add certain roles. Please ensure I'm above the role you're trying to add and that I have the necessary permissions.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
                 return
@@ -178,10 +177,10 @@ class promo(commands.Cog):
                 if await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id}):
                     promotionroleresult = await promotionroles.find_one({'guild_id': ctx.guild.id, 'rank': new.id})
                     for role in promotionroleresult.get('promotionranks'):
-                        role = staff.guild.get_role(role)
+                        role = member.guild.get_role(role)
                         if role is None:
                             continue
-                        await staff.add_roles(role)                
+                        await member.add_roles(role)                
             except discord.Forbidden:
                 await ctx.send(f"<:Allonswarning:1123286604849631355> **{ctx.author.display_name}**, I don't have permission to add roles. Please ensure I'm above the new role or that I have the necessary permissions.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
                 return
