@@ -133,7 +133,11 @@ class promo(commands.Cog):
         
         if not await has_admin_role(ctx):
             return             
-        member = await ctx.guild.fetch_member(staff.id)
+        try:
+         member = await ctx.guild.fetch_member(staff.id)
+        except (discord.NotFound, discord.HTTPException):
+            print('[CHUNKING ISSUE] FETCHING INSTEAD')
+            return 
         if member is None:
             await ctx.send(f"{no} **{ctx.author.display_name}**, this user isn't in the server how are you gonna promote them?", allowed_mentions=discord.AllowedMentions.none())
             return       
