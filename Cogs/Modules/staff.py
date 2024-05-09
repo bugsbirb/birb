@@ -305,9 +305,10 @@ class quota(commands.Cog):
             return
 
         await ctx.defer()
+        
         if not await has_staff_role(ctx):
             return
-
+        await ctx.guild.chunk()
         filter = {'guild_id': ctx.guild.id}
         cursor = mccollection.find(filter).sort("message_count", pymongo.DESCENDING).limit(750)
 
