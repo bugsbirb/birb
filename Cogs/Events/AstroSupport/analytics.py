@@ -20,7 +20,7 @@ class analyticss(commands.Cog):
      
      if ctx.guild is None:
         return
-     await ctx.guild.chunk()
+
      prfx = f"[🤖] {prfx}"
      await analytics.update_one({}, {'$inc': {f'{ctx.command.qualified_name}': 1}}, upsert=True)
 
