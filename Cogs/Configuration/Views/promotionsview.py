@@ -29,7 +29,7 @@ class Promotionchannel(discord.ui.ChannelSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name,** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)                  
         channelid = self.values[0]
@@ -127,7 +127,7 @@ class PromotionRanks(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name,** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)          
         view = discord.ui.View(timeout=None)
@@ -140,7 +140,7 @@ class DeleteRank(discord.ui.RoleSelect):
         self.author = author
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name,** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await promotionroles.delete_one({'guild_id': interaction.guild.id, 'rank': self.values[0].id})
@@ -155,7 +155,7 @@ class AdditonalRoles(discord.ui.RoleSelect):
         self.rank = rank
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name,** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)            
         selected_role_ids = [role.id for role in self.values]    
@@ -181,7 +181,7 @@ class PromotionModuleToggle(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         color = self.values[0]
         if interaction.user.id != self.author.id:
-            embed = discord.Embed(description=f"{redx} **{interaction.user.display_namee},** this is not your panel!",
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name,** this is not your panel!",
                                   color=discord.Colour.brand_red())
             return await interaction.response.send_message(embed=embed, ephemeral=True)    
 
