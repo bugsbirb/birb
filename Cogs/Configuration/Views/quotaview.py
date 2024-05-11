@@ -2,6 +2,9 @@ import discord
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
+from datetime import datetime, timedelta
+
+import re
 MONGO_URL = os.getenv('MONGO_URL')
 
 mongo = AsyncIOMotorClient(MONGO_URL)
@@ -27,7 +30,7 @@ appealschannel = db['Appeals Channel']
 loachannel = db['LOA Channel']
 partnershipsch = db['Partnerships Channel']
 modules = db['Modules']
-
+autoactivity = db['auto activity']
 
 
 
@@ -48,12 +51,12 @@ class QuotaToggle(discord.ui.Select):
 
         if color == 'Enabled':    
             await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': True}}, upsert=True)  
+            await  modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': True}}, upsert=True)  
             await refreshembed(interaction)
 
         if color == 'Disabled':  
             await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
-            modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': False}}, upsert=True) 
+            await modules.update_one({'guild_id': interaction.guild.id}, {'$set': {'Quota': False}}, upsert=True) 
             await refreshembed(interaction)
 
 
@@ -83,6 +86,120 @@ class IgnoredChannel(discord.ui.ChannelSelect):
             print(f"An error occurred: {str(e)}")
 
         print(f"Channel IDs: {channelids}")
+
+class AutoActivity(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+    
+        options = [
+        discord.SelectOption(label="Toggle", emoji="<:Button:1223063359184830494>"),
+        discord.SelectOption(label="Channel", emoji=f"{tagsemoji}"),
+        discord.SelectOption(label="Post Date", emoji="<:time:1158064756104630294>"),
+        ]
+        super().__init__(placeholder='Auto Activity', min_values=1, max_values=1, options=options)    
+
+    async def callback(self, interaction: discord.Interaction):
+        selection = self.values[0]
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)  
+        
+        view = discord.ui.View()
+        if selection == 'Toggle':
+            
+            view.add_item(ActivityToggle(interaction.user))
+            await interaction.response.send_message(view=view, ephemeral=True)
+        if selection == 'Channel':
+            view.add_item(PostChannel(interaction.user))
+            await interaction.response.send_message(view=view, ephemeral=True)
+        if selection == 'Post Date':
+            await interaction.response.send_modal(PostDate())
+
+
+
+class PostDate(discord.ui.Modal, title='How often?'):
+    
+     postdate = discord.ui.TextInput(label='Post Day', placeholder="What day do you want it to post every week? (Monday, Tuesday etc)", style=discord.TextStyle.short)
+
+
+     async def on_submit(self, interaction: discord.Interaction):
+            days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'tuesday']
+            specified_day = self.postdate.value.lower()
+            
+            if specified_day not in days:
+                await interaction.response.send_message("Invalid day specified. Please enter a valid day of the week.", ephemeral=True)
+                return
+            current_day_index = datetime.utcnow().weekday()  
+            specified_day_index = days.index(specified_day)
+            
+            days_until_next_occurrence = (specified_day_index - current_day_index) % 7
+            
+            if days_until_next_occurrence <= 0:
+                days_until_next_occurrence += 7      
+            next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )
+            await autoactivity.update_one({'guild_id': interaction.guild.id}, {'$set': {'day': self.postdate.value, 'nextdate': next_occurrence_date}}, upsert=True)
+            embed = discord.Embed(title="Succesfull!", color=discord.Color.brand_green(), description=f"**Next Post Date:** <t:{int(next_occurrence_date.timestamp())}>")
+            
+            await interaction.response.send_message(embed=embed,  ephemeral=True)
+
+
+        
+
+
+class PostChannel(discord.ui.ChannelSelect):
+    def __init__(self, author):
+        super().__init__(placeholder='Post Channel', channel_types=[discord.ChannelType.text, discord.ChannelType.news])
+        self.author = author
+    
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
+                  
+        channelid = interaction.channel.id
+
+
+        filter = {
+            'guild_id': interaction.guild.id
+        }
+
+        try:
+            await autoactivity.update_one(filter, {'$set': {'channel_id': channelid}}, upsert=True)
+            await interaction.edit_original_response(content=None)
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        print(f"Channel IDs: {channelid}")
+class ActivityToggle(discord.ui.Select):
+    def __init__(self, author):
+        self.author = author
+
+        
+
+        options = [
+        discord.SelectOption(label="Enabled"),
+        discord.SelectOption(label="Disabled"),
+        ]
+        super().__init__(placeholder='Activity Toggle', min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        color = self.values[0]
+        if interaction.user.id != self.author.id:
+            embed = discord.Embed(description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                                  color=discord.Colour.brand_red())
+            return await interaction.response.send_message(embed=embed, ephemeral=True)    
+
+        if color == 'Enabled':    
+            await interaction.response.send_message(content=f"{tick} Enabled", ephemeral=True)
+            await autoactivity.update_one({'guild_id': interaction.guild.id}, {'$set': {'enabled': True}}, upsert=True)  
+
+        if color == 'Disabled':  
+            await interaction.response.send_message(content=f"{no} Disabled", ephemeral=True)
+            await autoactivity.update_one({'guild_id': interaction.guild.id}, {'$set': {'enabled': False}}, upsert=True)       
+        
 
 class QuotaAmount(discord.ui.Select):
     def __init__(self, author):

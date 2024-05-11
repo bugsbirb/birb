@@ -18,7 +18,7 @@ from Cogs.Configuration.Views.tagsview import ToggleTags
 from Cogs.Configuration.Views.tagsview import TagsUsageChannel
 
 from Cogs.Configuration.Views.quotaview import QuotaToggle
-from Cogs.Configuration.Views.quotaview import QuotaAmount, IgnoredChannel
+from Cogs.Configuration.Views.quotaview import QuotaAmount, IgnoredChannel, AutoActivity
 
 
 from Cogs.Configuration.Views.feedbackview import FeedbackChannel, FMoreOptions
@@ -1219,6 +1219,7 @@ class QuotaModule(discord.ui.View):
         self.add_item(QuotaToggle(author, options))            
         self.add_item(QuotaAmount(author))          
         self.add_item(IgnoredChannel(author, channels))
+        self.add_item(AutoActivity(author))
         self.add_item(Config(author)) 
 
 

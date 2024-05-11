@@ -5,8 +5,13 @@ import pymongo
 import Paginator
 from emojis import *
 import os
-from datetime import datetime
+import re
+import random
+from discord.ext import tasks
+from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
+import string
+from Cogs.Modules.infractions import InfractionIssuer
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
 
@@ -21,7 +26,16 @@ modules = db['Modules']
 staffdb = db['staff database']
 Customisation = db['Customisation']
 StaffPanelLabel = db['StaffPanel Label']
+autoactivity = db['auto activity']
+infchannel = db['infraction channel']
+consent = db['consent']
 
+modules = db['Modules']
+Customisation = db['Customisation']
+infractiontypes = db['infractiontypes']
+infractiontypeactions = db['infractiontypeactions']
+collection = db['infractions']
+options = db['module options']
 class SetMessages(discord.ui.Modal, title='Set Message Count'):
     def __init__(self, user_id):
         super().__init__()
@@ -165,6 +179,7 @@ message_quota_collection = dbq["message_quota"]
 class quota(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.quota_activity.start()
 
 
 
@@ -212,6 +227,157 @@ class quota(commands.Cog):
                 return False
         else:
             return False
+
+
+    async def check_admin_and_staff_2(self, guild: discord.Guild, user: discord.Member):
+        filter = {'guild_id': guild.id}
+        staff_data = await scollection.find_one(filter)
+        if staff_data and 'staffrole' in staff_data:
+            staff_role_ids = staff_data['staffrole']
+            staff_role_ids = staff_role_ids if isinstance(staff_role_ids, list) else [staff_role_ids]
+            admin_data = await arole.find_one(filter)
+            if not user:
+                return False
+            if not admin_data:
+             return False
+            else:
+                if 'staffrole' in admin_data:
+                    admin_role_ids = admin_data['staffrole']
+                    admin_role_ids = admin_role_ids if isinstance(admin_role_ids, list) else [admin_role_ids]
+
+                    if any(role.id in staff_role_ids + admin_role_ids for role in user.roles):
+                        return True
+                    else:
+                        return False
+            if any(role.id in staff_role_ids for role in user.roles):
+                return True
+            else:
+                return False
+        else:
+            return False
+    
+
+    @tasks.loop(minutes=5)
+    async def quota_activity(self):
+       autoactivityresult = await autoactivity.find({}).to_list(length=None)
+       if autoactivityresult:
+
+        for data in autoactivityresult:
+            if data.get('enabled', False) == False:
+                continue
+            try: 
+             channel = self.client.get_channel(data.get('channel_id', None))
+            except (discord.HTTPException, discord.NotFound):
+                 print(f"[ERROR] Channel {data.get('channel_id', None)} not found.") 
+                 pass
+            days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'tuesday']
+            
+            nextdate = data.get('nextdate', None)
+            day = data.get('day', None)
+            day = day.lower()
+            if day is None:
+                continue
+            if not nextdate:
+                continue            
+            current_day_index = datetime.utcnow().weekday()  
+            specified_day_index = days.index(day)
+            
+            days_until_next_occurrence = (specified_day_index - current_day_index) % 7
+            
+            if days_until_next_occurrence <= 0:
+                days_until_next_occurrence += 7      
+            next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )            
+         
+
+            if nextdate < datetime.now():
+                await autoactivity.update_one({'guild_id': data.get('guild_id', None)}, {'$set': {'nextdate': next_occurrence_date}})
+
+
+
+
+                try:
+                 guild = await self.client.fetch_guild(data.get('guild_id', None))
+                except (discord.HTTPException, discord.NotFound):
+                    continue 
+                if not guild:
+                    continue    
+                if guild:
+                    result = await mccollection.find({'guild_id': guild.id}).to_list(length=None)
+                    loa_role_data = await lcollection.find_one({'guild_id': guild.id})
+                    passed = []
+                    failed = []    
+                    on_loa = []      
+                    failedids = []      
+                    if result:
+                        for data in result:
+
+                            try:
+                             user = await guild.fetch_member(data.get('user_id', None))
+                            except (discord.HTTPException, discord.NotFound):
+                                print('[ERROR] User not found.')                         
+                            if not user:
+                                continue
+                            if user:
+                                if not await self.check_admin_and_staff_2(guild, user):
+                                    continue
+                                result = await mccollection.find_one({'guild_id': guild.id, 'user_id': user.id})
+                                quotaresult = await message_quota_collection.find_one({'guild_id': guild.id})
+                                if loa_role_data:
+                                    loa_role_id = loa_role_data.get('staffrole')
+                                    has_loa_role = any(role.id == loa_role_id for role in user.roles)
+                                                    
+                                if quotaresult and result:
+                                    message_quota = quotaresult.get('quota', 100)
+                                    message_count = result.get('message_count', 0)
+                                    if has_loa_role:
+                                        on_loa.append(f"> **{user.name}** • `{message_count}` messages")
+                                        continue
+
+
+
+                                    if message_count >= message_quota:
+                                        passed.append(f"> **{user.name}** • `{message_count}` messages")
+                                    else:    
+                                        failed.append(f"> **{user.name}** • `{message_count}` messages")
+                                        failedids.append(user.id)
+
+
+
+
+                                    
+                    
+                    else:
+                        continue
+                    passedembed = discord.Embed(title="Passed", color=discord.Color.brand_green())   
+                    passedembed.set_image(url="https://astrobirb.dev/assets/invisible.png")
+                    if passed:
+                     passedembed.description = "\n".join(passed)
+                    else:
+                        passedembed.description = "> No users passed the quota."
+                    
+                    loaembed = discord.Embed(title="On LOA", color=discord.Color.purple())
+                    loaembed.set_image(url="https://astrobirb.dev/assets/invisible.png")
+                    if on_loa:
+                     loaembed.description = "\n".join(on_loa)
+                    else:
+                        loaembed.description = "> No users on LOA."
+
+
+
+                    failedembed = discord.Embed(title="Failed", color=discord.Color.brand_red())   
+                    failedembed.set_image(url="https://astrobirb.dev/assets/invisible.png")
+                    if failed:
+                     failedembed.description = "\n".join(failed)
+                    else:
+                        failedembed.description = "> No users failed the quota."
+                    if channel:
+                        view = ResetLeaderboard()
+                        await channel.send(embeds=[passedembed, loaembed, failedembed], view=view)
+                    else:
+                        continue    
+
+
+                                   
 
 
     @commands.hybrid_group(name="staff")
@@ -634,6 +800,8 @@ class quota(commands.Cog):
 
 
 
+        
+
 
 class Staffview(discord.ui.View):
     def __init__(self):
@@ -783,9 +951,41 @@ class StaffModal(discord.ui.Modal, title='Search Staff'):
         else:
                      return await interaction.response.send_message(f"{no} {interaction.user.display_name}, I couldn't find **@{staff_name}**.", ephemeral=True, allowed_mentions=discord.AllowedMentions.none())
 
-                     
+class ResetLeaderboard(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @staticmethod
+    async def has_admin_role(interaction):
+        filter = {
+            'guild_id': interaction.guild.id
+        }
+        staff_data = await arole.find_one(filter)
+
+        if staff_data and 'staffrole' in staff_data:
+            staff_role_ids = staff_data['staffrole']
+            staff_role = discord.utils.get(interaction.guild.roles, id=staff_role_ids)
+            if not isinstance(staff_role_ids, list):
+                staff_role_ids = [staff_role_ids]
+            if any(role.id in staff_role_ids for role in interaction.user.roles):
+                return True
+
+        return False
+
+    @discord.ui.button(label='Reset Leaderboard', style=discord.ButtonStyle.danger, custom_id='persistent:resetleaderboard', emoji="<:staticload:1206248311280111616>")
+    async def reset_button(self,  interaction: discord.Interaction, button: discord.ui.Button):   
+       if not self.has_admin_role(interaction):
+           await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, You don't have permission to use this button", ephemeral=True)
+           return    
+       button.label =f'Reset By @{interaction.user.display_name}'
+       button.disabled = True
+       await mccollection.update_many({'guild_id': interaction.guild.id}, {'$set': {'message_count': 0}})
+       await interaction.response.edit_message(view=self)       
+
+
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(quota(client))        
+    await client.add_cog(quota(client))     
+       
     
