@@ -259,6 +259,7 @@ class quota(commands.Cog):
 
     @tasks.loop(minutes=5)
     async def quota_activity(self):
+       print('[INFO] Checking for quota activity')
        autoactivityresult = await autoactivity.find({}).to_list(length=None)
        if autoactivityresult:
 
@@ -335,7 +336,7 @@ class quota(commands.Cog):
 
 
 
-                                    if message_count >= message_quota:
+                                    if int(message_count) >= int(message_quota):
                                         passed.append(f"> **{user.name}** • `{message_count}` messages")
                                     else:    
                                         failed.append(f"> **{user.name}** • `{message_count}` messages")
@@ -371,9 +372,16 @@ class quota(commands.Cog):
                     else:
                         failedembed.description = "> No users failed the quota."
                     if channel:
-                        view = ResetLeaderboard()
-                        await channel.send(embeds=[passedembed, loaembed, failedembed], view=view)
+                        
+                         view = ResetLeaderboard()
+
+                         try:
+                          await channel.send(embeds=[passedembed, loaembed, failedembed], view=view)
+                         except discord.Forbidden:
+                            print('[ERROR] Channel not found') 
+                            return                        
                     else:
+                        print('[NOTFOUND] Channel not found')
                         continue    
 
 
@@ -974,7 +982,7 @@ class ResetLeaderboard(discord.ui.View):
 
     @discord.ui.button(label='Reset Leaderboard', style=discord.ButtonStyle.danger, custom_id='persistent:resetleaderboard', emoji="<:staticload:1206248311280111616>")
     async def reset_button(self,  interaction: discord.Interaction, button: discord.ui.Button):   
-       if not self.has_admin_role(interaction):
+       if not await self.has_admin_role(interaction):
            await interaction.response.send_message(f"{no} **{interaction.user.display_name}**, You don't have permission to use this button", ephemeral=True)
            return    
        button.label =f'Reset By @{interaction.user.display_name}'
