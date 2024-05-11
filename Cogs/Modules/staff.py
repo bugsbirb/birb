@@ -315,7 +315,7 @@ class quota(commands.Cog):
                             try:
                              user = await guild.fetch_member(data.get('user_id', None))
                             except (discord.HTTPException, discord.NotFound):
-                                print('[ERROR] User not found.')                         
+                                continue                         
                             if not user:
                                 continue
                             if user:
