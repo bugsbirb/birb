@@ -289,11 +289,12 @@ class quota(commands.Cog):
             specified_day_index = days.index(day)
             
             days_until_next_occurrence = (specified_day_index - current_day_index) % 7
+            print(days_until_next_occurrence)
             
-            if days_until_next_occurrence <= 0:
-                days_until_next_occurrence += 7      
+
             next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )
-                    
+            if next_occurrence_date < datetime.now():
+                next_occurrence_date += timedelta(days=7)                    
 
             if nextdate < datetime.now():
                 
