@@ -276,21 +276,21 @@ class quota(commands.Cog):
             nextdate = data.get('nextdate', None)
             day = data.get('day', None)
             
+            
             if day is None:
                 continue
-            if not nextdate:
+            if nextdate is None:
                 continue     
-            day = day.lower()       
-            current_day_index = datetime.utcnow().weekday()  
+            day = str(day).lower()       
+            current_day_index = datetime.now().weekday()  
             specified_day_index = days.index(day)
             
             days_until_next_occurrence = (specified_day_index - current_day_index) % 7
             
             if days_until_next_occurrence <= 0:
                 days_until_next_occurrence += 7      
-            next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )    
+            next_occurrence_date = datetime.now() + timedelta(days=days_until_next_occurrence - 1 )    
                     
-         
 
             if nextdate < datetime.now():
                 
