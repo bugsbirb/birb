@@ -292,7 +292,10 @@ class quota(commands.Cog):
          
 
             if nextdate < datetime.now():
-                await autoactivity.update_one({'guild_id': data.get('guild_id', None)}, {'$set': {'nextdate': next_occurrence_date, 'lastposted': await autoactivity.update_one({'guild_id': data.get('guild_id', None)}, {'$set': {'nextdate': next_occurrence_date, 'lastposted': datetime.utcnow()}})}})
+                await autoactivity.update_one(
+                {'guild_id': data.get('guild_id', None)},
+                {'$set': {'nextdate': next_occurrence_date, 'lastposted': datetime.utcnow()}}
+)
                          
                 try:
                  guild = await self.client.fetch_guild(data.get('guild_id', None))
