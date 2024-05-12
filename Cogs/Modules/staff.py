@@ -288,21 +288,24 @@ class quota(commands.Cog):
             
             if days_until_next_occurrence <= 0:
                 days_until_next_occurrence += 7      
-            next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )            
+            next_occurrence_date = datetime.utcnow() + timedelta(days=days_until_next_occurrence - 1 )    
+                    
          
 
             if nextdate < datetime.now():
-                await autoactivity.update_one(
-                {'guild_id': data.get('guild_id', None)},
-                {'$set': {'nextdate': next_occurrence_date, 'lastposted': datetime.utcnow()}}
-)
-                         
+                
                 try:
                  guild = await self.client.fetch_guild(data.get('guild_id', None))
                 except (discord.HTTPException, discord.NotFound):
                     continue 
                 if not guild:
-                    continue    
+                    continue                   
+                await autoactivity.update_one(
+                {'guild_id': guild.id},
+                {'$set': {'nextdate': next_occurrence_date, 'lastposted': datetime.utcnow()}}
+)  
+                         
+                print(f'[⏰] Sending Activity @{guild.name} next post is {next_occurrence_date}!')
                 if guild:
                     result = await mccollection.find({'guild_id': guild.id}).to_list(length=None)
                     loa_role_data = await lcollection.find_one({'guild_id': guild.id})
