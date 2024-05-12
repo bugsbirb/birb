@@ -5,13 +5,9 @@ import pymongo
 import Paginator
 from emojis import *
 import os
-import re
-import random
 from discord.ext import tasks
 from datetime import datetime, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
-import string
-from Cogs.Modules.infractions import InfractionIssuer
 MONGO_URL = os.getenv('MONGO_URL')
 mongo = AsyncIOMotorClient(MONGO_URL)
 
@@ -36,6 +32,10 @@ infractiontypes = db['infractiontypes']
 infractiontypeactions = db['infractiontypeactions']
 collection = db['infractions']
 options = db['module options']
+
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
+
 class SetMessages(discord.ui.Modal, title='Set Message Count'):
     def __init__(self, user_id):
         super().__init__()
@@ -260,7 +260,10 @@ class quota(commands.Cog):
     @tasks.loop(minutes=5)
     async def quota_activity(self):
        print('[INFO] Checking for quota activity')
-       autoactivityresult = await autoactivity.find({}).to_list(length=None)
+       if environment == "custom":
+           autoactivityresult = await autoactivity.find({'guild_id': int(guildid)}).to_list(length=None)
+       else:
+        autoactivityresult = await autoactivity.find({}).to_list(length=None)
        if autoactivityresult:
 
         for data in autoactivityresult:
