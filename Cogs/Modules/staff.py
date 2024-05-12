@@ -275,11 +275,12 @@ class quota(commands.Cog):
             
             nextdate = data.get('nextdate', None)
             day = data.get('day', None)
-            day = day.lower()
+            
             if day is None:
                 continue
             if not nextdate:
-                continue            
+                continue     
+            day = day.lower()       
             current_day_index = datetime.utcnow().weekday()  
             specified_day_index = days.index(day)
             
