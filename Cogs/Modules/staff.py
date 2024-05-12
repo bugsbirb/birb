@@ -357,6 +357,9 @@ class quota(commands.Cog):
                     
                     else:
                         continue
+                    passed.sort(key=lambda x: int(x.split('•')[-1].strip().split(' ')[0].strip('`')), reverse=True)
+                    failed.sort(key=lambda x: int(x.split('•')[-1].strip().split(' ')[0].strip('`')), reverse=True)
+                    on_loa.sort(key=lambda x: int(x.split('•')[-1].strip().split(' ')[0].strip('`')), reverse=True)
                     passedembed = discord.Embed(title="Passed", color=discord.Color.brand_green())   
                     passedembed.set_image(url="https://astrobirb.dev/assets/invisible.png")
                     if passed:
