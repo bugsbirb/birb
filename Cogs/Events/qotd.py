@@ -6,9 +6,14 @@ import datetime
 from emojis import *
 import os
 import random
+from dotenv import load_dotenv
+load_dotenv()
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 MONGO_URL = os.getenv('MONGO_URL')
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
+
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 questiondb = db['qotd']
@@ -33,10 +38,16 @@ class qotd(commands.Cog):
     @tasks.loop(hours=1)
     async def sendqotd(self) -> None:
         print("[👀] Checking QOTD")
+        if environment == "custom":
         
-        result = await questiondb.find({}).to_list(
+         result = await questiondb.find({'guild_id': int(guildid)}).to_list(
             length=None
         )
+        else:
+         result = await questiondb.find({}).to_list(
+            length=None
+        )            
+         
         if not result:
             return
 
