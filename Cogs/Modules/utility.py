@@ -100,17 +100,6 @@ class SetupGuide(discord.ui.Select):
         await interaction.response.edit_message(embed=embed)
 
 
-
-
-
-
-
-
-
-
-
-
-
 class Help(discord.ui.View):
     def __init__(self, author):
         super().__init__()
@@ -125,14 +114,13 @@ class Utility(commands.Cog):
         self.client.help_command = None
 
     async def modulecheck(self, ctx): 
-     modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
-     if modulesdata is None:
-        return True
-     if modulesdata['Utility'] is True:   
-        return True
-     else:
-        return False
-
+        modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
+        if modulesdata is None:
+            return True
+        if modulesdata['Utility'] is True:   
+            return True
+        else:
+            return False
 
     async def check_database_connection(self):
         try:
@@ -142,7 +130,6 @@ class Utility(commands.Cog):
         except Exception as e:
             print(f"Error interacting with the database: {e}")
             return "Not Connected"
-
 
     @commands.hybrid_command()
     async def server(self, ctx: commands.Context):
@@ -164,7 +151,7 @@ class Utility(commands.Cog):
         embed.add_field(name="<:Promotion:1234997026677198938> Security", value=f"* **Verifiy Level:** {str(ctx.guild.verification_level).capitalize()}\n* **Content Filter:** `{content_filter}`")
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=f"{ctx.guild.owner}'s creation", icon_url=ctx.guild.owner.display_avatar)
-        
+
         await ctx.send(embed=embed)
 
     @app_commands.command(description="Support Astro Birb!")    
@@ -177,7 +164,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(title='<a:dancebirb:1181758263113551912> Donations', description="> Your support helps us keep Astro Birb running smoothly and enables us to continue improving our services.", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=self.client.user.display_avatar)
         await interaction.response.send_message(embed=embed,view=view)
-        
+
     @app_commands.command(description="View someones avatar")
     @app_commands.allowed_installs(guilds=False, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -187,8 +174,6 @@ class Utility(commands.Cog):
         embed = discord.Embed(title=f"{(user.name).capitalize()}'s Avatar", color=discord.Color.dark_embed())
         embed.set_image(url=user.display_avatar)
         await interaction.response.send_message(embed=embed)
-
-
 
     @app_commands.command()
     @app_commands.allowed_installs(guilds=True, users=True)
@@ -200,7 +185,7 @@ class Utility(commands.Cog):
             user = interaction.user
         user_badges = badges.find({'user_id': user.id})            
         badge_values = ""
-   
+
         public_flags_emojis = {
             "staff": "<:Staff:1221449338744602655>",
             "partner": "<:blurple_partner:1221449485792841791>",
@@ -217,40 +202,40 @@ class Utility(commands.Cog):
         }
         badgecount = 0
         async for badge_data in user_badges:
-         badge = badge_data['badge']
-         badge_values += f"{badge}\n"
-         badgecount += 1 
+            badge = badge_data['badge']
+            badge_values += f"{badge}\n"
+            badgecount += 1 
         member = None 
 
         if interaction.guild: 
-         guild = await self.client.fetch_guild(1092976553752789054)
-         print(guild)
-         try:
-          if guild:
+            guild = await self.client.fetch_guild(1092976553752789054)
+            print(guild)
+            try:
+                if guild:
 
-              if await guild.fetch_member(user.id):
- 
-                 booster = guild.get_role(1160541890035339264) # Booster
-                 donator = guild.get_role(1229172969830617199) # Ko-fi
-                 donator2 = guild.get_role(1182011116650496031) # Normal
-                 member = await guild.fetch_member(user.id)
-                 if donator2 in member.roles:
-                     badge_values += f"<:Patreon:1229499944533233695> [Patreon Donator](https://www.patreon.com/astrobirb)\n"
-                     badgecount += 1    
-                 if donator in member.roles:
-                     badge_values += f"<:kofi:1229499870193258556> [Ko-fi Donator](https://ko-fi.com/astrobird#)\n"
-                     badgecount += 1
-                 if booster in member.roles:   
-                     badge_values += f"{public_flags_emojis['booster']} Astro Birb Booster\n"
-                     badgecount += 1    
-                 
-          try:
-           member = await interaction.guild.fetch_member(user.id)
-          except discord.HTTPException:
-            member = None 
-         except (discord.HTTPException, discord.NotFound):
-            print('Not in guild')
-            pass
+                    if await guild.fetch_member(user.id):
+
+                        booster = guild.get_role(1160541890035339264) # Booster
+                        donator = guild.get_role(1229172969830617199) # Ko-fi
+                        donator2 = guild.get_role(1182011116650496031) # Normal
+                        member = await guild.fetch_member(user.id)
+                        if donator2 in member.roles:
+                            badge_values += f"<:Patreon:1229499944533233695> [Patreon Donator](https://www.patreon.com/astrobirb)\n"
+                            badgecount += 1    
+                        if donator in member.roles:
+                            badge_values += f"<:kofi:1229499870193258556> [Ko-fi Donator](https://ko-fi.com/astrobird#)\n"
+                            badgecount += 1
+                        if booster in member.roles:   
+                            badge_values += f"{public_flags_emojis['booster']} Astro Birb Booster\n"
+                            badgecount += 1    
+
+                try:
+                    member = await interaction.guild.fetch_member(user.id)
+                except discord.HTTPException:
+                    member = None 
+            except (discord.HTTPException, discord.NotFound):
+                print('Not in guild')
+                pass
 
         userFlags = user.public_flags.all()
         for flag in userFlags:
@@ -259,7 +244,7 @@ class Utility(commands.Cog):
                 flag_name2 = str(flag_name).replace("Userflags.", "").replace("_", " ").title()
                 badge_values += f"{public_flags_emojis[flag_name]} {flag_name2}\n"
                 badgecount += 1 
-          
+
         if not member:
             embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=0x2b2d31)
             embed.set_thumbnail(url=user.display_avatar.url)    
@@ -270,7 +255,7 @@ class Utility(commands.Cog):
             return
         embed = discord.Embed(title=f"@{user.display_name}", description=f"", color=discord.Color.dark_embed())
         if userFlags or badge_values:
-                embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}") 
+            embed.add_field(name=f'Flags [{badgecount}]', value=f"{badge_values}") 
         embed.set_thumbnail(url=user.display_avatar.url)    
         embed.add_field(name='**Profile**', value=f"* **User:** {user.mention}\n* **Display:** {user.display_name}\n* **ID:** {user.id}\n* **Join:** <t:{int(user.joined_at.timestamp())}:F>\n* **Created:** <t:{int(user.created_at.timestamp())}:F>", inline=False)
         user_roles = " ".join([role.mention for role in reversed(user.roles) if role != interaction.guild.default_role][:20])
@@ -315,28 +300,19 @@ class Utility(commands.Cog):
         embed.set_author(name=server_name, icon_url=server_icon)
         embed.set_thumbnail(url=server_icon)
         if interaction.guild:
-         await interaction.followup.send(embed=embed, view=NetWorkPage(self.client, interaction.user))    
+            await interaction.followup.send(embed=embed, view=NetWorkPage(self.client, interaction.user))    
         else:
             await interaction.followup.send(embed=embed)
-        
-
-
-
-
-    
-        
-      
 
     @commands.hybrid_command(description="Get help with Astro Birb.")
     async def help(self, ctx: commands.Context):         
-     embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
-     embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get setup guides."
-     embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
-     embed.add_field(name="**Command Prefix**", value="`/`")
-     embed.add_field(name="**Support Links**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.\n[**Read the documentation**](https://docs.astrobirb.dev) for some extra help.")     
-     view = Help(ctx.author)
-     await ctx.send(embed=embed, view=view)
-
+        embed = discord.Embed(title="**Astro Help**", color=discord.Color.dark_embed())
+        embed.description = "Welcome to the **Astro Birb** help menu. You can select a category from the dropdown below to get setup guides."
+        embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
+        embed.add_field(name="**Command Prefix**", value="`/`")
+        embed.add_field(name="**Support Links**", value="[**Join our support server**](https://discord.gg/Pz2FzUqZWe) for assistance and updates.\n[**Read the documentation**](https://docs.astrobirb.dev) for some extra help.")     
+        view = Help(ctx.author)
+        await ctx.send(embed=embed, view=view)
 
     @app_commands.command(description="Get support from the support server")
     @app_commands.allowed_installs(guilds=True, users=True)
@@ -357,10 +333,8 @@ class Utility(commands.Cog):
     @app_commands.allowed_installs(guilds=False, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)     
     async def invite(self, interaction: discord.Interaction):
-     view = invite()
-     await interaction.response.send_message(view=view)
-    
-
+        view = invite()
+        await interaction.response.send_message(view=view)
 
     @commands.hybrid_command(description="Buy or manage your premium!")
     async def premium(self, ctx: commands.Context):
@@ -368,7 +342,11 @@ class Utility(commands.Cog):
 
         result = await premium.find_one({'user_id': ctx.author.id})
         if result is None:
-            embed = discord.Embed(title="", description="## 🎁Premium Benefits\n* More infraction Types\n* More Promotion Ranks\n* More Custom Commands\n* /infraction multiple command (You can infract multiple staff members using one command which is good for activity strikes.)\n* Premium Badge on /user\n* More Applications\n* Premium Hangout\n\nWith more to come....", color=discord.Color.dark_embed())
+            embed = discord.Embed(
+                title="",
+                description="## 💎 **Premium Benefits**\n* **Unlimited Infraction Types**\n* **Unlimited Promotion Ranks**\n* **Unlimited Custom Commands**\n* </infraction multiple:1157361167405154344> Infract multiple people at once with ease.\n* **Premium Badge** on </user:1115670483325685846>\n* **Unlimited Applications**\n* **Premium Hangout**\n\n<:Soon:1239613393472589945> With more to come!",
+                color=discord.Color.blurple(),
+            )
             embed.set_thumbnail(url=self.client.user.display_avatar)
             view = PRemium()
             await ctx.send(embed=embed, view=view)
@@ -382,22 +360,12 @@ class Utility(commands.Cog):
             guild = self.client.get_guild(guild_id)
             if guild:
                 server_name = guild.name
-                
-
 
         embed = discord.Embed(title="Premium Portal", description=f"* **Server**: {server_name}", color=discord.Color.dark_embed())
         embed.set_thumbnail(url=ctx.author.display_avatar)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar)
 
-
-
-        
         await ctx.send(embed=embed, view=view)
-
-
-
-
-
 
     @app_commands.command(name='vote',description="❤️ Support Astro Birb!")
     @app_commands.allowed_installs(guilds=True, users=True)
@@ -415,7 +383,7 @@ class Utility(commands.Cog):
         view.add_item(button3)
         await interaction.response.send_message(embed=embed
                        , view=view)
-   
+
     @commands.command()
     @commands.guild_only()
     @commands.is_owner()
@@ -461,8 +429,7 @@ class PremiumButtons(discord.ui.View):
     async def disable(self, interaction: discord.Interaction, button: discord.Button):
         await premium.update_one({'user_id': interaction.user.id}, {'$set': {'guild_id': None}})
         await interaction.response.edit_message(content=f"{tick} I've deactivated the servers premium for you!", embed=None, view=None)
-     
-        
+
 
 class EnableAServer(discord.ui.Modal):
     def __init__(self):
@@ -478,13 +445,11 @@ class EnableAServer(discord.ui.Modal):
         await premium.update_one({'user_id': interaction.user.id}, {'$set': {'guild_id': server_id}})
         await interaction.response.edit_message(content=f"{tick} Successfully upgraded the server!", embed=None, view=None)
 
-        
-
 
 class PRemium(discord.ui.View):
     def __init__(self):
         super().__init__()
-        self.add_item(discord.ui.Button(label="Premium", emoji="<:Tip:1223062864793702431>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb"))
+        self.add_item(discord.ui.Button(label="Premium", emoji="<:sparkle:1233931758089666695>",style=discord.ButtonStyle.link, url="https://patreon.com/astrobirb"))
 
 
 class NetWorkPage(discord.ui.View):
@@ -594,7 +559,6 @@ class invite(discord.ui.View):
         self.add_item(discord.ui.Button(label='Invite', url=url, style=discord.ButtonStyle.blurple, emoji="<:link:1206670134064717904>"))
 
 
-       
 class Support(discord.ui.View):
     def __init__(self):
         super().__init__()
