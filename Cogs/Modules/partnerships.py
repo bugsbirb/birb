@@ -162,7 +162,7 @@ class Partnerships(commands.Cog):
           alert = ""
           await ctx.send(f"{tick} {ctx.author.display_name}, I've succesfully terminated this partnership.")
           try:
-           invite = await self.client.fetch_invite(url=invite)
+           invite = await self.client.fetch_invite(url=inviteurl)
            guild = invite.guild
            guildicon = guild.icon
           except discord.NotFound:
@@ -214,7 +214,7 @@ class Partnerships(commands.Cog):
       
       alert = ""
       try:
-            invite = await self.client.fetch_invite(url=invite)
+            invite = await self.client.fetch_invite(url=inviteurl)
             guild = invite.guild  
             guildicon = guild.icon
       except discord.NotFound:
