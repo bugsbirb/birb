@@ -28,8 +28,7 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
     profiles_sample_rate=1.0,
 )
-environment = os.getenv("ENVIRONMENT")
-guildid = os.getenv("CUSTOM_GUILD")
+
 load_dotenv()
 client = AsyncIOMotorClient(MONGO_URL)
 db = client["astro"]

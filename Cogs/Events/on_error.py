@@ -19,6 +19,9 @@ class On_error(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        if isinstance(error, commands.NoPrivateMessage):
+            await ctx.send(f"{no} **{ctx.author.display_name},** I can't execute commands in DMs. Please use me in a server.")
+            return
         if isinstance(error, commands.CommandNotFound):
             return
         if isinstance(error, commands.NotOwner):

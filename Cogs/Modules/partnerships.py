@@ -55,7 +55,7 @@ class Partnerships(commands.Cog):
      elif modulesdata['Partnerships'] is True:   
         return True
 
-    @partnership.command(description="Log a partnership")
+    @partnership.command(description="Log a partnership affiliation")
     @app_commands.describe(respresentive="The partnership respresentive of the server", server="The name of the server", invite="The invite link to the server")
     async def log(self, ctx: commands.Context, respresentive: discord.User, server:  discord.ext.commands.Range[str, 1, 400],  invite: discord.ext.commands.Range[str, 1, 100]):
         await ctx.defer()
@@ -78,7 +78,17 @@ class Partnerships(commands.Cog):
         except discord.NotFound:
           await ctx.send(f"{no} **{ctx.author.display_name}**, that invite is invalid.", allowed_mentions=discord.AllowedMentions.none())
           return
+        
+        if invited and invited.guild is None:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, that invite is invalid.", allowed_mentions=discord.AllowedMentions.none())
+          return          
 
+
+        if invited.expires_at is not None:
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the invite has to be unlimited.", allowed_mentions=discord.AllowedMentions.none)
+          return
+
+         
         data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data.get('channel_id', None)
@@ -94,23 +104,23 @@ class Partnerships(commands.Cog):
             'owner': respresentive.id,
             'admin': ctx.author.id,
             'invite': invite,
-            'server': server
+            'server': server,
+            'since': discord.utils.utcnow()
         }
 
           guild = invited.guild
           guild_name = server
-          guild_id = "Unknown" if guild is None or guild.id is None else guild.id
-          icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
-          invite = "Unknown" if guild is None or invited.url is None else invited.url
-          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Logged", description=f"\n**Logged By:** {ctx.author.mention}\n**Owner:** {respresentive.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}", color=discord.Color.dark_embed())
-          embed.set_author(name=guild_name, icon_url=icon_url)
-          embed.set_thumbnail(url=guild.icon.url)
+        
+          description = f"<:crown:1226668264260894832> **Representive:** <@{respresentive.id}>\n<:ID:1226671706022740058> **Guild ID:** {guild.id}\n<:Member:1226674150463111299> **Logged By:** <@{ctx.author.id}>\n<:link:1226672596284866631> **Invite:** {invite}" 
+          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Logged", description=description, color=discord.Color.dark_embed())
+          embed.set_author(name=guild_name, icon_url=guild.icon)
+          embed.set_thumbnail(url=guild.icon)
           try:
            await channel.send(embed=embed)
-           await ctx.send(f"{tick} **Partnership** logged.")  
+           await ctx.send(f"{tick} {ctx.author.display_name}, I've succesfully logged the partnership.", allowed_mentions=discord.AllowedMentions.none())  
            await partnerships.insert_one(partnershipdata)
           except discord.Forbidden: 
-            await ctx.send(f"{no} I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
+            await ctx.send(f"{no} {ctx.author.display_name}, I don't have permission to view that channel.", allowed_mentions=discord.AllowedMentions.none())
             return
          else:
            await ctx.send(f"{no} **{ctx.author.display_name}**, the channel can not be found please resetup the channel in `/config`", allowed_mentions=discord.AllowedMentions.none())   
@@ -118,7 +128,7 @@ class Partnerships(commands.Cog):
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
          
-    @partnership.command(description="Terminate a server partnership")     
+    @partnership.command(description="Close an ongoing partnership")    
     @app_commands.autocomplete(server=servers_autocomplete)    
     async def terminate(self, ctx: commands.Context, server, *,reason:  discord.ext.commands.Range[str, 1, 2000]):
         if not await self.modulecheck(ctx):
@@ -129,17 +139,17 @@ class Partnerships(commands.Cog):
          return              
 
 
-        partnership_data = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
-        if partnership_data is None:   
+        result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
+        if result is None:   
             await ctx.send(f"{no} **{ctx.author.display_name}**, I could not find that partnership.", allowed_mentions=discord.AllowedMentions.none())
             return
-        if partnership_data:
-            server = partnership_data['server']
-            ownerid = partnership_data['owner']
-            adminid = partnership_data['admin']
-            invite = partnership_data['invite']            
-            owner = await self.client.fetch_user(ownerid)
-            admin = await self.client.fetch_user(adminid)
+        server = result.get('server')
+        ownerid = result.get('owner')
+        adminid = result.get('admin')
+        inviteurl = result.get('invite')
+        guildid = result.get('guild_id')   
+        since = result.get('since', None)
+         
         data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
         if data:
          channel_id = data.get('channel_id', None)
@@ -149,24 +159,26 @@ class Partnerships(commands.Cog):
           channel = self.client.get_channel(channel_id)
 
          if channel:
-          await ctx.send(f"{tick} **Partnership** terminiated.")
+          alert = ""
+          await ctx.send(f"{tick} {ctx.author.display_name}, I've succesfully terminated this partnership.")
           try:
            invite = await self.client.fetch_invite(url=invite)
-          except discord.NotFound:
-           invite = None
-          if invite is not None:
            guild = invite.guild
-          else:
-              guild = None 
-          
-          guild_name = server if guild is None or guild.name is None else guild.name
-          guild_id = "Unknown" if guild is None or guild.id is None else guild.id
-          icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
+           guildicon = guild.icon
+          except discord.NotFound:
+           invite = f"Expired ||{inviteurl}||"
+           guild = None
+           guildicon = None
+           alert = ""
 
-          invite = "Unknown" if guild is None or invite.url is None else invite.url
-          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Terminated", description=f"\n**Logged By:** {admin.mention}\n**Owner:** {owner.mention}\n**Server:** {guild_name}\n**Server ID:** {guild_id}\n**Invite:** {invite}\n**Reason:** {reason}", color=discord.Color.dark_embed())
-          embed.set_author(name=guild_name, icon_url=icon_url)
-          embed.set_thumbnail(url=icon_url)
+
+          description = f"{alert}\n<:crown:1226668264260894832> **Representive:** <@{ownerid}>\n<:ID:1226671706022740058> **Guild ID:** {guildid}\n<:Member:1226674150463111299> **Logged By:** <@{adminid}>\n<:link:1226672596284866631> **Invite:** {invite}\n<:messageforward1:1230919023361921165> **Reason:** {reason}"
+          embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Terminated", description=description, color=discord.Color.dark_embed(), timestamp=since)
+          embed.set_author(name=server, icon_url=guildicon)
+          if guild:
+           embed.set_thumbnail(url=guildicon)
+          else:
+            embed.set_footer(text="The invite has expired, the guild information is limited.")
           try:
            await channel.send(embed=embed)
           except discord.Forbidden: 
@@ -179,6 +191,55 @@ class Partnerships(commands.Cog):
         else:  
          await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())        
          return
+        
+    @partnership.command(description="Retrieve detailed information about a specific partnership")
+    @app_commands.autocomplete(server=servers_autocomplete)
+    async def view(self, ctx: commands.Context, *,server: str):
+      await ctx.defer()
+      if not await self.modulecheck(ctx):
+         await ctx.send(f"{no} **{ctx.author.display_name}**, the partnership module isn't enabled.", allowed_mentions=discord.AllowedMentions.none())
+         return
+      if not await has_admin_role(ctx):
+         return              
+      result = await partnerships.find_one({'guild_id': ctx.guild.id, 'server': server})
+      if result is None:
+        await ctx.send(f"{no} {ctx.author.display_name}, this isn't a valid partnership.", allowed_mentions=discord.AllowedMentions.none())
+        return
+      server = result.get('server')
+      ownerid = result.get('owner')
+      adminid = result.get('admin')
+      inviteurl = result.get('invite')
+      guildid = result.get('guild_id')
+      since = result.get('since', None)
+      
+      alert = ""
+      try:
+            invite = await self.client.fetch_invite(url=invite)
+            guild = invite.guild  
+            guildicon = guild.icon
+      except discord.NotFound:
+            invite = f"Expired ||{inviteurl}||"
+            guild = None
+            guildicon = None
+            alert = "## <:bell:1191903691750514708> Invite Expired\n\n"
+      
+    
+      description = f"{alert}\n<:crown:1226668264260894832> **Representive:** <@{ownerid}>\n<:ID:1226671706022740058> **Guild ID:** {guildid}\n<:Member:1226674150463111299> **Logged By:** <@{adminid}>\n<:link:1226672596284866631> **Invite:** {invite}"
+      embed = discord.Embed(title="", description=description, color=discord.Color.dark_embed(), timestamp=since)
+      embed.set_author(name=server, icon_url=guildicon)
+      embed.set_thumbnail(url=guildicon)
+      if guild is None:
+        embed.set_footer(text="The invite has expired, the guild information is limited.")
+      await ctx.send(embed=embed)
+
+     
+        
+
+      
+      
+     
+
+
     @partnership.command(description="View all Partnerships in this server.")
     async def all(self, ctx: commands.Context):
         await ctx.defer()
@@ -188,53 +249,56 @@ class Partnerships(commands.Cog):
 
         if not await has_admin_role(ctx):
          return              
-        partnership_data = partnerships.find({'guild_id': ctx.guild.id})
-        if not partnership_data:
+        result = partnerships.find({'guild_id': ctx.guild.id})
+        if not result:
             await ctx.send(f"{no} **{ctx.author.display_name}**, there are no active partnerships on this server.", allowed_mentions=discord.AllowedMentions.none())
             return
 
         embeds = []
 
-        async for partnership in partnership_data:
-         server = partnership['server']
-         owner_id = partnership['owner']
-         invite = partnership['invite']
-         admin_id = partnership['admin']
-         admin = await self.client.fetch_user(admin_id)
-         owner = await self.client.fetch_user(owner_id)
+        async for partnership in result:
+         server = partnership.get('server')
+         ownerid = partnership.get('owner')
+         adminid = partnership.get('admin')
+         inviteurl = partnership.get('invite')
+         guildid = partnership.get('guild_id')
+         since = partnership.get('since', None)
+         alert = ""
 
          try:
-            invite = await self.client.fetch_invite(url=invite)
+            invite = await self.client.fetch_invite(url=inviteurl)
             guild = invite.guild  
+            guildicon = guild.icon
          except discord.NotFound:
-            invite = None
+            invite = f"Expired ||{inviteurl}||"
             guild = None
+            alert = "## <:bell:1191903691750514708> Invite Expired\n"
+            guildicon = None
+
+
 
 
          guild_name = server
-         guild_id = "Unknown" if guild is None or guild.id is None else guild.id
-         icon_url = "https://cdn.discordapp.com/attachments/1104358043598200882/1185555135544426618/error-404-page-found-vector-concept-icon-internet-website-down-simple-flat-design_570429-4168.png?ex=65900942&is=657d9442&hm=fc312fddae78ea4347315f4af2893893b684bb9b97686c2859272aa16c81a5b0&h=256&w=256" if guild is None or guild.icon is None else guild.icon
-         admin_mention = "Unknown" if admin is None or admin.mention is None else admin.mention
-         owner_mention = "Unknown" if owner is None or owner.mention is None else owner.mention
+         description = f"{alert}\n<:crown:1226668264260894832> **Representive:** <@{ownerid}>\n<:ID:1226671706022740058> **Guild ID:** {guildid}\n<:Member:1226674150463111299> **Logged By:** <@{adminid}>\n<:link:1226672596284866631> **Invite:** {invite}"
          embed = discord.Embed(
             title="<:Partner:1235001453861535825> Partnership Logged",
-            description=f"\n**Logged By:** {admin_mention}\n"
-                        f"**Owner:** {owner_mention}\n"
-                        f"**Server:** {guild_name}\n"
-                        f"**Server ID:** {guild_id}\n"
-                        f"**Invite:** {invite if invite else 'Unknown'}",
-            color=discord.Color.dark_embed()
+            description=description,
+            color=discord.Color.dark_embed(), 
+            timestamp=since
         )
-         embed.set_author(name=guild_name, icon_url=icon_url)
-         embed.set_thumbnail(url=icon_url)
+         embed.set_author(name=guild_name, icon_url=guildicon)
+         embed.set_thumbnail(url=guildicon)
          embeds.append(embed)
+         if guild is None:
+            embed.set_footer(text="The invite has expired, the guild information is limited.")
+           
 
         PreviousButton = discord.ui.Button(emoji="<:chevronleft:1220806425140531321>")
         NextButton = discord.ui.Button(emoji="<:chevronright:1220806430010118175>")
         FirstPageButton = discord.ui.Button(emoji="<:chevronsleft:1220806428726661130>")
         LastPageButton = discord.ui.Button(emoji="<:chevronsright:1220806426583371866>")
         InitialPage = 0
-        timeout = 42069
+        timeout = 92069
 
         paginator = Paginator.Simple(
             PreviousButton=PreviousButton,
