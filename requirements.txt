@@ -1,4 +1,4 @@
-git+https://github.com/Rapptz/discord.py@feature/user_apps
+git+https://github.com/Rapptz/discord.py
 jishaku
 datetime
 typing
