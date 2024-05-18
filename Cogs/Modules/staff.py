@@ -318,6 +318,7 @@ class quota(commands.Cog):
                     failedids = []      
                     if result:
                         for data in result:
+                            has_loa_role = False
 
                             try:
                              user = await guild.fetch_member(data.get('user_id', None))
