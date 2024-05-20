@@ -208,6 +208,8 @@ client = client()
 
 @tasks.loop(minutes=10)
 async def update_channel_name():
+    if environment == 'custom':
+       return
     guild_count = len(client.guilds)
     channel_id = 1131245978704420964
     channel = client.get_channel(channel_id)

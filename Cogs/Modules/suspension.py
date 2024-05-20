@@ -13,7 +13,13 @@ import os
 
 from datetime import datetime
 
+
+from dotenv import load_dotenv
+load_dotenv()
 MONGO_URL = os.getenv('MONGO_URL')
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
+
 from motor.motor_asyncio import AsyncIOMotorClient
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
@@ -186,7 +192,11 @@ class Suspensions(commands.Cog):
         
         print("[👀] Checking suspensions")
         current_time = datetime.now()
-        filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}
+        if environment == 'custom':
+                     filter = {"end_time": {"$lte": current_time}, "action": "Suspension", "guild_id": str(guildid)}
+        else:
+        
+         filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}
 
         suspension_requests = suspensions.find(filter)
         

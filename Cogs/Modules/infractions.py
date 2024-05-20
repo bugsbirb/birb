@@ -17,7 +17,13 @@ import re
 import discord
 from discord.ext import tasks
 from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
+load_dotenv()
 MONGO_URL = os.getenv('MONGO_URL')
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
+
+
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 collection = db['infractions']
@@ -698,10 +704,16 @@ class Infractions(commands.Cog):
     @tasks.loop(minutes=3, reconnect=True)
     async def check_infractions(self):
         try:
-            infractions = collection.find({
+            if environment == 'custom':
+                infractions = collection.find({
+                    'expiration': {'$exists': True}, 'guild_id': int(guildid),
+                    'expired': {'$ne': True}
+                })       
+            else:            
+             infractions = collection.find({
                 'expiration': {'$exists': True},
                 'expired': {'$ne': True}
-            })
+             })
             infractions = await infractions.to_list(None)
             if infractions:
                 for infraction in infractions:

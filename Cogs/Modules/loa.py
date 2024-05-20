@@ -12,8 +12,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime
 import re
 load_dotenv()
+
+
+
 from permissions import has_admin_role, has_staff_role
 MONGO_URL = os.getenv('MONGO_URL')
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']
 loa_collection = db['loa']
@@ -138,8 +143,10 @@ class loamodule(commands.Cog):
         print("[👀] Checking LOA Status")
         try:
             current_time = datetime.now()
-
-            filter = {'end_time': {'$lte': current_time}, 'active': True}
+            if environment == 'custom':
+             filter = {'end_time': {'$lte': current_time}, 'active': True, 'guild_id': int(guildid)}
+            else:
+                filter =  {'end_time': {'$lte': current_time}, 'active': True}
 
             loa_requests = await loa_collection.find(filter).to_list(length=None)
             for request in loa_requests:

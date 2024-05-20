@@ -1,8 +1,11 @@
 from discord.ext import commands, tasks
 from emojis import *
 import topgg
-
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
+environment = os.getenv("ENVIRONMENT")
+guildid = os.getenv("CUSTOM_GUILD")
 
 
 class Topgg(commands.Cog):
@@ -17,6 +20,8 @@ class Topgg(commands.Cog):
 
     @tasks.loop(minutes=30)
     async def update_stats(self):
+      if environment == 'custom':
+         return
       try:
         await self.client.topggpy.post_guild_count()
         print(f"[🔝] Posted server count ({self.client.topggpy.guild_count})")
