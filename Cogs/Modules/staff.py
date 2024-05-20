@@ -257,7 +257,7 @@ class quota(commands.Cog):
             return False
     
 
-    @tasks.loop(minutes=5)
+    @tasks.loop(minutes=5, reconnect=True)
     async def quota_activity(self):
        print('[INFO] Checking for quota activity')
        if environment == "custom":
@@ -318,6 +318,7 @@ class quota(commands.Cog):
                     failedids = []      
                     if result:
                         for data in result:
+                            has_loa_role = False
 
                             try:
                              user = await guild.fetch_member(data.get('user_id', None))

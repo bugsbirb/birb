@@ -83,13 +83,15 @@ class Partnerships(commands.Cog):
           await ctx.send(f"{no} **{ctx.author.display_name}**, that invite is invalid.", allowed_mentions=discord.AllowedMentions.none())
           return          
 
-
         if invited.expires_at is not None:
-          await ctx.send(f"{no} **{ctx.author.display_name}**, the invite has to be unlimited.", allowed_mentions=discord.AllowedMentions.none)
+          await ctx.send(f"{no} **{ctx.author.display_name}**, the invite has to be unlimited.", allowed_mentions=discord.AllowedMentions.none())
           return
 
          
         data = await partnershipsch.find_one({'guild_id': ctx.guild.id})
+        if not data:
+           await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
+           return
         if data:
          channel_id = data.get('channel_id', None)
          if channel_id is None:
@@ -110,11 +112,12 @@ class Partnerships(commands.Cog):
 
           guild = invited.guild
           guild_name = server
+          icon_url = guild.icon if guild.icon else None
         
           description = f"<:crown:1226668264260894832> **Representive:** <@{respresentive.id}>\n<:ID:1226671706022740058> **Guild ID:** {guild.id}\n<:Member:1226674150463111299> **Logged By:** <@{ctx.author.id}>\n<:link:1226672596284866631> **Invite:** {invite}" 
           embed = discord.Embed(title="<:Partner:1235001453861535825> Partnership Logged", description=description, color=discord.Color.dark_embed())
-          embed.set_author(name=guild_name, icon_url=guild.icon)
-          embed.set_thumbnail(url=guild.icon)
+          embed.set_author(name=guild_name, icon_url=icon_url)
+          embed.set_thumbnail(url=icon_url)
           try:
            await channel.send(embed=embed)
            await ctx.send(f"{tick} {ctx.author.display_name}, I've succesfully logged the partnership.", allowed_mentions=discord.AllowedMentions.none())  
@@ -125,8 +128,8 @@ class Partnerships(commands.Cog):
          else:
            await ctx.send(f"{no} **{ctx.author.display_name}**, the channel can not be found please resetup the channel in `/config`", allowed_mentions=discord.AllowedMentions.none())   
            return                        
-        else:  
-         await ctx.send(f"{no} **{ctx.author.display_name}**, the channel is not setup please run `/config`", allowed_mentions=discord.AllowedMentions.none())
+
+        
          
     @partnership.command(description="Close an ongoing partnership")    
     @app_commands.autocomplete(server=servers_autocomplete)    

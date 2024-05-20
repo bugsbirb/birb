@@ -35,7 +35,7 @@ class qotd(commands.Cog):
 
         
     
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=1, reconnect=True)
     async def sendqotd(self) -> None:
         print("[👀] Checking QOTD")
         if environment == "custom":

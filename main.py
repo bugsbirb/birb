@@ -96,7 +96,7 @@ class client(commands.AutoShardedBot):
             "Cogs.Events.AstroSupport.analytics",
             "Cogs.Events.welcome",
             "Cogs.Modules.datamanage",
-            "Cogs.Events.on_error",
+
 
             'Cogs.Events.qotd',
             'api'

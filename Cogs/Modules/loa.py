@@ -133,7 +133,7 @@ class loamodule(commands.Cog):
     async def loa(self, ctx: commands.Context):
         pass
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=10, reconnect=True)
     async def check_loa_status(self):
         print("[👀] Checking LOA Status")
         try:

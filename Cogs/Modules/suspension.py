@@ -181,8 +181,9 @@ class Suspensions(commands.Cog):
         else:
             await ctx.send(f"{no} **{ctx.author.display_name}**, No suspensions found for this user.", allowed_mentions=discord.AllowedMentions.none())
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=10, reconnect=True)
     async def check_suspensions(self):
+        
         print("[👀] Checking suspensions")
         current_time = datetime.now()
         filter = {"end_time": {"$lte": current_time}, "action": "Suspension"}

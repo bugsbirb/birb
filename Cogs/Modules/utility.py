@@ -236,7 +236,6 @@ class Utility(commands.Cog):
             except (discord.HTTPException, discord.NotFound):
                 print('Not in guild')
                 pass
-
         userFlags = user.public_flags.all()
         for flag in userFlags:
             flag_name = flag.name

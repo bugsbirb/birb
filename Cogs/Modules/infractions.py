@@ -695,7 +695,7 @@ class Infractions(commands.Cog):
       await ctx.send(f"{tick} **{ctx.author.display_name}**, I've edited the infraction with ID `{id}` in this guild.\n{error}", allowed_mentions=discord.AllowedMentions.none())
 
 
-    @tasks.loop(minutes=3)
+    @tasks.loop(minutes=3, reconnect=True)
     async def check_infractions(self):
         try:
             infractions = collection.find({
