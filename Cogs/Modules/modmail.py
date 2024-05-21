@@ -215,7 +215,7 @@ class Modmail(commands.Cog):
        content = "The new content of the snippet"
     )
     @app_commands.autocomplete(name=snippet_autocomplete)    
-    async def edit(self, ctx: commands.Context, *, name, content):
+    async def edit(self, ctx: commands.Context,  name, *, content):
        await ctx.defer()
        if not await has_admin_role(ctx):
           return
