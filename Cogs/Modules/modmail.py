@@ -177,11 +177,12 @@ class Modmail(commands.Cog):
 
     @snippets.command(description="Create a modmail snippet")
     @app_commands.describe(
-       name =  "The name of the snippet", 
-       content = "The content of the snippet"
+        name="The name of the snippet",
+        content="The content of the snippet"
     )
-    async def create(self, ctx: commands.Context, *, name, content):
+    async def create(self, ctx: commands.Context,  name,*, content: discord.ext.commands.Range[str, 1, 1800]):
        await ctx.defer()
+
        if not await has_admin_role(ctx):
             return          
        result = await modmailsnippets.find_one({'guild_id': ctx.guild.id, 'name': name})
