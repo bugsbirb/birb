@@ -206,7 +206,7 @@ class Modmail(commands.Cog):
        if not result:
            await ctx.send(f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",  allowed_mentions=discord.AllowedMentions.none())
            return
-       await modmailsnippets.delete_one({'guild_id': ctx.guild.id, 'name': name})
+       await modmailsnippets.delete_many({'guild_id': ctx.guild.id, 'name': name})
        await ctx.send(f"{tick} **{ctx.author.display_name}**, I've deleted the snippet succesfully!", allowed_mentions=discord.AllowedMentions.none())
        
     @snippets.command(description="Edit a modmail snippet")
