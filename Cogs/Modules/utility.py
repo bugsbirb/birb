@@ -264,11 +264,10 @@ class Utility(commands.Cog):
 
     async def fetch_birb_image(self):
         birb_api_url = "https://api.alexflipnote.dev/birb"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(birb_api_url) as response:
-                response.raise_for_status()
-                data = await response.json()
-                return data["file"]
+        async with aiohttp.ClientSession() as session, session.get(birb_api_url) as response:
+            response.raise_for_status()
+            data = await response.json()
+            return data["file"]
 
     @app_commands.command(name='birb', description="Get silly birb photo")
     @app_commands.allowed_installs(guilds=True, users=True)
