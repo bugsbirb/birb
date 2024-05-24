@@ -1,6 +1,4 @@
 import discord
-import discord
-from discord.ext import commands
 from discord.ext import commands
 import os
 from emojis import * 

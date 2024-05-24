@@ -1,7 +1,6 @@
 import discord
 import sys
 sys.dont_write_bytecode = True
-import discord
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *

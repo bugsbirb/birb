@@ -5,7 +5,6 @@ from typing import Literal
 import random
 import string
 from typing import Optional
-from discord.ext import commands
 import typing
 import os
 import Paginator
@@ -14,7 +13,6 @@ from emojis import *
 from permissions import *
 from datetime import datetime, timedelta
 import re
-import discord
 from discord.ext import tasks
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv

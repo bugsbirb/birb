@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-import os
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)

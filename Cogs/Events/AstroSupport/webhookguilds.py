@@ -3,7 +3,6 @@ from discord.ext import commands
 from emojis import *
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-import os
 MONGO_URL = os.getenv('MONGO_URL')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client['astro']

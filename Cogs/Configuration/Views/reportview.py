@@ -3,7 +3,6 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from emojis import *
 MONGO_URL = os.getenv('MONGO_URL')
-from motor.motor_asyncio import AsyncIOMotorClient
 mongo = AsyncIOMotorClient(MONGO_URL)
 db = mongo['astro']
 modules = db['Modules']

@@ -4,8 +4,7 @@ from discord import app_commands
 from discord.ext import commands
 import datetime 
 from datetime import timedelta
-from discord import app_commands
-from discord.ext import commands, tasks
+from discord.ext import tasks
 
 from emojis import *
 import re

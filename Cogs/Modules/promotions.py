@@ -1,8 +1,6 @@
 import discord
-import discord
 from discord.ext import commands
 from discord import app_commands
-from discord.ext import commands
 import os
 from emojis import *
 import datetime

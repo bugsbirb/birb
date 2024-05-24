@@ -4,7 +4,6 @@ import discord
 from discord.ext import commands, tasks
 import datetime
 from emojis import *
-import os
 import random
 from dotenv import load_dotenv
 load_dotenv()
