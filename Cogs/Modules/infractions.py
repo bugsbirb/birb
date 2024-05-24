@@ -292,7 +292,7 @@ class Infractions(commands.Cog):
                         pass
                     except discord.HTTPException:
                         pass
-            if typeactions.get('dbremoval', False) == True:
+            if typeactions.get('dbremoval', False) is True:
                 await staffdb.delete_one({"staff_id": staff.id})
 
                        
@@ -938,7 +938,7 @@ class InfractionMultiple(discord.ui.UserSelect):
                             except discord.HTTPException:
                                 pass
  
-                    if typeactions.get('dbremoval', False) == True:
+                    if typeactions.get('dbremoval', False) is True:
                         await staffdb.delete_one({"staff_id": user.id})
 
               

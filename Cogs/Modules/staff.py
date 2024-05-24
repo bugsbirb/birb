@@ -191,14 +191,14 @@ class quota(commands.Cog):
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Quota', False) == True:   
+     elif modulesdata.get('Quota', False) is True:   
         return True
 
     async def modulecheck2(self, ctx: commands.Context): 
      modulesdata = await modules.find_one({"guild_id": ctx.guild.id})    
      if modulesdata is None:
         return False
-     elif modulesdata.get('Staff Database', False) == True: 
+     elif modulesdata.get('Staff Database', False) is True: 
         return True
      else:   
         return False
@@ -267,7 +267,7 @@ class quota(commands.Cog):
        if autoactivityresult:
 
         for data in autoactivityresult:
-            if data.get('enabled', False) == False:
+            if data.get('enabled', False) is False:
                 continue
             try: 
              channel = self.client.get_channel(data.get('channel_id', None))
@@ -754,7 +754,7 @@ class quota(commands.Cog):
             return
         custom = await Customisation.find_one({'guild_id': ctx.guild.id, 'name': 'Staff Panel'})
         if custom:
-            if custom.get('embed') == True:
+            if custom.get('embed') is True:
              embed_title = custom.get('title', None)
              embed_description = custom.get('description', None)
              embed_author = custom.get('author', None)
