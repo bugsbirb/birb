@@ -714,7 +714,6 @@ class DenyReason(discord.ui.Modal):
                 color=discord.Color.brand_red(),
             )
               embed.set_thumbnail(url=applicant.display_avatar)
-              embed.footer
               embed.set_author(
                 name=f"Reviewed by {interaction.user.display_name.capitalize()}",
                 icon_url=interaction.user.display_avatar,
