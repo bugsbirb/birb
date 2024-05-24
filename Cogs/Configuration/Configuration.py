@@ -810,15 +810,30 @@ class Config(discord.ui.Select):
                 premiummsg = "∞"
             else:
                 premiummsg = 3
+                
+            description = ""    
+            applicationslist = list(applications.sort('field', pymongo.ASCENDING))
+            for applicationz in applicationslist:
+                description += f"> {applicationz['name']}\n"           
+
+
+
             embed = discord.Embed(title="<:Application:1224722901328986183> Applications Module",
-                                   description=f"",
+                                   description="",
                                    color=discord.Color.dark_embed())
-            applications_count = len(list(applications.sort('field', pymongo.ASCENDING)))
+
+            applications_count = len(applicationslist)
+
+
 
             embed.add_field(name="<:settings:1207368347931516928> Applications Configuration",
                             
                             value=f"{replytop}**Enabled:** {modulemsg}\n{replymiddle}**Submission Channel:** {subchannelmsg}\n{replymiddle}**Results Channel:** {appchannelmsg}\n{replymiddle}**Application Roles:** {approlemsg}\n{replybottom}**Applications:** {applications_count}/{premiummsg}\n\n<:Tip:1223062864793702431> If you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
                             inline=False)
+            if applicationslist:
+             embed.add_field(name="<:Application:1224722901328986183> Applications",
+                                value=description,
+                                inline=False)            
             embed.set_thumbnail(url=interaction.guild.icon)
             embed.set_author(name=interaction.guild.name, icon_url=interaction.guild.icon)
             channels = []
