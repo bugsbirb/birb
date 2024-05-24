@@ -327,7 +327,7 @@ class Modmailevnt(commands.Cog):
             return
          option = await options.find_one({'guild_id': message.guild.id})
          media = ""
-         if option and option.get('automessage') == True:
+         if option and option.get('automessage') is True:
           modmail_data = await modmail.find_one({'channel_id': message.channel.id})
           if modmail_data:
                     channel = message.channel
