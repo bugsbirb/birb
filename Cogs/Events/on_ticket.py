@@ -144,20 +144,14 @@ class TicketsPublic(commands.Cog):
                 await asyncio.sleep(0.4)
                 Guild = self.client.get_guild(Ticket.get("GuildID"))
                 if not Guild:
-                    return logging.critical(
-                        f"[AutomAtions] Guild with ID {Ticket.get('GuildID')} not found"
-                    )
+                    return 
                 Channel = Guild.get_channel(Ticket.get("ChannelID"))
-                print(Channel)
-                print(Ticket.get("ChannelID"))
 
                 if not Channel:
-                    return logging.critical(
-                        f"[AutomAtions] Channel with ID {Ticket.get('ChannelID')} not found"
-                    )
+                    return 
                 P = await self.client.db['Panels'].find_one({"name": Ticket.get("panel"), "guild": Guild.id})
                 if not P:
-                    return logging.critical("[AutomAtions] I can't find the panel.")
+                    return
                 if not P.get("Automations"):
                     return
                 ActivityReminder = P.get("Automations", {}).get("Inactivity", {})
