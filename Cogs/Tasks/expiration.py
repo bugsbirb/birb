@@ -22,18 +22,18 @@ class expiration(commands.Cog):
     async def CheckInfractions(self):
         if not self.client.infractions_maintenance:
             return
-        filter = {}
+        filter = {'expiration': {'$lte': datetime.now(), '$exists': True}, 'expired': {'$ne': True}}
         if environment == "custom":
-            filter = {"guild_id": int(guildid)}
+            filter["guild_id"] = int(guildid)
         infractions = (
             await self.client.db["Infractions"].find(filter).to_list(length=None)
         )
         if not infractions:
             return
         for infraction in infractions:
-            if not infraction.get("expires_at"):
+            if not infraction.get("expiration"):
                 continue
-            if infraction.get("expires_at") <= datetime.utcnow():
+            if infraction.get("expiration") <= datetime.now():
                 ActionType = await self.client.db["infractiontypeactions"].find_one(
                     {
                         "name": infraction.get("type"),
