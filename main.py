@@ -402,6 +402,7 @@ class Client(commands.AutoShardedBot):
         if not guildid:
             print("[❌] CUSTOM_GUILD not defined in .env")
             sys.exit(1)
+        guild = None
         try:
             guild = await self.fetch_guild(guildid)
         except (discord.HTTPException, discord.Forbidden, discord.NotFound):
