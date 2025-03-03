@@ -80,10 +80,10 @@ if not (TOKEN or MONGO_URL, PREFIX):
     print("[❌] Missing .env variables. [TOKEN, MONGO_URL]")
     sys.exit(1)
 
-if os.getenv("RemoveEmojis", False) == "True" or environment == "custom":
+if os.getenv("REMOVE_EMOJIS", False) == "True" or environment == "custom":
     from branding import ClearEmojis
 
-    ClearEmojis(True, os.getenv("FolderPath", "/app"))
+    ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
 
 if os.getenv("SENTRY_URL", None):
     import sentry_sdk
