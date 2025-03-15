@@ -20,7 +20,7 @@ class PermissionsDropdown(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -44,7 +44,7 @@ class ManagePermissions(discord.ui.View):
     async def Add(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -134,7 +134,7 @@ class ManagePermissions(discord.ui.View):
     async def Remove(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -143,12 +143,12 @@ class ManagePermissions(discord.ui.View):
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if config is None or "Advanced Permissions" not in config:
             return await interaction.followup.send(
-                content=f"{redx} There are no advanced permissions set.", ephemeral=True
+                content=f"  There are no advanced permissions set.", ephemeral=True
             )
         commands = list(config["Advanced Permissions"].keys())
         if not commands:
             return await interaction.followup.send(
-                content=f"{redx} There are no advanced permissions set.", ephemeral=True
+                content=f"  There are no advanced permissions set.", ephemeral=True
             )
 
         view = discord.ui.View()
@@ -176,7 +176,7 @@ class RemoveCommands(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -186,7 +186,7 @@ class RemoveCommands(discord.ui.Select):
 
         if config is None or "Advanced Permissions" not in config:
             return await interaction.followup.send(
-                content=f"{redx} There are no advanced permissions set.", ephemeral=True
+                content=f"  There are no advanced permissions set.", ephemeral=True
             )
         for command in self.values:
             if command in config["Advanced Permissions"]:
@@ -195,7 +195,7 @@ class RemoveCommands(discord.ui.Select):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.edit_original_response(
-            content=f"{tick} Successfully reset advanced permissions.",
+            content=f"  Successfully reset advanced permissions.",
             view=None,
             embed=None,
         )
@@ -214,7 +214,7 @@ class Commands(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -299,7 +299,7 @@ class RoleSelect(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -322,7 +322,7 @@ class RoleSelect(discord.ui.RoleSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} Successfully updated advanced permissions.",
+            content=f"  Successfully updated advanced permissions.",
             view=None,
             embed=None,
         )

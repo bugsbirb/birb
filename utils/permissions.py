@@ -39,7 +39,7 @@ async def has_staff_role(toy, permissions=None):
     blacklists = await blacklist.find_one({"user": author.id})
     if blacklists:
         await send(
-            f"{no} **{author.display_name}**, you are blacklisted from using **Astro Birb.** You are probably a shitty person and that might be why?",
+            f"  **{author.display_name}**, you are blacklisted from using **Astro Birb.** You are probably a shitty person and that might be why?",
             ephemeral=True,
         )
         return False
@@ -60,20 +60,20 @@ async def has_staff_role(toy, permissions=None):
                 return True
             else:
                 await send(
-                    f"{no} **{author.display_name}**, you don't have permission to use this command.\n-# Advanced Permission",
+                    f"  **{author.display_name}**, you don't have permission to use this command.\n-# Advanced Permission",
                     ephemeral=True,
                 )
                 return False
 
     if not Config.get("Permissions"):
         await send(
-            f"{no} **{author.display_name}**, the permissions haven't been setup yet please run `/config`"
+            f"  **{author.display_name}**, the permissions haven't been setup yet please run `/config`"
         )
         return False
 
     if not Config.get("Permissions").get("adminrole"):
         await send(
-            f"{no} **{author.display_name}**, the admin role hasn't been setup yet please run `/config`"
+            f"  **{author.display_name}**, the admin role hasn't been setup yet please run `/config`"
         )
         return False
 
@@ -95,7 +95,7 @@ async def has_staff_role(toy, permissions=None):
                 return True
 
     await send(
-        f"{no} **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`",
+        f"  **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Staff Role`",
     )
     return False
 
@@ -143,7 +143,7 @@ async def has_admin_role(toy, permissions=None):
     blacklists = await blacklist.find_one({"user": author.id})
     if blacklists:
         await send(
-            f"{no} **{author.display_name}**, you are blacklisted from using **Astro Birb.** You are probably a shitty person and that might be why?",
+            f"  **{author.display_name}**, you are blacklisted from using **Astro Birb.** You are probably a shitty person and that might be why?",
             ephemeral=True,
         )
         return False
@@ -169,21 +169,21 @@ async def has_admin_role(toy, permissions=None):
                     return True
                 else:
                     await send(
-                        f"{no} **{author.display_name}**, you don't have permission to use this command.\n-# Advanced Permission",
+                        f"  **{author.display_name}**, you don't have permission to use this command.\n-# Advanced Permission",
                         ephemeral=True,
                     )
                     return False
 
     if not Config.get("Permissions"):
         await send(
-            f"{no} **{author.display_name}**, the permissions haven't been setup yet please run `/config`",
+            f"  **{author.display_name}**, the permissions haven't been setup yet please run `/config`",
             ephemeral=True if s == "interaction" else False,
         )
         return False
 
     if not Config.get("Permissions").get("adminrole"):
         await send(
-            f"{no} **{author.display_name}**, the admin role hasn't been setup yet please run `/config`",
+            f"  **{author.display_name}**, the admin role hasn't been setup yet please run `/config`",
             ephemeral=True if s == "interaction" else False,
         )
         return False
@@ -205,20 +205,20 @@ async def has_admin_role(toy, permissions=None):
     else:
         if author.guild_permissions.administrator:
             await send(
-                f"{no} **{author.display_name}**, the admin role isn't set please run </config:1140463441136586784>",
+                f"  **{author.display_name}**, the admin role isn't set please run </config:1140463441136586784>",
                 view=PermissionsButtons(),
                 ephemeral=True if s == "interaction" else False,
             )
         else:
             await send(
-                f"{no} **{author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.",
+                f"  **{author.display_name}**, the admin role is not setup please tell an admin to run </config:1140463441136586784> to fix it.",
                 view=PermissionsButtons(),
                 ephemeral=True if s == "interaction" else False,
             )
         return False
 
     await send(
-        f"{no} **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
+        f"  **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
         ephemeral=True if s == "interaction" else False,
     )
     return False

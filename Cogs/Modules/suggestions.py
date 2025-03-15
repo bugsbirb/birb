@@ -37,7 +37,7 @@ class suggestions(commands.Cog):
         await ctx.defer(ephemeral=True)
         if self.client.suggestions_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the suggestion module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the suggestion module is currently under maintenance. Please try again later.",
             )
             return
 
@@ -100,7 +100,7 @@ class suggestions(commands.Cog):
         )
         self.client.dispatch("suggestion", result.inserted_id, Config)
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name},** succesfully submitted suggestion."
+            content=f"  **{ctx.author.display_name},** succesfully submitted suggestion."
         )
 
 

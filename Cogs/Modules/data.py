@@ -22,7 +22,7 @@ class Data(commands.Cog):
         Configuration = await self.client.config.find_one({"_id": ctx.guild.id})
         if not Configuration:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the config is not setup please run `/config`."
+                f"  **{ctx.author.display_name}**, the config is not setup please run `/config`."
             )
 
         options = await ModuleOptions(Config=Configuration, data=True)
@@ -51,7 +51,7 @@ class Data(commands.Cog):
     async def PermsHandler(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name},** you are missing the `Administrator` permission."
+                f"  **{ctx.author.display_name},** you are missing the `Administrator` permission."
             )
 
 
@@ -63,7 +63,7 @@ class DataManage(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -167,7 +167,7 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -280,13 +280,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await infractions.delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all infractions.", ephemeral=True
+            f"  Successfully cleared all infractions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Promotions", style=discord.ButtonStyle.danger)
@@ -295,13 +295,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await promotions.delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all promotions.", ephemeral=True
+            f"  Successfully cleared all promotions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Suggestions", style=discord.ButtonStyle.danger)
@@ -310,13 +310,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['suggestions'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all suggestions.", ephemeral=True
+            f"  Successfully cleared all suggestions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Custom Commands", style=discord.ButtonStyle.danger)
@@ -325,13 +325,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['Custom Commands'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all custom commands.", ephemeral=True
+            f"  Successfully cleared all custom commands.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase LOA", style=discord.ButtonStyle.danger)
@@ -340,13 +340,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['loa'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all LOA.", ephemeral=True
+            f"  Successfully cleared all LOA.", ephemeral=True
         )
 
     @discord.ui.button(
@@ -357,13 +357,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['Forum Configuration'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all forum configurations.", ephemeral=True
+            f"  Successfully cleared all forum configurations.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Staff Database", style=discord.ButtonStyle.danger)
@@ -372,13 +372,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['staff database'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all staff database.", ephemeral=True
+            f"  Successfully cleared all staff database.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Feedback", style=discord.ButtonStyle.danger)
@@ -387,13 +387,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['feedback'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all feedback.", ephemeral=True
+            f"  Successfully cleared all feedback.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Responders", style=discord.ButtonStyle.danger)
@@ -402,13 +402,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['Auto Responders'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all responders.", ephemeral=True
+            f"  Successfully cleared all responders.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Suspensions", style=discord.ButtonStyle.danger)
@@ -417,13 +417,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['Suspensions'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all suspensions.", ephemeral=True
+            f"  Successfully cleared all suspensions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Connection Roles", style=discord.ButtonStyle.danger)
@@ -432,13 +432,13 @@ class ClearData(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.client.db['connectionroles'].delete_many({"guild_id": interaction.guild.id})
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all connection roles.", ephemeral=True
+            f"  Successfully cleared all connection roles.", ephemeral=True
         )
 
 

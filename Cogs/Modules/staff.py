@@ -43,7 +43,7 @@ class SetMessages(discord.ui.Modal, title="Set Message Count"):
             message_count_value = int(self.message_count.value)
         except ValueError:
             await interaction.response.send_message(
-                f"{no} Invalid input. Please enter a valid number for the message count.",
+                f"  Invalid input. Please enter a valid number for the message count.",
                 ephemeral=True,
             )
             return
@@ -56,7 +56,7 @@ class SetMessages(discord.ui.Modal, title="Set Message Count"):
             filter, update_data, upsert=True
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've set the users messages as `{message_count_value}`.",
+            content=f"  **{interaction.user.display_name}**, I've set the users messages as `{message_count_value}`.",
             embed=None,
             view=None,
         )
@@ -85,7 +85,7 @@ class AddMessage(discord.ui.Modal, title="Add Messages"):
                 filter, {"$set": {"message_count": message_count}}
             )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the staff member.",
+                content=f"  **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the staff member.",
                 embed=None,
                 view=None,
             )
@@ -123,7 +123,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
                 filter, {"$set": {"message_count": message_count}}
             )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the staff member.",
+                content=f"  **{interaction.user.display_name}**, I have added `{message_count_value}` messages to the staff member.",
                 embed=None,
                 view=None,
             )
@@ -150,7 +150,7 @@ class StaffManage(discord.ui.View):
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -167,7 +167,7 @@ class StaffManage(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -182,7 +182,7 @@ class StaffManage(discord.ui.View):
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -198,7 +198,7 @@ class StaffManage(discord.ui.View):
         staff_id = self.staff_id
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -207,7 +207,7 @@ class StaffManage(discord.ui.View):
         await interaction.client.qdb["messages"].update_one(filter, update)
 
         await interaction.response.edit_message(
-            content=f"**{tick} {interaction.user.display_name}**, I have reset the staff member's ",
+            content=f"**  {interaction.user.display_name}**, I have reset the staff member's ",
             embed=None,
             view=None,
         )
@@ -245,7 +245,7 @@ class quota(commands.Cog):
             upsert=True,
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have added `@{rank.name}` to the staff list.",
+            f"  **{ctx.author.display_name}**, I have added `@{rank.name}` to the staff list.",
         )
 
     @list.command(description="Remove a rank from the staff list")
@@ -260,7 +260,7 @@ class quota(commands.Cog):
             return
         await self.client.db["Staff List"].delete_one({"rank": rank.id})
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have removed `@{rank.name}` from the staff list.",
+            f"  **{ctx.author.display_name}**, I have removed `@{rank.name}` from the staff list.",
         )
 
     @list.command(description="Send the staff list")
@@ -281,7 +281,7 @@ class quota(commands.Cog):
         )
         if len(results) == 0 or not results:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no ranks in the staff list.\n{replybottom} You can add a rank using `/staff list add <rank> <position>`."
+                f"  **{ctx.author.display_name}**, there are no ranks in the staff list.\n{replybottom} You can add a rank using `/staff list add <rank> <position>`."
             )
         results = sorted(results, key=lambda x: int(x.get("position", 0)))
         member_roles = {}
@@ -332,7 +332,7 @@ class quota(commands.Cog):
             msg = await ctx.channel.send(
                 embed=embed, allowed_mentions=discord.AllowedMentions().none()
             )
-            await ctx.send(f"{tick} successfully sent the staff list.", ephemeral=True)
+            await ctx.send(f"  successfully sent the staff list.", ephemeral=True)
         else:
             await ctx.message.delete()
             msg = await ctx.send(
@@ -755,7 +755,7 @@ class quota(commands.Cog):
         )
         if not MessageData:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, they haven't sent any messages."
+                f"  **{ctx.author.display_name}**, they haven't sent any messages."
             )
         Config = await self.client.config.find_one({"_id": ctx.guild.id})
         if Config is None:
@@ -836,7 +836,7 @@ class quota(commands.Cog):
 
         if not users:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no users in the leaderboard."
+                f"  **{ctx.author.display_name}**, there are no users in the leaderboard."
             )
 
         CSV = "User,Messages"
@@ -864,7 +864,7 @@ class quota(commands.Cog):
             f.write(CSV)
         await msg.edit(
             attachments=[discord.File(filename)],
-            content=f"{tick} **{ctx.author.display_name}**, here's your CSV file.",
+            content=f"  **{ctx.author.display_name}**, here's your CSV file.",
         )
         os.remove(filename)
 
@@ -944,7 +944,7 @@ class quota(commands.Cog):
 
         if len(Users) == 0:
             return await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there hasn't been any {'messages' if message_users else 'tickets'} sent yet.",
+                content=f"  **{ctx.author.display_name},** there hasn't been any {'messages' if message_users else 'tickets'} sent yet.",
                 embed=None,
             )
         YouProgress = next(
@@ -987,7 +987,7 @@ class quota(commands.Cog):
 
         if Users is None:
             return await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there has been no messages sent yet."
+                content=f"  **{ctx.author.display_name},** there has been no messages sent yet."
             )
         Description = ""
         i = 1
@@ -1101,7 +1101,7 @@ class quota(commands.Cog):
             await paginator.start(ctx, pages=pages[:45], msg=msg)
         else:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there are no pages to display.",
+                content=f"  **{ctx.author.display_name},** there are no pages to display.",
                 embed=None,
             )
 
@@ -1161,7 +1161,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user is already a staff member.\n-#{arrow} You can always edit them using </staff edit:1165258229102682124>!"
+                f"  **{ctx.author.display_name}**, this user is already a staff member.\n-#{arrow} You can always edit them using </staff edit:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].insert_one(
@@ -1179,7 +1179,7 @@ class quota(commands.Cog):
             print(e)
 
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member added successfully.\n-# You should now be able to see them on </staff panel:1165258229102682124>!"
+            f"  **{ctx.author.display_name},** staff member added successfully.\n-# You should now be able to see them on </staff panel:1165258229102682124>!"
         )
 
     @staff.command(description="Remove a staff member from the staff database.")
@@ -1197,7 +1197,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
+                f"  **{ctx.author.display_name}**, this user has not been added to the staff team.\n{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].delete_one(
@@ -1206,7 +1206,7 @@ class quota(commands.Cog):
         except Exception as e:
             print(e)
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member removed successfully."
+            f"  **{ctx.author.display_name},** staff member removed successfully."
         )
 
     @staff.command(description="Edit a staff member's rank. (Staff Database)")
@@ -1238,7 +1238,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n-#{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
+                f"  **{ctx.author.display_name}**, this user has not been added to the staff team.\n-#{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].update_one(
@@ -1254,7 +1254,7 @@ class quota(commands.Cog):
         except Exception as e:
             print(e)
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member edited successfully."
+            f"  **{ctx.author.display_name},** staff member edited successfully."
         )
 
     @staff.command(description="View a staff member's information. (Staff Database)")
@@ -1273,7 +1273,7 @@ class quota(commands.Cog):
         )
         if result is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user is not in the staff database."
+                f"  **{ctx.author.display_name}**, this user is not in the staff database."
             )
             return
         timezone = ""
@@ -1323,7 +1323,7 @@ class quota(commands.Cog):
         )
         if not result:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you are not in the staff database."
+                f"  **{ctx.author.display_name}**, you are not in the staff database."
             )
 
         await self.client.db["staff database"].update_one(
@@ -1331,7 +1331,7 @@ class quota(commands.Cog):
             {"$set": {"introduction": introduction}},
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, your introduction has been updated."
+            f"  **{ctx.author.display_name}**, your introduction has been updated."
         )
 
     @staff.command(
@@ -1404,17 +1404,17 @@ class quota(commands.Cog):
         try:
             msg = await ctx.channel.send(embed=embed, view=view)
             await ctx.send(
-                f"{tick} **{ctx.author.display_name},** staff panel sent successfully.",
+                f"  **{ctx.author.display_name},** staff panel sent successfully.",
                 ephemeral=True,
             )
         except discord.errors.Forbidden:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.",
+                f"  **{ctx.author.display_name}**, I don't have permission to send messages in that channel.",
             )
             return
         except discord.errors.HTTPException:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there is an error with the message. Make sure the embed/message is formed correctly.",
+                f"  **{ctx.author.display_name}**, there is an error with the message. Make sure the embed/message is formed correctly.",
             )
             return
         await self.client.db["Views"].insert_one(
@@ -1434,7 +1434,7 @@ class InfractionTypeSelection(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"  **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -1451,12 +1451,12 @@ class InfractionTypeSelection(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
+                f"  **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
                 ephemeral=True,
             )
         if not Config.get("Infraction", None):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
+                f"  **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
                 ephemeral=True,
             )
         try:
@@ -1465,23 +1465,23 @@ class InfractionTypeSelection(discord.ui.Select):
             )
         except (discord.NotFound, discord.HTTPException):
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"  **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         if not channel:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"  **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         client = await interaction.guild.fetch_member(interaction.client.user.id)
         if channel.permissions_for(client).send_messages is False:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
+                content=f"  **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
                 ephemeral=True,
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 ephemeral=True,
             )
             return
@@ -1511,7 +1511,7 @@ class InfractionTypeSelection(discord.ui.Select):
             )
             if not InfractionResult.inserted_id:
                 await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
+                    content=f"  **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
                     ephemeral=True,
                 )
                 return
@@ -1521,7 +1521,7 @@ class InfractionTypeSelection(discord.ui.Select):
 
         await interaction.edit_original_response(
             embed=None,
-            content=f"{tick} **{interaction.user.display_name},** succesfully punished all the failures.",
+            content=f"  **{interaction.user.display_name},** succesfully punished all the failures.",
             view=None,
         )
 
@@ -1589,7 +1589,7 @@ class StaffPanel(discord.ui.Select):
                 member = await interaction.guild.fetch_member(int(self.values[0]))
             except (discord.NotFound, discord.HTTPException):
                 return await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name},** I couldn't find that user.",
+                    content=f"  **{interaction.user.display_name},** I couldn't find that user.",
                     ephemeral=True,
                 )
         result = await interaction.client.db["staff database"].find_one(
@@ -1597,7 +1597,7 @@ class StaffPanel(discord.ui.Select):
         )
         if not result:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this user is not in the staff database.",
+                content=f"  **{interaction.user.display_name},** this user is not in the staff database.",
                 ephemeral=True,
             )
         timezone = ""
@@ -1634,7 +1634,7 @@ class ArmFire(discord.ui.View):
     async def Arm(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1648,7 +1648,7 @@ class ArmFire(discord.ui.View):
     async def Fire(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1663,7 +1663,7 @@ class ArmFire(discord.ui.View):
                 {"$set": {"ClaimedTickets": 0}},
             )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I have reset the staff leaderboard.",
+            content=f"  **{interaction.user.display_name}**, I have reset the staff leaderboard.",
             embed=None,
             view=None,
         )

@@ -244,7 +244,7 @@ class Utility(commands.Cog):
 
         except aiohttp.ClientError as e:
             await interaction.response.send_message(
-                f"{crisis} {interaction.user.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`",
+                f"  {interaction.user.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`",
             )
 
     @app_commands.command(name="ping", description="Check the bots latency & uptime")
@@ -431,7 +431,7 @@ class NetWorkPage(discord.ui.View):
     async def Right(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -493,7 +493,7 @@ class ShardsPage(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)

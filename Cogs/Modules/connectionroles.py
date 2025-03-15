@@ -26,7 +26,7 @@ class ConnectionRoles(commands.Cog):
     async def sync(self, ctx: commands.Context):
         if not await ModuleCheck(ctx.guild.id, "connectionroles"):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.",
+                f"  **{ctx.author.display_name}**, the connection roles module isn't enabled.",
             )
             return
 
@@ -36,7 +36,7 @@ class ConnectionRoles(commands.Cog):
         )
         if len(roleresult) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, There are no connection roles.",
+                f"  **{ctx.author.display_name}**, There are no connection roles.",
             )
             return
         if not ctx.guild.chunked:
@@ -65,12 +65,12 @@ class ConnectionRoles(commands.Cog):
                                 )
                             except discord.Forbidden:
                                 await ctx.send(
-                                    f"{no} **{ctx.author.display_name}**, I don't have permission to add the role to {member.mention}.",
+                                    f"  **{ctx.author.display_name}**, I don't have permission to add the role to {member.mention}.",
                                 )
                                 return
                             except discord.HTTPException:
                                 await ctx.send(
-                                    f"{no} **{ctx.author.display_name}**, An error occurred while adding the role to {member.mention}.",
+                                    f"  **{ctx.author.display_name}**, An error occurred while adding the role to {member.mention}.",
                                 )
                                 return
 
@@ -80,7 +80,7 @@ class ConnectionRoles(commands.Cog):
                         )
                 break
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name}**, Connection roles have been synced. {updated_members}/{total_members} members updated."
+            content=f"  **{ctx.author.display_name}**, Connection roles have been synced. {updated_members}/{total_members} members updated."
         )
 
     @connectionrole.command(
@@ -96,12 +96,12 @@ class ConnectionRoles(commands.Cog):
     ):
         if not await ModuleCheck(ctx.guild.id, "connectionroles"):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the connection roles module isn't enabled.",
+                f"  **{ctx.author.display_name}**, the connection roles module isn't enabled.",
             )
             return
         if parent == child:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, The parent and child roles cannot be the same.",
+                f"  **{ctx.author.display_name}**, The parent and child roles cannot be the same.",
             )
             return
 
@@ -114,7 +114,7 @@ class ConnectionRoles(commands.Cog):
             }
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, The connection role has been added."
+            f"  **{ctx.author.display_name}**, The connection role has been added."
         )
 
     @connectionrole.command(
@@ -135,13 +135,13 @@ class ConnectionRoles(commands.Cog):
         )
         if roleresult is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, The connection role does not exist.",
+                f"  **{ctx.author.display_name}**, The connection role does not exist.",
             )
             return
 
         await self.client.db['connectionroles'].delete_many({"guild": ctx.guild.id, "name": name})
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, The connection role has been removed.",
+            f"  **{ctx.author.display_name}**, The connection role has been removed.",
         )
 
     @connectionrole.command(
@@ -161,7 +161,7 @@ class ConnectionRoles(commands.Cog):
         )
         if len(roleresult) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, There are no connection roles.",
+                f"  **{ctx.author.display_name}**, There are no connection roles.",
             )
             return
 
@@ -226,12 +226,12 @@ class ConnectionRoles(commands.Cog):
     async def permissionerror(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can only use this command once every hour.",
+                f"  **{ctx.author.display_name}**, you can only use this command once every hour.",
             )
             return
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n<:Arrow:1115743130461933599>**Required:** ``Manage Roles``",
+                f"  **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n<:Arrow:1115743130461933599>**Required:** ``Manage Roles``",
             )
 
 

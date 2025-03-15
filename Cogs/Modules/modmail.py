@@ -37,13 +37,13 @@ class Modmail(commands.Cog):
     async def alert(self, ctx: commands.Context):
         if not await ModuleCheck(ctx.guild.id, "Modmail"):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled."
+                f"  **{ctx.author.display_name}**, the modmail module isn't enabled."
             )
             return
         if not await has_staff_role(ctx, "Modmail Permissions"):
             return
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** you will be alerted for the next message.",
+            f"  **{ctx.author.display_name},** you will be alerted for the next message.",
             ephemeral=True,
         )
         await self.client.db["modmailalerts"].update_one(
@@ -57,7 +57,7 @@ class Modmail(commands.Cog):
     async def blacklist(self, ctx: commands.Context, member: discord.Member):
         if not await ModuleCheck(ctx.guild.id, "Modmail"):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the modmail module isn't enabled."
+                f"  **{ctx.author.display_name}**, the modmail module isn't enabled."
             )
             return
         if not await has_admin_role(ctx, "Modmail Permissions"):
@@ -66,13 +66,13 @@ class Modmail(commands.Cog):
             {"guild_id": ctx.guild.id}
         )
         if blacklist and member.id in blacklist["blacklist"]:
-            await ctx.send(f"{no} **{member.display_name}** is already blacklisted.")
+            await ctx.send(f"  **{member.display_name}** is already blacklisted.")
             return
         await self.client.db["modmailblacklists"].update_one(
             {"guild_id": ctx.guild.id}, {"$push": {"blacklist": member.id}}, upsert=True
         )
         await ctx.send(
-            f"{tick} **{member.display_name}** has been blacklisted from using modmail."
+            f"  **{member.display_name}** has been blacklisted from using modmail."
         )
 
     @modmail.command(description="Unblacklist someone from using modmail")
@@ -93,14 +93,14 @@ class Modmail(commands.Cog):
         )
         if blacklist and member.id not in blacklist["blacklist"]:
             await ctx.send(
-                f"{no} **{member.display_name}** is not blacklisted.",
+                f"  **{member.display_name}** is not blacklisted.",
             )
             return
         await self.client.db["modmailblacklists"].update_one(
             {"guild_id": ctx.guild.id}, {"$pull": {"blacklist": member.id}}, upsert=True
         )
         await ctx.send(
-            f"{tick} **{member.display_name}** has been unblacklisted from using modmail.",
+            f"  **{member.display_name}** has been unblacklisted from using modmail.",
         )
 
     @modmail.command(description="Reply to a modmail")
@@ -152,14 +152,14 @@ class Modmail(commands.Cog):
         )
         if result:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, a snippet with that name already exists.",
+                f"  **{ctx.author.display_name}**, a snippet with that name already exists.",
             )
             return
         await self.client.db["Modmail Snippets"].insert_one(
             {"guild_id": ctx.guild.id, "name": name, "content": content}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I've created the snippet succesfully!",
+            f"  **{ctx.author.display_name}**, I've created the snippet succesfully!",
         )
 
     @snippets.command(description="Delete a modmail snippet")
@@ -174,14 +174,14 @@ class Modmail(commands.Cog):
         )
         if not result:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
+                f"  **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
             )
             return
         await self.client.db["Modmail Snippets"].delete_many(
             {"guild_id": ctx.guild.id, "name": name}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I've deleted the snippet succesfully!",
+            f"  **{ctx.author.display_name}**, I've deleted the snippet succesfully!",
         )
 
     @snippets.command(description="Edit a modmail snippet")
@@ -198,14 +198,14 @@ class Modmail(commands.Cog):
         )
         if not result:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
+                f"  **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
             )
             return
         await self.client.db["Modmail Snippets"].update_one(
             {"guild_id": ctx.guild.id, "name": name}, {"$set": {"content": content}}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I've edited the snippet succesfully!",
+            f"  **{ctx.author.display_name}**, I've edited the snippet succesfully!",
         )
 
     @snippets.command(description="Send a modmail snippet in a modmail")
@@ -226,7 +226,7 @@ class Modmail(commands.Cog):
         )
         if not result:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
+                f"  **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
             )
             return
         await self.Reply(ctx, content=result.get("content"))
@@ -248,7 +248,7 @@ class Modmail(commands.Cog):
         result = self.client.db["Modmail Snippets"].find(filter)
         if result is None:
             await ctx.send(
-                f"{no} {ctx.author.display_name}, there are no snippets in the server.\n{arrow} To create a new snippet, use </modmail snippets create:1226670215740264483>",
+                f"  {ctx.author.display_name}, there are no snippets in the server.\n{arrow} To create a new snippet, use </modmail snippets create:1226670215740264483>",
             )
             return
         result = await result.to_list(length=750)
@@ -297,7 +297,7 @@ class Modmail(commands.Cog):
                 embed = Embed()
         if count == 0:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name}**, there are no snippets in the server.\n{arrow} To create a new snippet, use </modmail snippets create:1226670215740264483>",
+                content=f"  **{ctx.author.display_name}**, there are no snippets in the server.\n{arrow} To create a new snippet, use </modmail snippets create:1226670215740264483>",
                 embed=None,
             )
             return
@@ -321,7 +321,7 @@ class Modmail(commands.Cog):
         )
         if not result:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
+                f"  **{ctx.author.display_name}**, a snippet with that name doesn't exist.",
             )
             return
         await self.Reply(ctx, content=result.get("content"))
@@ -363,7 +363,7 @@ class Modmail(commands.Cog):
             if not isinstance(ctx.channel, (discord.TextChannel, discord.Thread)):
 
                 return await ctx.send(
-                    content=f"{no} **{ctx.author.display_name},** this isn't a modmail channel."
+                    content=f"  **{ctx.author.display_name},** this isn't a modmail channel."
                 )
             if not isinstance(media, discord.Attachment):
                 media = None
@@ -379,17 +379,17 @@ class Modmail(commands.Cog):
                 )
             if not Modmail:
                 return await ctx.send(
-                    content=f"{no} **{ctx.author.display_name},** this isn't a modmail channel."
+                    content=f"  **{ctx.author.display_name},** this isn't a modmail channel."
                 )
             Server = await self.client.fetch_guild(Modmail.get("guild_id"))
             if not Server:
                 return await ctx.send(
-                    content=f"{no} **{ctx.author.display_name},** no idea how but the guild can't be found from the modmail????"
+                    content=f"  **{ctx.author.display_name},** no idea how but the guild can't be found from the modmail????"
                 )
             user = await self.client.fetch_user(Modmail.get("user_id"))
             if not user:
                 return await ctx.send(
-                    content=f"{no} **{ctx.author.display_name},** the user can't be found from the modmail????"
+                    content=f"  **{ctx.author.display_name},** the user can't be found from the modmail????"
                 )
             author_name = "Anonymous" if annonymous else ctx.author.name
 
@@ -411,7 +411,7 @@ class Modmail(commands.Cog):
                         )
                     except (discord.Forbidden, discord.HTTPException):
                         await ctx.send(
-                            f"{no} **{ctx.author.display_name},** I can't send a message to this user.",
+                            f"  **{ctx.author.display_name},** I can't send a message to this user.",
                             ephemeral=True,
                         )
                         return
@@ -419,7 +419,7 @@ class Modmail(commands.Cog):
                         return await ctx.message.delete()
                     else:
                         return await ctx.send(
-                            content=f"{tick} **{ctx.author.display_name}**, I've sent the message to the user.",
+                            content=f"  **{ctx.author.display_name}**, I've sent the message to the user.",
                             ephemeral=True,
                         )
 
@@ -431,7 +431,7 @@ class Modmail(commands.Cog):
                         await ctx.channel.send(embed=embed, file=file)
                     except (discord.Forbidden, discord.HTTPException):
                         await ctx.send(
-                            f"{no} **{ctx.author.display_name},** I can't send a message to this user.",
+                            f"  **{ctx.author.display_name},** I can't send a message to this user.",
                             ephemeral=True,
                         )
                 else:
@@ -440,19 +440,19 @@ class Modmail(commands.Cog):
                         await ctx.channel.send(embed=embed)
                     except (discord.Forbidden, discord.HTTPException):
                         await ctx.send(
-                            f"{no} **{ctx.author.display_name},** I can't send a message to this user.",
+                            f"  **{ctx.author.display_name},** I can't send a message to this user.",
                             ephemeral=True,
                         )
                 if ctx.interaction:
                     await ctx.send(
-                        content=f"{tick} **{ctx.author.display_name},** i've sent the message."
+                        content=f"  **{ctx.author.display_name},** i've sent the message."
                     )
                 else:
                     await ctx.message.delete()
 
             except discord.Forbidden:
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** I can't send a message to this user.",
+                    f"  **{ctx.author.display_name},** I can't send a message to this user.",
                     ephemeral=True,
                 )
                 return

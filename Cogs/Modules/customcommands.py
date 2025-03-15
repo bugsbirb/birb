@@ -25,14 +25,14 @@ async def run(
 
     if client.customcommands_maintenance:
         await ctx.followup.send(
-            f"{no} **{ctx.user.display_name}**, the custom commands module is currently under maintenance. Please try again later.",
+            f"  **{ctx.user.display_name}**, the custom commands module is currently under maintenance. Please try again later.",
             ephemeral=True,
         )
         return
 
     if not await ModuleCheck(ctx.guild.id, "customcommands"):
         await ctx.followup.send(
-            f"{no} **{ctx.user.display_name}**, the custom commands module isn't enabled.",
+            f"  **{ctx.user.display_name}**, the custom commands module isn't enabled.",
             ephemeral=True,
         )
         return
@@ -48,7 +48,7 @@ async def run(
 
         if command_data is None:
             await ctx.followup.send(
-                f"{no} **{ctx.user.display_name},** That command does not exist.",
+                f"  **{ctx.user.display_name},** That command does not exist.",
                 ephemeral=True,
             )
             return
@@ -98,7 +98,7 @@ async def run(
                 ),
             )
             await ctx.followup.send(
-                f"{tick} **{ctx.user.display_name},** The command has been sent",
+                f"  **{ctx.user.display_name},** The command has been sent",
                 ephemeral=True,
             )
         else:
@@ -113,7 +113,7 @@ async def run(
 
     except discord.Forbidden:
         await ctx.followup.send(
-            f"{no} **{ctx.user.display_name},** I do not have permission to send messages in that channel.",
+            f"  **{ctx.user.display_name},** I do not have permission to send messages in that channel.",
             ephemeral=True,
         )
         return
@@ -325,7 +325,7 @@ class Voting(discord.ui.View):
             button.label = str(voting["votes"] - 1)
             await interaction.message.edit(view=self)
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name},** You have successfully unvoted.",
+                f"  **{interaction.user.display_name},** You have successfully unvoted.",
                 ephemeral=True,
             )
         else:
@@ -340,7 +340,7 @@ class Voting(discord.ui.View):
             button.label = str(voting["votes"] + 1)
             await interaction.message.edit(view=self)
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name},** You have successfully voted.",
+                f"  **{interaction.user.display_name},** You have successfully voted.",
                 ephemeral=True,
             )
 
@@ -392,7 +392,7 @@ async def has_customcommandrole(ctx, command):
             return True
         else:
             await send(
-                f"{no} **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Custom Command Permission`"
+                f"  **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Custom Command Permission`"
             )
             return False
     else:

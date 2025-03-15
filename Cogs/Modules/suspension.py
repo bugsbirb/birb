@@ -56,25 +56,25 @@ class Suspensions(commands.Cog):
             return
         if staff.bot:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can't suspend a bot.",
+                f"  **{ctx.author.display_name}**, you can't suspend a bot.",
             )
             return
 
         if not re.match(r"^\d+[mhdw]$", length):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
 
         if ctx.author == staff:
             await ctx.send(
-                f"{no} You can't suspend yourself.",
+                f"  You can't suspend yourself.",
             )
             return
 
         if ctx.author.top_role <= staff.top_role:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.",
+                f"  **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.",
                 ephemeral=True,
             )
             return
@@ -84,7 +84,7 @@ class Suspensions(commands.Cog):
 
         if existing_suspensions:
             await ctx.send(
-                f"{no} **{staff.display_name}** is already suspended.",
+                f"  **{staff.display_name}** is already suspended.",
                 ephemeral=True,
             )
             return
@@ -141,7 +141,7 @@ class Suspensions(commands.Cog):
 
         if len(loa_requests) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.",
+                f"  **{ctx.author.display_name}**, there aren't any active suspensions on this server.",
             )
         else:
             embed = discord.Embed(
@@ -226,7 +226,7 @@ class Suspensions(commands.Cog):
             await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, No suspensions found for this user.",
+                f"  **{ctx.author.display_name}**, No suspensions found for this user.",
             )
 
 
@@ -254,7 +254,7 @@ class Suspension(discord.ui.RoleSelect):
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not config:
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, you need to select at least one role.",
+                f"  **{interaction.user.display_name}**, you need to select at least one role.",
                 ephemeral=True,
             )
         ChannelID = config.get("Suspension", {}).get("channel") or config.get(
@@ -299,7 +299,7 @@ class Suspension(discord.ui.RoleSelect):
             "infraction", RESULT.inserted_id, config, None, "Suspension"
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
+            content=f"  **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
             view=None,
             embed=None,
         )
@@ -327,7 +327,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
     async def Yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -402,7 +402,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             "infraction", RESULT.inserted_id, config, None, "Suspension"
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
+            content=f"  **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
             view=None,
             embed=None,
         )
@@ -477,7 +477,7 @@ class SuspensionPanel(discord.ui.View):
                     try:
                         await member.add_roles(*roles_to_return)
                         await interaction.edit_original_response(
-                            content=f"{tick} Suspension has been voided. Roles have been restored.",
+                            content=f"  Suspension has been voided. Roles have been restored.",
                             view=None,
                             embed=None,
                         )
@@ -487,7 +487,7 @@ class SuspensionPanel(discord.ui.View):
 
                     except discord.Forbidden:
                         await interaction.edit_original_response(
-                            content=f"{no} Failed to restore roles due to insufficient permissions.",
+                            content=f"  Failed to restore roles due to insufficient permissions.",
                             view=None,
                             embed=None,
                         )
@@ -505,7 +505,7 @@ class SuspensionPanel(discord.ui.View):
                     {"guild_id": interaction.guild.id, "staff": self.user.id}
                 )
                 await interaction.response.edit_message(
-                    content=f"{tick} Suspension has been voided.", embed=None, view=None
+                    content=f"  Suspension has been voided.", embed=None, view=None
                 )
                 try:
                     await member.send(
@@ -517,7 +517,7 @@ class SuspensionPanel(discord.ui.View):
 
         else:
             await interaction.response.send_message(
-                f"{no} No suspension found.", ephemeral=True
+                f"  No suspension found.", ephemeral=True
             )
 
 

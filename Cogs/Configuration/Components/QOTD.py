@@ -23,7 +23,7 @@ class QOTDOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -39,7 +39,7 @@ class QOTDOptions(discord.ui.Select):
             nextdate = datetime.now() + timedelta(days=1)
             timestamp = f"<t:{int(nextdate.timestamp())}>"
             embed = discord.Embed(
-                title=f"{greencheck} Enabled",
+                title=f"  Enabled",
                 description=f"> **Next Post Date:** {timestamp}",
                 color=discord.Color.brand_green(),
             )
@@ -83,7 +83,7 @@ class QOTDOptions(discord.ui.Select):
                 upsert=True,
             )
             embed = discord.Embed(
-                title=f"{redx} Disabled",
+                title=f"  Disabled",
                 description="> **QOTD has been disabled.**",
                 color=discord.Color.brand_red(),
             )
@@ -183,7 +183,7 @@ class PingRole(discord.ui.RoleSelect):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -222,7 +222,7 @@ class QOTDChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -242,7 +242,7 @@ class QOTDChannel(discord.ui.ChannelSelect):
             )
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** channel has been updated.",
+            content=f"  **{interaction.user.display_name},** channel has been updated.",
             view=None,
             embed=None,
         )

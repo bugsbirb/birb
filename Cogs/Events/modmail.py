@@ -73,21 +73,21 @@ async def Close(interaction: discord.Interaction, reason=None):
         )
     if not Modmail:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** you have no active modmail."
+            content=f"  **{interaction.user.display_name},** you have no active modmail."
         )
     Server = await interaction.client.fetch_guild(Modmail.get("guild_id"))
     if not Server:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** no idea how but the guild can't be found from the modmail????"
+            content=f"  **{interaction.user.display_name},** no idea how but the guild can't be found from the modmail????"
         )
     Config = await interaction.client.config.find_one({"_id": Server.id})
     if not Config:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** the bot isn't set up. Run `/config`."
+            content=f"  **{interaction.user.display_name},** the bot isn't set up. Run `/config`."
         )
     if not Config.get("Modmail"):
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** you haven't set up the modmail module."
+            content=f"  **{interaction.user.display_name},** you haven't set up the modmail module."
         )
     ModmailType = Config.get("Module Options", {}).get("ModmailType", "channel")
     channel = interaction.client.get_channel(int(Modmail.get("channel_id")))
@@ -120,7 +120,7 @@ async def Close(interaction: discord.Interaction, reason=None):
 
             except discord.Forbidden:
                 await msg.edit(
-                    content=f"{no} **{interaction.user.display_name},** I can't delete this channel please contact the server admins.",
+                    content=f"  **{interaction.user.display_name},** I can't delete this channel please contact the server admins.",
                 )
                 return
     user = await interaction.client.fetch_user(Modmail.get("user_id"))
@@ -191,7 +191,7 @@ async def Close(interaction: discord.Interaction, reason=None):
                     )
                 except (discord.NotFound, discord.HTTPException):
                     return await msg.edit(
-                        content=f"{no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
+                        content=f"  **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
                     )
                 view = Links()
                 try:
@@ -205,7 +205,7 @@ async def Close(interaction: discord.Interaction, reason=None):
                     )
                 except (discord.NotFound, discord.HTTPException):
                     return await msg.edit(
-                        content=f"{no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
+                        content=f"  **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
                     )
                 view = Links()
                 try:
@@ -262,19 +262,19 @@ class Links(discord.ui.View):
         )
         if not Modmail:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** you have no active modmail."
+                content=f"  **{interaction.user.display_name},** you have no active modmail."
             )
         if Modmail.get("text"):
             Text = Modmail.get("text")
             if not isinstance(Text, str):
                 return await interaction.followup.send(
-                    content=f"{no} **{interaction.user.display_name},** this isn't a valid transcript."
+                    content=f"  **{interaction.user.display_name},** this isn't a valid transcript."
                 )
             file = discord.File(io.BytesIO(Text.encode()), filename="transcript.txt")
             await interaction.followup.send(file=file, ephemeral=True)
         else:
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there is no transcript to generate.",
+                content=f"  **{interaction.user.display_name},** there is no transcript to generate.",
                 ephemeral=True,
             )
 
@@ -294,13 +294,13 @@ class Select(discord.ui.Select):
             Guild = await interaction.client.fetch_guild(self.values[0])
         except (discord.NotFound, discord.HTTPException):
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** I can't find the server anymore.",
+                f"  **{interaction.user.display_name},** I can't find the server anymore.",
                 ephemeral=True,
             )
 
         if not Guild:
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** I can't find the server anymore.",
+                f"  **{interaction.user.display_name},** I can't find the server anymore.",
                 ephemeral=True,
             )
 
@@ -309,7 +309,7 @@ class Select(discord.ui.Select):
         )
         if Blacklists and interaction.user.id in Blacklists.get("blacklist", []):
             return interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** you are blacklisted from using modmail in this server.",
+                f"  **{interaction.user.display_name},** you are blacklisted from using modmail in this server.",
                 ephemeral=True,
             )
 
@@ -318,7 +318,7 @@ class Select(discord.ui.Select):
         )
         if Modmail:
             return await interaction.edit_original_response(
-                content=f"{no} {interaction.user.display_name}, you've already started a Modmail, calm down.",
+                content=f"  {interaction.user.display_name}, you've already started a Modmail, calm down.",
                 embed=None,
                 view=None,
             )
@@ -326,7 +326,7 @@ class Select(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": Guild.id})
         if not Config or not Config.get("Modmail"):
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** this server doesn't even have the bot setup how did you even get this?",
+                f"  **{interaction.user.display_name},** this server doesn't even have the bot setup how did you even get this?",
                 ephemeral=True,
             )
 
@@ -368,13 +368,13 @@ class Select(discord.ui.Select):
                 )
             except (discord.NotFound, discord.HTTPException):
                 return await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                    content=f"  **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                     embed=None,
                     view=None,
                 )
             if not Category:
                 return await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                    content=f"  **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                     embed=None,
                     view=None,
                 )
@@ -396,7 +396,7 @@ class CategorySelection(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": self.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** this server doesn't have modmail setup."
+                f"  **{interaction.user.display_name},** this server doesn't have modmail setup."
             )
 
         CategoryConfig = (
@@ -406,7 +406,7 @@ class CategorySelection(discord.ui.Select):
         )
         if not CategoryConfig:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** this category doesn't have anything setup."
+                f"  **{interaction.user.display_name},** this category doesn't have anything setup."
             )
 
         Config["Modmail"] = {
@@ -485,7 +485,7 @@ async def OpenModmail(
 
         except (discord.Forbidden, discord.HTTPException):
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                content=f"  **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                 embed=None,
                 view=None,
             )
@@ -496,14 +496,14 @@ async def OpenModmail(
             )
         except:
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find their threads channel.",
+                content=f"  **{interaction.user.display_name},** I can't find their threads channel.",
                 embed=None,
                 view=None,
             )
 
         if not Channel:
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find their threads channel.",
+                content=f"  **{interaction.user.display_name},** I can't find their threads channel.",
                 embed=None,
                 view=None,
             )
@@ -603,7 +603,7 @@ class ModmailEvent(commands.Cog):
                         )
                     if Remaining.total_seconds() > 0:
                         await Message.edit(
-                            content=f"{no} **{message.author.display_name},** Please wait {int(Remaining.total_seconds())} seconds before opening another modmail panel."
+                            content=f"  **{message.author.display_name},** Please wait {int(Remaining.total_seconds())} seconds before opening another modmail panel."
                         )
                         return
                     Mutual = []
@@ -620,7 +620,7 @@ class ModmailEvent(commands.Cog):
                             Mutual.append(guilds)
                     if len(Mutual) == 0:
                         return await Message.edit(
-                            content=f"{crisis} **{message.author.display_name},** you aren't in any mutual servers with modmail enabled."
+                            content=f"  **{message.author.display_name},** you aren't in any mutual servers with modmail enabled."
                         )
                     Options = []
                     for Guild in Mutual:
@@ -633,7 +633,7 @@ class ModmailEvent(commands.Cog):
                         )
                     if len(Options) == 0:
                         return await Message.edit(
-                            content=f"{crisis} big fuck up happened."
+                            content=f"  big fuck up happened."
                         )
                     view = discord.ui.View()
                     view.add_item(Select(message.author, message, Options))
@@ -686,12 +686,12 @@ class ModmailEvent(commands.Cog):
                 User = await message.guild.fetch_member(int(Modmail.get("user_id")))
             except (discord.Forbidden, discord.NotFound):
                 return await message.reply(
-                    content=f"{crisis} I can't find the user they must of left. Probably should delete this."
+                    content=f"  I can't find the user they must of left. Probably should delete this."
                 )
 
             if not User:
                 return await message.reply(
-                    content=f"{crisis} I can't find the user they must of left. Probably should delete this."
+                    content=f"  I can't find the user they must of left. Probably should delete this."
                 )
             embed = discord.Embed(
                 color=discord.Color.dark_embed(),

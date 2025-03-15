@@ -31,7 +31,7 @@ class Suggestions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -82,7 +82,7 @@ class SuggestionsChannel(discord.ui.ChannelSelect):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -156,11 +156,11 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
                 value="{upvotes} <:UpVote:1223062893096996934> | {downvote} <:DownVote:1223063241433939989>",
             )
             if option == "Accepted Suggestion":
-                embed.title = f"{greencheck} Suggestion Accepted"
+                embed.title = f"  Suggestion Accepted"
                 embed.color = discord.Color.brand_green()
 
             if option == "Denied Suggestion":
-                embed.title = f"{redx} Suggestion Denied"
+                embed.title = f"  Suggestion Denied"
                 embed.color = discord.Color.brand_red()
                 embed.add_field(name="Denied Reason", value="{reason}", inline=False)
 
@@ -279,7 +279,7 @@ class EmbedSelection(discord.ui.Select):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)

@@ -35,7 +35,7 @@ class GuildJoins(commands.Cog):
 
         try:
             embed = discord.Embed(
-                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{tick}' if blacklist else f'{no}'}",
+                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f' ' if blacklist else f' '}",
                 color=discord.Color.dark_embed(),
                 timestamp=datetime.utcnow(),
             )
@@ -100,7 +100,7 @@ class GuildJoins(commands.Cog):
         )
         try:
             embed = discord.Embed(
-                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{tick}' if blacklist else f'{no}'}",
+                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f' ' if blacklist else f' '}",
                 color=discord.Color.dark_embed(),
                 timestamp=datetime.utcnow(),
             )

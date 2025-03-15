@@ -82,7 +82,7 @@ class CloseLock(discord.ui.View):
             return
         if not isinstance(interaction.channel, discord.Thread):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** This can only be used in a thread.",
+                f"  **{interaction.user.display_name},** This can only be used in a thread.",
                 ephemeral=True,
             )
             return
@@ -115,7 +115,7 @@ class CloseLock(discord.ui.View):
             return
         if not isinstance(interaction.channel, discord.Thread):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** This can only be used in a thread.",
+                f"  **{interaction.user.display_name},** This can only be used in a thread.",
                 ephemeral=True,
             )
             return

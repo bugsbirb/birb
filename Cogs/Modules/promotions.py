@@ -43,7 +43,7 @@ async def SingleHierarchy(
 ):
     if interaction.client.promotions_maintenance is True:
         await interaction.response.send_message(
-            f"{no} **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
+            f"  **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
             ephemeral=True,
         )
         return
@@ -65,19 +65,19 @@ async def SingleHierarchy(
 
     if user is None:
         await msg.edit(
-            content=f"{no} **{user.display_name}**, this user cannot be found.",
+            content=f"  **{user.display_name}**, this user cannot be found.",
         )
         return
 
     if interaction.user.bot:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
+            content=f"  **{interaction.user.display_name}**, you can't promote bots.",
         )
         return
 
     if interaction.user == user:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
+            content=f"  **{interaction.user.display_name}**, you can't promote yourself.",
         )
         return
 
@@ -120,7 +120,7 @@ async def SingleHierarchy(
     )
     if not HierarchyRoles:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, the hierarchy roles have not been set up yet.",
+            content=f"  **{interaction.user.display_name}**, the hierarchy roles have not been set up yet.",
         )
     SortedRoles = [
         interaction.guild.get_role(int(role_id))
@@ -134,7 +134,7 @@ async def SingleHierarchy(
     if SkipRole and SkipRole in SortedRoles:
         if interaction.user.top_role.position <= SkipRole.position:
             await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
+                content=f"  **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
             )
             return
 
@@ -147,13 +147,13 @@ async def SingleHierarchy(
     if NextRole:
         if interaction.user.top_role.position <= NextRole.position:
             await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+                content=f"  **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
             )
             return
 
     if not NextRole and not SkipRole:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+            content=f"  **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
         )
         return
     Object = await interaction.client.db["promotions"].insert_one(
@@ -175,7 +175,7 @@ async def SingleHierarchy(
 
     interaction.client.dispatch("promotion", Object.inserted_id, Config)
     await msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
+        content=f"  **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
     )
 
 
@@ -195,7 +195,7 @@ async def MultiHireachy(
 ):
     if interaction.client.promotions_maintenance is True:
         await interaction.response.send_message(
-            f"{no} **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
+            f"  **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
             ephemeral=True,
         )
         return
@@ -217,19 +217,19 @@ async def MultiHireachy(
 
     if user is None:
         await msg.edit(
-            content=f"{no} **{user.display_name}**, this user cannot be found.",
+            content=f"  **{user.display_name}**, this user cannot be found.",
         )
         return
 
     if interaction.user.bot:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
+            content=f"  **{interaction.user.display_name}**, you can't promote bots.",
         )
         return
 
     if interaction.user == user:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
+            content=f"  **{interaction.user.display_name}**, you can't promote yourself.",
         )
         return
 
@@ -280,7 +280,7 @@ async def MultiHireachy(
     )
     if not department_data:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
+            content=f"  **{interaction.user.display_name}**, the department `{department}` does not exist.",
         )
         return
 
@@ -296,7 +296,7 @@ async def MultiHireachy(
     if SkipRole and SkipRole in SortedRoles:
         if interaction.user.top_role.position <= SkipRole.position:
             await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
+                content=f"  **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
             )
             return
 
@@ -306,13 +306,13 @@ async def MultiHireachy(
             NextRole = SortedRoles[index + 1]
             if interaction.user.top_role.position <= NextRole.position:
                 await msg.edit(
-                    content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+                    content=f"  **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
                 )
                 return
 
     if not NextRole and not SkipRole:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+            content=f"  **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
         )
         return
 
@@ -335,7 +335,7 @@ async def MultiHireachy(
 
     interaction.client.dispatch("promotion", Object.inserted_id, Config)
     await msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
+        content=f"  **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
     )
 
 
@@ -352,7 +352,7 @@ async def issue(
 ):
     if interaction.client.promotions_maintenance is True:
         await interaction.response.send_message(
-            f"{no} **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
+            f"  **{interaction.user.display_name}**, the promotions module is currently under maintenance. Please try again later.",
             ephemeral=True,
         )
         return
@@ -373,25 +373,25 @@ async def issue(
 
     if staff is None:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, this user cannot be found.",
+            content=f"  **{interaction.user.display_name}**, this user cannot be found.",
         )
         return
 
     if staff.bot:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
+            content=f"  **{interaction.user.display_name}**, you can't promote bots.",
         )
         return
 
     if interaction.user == staff:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
+            content=f"  **{interaction.user.display_name}**, you can't promote yourself.",
         )
         return
 
     if interaction.user.top_role <= new:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you are below the role `{new.name}` and do not have authority to promote this member.",
+            content=f"  **{interaction.user.display_name}**, you are below the role `{new.name}` and do not have authority to promote this member.",
         )
         return
 
@@ -444,7 +444,7 @@ async def issue(
 
     interaction.client.dispatch("promotion", Object.inserted_id, Config)
     await msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{staff.display_name}** to `{new.name}`!",
+        content=f"  **{interaction.user.display_name}**, I've successfully promoted **@{staff.display_name}** to `{new.name}`!",
     )
 
 
@@ -616,7 +616,7 @@ class promo(commands.Cog):
         await ctx.defer()
         if self.client.promotions_maintenance:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the promotions module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the promotions module is currently under maintenance. Please try again later.",
             )
             return
 
@@ -638,7 +638,7 @@ class promo(commands.Cog):
         Promotions = await self.client.db["promotions"].find(filter).to_list(750)
         if not len(Promotions) > 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this staff member doesn't have any promotions.",
+                f"  **{ctx.author.display_name}**, this staff member doesn't have any promotions.",
             )
             return
 

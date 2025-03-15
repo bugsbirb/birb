@@ -63,7 +63,7 @@ class ModmailOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -234,7 +234,7 @@ class ThreadsChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -346,7 +346,7 @@ class SelectModmailType(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -360,7 +360,7 @@ class SelectModmailType(discord.ui.Select):
         config["Module Options"]["ModmailType"] = self.values[0]
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} {interaction.user.display_name}, the modmail type has been updated to {self.values[0]}.",
+            content=f"  {interaction.user.display_name}, the modmail type has been updated to {self.values[0]}.",
             view=None,
         )
 
@@ -399,7 +399,7 @@ class ModmailCategories(discord.ui.View):
     async def create(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -411,7 +411,7 @@ class ModmailCategories(discord.ui.View):
         if 3 <= len(config.get("Modmail", {}).get("Categories", [])):
             if not await premium(interaction.guild.id):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** you've reached the maximum amount of categories!\n-# Upgrade to premium for unlimited.",
+                    description=f"  **{interaction.user.display_name},** you've reached the maximum amount of categories!\n-# Upgrade to premium for unlimited.",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -424,7 +424,7 @@ class ModmailCategories(discord.ui.View):
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -435,7 +435,7 @@ class ModmailCategories(discord.ui.View):
             config["Modmail"] = {}
         if not config.get("Modmail").get("Categories"):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no categories to delete!",
+                description=f"  **{interaction.user.display_name},** there are no categories to delete!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -458,7 +458,7 @@ class DeleteCategory(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -470,20 +470,20 @@ class DeleteCategory(discord.ui.Modal):
             config["Modmail"] = {}
         if not config.get("Modmail").get("Categories"):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no categories to delete!",
+                description=f"  **{interaction.user.display_name},** there are no categories to delete!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if name not in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category doesn't exist!",
+                description=f"  **{interaction.user.display_name},** this category doesn't exist!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         del config["Modmail"]["Categories"][name]
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** the category `{name}` has been deleted.", view=None, embed=None
+            content=f"  **{interaction.user.display_name},** the category `{name}` has been deleted.", view=None, embed=None
 
         )
 
@@ -504,7 +504,7 @@ class CreateCategory(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -521,7 +521,7 @@ class CreateCategory(discord.ui.Modal):
             config["Modmail"]["Categories"] = []
         if name in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category already exists!",
+                description=f"  **{interaction.user.display_name},** this category already exists!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -563,12 +563,12 @@ class NoThanks(discord.ui.View):
     ):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've created the modmail category for you.",
+            content=f"  **{interaction.user.display_name},** I've created the modmail category for you.",
             view=None,
         )
 
@@ -578,7 +578,7 @@ class NoThanks(discord.ui.View):
     ):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -592,7 +592,7 @@ class NoThanks(discord.ui.View):
             config['Modmail']['Categories'] = {}
         if self.name in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category already exists!",
+                description=f"  **{interaction.user.display_name},** this category already exists!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -601,7 +601,7 @@ class NoThanks(discord.ui.View):
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, No problem! I've created the modmail category for you!",
+            content=f"  **{interaction.user.display_name}**, No problem! I've created the modmail category for you!",
             view=None,
         )
 
@@ -617,7 +617,7 @@ class CategoryType(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -652,7 +652,7 @@ class Threads(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -668,7 +668,7 @@ class Threads(discord.ui.ChannelSelect):
         config["Modmail"]["Categories"][self.name]["threads"] = self.values[0].id if self.values else None
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set threads channel for `{self.name}`.",
+            content=f"  **{interaction.user.display_name},** Successfully set threads channel for `{self.name}`.",
             view=None
         )
 
@@ -686,7 +686,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -702,7 +702,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
         config["Modmail"]["Categories"][self.name]["transcript"] = self.values[0].id if self.values else None
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set transcript channel for `{self.name}`.",
+            content=f"  **{interaction.user.display_name},** Successfully set transcript channel for `{self.name}`.",
             view=None
         )
 
@@ -719,7 +719,7 @@ class CategoryChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -735,7 +735,7 @@ class CategoryChannel(discord.ui.ChannelSelect):
         config["Modmail"]["Categories"][self.name]["category"] = self.values[0].id if self.values else None
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set category for `{self.name}`.",
+            content=f"  **{interaction.user.display_name},** Successfully set category for `{self.name}`.",
             view=None
         )
 
@@ -749,7 +749,7 @@ class PingRoles(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"  **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -765,7 +765,7 @@ class PingRoles(discord.ui.RoleSelect):
         config["Modmail"]["Categories"][self.name]["ping"] = [role.id for role in self.values]
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set ping roles for `{self.name}`.",
+            content=f"  **{interaction.user.display_name},** Successfully set ping roles for `{self.name}`.",
             view=None
         )
 
@@ -788,7 +788,7 @@ class ModmailPings(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -826,7 +826,7 @@ class Category(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -864,7 +864,7 @@ class Transcript(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)

@@ -35,7 +35,7 @@ class QuotaOptions(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"  **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -86,7 +86,7 @@ class IgnoredChannels(discord.ui.ChannelSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"  **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -149,7 +149,7 @@ class MessageQuota(discord.ui.Modal, title="Message Quota"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -177,7 +177,7 @@ class MessageQuota(discord.ui.Modal, title="Message Quota"):
                 pass
         except ValueError:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** please enter a valid number.",
+                description=f"  **{interaction.user.display_name},** please enter a valid number.",
                 color=discord.Colour.brand_red(),
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -202,7 +202,7 @@ class AutoActivity(discord.ui.Select):
         selection = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -279,7 +279,7 @@ class PostChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -311,14 +311,14 @@ class ActivityToggle(discord.ui.Select):
         color = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
 
         if color == "Enabled":
             await interaction.response.send_message(
-                content=f"{tick} Enabled", ephemeral=True
+                content=f"ed", ephemeral=True
             )
             await interaction.client.db['auto activity'].update_one(
                 {"guild_id": interaction.guild.id},
@@ -328,7 +328,7 @@ class ActivityToggle(discord.ui.Select):
 
         if color == "Disabled":
             await interaction.response.send_message(
-                content=f"{no} Disabled", ephemeral=True
+                content=f"  Disabled", ephemeral=True
             )
             await interaction.client.db['auto activity'].update_one(
                 {"guild_id": interaction.guild.id},

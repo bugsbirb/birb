@@ -22,7 +22,7 @@ class ForumsOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -66,7 +66,7 @@ class ForumManagent(discord.ui.View):
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)        
@@ -76,7 +76,7 @@ class ForumManagent(discord.ui.View):
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)        
@@ -96,7 +96,7 @@ class ForumManagent(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** there are no forums.",
+                f"  **{interaction.user.display_name},** there are no forums.",
                 ephemeral=True,
             )
         view.add_item(ForumSelection(interaction.user, "Edit", Options))
@@ -107,7 +107,7 @@ class ForumManagent(discord.ui.View):
     async def remove(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)        
@@ -127,7 +127,7 @@ class ForumManagent(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** there are no forums.",
+                f"  **{interaction.user.display_name},** there are no forums.",
                 ephemeral=True,
             )
         view.add_item(ForumSelection(interaction.user, "Remove", Options))
@@ -143,7 +143,7 @@ class ForumSelection(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -156,7 +156,7 @@ class ForumSelection(discord.ui.Select):
         )
         if not Forum:
             return await interaction.followup.send(
-                f"{redx} **{interaction.user.display_name},** theres no forum named that.",
+                f"  **{interaction.user.display_name},** theres no forum named that.",
                 ephemeral=True,
             )
         if self.typed == "Remove":
@@ -164,7 +164,7 @@ class ForumSelection(discord.ui.Select):
                 {"guild_id": interaction.guild.id, "name": self.values[0]}
             )
             return await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name},** successfully deleted the forum.",
+                content=f" **{interaction.user.display_name},** successfully deleted the forum.",
                 embed=None,
                 view=None,
             )
@@ -202,7 +202,7 @@ class CreateForum(discord.ui.Modal, title="Create Forum"):
         )
         if Forum:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** theres already a forum named that.",
+                content=f"  **{interaction.user.display_name},** theres already a forum named that.",
                 ephemeral=True,
             )
         from Cogs.Configuration.Components.EmbedBuilder import Embed
@@ -229,7 +229,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
     if embed:
         if not datad.get("channel_id"):
             await interaction.response.send_message(
-                f"{tick} **{interaction.user.display_name},** you need to select a forum channel before finishing.",
+                f" **{interaction.user.display_name},** you need to select a forum channel before finishing.",
                 ephemeral=True,
             )
             return
@@ -277,7 +277,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
         upsert=True,
     )
     await interaction.response.edit_message(
-        content=f"{tick} **{interaction.user.display_name},** success.",
+        content=f" **{interaction.user.display_name},** success.",
         view=None,
         embed=None,
     )

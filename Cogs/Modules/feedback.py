@@ -41,7 +41,7 @@ class Feedback(commands.Cog):
     async def remove(self, ctx: commands.Context, id: int):
         if self.client.feedback_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
             )
             return
 
@@ -59,7 +59,7 @@ class Feedback(commands.Cog):
         )
         if result is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any feedback with that ID."
+                f"  **{ctx.author.display_name}**, I couldn't find any feedback with that ID."
             )
             return
 
@@ -67,7 +67,7 @@ class Feedback(commands.Cog):
             {"feedbackid": id, "guild_id": ctx.guild.id}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have removed the feedback.",
+            f"  **{ctx.author.display_name}**, I have removed the feedback.",
         )
 
     @feedback.command(description="Rate a staff member", name="give")
@@ -97,13 +97,13 @@ class Feedback(commands.Cog):
     ):
         if self.client.feedback_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
             )
             return
         await ctx.defer(ephemeral=True)
         if not await ctx.guild.fetch_member(ctx.author.id):
             return await ctx.send(
-                f"{no} {ctx.author.display_name}, that user isn't in the server."
+                f"  {ctx.author.display_name}, that user isn't in the server."
             )
         existing_feedback = await self.client.db["feedback"].find_one(
             {"guild_id": ctx.guild.id, "staff": staff.id, "author": ctx.author.id}
@@ -119,7 +119,7 @@ class Feedback(commands.Cog):
 
         if staff is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, please provide a staff member.",
+                f"  **{ctx.author.display_name}**, please provide a staff member.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "Feedback"):
@@ -130,7 +130,7 @@ class Feedback(commands.Cog):
             return
         if staff == ctx.author:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you cannot rate yourself.",
+                f"  **{ctx.author.display_name}**, you cannot rate yourself.",
             )
             return
 
@@ -138,7 +138,7 @@ class Feedback(commands.Cog):
 
         if not has_staff_role:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can only rate staff members.",
+                f"  **{ctx.author.display_name}**, you can only rate staff members.",
             )
             return
         if Config.get("Module Options"):
@@ -147,13 +147,13 @@ class Feedback(commands.Cog):
                 and existing_feedback
             ):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** You have already rated this staff member.",
+                    f"  **{ctx.author.display_name},** You have already rated this staff member.",
                 )
                 return
         else:
             if existing_feedback:
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** You have already rated this staff member.",
+                    f"  **{ctx.author.display_name},** You have already rated this staff member.",
                 )
                 return
         feedbackid = await self.client.db["feedback"].count_documents({}) + 1
@@ -192,7 +192,7 @@ class Feedback(commands.Cog):
             insert = await self.client.db["feedback"].insert_one(feedbackdata)
             self.client.dispatch("feedback", insert.inserted_id, Config)
             await msg.edit(
-                content=f"{tick} You've rated **@{staff.display_name}** {rating}!",
+                content=f"  You've rated **@{staff.display_name}** {rating}!",
             )
         except discord.Forbidden:
             await ctx.send(
@@ -213,7 +213,7 @@ class Feedback(commands.Cog):
     ):
         if self.client.feedback_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the feedback module is currently under maintenance. Please try again later.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "Feedback"):
@@ -242,12 +242,12 @@ class Feedback(commands.Cog):
                 {"guild_id": ctx.guild.id, "staff": staff.id}
             )
         else:
-            await ctx.send(f"{no} Invalid scope. Please use 'global' or 'server'.")
+            await ctx.send(f"  Invalid scope. Please use 'global' or 'server'.")
             return
 
         if total_ratings == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any rating for this user.\n{arrow} To rate someone use </feedback give:1194418154617700382>!",
+                f"  **{ctx.author.display_name}**, I couldn't find any rating for this user.\n{arrow} To rate someone use </feedback give:1194418154617700382>!",
             )
             return
         sum_ratings = sum(

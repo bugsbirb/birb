@@ -85,13 +85,13 @@ class On_suggestions_edit(commands.Cog):
                 value=f"{len(back.get('upvoters')) if back.get('upvoters') else 0} <:UpVote:1223062893096996934> | {len(back.get('downvoters')) if back.get('downvoters') else 0} <:DownVote:1223063241433939989>",
             )
             if action == "Accepted Suggestion":
-                embed.title = f"{greencheck} Suggestion Accepted"
+                embed.title = f"  Suggestion Accepted"
                 embed.color = discord.Color.brand_green()
                 view.upvote.disabled = True
                 view.downvote.disabled = True
                 view.settings.disabled = True
             if action == "Denied Suggestion":
-                embed.title = f"{redx} Suggestion Denied"
+                embed.title = f"  Suggestion Denied"
                 embed.color = discord.Color.brand_red()
                 embed.add_field(
                     name="Denied Reason", value=f"{back.get('reason')}", inline=False

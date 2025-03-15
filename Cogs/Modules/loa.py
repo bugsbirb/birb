@@ -29,7 +29,6 @@ environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
 
-
 class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
     def __init__(self, user, guild, author):
         super().__init__()
@@ -58,7 +57,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
                 )
             if not re.match(r"^\d+[smhdw]$", duration):
                 await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                    f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                     ephemeral=True,
                 )
                 return
@@ -79,7 +78,9 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
             start_time = datetime.now()
             end_time = start_time + timedelta(seconds=duration_seconds)
 
-            Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
+            Config = await interaction.client.config.find_one(
+                {"_id": interaction.guild.id}
+            )
             if not Config:
                 return await interaction.response.send_message(
                     embed=BotNotConfigured(), ephemeral=True, view=Support()
@@ -124,7 +125,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
                         await self.user.add_roles(role)
                     except discord.Forbidden:
                         await interaction.response.edit_message(
-                            content=f"{no} I don't have permission to add roles."
+                            content=f"  I don't have permission to add roles."
                         )
                         return
             try:
@@ -140,15 +141,15 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
                 )
             except discord.Forbidden:
                 await interaction.response.edit_message(
-                    content=f"{no} I don't have permission to view that channel."
+                    content=f"  I don't have permission to view that channel."
                 )
                 return
             await interaction.response.edit_message(
-                content=f"{tick} Created LOA for **@{self.user.display_name}**",
+                content=f"  Created LOA for **@{self.user.display_name}**",
                 embed=embed,
                 view=None,
             )
-            await interaction.client.db['loa'].insert_one(loadata)
+            await interaction.client.db["loa"].insert_one(loadata)
 
             try:
                 await self.user.send(
@@ -160,7 +161,7 @@ class LOA(discord.ui.Modal, title="Create Leave Of Absence"):
         except Exception as e:
             print(e)
             await interaction.response.send_message(
-                f"{no} error error big massive error: {e}"
+                f"  error error big massive error: {e}"
             )
             return
 
@@ -178,7 +179,7 @@ class loamodule(commands.Cog):
     async def manage(self, ctx: commands.Context, user: discord.Member):
         if self.client.loa_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "LOA"):
@@ -190,7 +191,7 @@ class loamodule(commands.Cog):
         if not await has_admin_role(ctx, "LOA Permissions"):
             return
 
-        loas = await self.client.db['loa'].find_one(
+        loas = await self.client.db["loa"].find_one(
             {
                 "user": user.id,
                 "guild_id": ctx.guild.id,
@@ -198,14 +199,18 @@ class loamodule(commands.Cog):
                 "request": {"$ne": True},
             }
         )
-        loainactive = await self.client.db['loa'].find(
-            {
-                "user": user.id,
-                "guild_id": ctx.guild.id,
-                "active": False,
-                "request": {"$ne": True},
-            }
-        ).to_list(length=None)
+        loainactive = (
+            await self.client.db["loa"]
+            .find(
+                {
+                    "user": user.id,
+                    "guild_id": ctx.guild.id,
+                    "active": False,
+                    "request": {"$ne": True},
+                }
+            )
+            .to_list(length=None)
+        )
         view = None
 
         if loas is None:
@@ -256,7 +261,7 @@ class loamodule(commands.Cog):
     async def active(self, ctx: commands.Context):
         if self.client.loa_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "LOA"):
@@ -277,11 +282,11 @@ class loamodule(commands.Cog):
             "request": {"$ne": True},
         }
 
-        loa_requests = await self.client.db['loa'].find(filter).to_list(length=None)
+        loa_requests = await self.client.db["loa"].find(filter).to_list(length=None)
 
         if len(loa_requests) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there aren't any active LOAs in this server.",
+                f"  **{ctx.author.display_name}**, there aren't any active LOAs in this server.",
             )
         else:
             embed = discord.Embed(title="Active LOAs", color=discord.Color.dark_embed())
@@ -319,7 +324,7 @@ class loamodule(commands.Cog):
 
         if self.client.loa_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the loa module is currently under maintenance. Please try again later.",
             )
             return
 
@@ -333,15 +338,15 @@ class loamodule(commands.Cog):
             return
         if not re.match(r"^\d+[smhdw]$", duration):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
-        LOA = await self.client.db['loa'].find_one(
+        LOA = await self.client.db["loa"].find_one(
             {"guild_id": ctx.guild.id, "user": ctx.author.id, "active": True}
         )
         if LOA:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you already have an active LOA.",
+                f"  **{ctx.author.display_name}**, you already have an active LOA.",
             )
             return
         Config = await self.client.config.find_one({"_id": ctx.guild.id})
@@ -378,7 +383,7 @@ class loamodule(commands.Cog):
         if start:
             if not re.match(r"^\d+[smhdw]$", start):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name}**, invalid start time format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                    f"  **{ctx.author.display_name}**, invalid start time format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 )
                 return
 
@@ -411,7 +416,7 @@ class loamodule(commands.Cog):
             icon_url=ctx.author.display_avatar, name=ctx.author.display_name
         )
         embed.set_thumbnail(url=ctx.author.display_avatar)
-        past_loas = await self.client.db['loa'].count_documents(
+        past_loas = await self.client.db["loa"].count_documents(
             {
                 "guild_id": ctx.guild.id,
                 "user": ctx.author.id,
@@ -451,8 +456,8 @@ class loamodule(commands.Cog):
                 "active": False,
                 "scheduled": True if start else False,
             }
-            await self.client.db['loa'].insert_one(loadata)
-            await ctx.send(f"{tick} LOA Request sent", ephemeral=True)
+            await self.client.db["loa"].insert_one(loadata)
+            await ctx.send(f"  LOA Request sent", ephemeral=True)
             print(f"[LOA] LOA Request @{ctx.guild.name} pending")
         except discord.Forbidden:
             return await ctx.send(
@@ -477,7 +482,7 @@ class Confirm(discord.ui.View):
     ):
         if interaction.client.loa_maintenance is True:
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, the loa module is currently under maintenance. Please try again later.",
+                f"  **{interaction.user.display_name}**, the loa module is currently under maintenance. Please try again later.",
                 ephemeral=True,
             )
             return
@@ -485,13 +490,15 @@ class Confirm(discord.ui.View):
         if not await has_admin_role(interaction):
             return
         await interaction.response.defer()
-        loa_data = await interaction.client.db['loa'].find_one({"messageid": interaction.message.id})
+        loa_data = await interaction.client.db["loa"].find_one(
+            {"messageid": interaction.message.id}
+        )
         if loa_data:
             try:
                 self.user = await interaction.guild.fetch_member(loa_data["user"])
             except (discord.HTTPException, discord.NotFound):
                 await interaction.followup.send(
-                    content=f"{no} **{interaction.user.display_name}**, I can't find this user.",
+                    content=f"  **{interaction.user.display_name}**, I can't find this user.",
                     ephemeral=True,
                 )
 
@@ -499,7 +506,7 @@ class Confirm(discord.ui.View):
 
         else:
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.",
+                content=f"  **{interaction.user.display_name}**, I can't find this LOA.",
                 ephemeral=True,
             )
             return
@@ -521,13 +528,13 @@ class Confirm(discord.ui.View):
         user = self.user
         embed = interaction.message.embeds[0]
         embed.color = discord.Color.brand_green()
-        embed.title = f"{greencheck} LOA Request - Accepted"
+        embed.title = f"  LOA Request - Accepted"
         embed.set_footer(
             text=f"Accepted by {interaction.user.display_name}",
             icon_url=interaction.user.display_avatar,
         )
         await interaction.message.edit(embed=embed, view=None)
-        await interaction.client.db['loa'].update_one(
+        await interaction.client.db["loa"].update_one(
             {
                 "guild_id": interaction.guild.id,
                 "messageid": interaction.message.id,
@@ -552,7 +559,9 @@ class Confirm(discord.ui.View):
                         )
                         pass
 
-        loanotification = await interaction.client.db['consent'].find_one({"user_id": self.user.id})
+        loanotification = await interaction.client.db["consent"].find_one(
+            {"user_id": self.user.id}
+        )
         if loanotification and loanotification.get("LOAAlerts", "Enabled") == "Enabled":
 
             try:
@@ -576,44 +585,46 @@ class Confirm(discord.ui.View):
         await interaction.response.defer()
         if interaction.client.loa_maintenance is True:
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, the loa module is currently under maintenance. Please try again later.",
+                f"  **{interaction.user.display_name}**, the loa module is currently under maintenance. Please try again later.",
                 ephemeral=True,
             )
             return
 
         if not await has_admin_role(interaction):
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
+                content=f"  **{interaction.user.display_name}**, you don't have permission to accept this LOA.\n<:Arrow:1115743130461933599>**Required:** `Admin Role`",
                 ephemeral=True,
             )
             return
-        loa_data = await interaction.client.db['loa'].find_one({"messageid": interaction.message.id})
+        loa_data = await interaction.client.db["loa"].find_one(
+            {"messageid": interaction.message.id}
+        )
         if loa_data:
             try:
                 self.user = await interaction.guild.fetch_member(loa_data["user"])
             except (discord.HTTPException, discord.NotFound):
                 await interaction.followup.send(
-                    content=f"{no} **{interaction.user.display_name}**, I can't find this user.",
+                    content=f"  **{interaction.user.display_name}**, I can't find this user.",
                     ephemeral=True,
                 )
                 return
         else:
 
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.",
+                content=f"  **{interaction.user.display_name}**, I can't find this LOA.",
                 ephemeral=True,
             )
             return
 
         embed = interaction.message.embeds[0]
         embed.color = discord.Color.brand_red()
-        embed.title = f"{redx} LOA Request - Denied"
+        embed.title = f"  LOA Request - Denied"
         embed.set_footer(
             text=f"Denied by {interaction.user.display_name}",
             icon_url=interaction.user.display_avatar,
         )
         await interaction.message.edit(embed=embed, view=None)
-        await interaction.client.db['loa'].delete_one(
+        await interaction.client.db["loa"].delete_one(
             {
                 "guild_id": interaction.guild.id,
                 "user": self.user.id,
@@ -621,12 +632,14 @@ class Confirm(discord.ui.View):
             }
         )
         print(f"LOA Request @{interaction.guild.name} denied")
-        loanotification = await interaction.client.db['consent'].find_one({"user_id": self.user.id})
+        loanotification = await interaction.client.db["consent"].find_one(
+            {"user_id": self.user.id}
+        )
         if loanotification and loanotification.get("LOAAlerts", "Enabled") == "Enabled":
             try:
 
                 await self.user.send(
-                    f"{no} **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied."
+                    f"  **{self.user.display_name}**, your LOA **@{interaction.guild.name}** has been denied."
                 )
             except discord.Forbidden:
                 print(f"Failed to send a DM to user {self.user.id}. Continuing...")
@@ -642,26 +655,29 @@ class Confirm(discord.ui.View):
     async def loacount(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        loa_data = await interaction.client.db['loa'].find_one({"messageid": interaction.message.id})
+        loa_data = await interaction.client.db["loa"].find_one(
+            {"messageid": interaction.message.id}
+        )
         if loa_data:
 
             try:
                 self.user = await interaction.guild.fetch_member(loa_data["user"])
             except (discord.HTTPException, discord.NotFound):
                 await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name}**, I can't find this user.",
+                    content=f"  **{interaction.user.display_name}**, I can't find this user.",
                     ephemeral=True,
                 )
                 return
         else:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, I can't find this LOA.",
+                content=f"  **{interaction.user.display_name}**, I can't find this LOA.",
                 ephemeral=True,
             )
             return
         user = self.user
         loainactive = (
-            await interaction.client.db['loa'].find(
+            await interaction.client.db["loa"]
+            .find(
                 {
                     "guild_id": interaction.guild.id,
                     "request": {"$ne": True},
@@ -709,11 +725,11 @@ class LOAPanel(discord.ui.View):
         author = self.author.id
         if interaction.user.id != author:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
-        loa = await interaction.client.db['loa'].find_one(
+        loa = await interaction.client.db["loa"].find_one(
             {"user": self.user.id, "guild_id": interaction.guild.id, "active": True}
         )
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
@@ -734,17 +750,19 @@ class LOAPanel(discord.ui.View):
                         )
                         pass
 
-        await interaction.client.db['loa'].update_many(
+        await interaction.client.db["loa"].update_many(
             {"guild_id": interaction.guild.id, "user": user.id},
             {"$set": {"active": False}},
         )
         await interaction.response.edit_message(
             embed=None,
-            content=f"{tick} Succesfully ended **@{user.display_name}'s** LOA",
+            content=f"  Succesfully ended **@{user.display_name}'s** LOA",
             view=None,
         )
         try:
-            loanotification = await interaction.client.db['consent'].find_one({"user_id": self.user.id})
+            loanotification = await interaction.client.db["consent"].find_one(
+                {"user_id": self.user.id}
+            )
             if (
                 loanotification
                 and loanotification.get("LOAAlerts", "Enabled") == "Enabled"
@@ -762,7 +780,7 @@ class LOAPanel(discord.ui.View):
         author = self.author.id
         if interaction.user.id != author:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -789,14 +807,14 @@ class ExtendLOA(discord.ui.Modal):
         await interaction.response.defer()
         if interaction.user.id != self.author:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
         duration = self.children[0].value
         if not re.match(r"^\d+[smhdw]$", duration):
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
 
@@ -817,27 +835,27 @@ class ExtendLOA(discord.ui.Modal):
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not config:
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** the bot isn't set up. Run `/config` to get started.",
+                f"  **{interaction.user.display_name},** the bot isn't set up. Run `/config` to get started.",
                 ephemeral=True,
             )
             return
         if not config.get("LOA"):
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** the LOA module isnt setup. Run `/config` to get started.",
+                f"  **{interaction.user.display_name},** the LOA module isnt setup. Run `/config` to get started.",
                 ephemeral=True,
             )
             return
 
-        loa = await interaction.client.db['loa'].find_one(
+        loa = await interaction.client.db["loa"].find_one(
             {"user": self.user.id, "guild_id": interaction.guild.id, "active": True}
         )
         if not loa:
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, this user doesn't have an active LOA.",
+                f"  **{interaction.user.display_name}**, this user doesn't have an active LOA.",
             )
             return
         end_time = loa["end_time"] + timedelta(seconds=duration_seconds)
-        await interaction.client.db['loa'].update_one(
+        await interaction.client.db["loa"].update_one(
             {
                 "user": self.user.id,
                 "guild_id": interaction.guild.id,
@@ -846,7 +864,7 @@ class ExtendLOA(discord.ui.Modal):
             {"$set": {"end_time": end_time}},
         )
         await interaction.edit_original_response(
-            content=f"{tick} Succesfully extended **@{self.user.display_name}'s** LOA",
+            content=f"  Succesfully extended **@{self.user.display_name}'s** LOA",
             embed=None,
             view=None,
         )
@@ -860,7 +878,9 @@ class ExtendLOA(discord.ui.Modal):
                 icon_url=self.user.display_avatar, name=self.user.display_name
             )
             embed.set_thumbnail(url=self.user.display_avatar)
-            loanotification = await interaction.client.db['consent'].find_one({"user_id": self.user.id})
+            loanotification = await interaction.client.db["consent"].find_one(
+                {"user_id": self.user.id}
+            )
             if (
                 loanotification
                 and loanotification.get("LOAAlerts", "Enabled") == "Enabled"
@@ -877,17 +897,17 @@ class ExtendLOA(discord.ui.Modal):
                 config.get("LOA", {}).get("channel")
             )
         except (discord.Forbidden, discord.NotFound, discord.HTTPException):
-            f"{no} **{interaction.user.display_name},** I can't find where the LOA channel is maybe you should fix that."
+            f"  **{interaction.user.display_name},** I can't find where the LOA channel is maybe you should fix that."
             return
         if not channel:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** I can't find where the LOA channel is maybe you should fix that."
+                f"  **{interaction.user.display_name},** I can't find where the LOA channel is maybe you should fix that."
             )
         try:
             await channel.send(embed=embed)
         except discord.Forbidden:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** I don't have permission to send messages in that channel."
+                f"  **{interaction.user.display_name},** I don't have permission to send messages in that channel."
             )
 
 
@@ -909,7 +929,7 @@ class LOACreate(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)

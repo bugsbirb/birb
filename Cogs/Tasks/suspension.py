@@ -95,7 +95,7 @@ class EmptyCog(commands.Cog):
                 if user:
                     try:
                         await user.send(
-                            f"{tick} Your suspension in **@{guild.name}** has ended."
+                            f"  Your suspension in **@{guild.name}** has ended."
                         )
                     except discord.Forbidden:
                         print(

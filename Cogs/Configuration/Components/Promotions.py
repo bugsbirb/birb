@@ -61,7 +61,7 @@ class PSelect(discord.ui.Select):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -448,7 +448,7 @@ class CreateAndDelete(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -475,7 +475,7 @@ class CreateAndDelete(discord.ui.Select):
             )
             if IsEmpty:
                 return await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name}**, there are no departments to modify.",
+                    content=f"  **{interaction.user.display_name}**, there are no departments to modify.",
                     ephemeral=True,
                 )
             view = discord.ui.View()
@@ -492,7 +492,7 @@ class CreateAndDelete(discord.ui.Select):
                 )
             )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, select the department to modify.",
+                content=f"  **{interaction.user.display_name}**, select the department to modify.",
                 view=view,
                 embed=None
             )
@@ -517,7 +517,7 @@ class SingleHierarchy(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -539,7 +539,7 @@ class SingleHierarchy(discord.ui.RoleSelect):
 
         await interaction.response.edit_message(
             view=None,
-            content=f"{tick} **{interaction.user.display_name}**, the hierarchy has been updated!",
+            content=f"  **{interaction.user.display_name}**, the hierarchy has been updated!",
             embed=None
         )
 
@@ -574,13 +574,13 @@ class ModmailSystem(discord.ui.Select):
             config["Promo"]["System"]["type"] = self.values[0]
         else:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name}**, no system type selected.",
+                content=f"  **{interaction.user.display_name}**, no system type selected.",
                 ephemeral=True,
             )
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, the promotions system has been updated to {self.values[0]}!",
+            content=f"  **{interaction.user.display_name}**, the promotions system has been updated to {self.values[0]}!",
             view=None,
         )
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
@@ -603,7 +603,7 @@ class ModmailSystem(discord.ui.Select):
             )
         except discord.Forbidden:
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, I couldn't update the message. You will need to reload the page to see the new options.",
+                content=f"  **{interaction.user.display_name}**, I couldn't update the message. You will need to reload the page to see the new options.",
             )
 
 
@@ -624,7 +624,7 @@ class ModifyDepartment(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -651,7 +651,7 @@ class ModifyDepartment(discord.ui.Select):
 
         if not department:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** department not found!",
+                description=f"  **{interaction.user.display_name},** department not found!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -684,7 +684,7 @@ class MultiHierarchy(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -710,7 +710,7 @@ class MultiHierarchy(discord.ui.RoleSelect):
         await interaction.client.config.update_one({"_id": interaction.guild.id}, {"$set": config})
         await interaction.response.edit_message(
             view=None,
-            content=f"{tick} **{interaction.user.display_name}**, the hierarchy for the department `{self.department}` has been updated!",
+            content=f"  **{interaction.user.display_name}**, the hierarchy for the department `{self.department}` has been updated!",
             embed=None
         )
 
@@ -750,7 +750,7 @@ class CreateDeleteDepartment(discord.ui.Modal):
                 for department in departments_group
             ):
                 return await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name},** I couldn't find the department.", ephemeral=True
+                    f"  **{interaction.user.display_name},** I couldn't find the department.", ephemeral=True
                 )
 
             config["Promo"]["System"]["multi"]["Departments"].append(
@@ -784,7 +784,7 @@ class CreateDeleteDepartment(discord.ui.Modal):
             )
 
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, the department `{DepartmentName}` has been deleted!",
+                content=f"  **{interaction.user.display_name}**, the department `{DepartmentName}` has been deleted!",
                 view=None,
             )
 
@@ -812,7 +812,7 @@ class PromotionChannel(discord.ui.ChannelSelect):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)

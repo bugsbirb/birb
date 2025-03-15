@@ -70,7 +70,7 @@ class PTicketControl(discord.ui.View):
 
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
+                f"  **{interaction.user.display_name}** you don't have permission to close this ticket.",
                 ephemeral=True,
             )
 
@@ -95,7 +95,7 @@ class PTicketControl(discord.ui.View):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
+                f"  **{interaction.user.display_name}** you don't have permission to close this ticket.",
                 ephemeral=True,
             )
         Result = await interaction.client.db["Tickets"].find_one(
@@ -824,7 +824,7 @@ class Review(discord.ui.Select):
             )
         if Ticket.get("review"):
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** you've already reviewed this.",
+                f"  **{interaction.user.display_name},** you've already reviewed this.",
                 ephemeral=True,
             )
 
@@ -855,7 +855,7 @@ class FormalReview(discord.ui.Modal):
             )
         if self.ticket.get("review"):
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** you've already reviewed this.",
+                f"  **{interaction.user.display_name},** you've already reviewed this.",
                 ephemeral=True,
             )
 

@@ -50,7 +50,7 @@ class InfractionOption(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -345,7 +345,7 @@ class ApprovalChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -401,7 +401,7 @@ class ApprovalRole(discord.ui.RoleSelect):
     async def callback(self, interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -449,7 +449,7 @@ class ManageReasons(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -463,7 +463,7 @@ class ManageReasons(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -480,7 +480,7 @@ class ManageReasons(discord.ui.View):
             )
         else:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no preset reasons to remove!",
+                description=f"  **{interaction.user.display_name},** there are no preset reasons to remove!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -502,7 +502,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -519,7 +519,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
                 Config["Infraction"]["reasons"] = []
             if self.reason.value in Config["Infraction"]["reasons"]:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this preset reason already exists!",
+                    description=f"  **{interaction.user.display_name},** this preset reason already exists!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -529,7 +529,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
         elif self.type == "remove":
             if self.reason.value not in Config["Infraction"]["reasons"]:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this preset reason doesn't exist!",
+                    description=f"  **{interaction.user.display_name},** this preset reason doesn't exist!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -540,7 +540,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
             {"_id": interaction.guild.id}, {"$set": Config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, {self.reason.value} has been {'added' if self.type == 'add' else 'removed'} to the preset reasons!",
+            content=f"  **{interaction.user.display_name}**, {self.reason.value} has been {'added' if self.type == 'add' else 'removed'} to the preset reasons!",
             view=None,
         )
         try:
@@ -636,7 +636,7 @@ class ManageTypes(discord.ui.Select):  # Infraction Types
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -665,7 +665,7 @@ class ManageTypes(discord.ui.Select):  # Infraction Types
 
             else:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** there are no infraction types to remove!",
+                    description=f"  **{interaction.user.display_name},** there are no infraction types to remove!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -692,7 +692,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -705,7 +705,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         if self.type == "add":
             if self.name in config.get("Infraction").get("types"):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this infraction type already exists!",
+                    description=f"  **{interaction.user.display_name},** this infraction type already exists!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -721,7 +721,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
             if config.get("Infraction").get("types") is not None:
                 if not self.name.value in config.get("Infraction").get("types"):
                     embed = discord.Embed(
-                        description=f"{redx} **{interaction.user.display_name},** this infraction type doesn't exist.",
+                        description=f"  **{interaction.user.display_name},** this infraction type doesn't exist.",
                         color=discord.Colour.brand_red(),
                     )
                     return await interaction.response.send_message(
@@ -739,13 +739,13 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
             view = NoThanks()
             view.add_item(InfractionTypesAction(self.author, self.name.value))
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?",
+                content=f"  **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?",
                 view=view,
             )
         elif self.type == "edit":
             if self.name.value not in config["Infraction"].get("types", []):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** there isn't an infraction type named this.",
+                    description=f"  **{interaction.user.display_name},** there isn't an infraction type named this.",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -754,7 +754,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
             view = Done()
             view.add_item(InfractionTypesAction(self.author, self.name.value))
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, you are now editing the infraction type.",
+                content=f"  **{interaction.user.display_name}**, you are now editing the infraction type.",
                 view=view,
             )
 
@@ -782,7 +782,7 @@ class NoThanks(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** No problem! I've created the infraction type for you!",
+            content=f"  **{interaction.user.display_name},** No problem! I've created the infraction type for you!",
             view=None,
         )
 
@@ -810,7 +810,7 @@ class InfractionChannel(discord.ui.ChannelSelect):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -865,7 +865,7 @@ class LogChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -940,7 +940,7 @@ class InfractionTypesAction(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"  This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -973,12 +973,12 @@ class InfractionTypesAction(discord.ui.Select):
             if Roles == 1:
 
                 return await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name},** you don't have access to the groups roles.",
+                    f"  **{interaction.user.display_name},** you don't have access to the groups roles.",
                     ephemeral=True,
                 )
             if Roles == 2:
                 return await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name},** a group hasn't been linked.",
+                    f"  **{interaction.user.display_name},** a group hasn't been linked.",
                     ephemeral=True,
                 )
             Roles = Roles.get("groupRoles")
@@ -1001,7 +1001,7 @@ class InfractionTypesAction(discord.ui.Select):
             filter, {"$set": update_data}, upsert=True
         )
         await interaction.response.edit_message(
-            content=f"{tick} Infraction type successfully updated.",
+            content=f"  Infraction type successfully updated.",
             view=view if view.children else None,
         )
 
@@ -1018,13 +1018,13 @@ class Done(discord.ui.View):
             if interaction.user.id != self.author.id:
                 return await interaction.response.send_message(
                     embed=discord.Embed(
-                        description=f"{redx} This is not your panel!",
+                        description=f"  This is not your panel!",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+                content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
                 view=None,
             )
 
@@ -1068,7 +1068,7 @@ class Escalate(discord.ui.Modal, title="Escalate"):
             {"guild_id": interaction.guild.id, "name": self.type}, {"$set": Result}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+            content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
             view=None,
         )
 
@@ -1085,7 +1085,7 @@ class TypeChannel(discord.ui.ChannelSelect):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"  This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1098,7 +1098,7 @@ class TypeChannel(discord.ui.ChannelSelect):
             upsert=True,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+            content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
             view=None,
         )
 
@@ -1112,7 +1112,7 @@ class RemoveRoles(discord.ui.RoleSelect):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"  This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1125,7 +1125,7 @@ class RemoveRoles(discord.ui.RoleSelect):
             upsert=True,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+            content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
             view=None,
         )
 
@@ -1139,7 +1139,7 @@ class GiveRoles(discord.ui.RoleSelect):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"  This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1152,7 +1152,7 @@ class GiveRoles(discord.ui.RoleSelect):
             upsert=True,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+            content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
             view=None,
         )
 
@@ -1168,7 +1168,7 @@ class ChangeGroupRole(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"  This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1181,7 +1181,7 @@ class ChangeGroupRole(discord.ui.Select):
             upsert=True,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** succesfully updated infraction type.",
+            content=f"  **{interaction.user.display_name},** succesfully updated infraction type.",
             view=None,
         )
 

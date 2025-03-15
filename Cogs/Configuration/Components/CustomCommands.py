@@ -27,7 +27,7 @@ class CustomCommands(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -84,7 +84,7 @@ class ManageCommands(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -104,7 +104,7 @@ class ManageCommands(discord.ui.View):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -131,7 +131,7 @@ class ManageCommands(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no custom commands.",
+                content=f"  **{interaction.user.display_name},** there are no custom commands.",
                 ephemeral=True,
             )
         view = discord.ui.View()
@@ -146,7 +146,7 @@ class ManageCommands(discord.ui.View):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -172,7 +172,7 @@ class ManageCommands(discord.ui.View):
                 continue
         if len(Options) == 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no custom commands.",
+                content=f"  **{interaction.user.display_name},** there are no custom commands.",
                 ephemeral=True,
             )
         view = discord.ui.View()
@@ -247,7 +247,7 @@ class CommandSelection(discord.ui.Select):
             )
             await Unsync(interaction.client, self.values[0], interaction.guild.id)
             await interaction.response.edit_message(
-                content=f"{no} **{interaction.user.display_name},** I've deleted the command.",
+                content=f"  **{interaction.user.display_name},** I've deleted the command.",
                 view=None,
                 embed=None,
             )
@@ -267,7 +267,7 @@ class CreateCommand(discord.ui.Modal, title="Create Command"):
         )
         if command:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** theres already a command named that.",
+                content=f"  **{interaction.user.display_name},** theres already a command named that.",
                 ephemeral=True,
             )
         from Cogs.Configuration.Components.EmbedBuilder import NoEmbed
@@ -338,7 +338,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
     await SyncCommand(interaction.client, datad.get("name"), interaction.guild.id)
 
     await interaction.response.edit_message(
-        content=f"{tick} **{interaction.user.display_name},** success.",
+        content=f"  **{interaction.user.display_name},** success.",
         view=None,
         embed=None,
     )

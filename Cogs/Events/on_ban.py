@@ -39,7 +39,7 @@ class on_ban(commands.Cog):
         view.remove_item(view.endappeal)
         banmsg = result.get(
             "Ban Message",
-            f"{crisis} **{user.display_name}**, you have been banned from **{guild.name}** appeal below.",
+            f"  **{user.display_name}**, you have been banned from **{guild.name}** appeal below.",
         )
 
         try:
@@ -83,12 +83,12 @@ class AppealButton(discord.ui.View):
             guild = await self.client.fetch_guild(result.get("guild_id", 0))
         except (discord.Forbidden, discord.NotFound, discord.HTTPException):
             return await interaction.followup.send(
-                f"{no} *{interaction.user.display_name},** I can't find the server you were banned from. They most likely removed the bot.",
+                f"  *{interaction.user.display_name},** I can't find the server you were banned from. They most likely removed the bot.",
                 ephemeral=True,
             )
         if guild is None:
             await interaction.followup.send(
-                f"{no} *{interaction.user.display_name},** I can't find the server you were banned from. They most likely removed the bot.",
+                f"  *{interaction.user.display_name},** I can't find the server you were banned from. They most likely removed the bot.",
                 ephemeral=True,
             )
             return
@@ -98,7 +98,7 @@ class AppealButton(discord.ui.View):
         )
         if not result2:
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** I couldn't find the appeal configuration for this guild.",
+                f"  **{interaction.user.display_name},** I couldn't find the appeal configuration for this guild.",
                 ephemeral=True,
             )
             return
@@ -106,7 +106,7 @@ class AppealButton(discord.ui.View):
         data = result2.get("questions", [])
         if len(data) == 0:
             await interaction.followup.send(
-                f"{no} I couldn't find any questions for this appeal.", ephemeral=True
+                f"  I couldn't find any questions for this appeal.", ephemeral=True
             )
             return
 
@@ -145,7 +145,7 @@ class AppealButton(discord.ui.View):
                         {"user_id": interaction.user.id}
                     )
                     await interaction.followup.send(
-                        f"{crisis} **{interaction.user.display_name},** you took too long to respond. Please start the appeal process again."
+                        f"  **{interaction.user.display_name},** you took too long to respond. Please start the appeal process again."
                     )
                     return
         embed = discord.Embed(description="", color=discord.Color.yellow())
@@ -166,7 +166,7 @@ class AppealButton(discord.ui.View):
                 {"user_id": interaction.user.id}
             )
             await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** I couldn't find the ban appeal channel for this guild."
+                f"  **{interaction.user.display_name},** I couldn't find the ban appeal channel for this guild."
             )
             return
 
@@ -174,7 +174,7 @@ class AppealButton(discord.ui.View):
         msg = await channel.send(embed=embed, view=view)
 
         await interaction.followup.send(
-            f"{tick} Your appeal has been submitted. Thanks @{interaction.user.display_name}."
+            f"  Your appeal has been submitted. Thanks @{interaction.user.display_name}."
         )
         await interaction.client.db["Appeal Sessions"].delete_one(
             {"user_id": interaction.user.id}
@@ -195,7 +195,7 @@ class AppealButton(discord.ui.View):
                 label="Appealed",
                 style=discord.ButtonStyle.green,
                 disabled=True,
-                emoji=tick,
+                emoji= None,
                 custom_id="APPEALEBUTRTONDS:PERSISTENT",
             )
         )
@@ -235,14 +235,14 @@ class AcceptOrDeny(discord.ui.View):
         )
         if not result:
             await interaction.response.send_message(
-                f"{no} I couldn't find the appeal data for this message.",
+                f"  I couldn't find the appeal data for this message.",
                 ephemeral=True,
             )
             return
         msg = interaction.message
         embed = msg.embeds[0]
         embed.color = discord.Color.brand_green()
-        embed.title = f"{greencheck} Appeal Accepted"
+        embed.title = f"  Appeal Accepted"
         embed.set_footer(
             text=f"Accepted By @{interaction.user.display_name}",
             icon_url=interaction.user.display_avatar,
@@ -256,12 +256,12 @@ class AcceptOrDeny(discord.ui.View):
                 await interaction.guild.unban(user)
             except discord.Forbidden:
                 await interaction.followup.send(
-                    f"{no} I couldn't unban the user. Please check if I have permissions to unban people.",
+                    f"  I couldn't unban the user. Please check if I have permissions to unban people.",
                     ephemeral=True,
                 )
                 return
             embed2 = discord.Embed(
-                title=f"{greencheck} Appeal Accepted",
+                title=f"  Appeal Accepted",
                 description=f"You have been unbanned from **@{interaction.guild.name}**!",
                 color=discord.Color.brand_green(),
             )
@@ -281,14 +281,14 @@ class AcceptOrDeny(discord.ui.View):
         )
         if not result:
             await interaction.followup.send(
-                f"{no} I couldn't find the appeal data for this message.",
+                f"  I couldn't find the appeal data for this message.",
                 ephemeral=True,
             )
             return
         msg = interaction.message
         embed = msg.embeds[0]
         embed.color = discord.Color.brand_red()
-        embed.title = f"{redx} Appeal Denied"
+        embed.title = f"  Appeal Denied"
         embed.set_footer(
             text=f"Denied By @{interaction.user.display_name}",
             icon_url=interaction.user.display_avatar,
@@ -299,7 +299,7 @@ class AcceptOrDeny(discord.ui.View):
             user = None
         if user:
             embed2 = discord.Embed(
-                title=f"{redx} Appeal Denied",
+                title=f"  Appeal Denied",
                 description=f"Your appeal has been denied @{interaction.guild.name}.",
                 color=discord.Color.brand_red(),
             )

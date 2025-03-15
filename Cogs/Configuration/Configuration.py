@@ -23,7 +23,7 @@ class ConfigMenu(discord.ui.Select):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -43,7 +43,7 @@ class ConfigMenu(discord.ui.Select):
         selection = self.values[0]
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -555,7 +555,7 @@ class ConfigCog(commands.Cog):
     async def PermsHandler(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name},** you are missing the `Manage Server` permission."
+                f"  **{ctx.author.display_name},** you are missing the `Manage Server` permission."
             )
 
 

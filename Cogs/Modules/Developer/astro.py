@@ -13,12 +13,12 @@ class management(commands.Cog):
         await ctx.defer()
         premiumresult = await self.client.db['premium'].find_one({"user_id": user.id})
         if premiumresult:
-            premiums = tick
+            premiums =  None
         else:
             premiums = no
         blacklistsresult = await self.client.db['blacklists'].find_one({"user": user.id})
         if blacklistsresult:
-            blacklistss = tick
+            blacklistss =  None
         else:
             blacklistss = no
         badgesresult = await self.client.db["User Badges"].find({"user_id": user.id}).to_list(length=None)
@@ -113,7 +113,7 @@ class management(commands.Cog):
     async def reloadjsk(self, ctx):
         await self.client.load_extension("jishaku")
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** I've successfully reloaded Jishaku!"
+            f"  **{ctx.author.display_name},** I've successfully reloaded Jishaku!"
         )
 
 
@@ -126,12 +126,12 @@ class ManageAccount(discord.ui.View):
     async def updateembed(self, user, interaction=None):
         premiumresult = await interaction.client.db['premium'].find_one({"user_id": user.id})
         if premiumresult:
-            premiums = tick
+            premiums =  None
         else:
             premiums = no
         blacklistsresult = await interaction.client.db['blacklists'].find_one({"user": user.id})
         if blacklistsresult:
-            blacklistss = tick
+            blacklistss =  None
         else:
             blacklistss = no
         badgesresult = await interaction.client.db['User Badges'].find({"user_id": user.id}).to_list(length=None)

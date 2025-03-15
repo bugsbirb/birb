@@ -28,7 +28,7 @@ class AutoResponderOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -65,7 +65,7 @@ class AutoResponder(discord.ui.View):
     async def create(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -75,7 +75,7 @@ class AutoResponder(discord.ui.View):
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -109,7 +109,7 @@ class Create(discord.ui.Modal):
         )
         if result:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** another response is using the same trigger.",
+                content=f"  **{interaction.user.display_name},** another response is using the same trigger.",
                 ephemeral=True,
             )
             return
@@ -129,7 +129,7 @@ class Create(discord.ui.Modal):
             }
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** response created.",
+            content=f"  **{interaction.user.display_name},** response created.",
             embed=None,
             view=None,
         )
@@ -169,7 +169,7 @@ class EditModal(discord.ui.Modal):
             },
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** response edited.",
+            content=f"  **{interaction.user.display_name},** response edited.",
             embed=None,
             view=None,
         )
@@ -184,7 +184,7 @@ class DeleteByTrigger(discord.ui.View):
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -205,7 +205,7 @@ class DeleteByTrigger2(discord.ui.Modal):
         )
         if not result:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** no response found with that trigger.",
+                content=f"  **{interaction.user.display_name},** no response found with that trigger.",
                 ephemeral=True,
             )
             return
@@ -213,7 +213,7 @@ class DeleteByTrigger2(discord.ui.Modal):
             {"guild_id": interaction.guild.id, "trigger": self.trigger.value}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** response deleted.",
+            content=f"  **{interaction.user.display_name},** response deleted.",
             embed=None,
             view=None,
         )

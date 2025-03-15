@@ -36,7 +36,7 @@ class On_error(commands.Cog):
         try:
             if isinstance(error, commands.NoPrivateMessage):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** I can't execute commands in DMs. Please use me in a server."
+                    f"  **{ctx.author.display_name},** I can't execute commands in DMs. Please use me in a server."
                 )
                 return
             if isinstance(error, commands.CommandNotFound):
@@ -46,19 +46,19 @@ class On_error(commands.Cog):
 
             if isinstance(error, commands.BadLiteralArgument):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name}**, you have used an invalid argument."
+                    f"  **{ctx.author.display_name}**, you have used an invalid argument."
                 )
                 return
             if isinstance(error, commands.MemberNotFound):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name}**, that member isn't in the server."
+                    f"  **{ctx.author.display_name}**, that member isn't in the server."
                 )
                 return
             if isinstance(error, commands.MissingPermissions):
                 return
             if isinstance(error, commands.MissingRequiredArgument):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name}**, you are missing a requirement."
+                    f"  **{ctx.author.display_name}**, you are missing a requirement."
                 )
                 return
             if isinstance(error, commands.BadArgument):

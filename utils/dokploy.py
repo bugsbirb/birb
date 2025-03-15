@@ -189,7 +189,7 @@ class SelectProject(discord.ui.Select):
         application = await GetApplication(self.values[0])
         if not application:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, I couldn't find that application.",
+                f"  **{interaction.user.display_name}**, I couldn't find that application.",
                 ephemeral=True,
             )
         embed = discord.Embed(
@@ -239,10 +239,10 @@ class ManageApplication(discord.ui.View):
         result = await Deploy(self.application.get("applicationId"))
         if not result:
             return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't deploy that application.",
+                content=f"  **{interaction.user.display_name}**, I couldn't deploy that application.",
             )
         await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've deployed that application.",
+            content=f"  **{interaction.user.display_name}**, I've deployed that application.",
         )
         await self.Logs(interaction, "deployed")
 
@@ -262,10 +262,10 @@ class ManageApplication(discord.ui.View):
         result = await Start(self.application.get("applicationId"))
         if not result:
             return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't start that application.",
+                content=f"  **{interaction.user.display_name}**, I couldn't start that application.",
             )
         await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've started that application.",
+            content=f"  **{interaction.user.display_name}**, I've started that application.",
         )
         await self.Logs(interaction, "started")
 
@@ -286,10 +286,10 @@ class ManageApplication(discord.ui.View):
         result = await Reload(self.application.get("applicationId"))
         if not result:
             return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't reload that application.",
+                content=f"  **{interaction.user.display_name}**, I couldn't reload that application.",
             )
         await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've reloaded that application.",
+            content=f"  **{interaction.user.display_name}**, I've reloaded that application.",
         )
         await self.Logs(interaction, "reloaded")
 
@@ -318,10 +318,10 @@ class DeployAllButton(discord.ui.View):
         result = await DeployAll()
         if not result:
             return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't deploy all applications.",
+                content=f"  **{interaction.user.display_name}**, I couldn't deploy all applications.",
             )
         await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've deployed all applications.",
+            content=f"  **{interaction.user.display_name}**, I've deployed all applications.",
         )
 
 
@@ -353,7 +353,7 @@ class Depl(commands.Cog):
                         if project.get("appName") == name:
                             await StopApplication(project.get("applicationId"))
                             await after.guild.owner.send(
-                                f"{tick} **@{after.name}** branding has been stopped succesfully."
+                                f"  **@{after.name}** branding has been stopped succesfully."
                             )
                             break
 
@@ -429,7 +429,7 @@ class Depl(commands.Cog):
         projects = await GetProjects()
         if not projects:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any projects."
+                f"  **{ctx.author.display_name}**, I couldn't find any projects."
             )
         embed = discord.Embed(color=discord.Color.dark_embed())
         options = []
@@ -463,7 +463,7 @@ class Setup(discord.ui.View):
     async def begin(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -471,7 +471,7 @@ class Setup(discord.ui.View):
         result = await bots.find_one({"user_id": self.author.id})
         if result:
             return await interaction.response.send_message(
-                content=f"{no} You already have a bot setup.", ephemeral=True
+                content=f"  You already have a bot setup.", ephemeral=True
             )
 
         embed = discord.Embed(color=discord.Color.dark_embed())
@@ -499,14 +499,14 @@ class Next(discord.ui.View):
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
         result = await bots.find_one({"user_id": interaction.user.id})
         if result:
             return await interaction.response.send_message(
-                content=f"{no} You already have a bot setup.", ephemeral=True
+                content=f"  You already have a bot setup.", ephemeral=True
             )
 
         embed = discord.Embed(color=discord.Color.dark_embed())
@@ -534,7 +534,7 @@ class Continue(discord.ui.View):
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -597,11 +597,11 @@ class SetUP(discord.ui.Modal):
             env = await UpdateENV(ProjectID, environment)
             if not env:
                 return await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> the env update didn't work."
+                    content=f"  **{interaction.user.display_name},** <@795743076520820776> the env update didn't work."
                 )
         else:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> this isn't working."
+                content=f"  **{interaction.user.display_name},** <@795743076520820776> this isn't working."
             )
         embed.set_footer(text=f"Setup completed by @{interaction.user.display_name}")
         embed.add_field(

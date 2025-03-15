@@ -295,7 +295,7 @@ class ResetLeaderboard(discord.ui.View):
             self.failures = result.get("failed", [])
             if not result or self.failures is None or len(self.failures) == 0:
                 await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name}**, there are no failures to punish.",
+                    f"  **{interaction.user.display_name}**, there are no failures to punish.",
                     ephemeral=True,
                 )
                 return
@@ -329,12 +329,12 @@ class ActionModal(discord.ui.Modal, title="Action"):
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
+                f"  **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
                 ephemeral=True,
             )
         if not Config.get("Infraction", None):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
+                f"  **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
                 ephemeral=True,
             )
         try:
@@ -343,23 +343,23 @@ class ActionModal(discord.ui.Modal, title="Action"):
             )
         except (discord.NotFound, discord.HTTPException):
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"  **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         if not channel:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"  **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         client = await interaction.guild.fetch_member(interaction.client.user.id)
         if channel.permissions_for(client).send_messages is False:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
+                content=f"  **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
                 ephemeral=True,
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 ephemeral=True,
             )
             return
@@ -369,7 +369,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
             user = await interaction.guild.fetch_member(user)
             if user is None:
                 await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name}**, this user can not be found.",
+                    f"  **{interaction.user.display_name}**, this user can not be found.",
                     ephemeral=True,
                 )
                 return
@@ -394,7 +394,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
             )
             if not InfractionResult.inserted_id:
                 await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
+                    content=f"  **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
                     ephemeral=True,
                 )
                 return
@@ -404,7 +404,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
         view = ResetLeaderboard()
         view.punishfailures.label = "Punished"
         view.punishfailures.style = discord.ButtonStyle.success
-        view.punishfailures.emoji = tick
+        view.punishfailures.emoji =  None
         view.punishfailures.disabled = True
         await interaction.edit_original_response(view=view)
 

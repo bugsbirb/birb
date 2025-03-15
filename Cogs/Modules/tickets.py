@@ -72,7 +72,7 @@ class TicketForm(discord.ui.Modal):
         )
 
         TSMG = await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've opened a ticket for you!",
+            content=f"  **{interaction.user.display_name}**, I've opened a ticket for you!",
             ephemeral=True,
         )
         await TicketError(interaction, t, TSMG)
@@ -117,18 +117,18 @@ class Button(discord.ui.Button):
         )
         if Blacklisted:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, you're blacklisted from this servers tickets.",
+                content=f"  **{interaction.user.display_name}**, you're blacklisted from this servers tickets.",
                 ephemeral=True,
             )
         Cli = await interaction.guild.fetch_member(interaction.client.user.id)
         if not Cli.guild_permissions.manage_channels:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, I don't have permission to manage channels.",
+                content=f"  **{interaction.user.display_name}**, I don't have permission to manage channels.",
                 ephemeral=True,
             )
         if AlreadyOpen > 3:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, you already have a max of 3 tickets open! If this is a mistake contact a developer.\n-# If this is a mistake (actually a mistake) press the debug button. (Abusing it'll can lead to a blacklist)",
+                content=f"  **{interaction.user.display_name}**, you already have a max of 3 tickets open! If this is a mistake contact a developer.\n-# If this is a mistake (actually a mistake) press the debug button. (Abusing it'll can lead to a blacklist)",
                 ephemeral=True,
                 view=Debug(),
             )
@@ -147,7 +147,7 @@ class Button(discord.ui.Button):
                     break
         if not await AccessControl(interaction, TPanel):
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, you don't have permission to use this panel.",
+                content=f"  **{interaction.user.display_name}**, you don't have permission to use this panel.",
                 ephemeral=True,
             )
 
@@ -180,7 +180,7 @@ class Button(discord.ui.Button):
             )            
         else:
             await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, no matching panel found for the given custom ID.",
+                content=f"  **{interaction.user.display_name}**, no matching panel found for the given custom ID.",
                 ephemeral=True,
                 view=Debug(),
             )
@@ -220,7 +220,7 @@ async def TicketError(interaction: discord.Interaction, t: dict, tmsg: discord.M
                 url = f"https://discord.com/channels/{interaction.guild.id}/{result.get('ChannelID')}"
                 await interaction.followup.edit_message(
                     tmsg.id,
-                    content=f"{tick} **{interaction.user.display_name}**, your ticket has been successfully opened!",
+                    content=f"  **{interaction.user.display_name}**, your ticket has been successfully opened!",
                     view=discord.ui.View().add_item(
                         discord.ui.Button(
                             label="Jump To", style=discord.ButtonStyle.link, url=url
@@ -233,7 +233,7 @@ async def TicketError(interaction: discord.Interaction, t: dict, tmsg: discord.M
         if attempts > 20:
             await interaction.followup.edit_message(
                 tmsg.id,
-                content=f"{crisis} **{interaction.user.display_name}**, the ticket didn't open.",
+                content=f"  **{interaction.user.display_name}**, the ticket didn't open.",
                 view=Support(),
             )
             break
@@ -250,7 +250,7 @@ class Debug(discord.ui.View):
         )
         if not R:
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, no open ticket found to debug.",
+                f"  **{interaction.user.display_name}**, no open ticket found to debug.",
                 ephemeral=True,
             )
 
@@ -258,7 +258,7 @@ class Debug(discord.ui.View):
         view.debug.disabled = True
         await interaction.response.edit_message(
             view=view,
-            content=f"{tick} **{interaction.user.display_name}**, your ticket has been purged.",
+            content=f"  **{interaction.user.display_name}**, your ticket has been purged.",
         )
         interaction.client.dispatch(
             "pticket_close",
@@ -330,7 +330,7 @@ class TicketsPub(commands.Cog):
 
         if not Panel:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** this panel does not exist!",
+                f"  **{interaction.user.display_name},** this panel does not exist!",
                 ephemeral=True,
             )
 
@@ -357,7 +357,7 @@ class TicketsPub(commands.Cog):
         if Panel.get("type") == "multi":
             if not Panel.get("Panels"):
                 return await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name},** this multi-panel doesn't have any sub-panels.",
+                    f"  **{interaction.user.display_name},** this multi-panel doesn't have any sub-panels.",
                     ephemeral=True,
                 )
             for panel_name in Panel.get("Panels"):
@@ -411,16 +411,16 @@ class TicketsPub(commands.Cog):
             )
         except discord.Forbidden:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** I don't have permission to send messages in this channel.",
+                f"  **{interaction.user.display_name},** I don't have permission to send messages in this channel.",
                 ephemeral=True,
             )
         except discord.HTTPException:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** I failed to send the panel. Make sure the embed/message is formed correctly.",
+                f"  **{interaction.user.display_name},** I failed to send the panel. Make sure the embed/message is formed correctly.",
                 ephemeral=True,
             )
         await interaction.followup.send(
-            f"{tick} **{interaction.user.display_name},** I've sent the panel.",
+            f"  **{interaction.user.display_name},** I've sent the panel.",
             ephemeral=True,
         )
 
@@ -434,7 +434,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -447,7 +447,7 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         await interaction.client.db["Tickets"].update_one(
             {"ChannelID": interaction.channel.id}, {"$set": {"name": name}}
@@ -456,10 +456,10 @@ class TicketsPub(commands.Cog):
             await interaction.channel.edit(name=name)
         except discord.Forbidden:
             return await interaction.followup.send(
-                content=f"{no} I don't have permission to rename this ticket."
+                content=f"  I don't have permission to rename this ticket."
             )
         await interaction.followup.send(
-            content=f"{tick} Successfully renamed ticket to {name}"
+            content=f"  Successfully renamed ticket to {name}"
         )
 
     @tickets.command(description="Close a ticket.")
@@ -468,7 +468,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -481,12 +481,12 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         self.client.dispatch(
             "pticket_close", Result.get("_id"), reason, interaction.user
         )
-        await interaction.followup.send(content=f"{tick} Ticket closed.")
+        await interaction.followup.send(content=f"  Ticket closed.")
 
     @tickets.command(description="Blacklist a user from the ticket system.")
     async def blacklist(self, interaction: discord.Interaction, user: discord.Member):
@@ -500,7 +500,7 @@ class TicketsPub(commands.Cog):
                 ephemeral=True,
             )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've blacklisted **@{user.display_name}** from the ticket system!"
+            content=f"  **{interaction.user.display_name},** you've blacklisted **@{user.display_name}** from the ticket system!"
         )
         await interaction.client.db["Ticket Blacklists"].insert_one(
             {"user": user.id, "guild": interaction.guild.id}
@@ -519,7 +519,7 @@ class TicketsPub(commands.Cog):
                 ephemeral=True,
             )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've unblacklisted **@{user.display_name}** from the ticket system!"
+            content=f"  **{interaction.user.display_name},** you've unblacklisted **@{user.display_name}** from the ticket system!"
         )
         await interaction.client.db["Ticket Blacklists"].delete_one(
             {"user": user.id, "guild": interaction.guild.id}
@@ -531,7 +531,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         Result = await interaction.client.db["Tickets"].find_one(
             {"ChannelID": interaction.channel.id}
@@ -539,7 +539,7 @@ class TicketsPub(commands.Cog):
 
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -554,7 +554,7 @@ class TicketsPub(commands.Cog):
             User = await interaction.guild.fetch_member(Result.get("UserID"))
         except (discord.NotFound, discord.HTTPException):
             return await interaction.followup.send(
-                content=f"{no} I can't find the user that opened this ticket."
+                content=f"  I can't find the user that opened this ticket."
             )
         CS = p.get("Close Request", {})
         embed = None
@@ -594,7 +594,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -607,7 +607,7 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         await interaction.channel.set_permissions(
             user,
@@ -622,7 +622,7 @@ class TicketsPub(commands.Cog):
             speak=True,
         )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've added **@{user.display_name}** to the ticket!"
+            content=f"  **{interaction.user.display_name},** you've added **@{user.display_name}** to the ticket!"
         )
 
     @tickets.command(description="Remove a user from a ticket.")
@@ -630,7 +630,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -643,23 +643,23 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         try:
             await interaction.channel.set_permissions(user, overwrite=None)
         except discord.Forbidden:
             return await interaction.followup.send(
-                content=f"{no} I don't have permission to remove this user from the ticket."
+                content=f"  I don't have permission to remove this user from the ticket."
             )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've removed **@{user.display_name}** to the ticket!"
+            content=f"  **{interaction.user.display_name},** you've removed **@{user.display_name}** to the ticket!"
         )
 
     @tickets.command(description="Claim a ticket.")
     async def claim(self, interaction: discord.Interaction):
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -672,11 +672,11 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         if Result.get("claimed").get("claimer"):
             return await interaction.followup.send(
-                content=f"{no} This ticket is already claimed."
+                content=f"  This ticket is already claimed."
             )
         await interaction.client.db["Tickets"].update_one(
             {"ChannelID": interaction.channel.id},
@@ -690,7 +690,7 @@ class TicketsPub(commands.Cog):
             },
         )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've claimed the ticket!"
+            content=f"  **{interaction.user.display_name},** you've claimed the ticket!"
         )
         self.client.dispatch("pticket_claim", Result.get("_id"), interaction.user)
 
@@ -698,7 +698,7 @@ class TicketsPub(commands.Cog):
     async def unclaim(self, interaction: discord.Interaction):
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -711,11 +711,11 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         if not Result.get("claimed").get("claimer"):
             return await interaction.followup.send(
-                content=f"{no} This ticket isn't claimed."
+                content=f"  This ticket isn't claimed."
             )
         await interaction.response.defer()
         await interaction.client.db["Tickets"].update_one(
@@ -723,7 +723,7 @@ class TicketsPub(commands.Cog):
             {"$set": {"claimed": {"claimer": None, "claimedAt": None}}},
         )
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** you've unclaimed the ticket!"
+            content=f"  **{interaction.user.display_name},** you've unclaimed the ticket!"
         )
         self.client.dispatch("unclaim", Result.get("_id"))
 
@@ -732,7 +732,7 @@ class TicketsPub(commands.Cog):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                content=f"{no} You don't have permission to use this command."
+                content=f"  You don't have permission to use this command."
             )
         if not await ModuleCheck(interaction.guild.id, "Tickets"):
             return await interaction.followup.send(
@@ -745,7 +745,7 @@ class TicketsPub(commands.Cog):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} This isn't a ticket channel."
+                content=f"  This isn't a ticket channel."
             )
         Config = await interaction.client.db["Config"].find_one(
             {"_id": interaction.guild.id}
@@ -768,7 +768,7 @@ class TicketsPub(commands.Cog):
         )
         if not Panel or not Panel.get("Automations", None):
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, automations aren't enabled for this ticket"
+                content=f"  **{interaction.user.display_name}**, automations aren't enabled for this ticket"
             )
 
         if Result.get("automations", True):
@@ -776,14 +776,14 @@ class TicketsPub(commands.Cog):
                 {"ChannelID": interaction.channel.id}, {"$set": {"automations": False}}
             )
             await interaction.followup.send(
-                content=f"{tick} **{interaction.user.display_name}**, I've paused automations in this ticket.",
+                content=f"  **{interaction.user.display_name}**, I've paused automations in this ticket.",
             )
         else:
             await interaction.client.db["Tickets"].update_one(
                 {"ChannelID": interaction.channel.id}, {"$set": {"automations": True}}
             )
             await interaction.followup.send(
-                content=f"{tick} **{interaction.user.display_name}**, I've resumed automations in this ticket.",
+                content=f"  **{interaction.user.display_name}**, I've resumed automations in this ticket.",
             )
 
     @tickets.command(description="View a users ticket stats.", name="stats")
@@ -827,7 +827,7 @@ class TicketsPub(commands.Cog):
 
         if not Tickets:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, no tickets found for this user.",
+                content=f"  **{interaction.user.display_name}**, no tickets found for this user.",
             )
 
         ClaimedTickets = [
@@ -895,7 +895,7 @@ class CloseRequest(discord.ui.View):
     ):
         if interaction.user != self.member:
             return await interaction.response.send_message(
-                f"{no} You can't close this ticket.", ephemeral=True
+                f"  You can't close this ticket.", ephemeral=True
             )
         await interaction.response.defer()
         Result = await interaction.client.db["Tickets"].find_one(
@@ -903,7 +903,7 @@ class CloseRequest(discord.ui.View):
         )
         if not Result:
             return await interaction.followup.send(
-                f"{no} This isn't a ticket channel.", ephemeral=True
+                f"  This isn't a ticket channel.", ephemeral=True
             )
         await interaction.message.delete()
         interaction.client.dispatch(
@@ -914,10 +914,10 @@ class CloseRequest(discord.ui.View):
     async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user != self.member:
             return await interaction.response.send_message(
-                f"{no} You can't close this ticket.", ephemeral=True
+                f"  You can't close this ticket.", ephemeral=True
             )
         await interaction.response.edit_message(
-            view=None, content=f"{no} Cancelled.", embed=None
+            view=None, content=f"  Cancelled.", embed=None
         )
 
 

@@ -79,7 +79,7 @@ class TicketQuota(discord.ui.Modal):
             {"$set": Config},
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** ticket quota updated successfully.",
+            content=f"  **{interaction.user.display_name},** ticket quota updated successfully.",
             ephemeral=True,
         )
 
@@ -195,7 +195,7 @@ class PanelCreationModal(discord.ui.Modal):
             }
         ):
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** a panel with that name already exists.",
+                content=f"  **{interaction.user.display_name},** a panel with that name already exists.",
                 ephemeral=True,
             )
         PanelName = self.name_input.value
@@ -250,7 +250,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -264,7 +264,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -286,7 +286,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -313,7 +313,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -341,7 +341,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -378,7 +378,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -409,7 +409,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -445,7 +445,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -486,7 +486,7 @@ class SingelPanelCustomisation(discord.ui.View):
     async def Forms(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -517,7 +517,7 @@ class SingelPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -526,7 +526,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         if not custom:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -557,7 +557,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         if not custom:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
             return
@@ -570,12 +570,12 @@ class SingelPanelCustomisation(discord.ui.View):
 
         if len(MissingFields) > 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
+                content=f"  **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
                 ephemeral=True,
             )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** configuration finished.",
+            content=f"  **{interaction.user.display_name},** configuration finished.",
             view=None,
         )
 
@@ -607,7 +607,7 @@ class Automations(discord.ui.Modal):
                 Inactivity = int(Inactivity)
             except:
                 return await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name},** inactivity must be an integer.",
+                    content=f"  **{interaction.user.display_name},** inactivity must be an integer.",
                     ephemeral=True,
                 )
 
@@ -618,7 +618,7 @@ class Automations(discord.ui.Modal):
             upsert=True,
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** inactivity reminder updated successfully.",
+            content=f"  **{interaction.user.display_name},** inactivity reminder updated successfully.",
             ephemeral=True,
         )
 
@@ -639,7 +639,7 @@ class MultiPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -653,7 +653,7 @@ class MultiPanelCustomisation(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -692,7 +692,7 @@ class MultiPanelCustomisation(discord.ui.View):
         )
         if not custom:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
             return
@@ -705,12 +705,12 @@ class MultiPanelCustomisation(discord.ui.View):
 
         if len(MissingFields) > 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
+                content=f"  **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
                 ephemeral=True,
             )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** configuration finished.",
+            content=f"  **{interaction.user.display_name},** configuration finished.",
             view=None,
         )
 
@@ -788,7 +788,7 @@ async def FinalFunction(interaction: discord.Interaction, d={}):
     embed = interaction.message.embeds
     if embed and interaction.message is None:
         return await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** you can't have an empty message.",
+            content=f"  **{interaction.user.display_name},** you can't have an empty message.",
         )
     RemoveEmbed = False
     if embed:
@@ -839,7 +839,7 @@ async def FinalFunction(interaction: discord.Interaction, d={}):
     
 
     await interaction.response.send_message(
-        content=f"{tick} **{interaction.user.display_name}**, succesfully updated `{d.get('option')}` embed.",
+        content=f"  **{interaction.user.display_name}**, succesfully updated `{d.get('option')}` embed.",
         embed=None,
         ephemeral=True
     )
@@ -869,7 +869,7 @@ class EmbedSelection(discord.ui.Select):
 
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -887,7 +887,7 @@ class MultiToSingle(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -896,7 +896,7 @@ class MultiToSingle(discord.ui.Select):
             {"$set": {"Panels": self.values}},
         )
         return await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've succesfully updated the connected panels.",
+            content=f"  **{interaction.user.display_name},** I've succesfully updated the connected panels.",
             embed=None,
             view=None,
         )
@@ -927,7 +927,7 @@ class Permissions(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -938,7 +938,7 @@ class Permissions(discord.ui.RoleSelect):
             {"$set": {"permissions": selected_roles}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** permissions updated successfully.",
+            content=f"  **{interaction.user.display_name},** permissions updated successfully.",
             view=None,
             embed=None
         )
@@ -958,7 +958,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -967,7 +967,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
             {"$set": {"TranscriptChannel": self.values[0].id if self.values else None}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** transcript channel updated successfully.",
+            content=f"  **{interaction.user.display_name},** transcript channel updated successfully.",
             view=None,
         )
 
@@ -1003,13 +1003,13 @@ class TicketForms(discord.ui.View):
         )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
         if len(Config.get("Questions", [])) == 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no questions to delete.",
+                content=f"  **{interaction.user.display_name},** there are no questions to delete.",
                 ephemeral=True,
             )
 
@@ -1043,7 +1043,7 @@ class DeleteQuestionSelect(discord.ui.Select):
         )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -1053,7 +1053,7 @@ class DeleteQuestionSelect(discord.ui.Select):
         )
         if not question:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this question does not exist.",
+                content=f"  **{interaction.user.display_name},** this question does not exist.",
                 ephemeral=True,
             )
 
@@ -1129,12 +1129,12 @@ class Question(discord.ui.Modal):
         )
         if any(q.get("label") == question for q in Config.get("Questions", [])):
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this question already exists.",
+                content=f"  **{interaction.user.display_name},** this question already exists.",
                 ephemeral=True,
             )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"  **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -1143,7 +1143,7 @@ class Question(discord.ui.Modal):
 
         if len(Config.get("Questions", [])) == 5:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** you can only have 5 questions.",
+                content=f"  **{interaction.user.display_name},** you can only have 5 questions.",
                 ephemeral=True,
             )
 
@@ -1189,7 +1189,7 @@ class Category(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1198,7 +1198,7 @@ class Category(discord.ui.ChannelSelect):
             {"$set": {"Category": self.values[0].id if self.values else None}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** category updated successfully.",
+            content=f"  **{interaction.user.display_name},** category updated successfully.",
             view=None,
         )
 
@@ -1217,7 +1217,7 @@ class MentionsOnOpen(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1227,7 +1227,7 @@ class MentionsOnOpen(discord.ui.RoleSelect):
             {"$set": {"MentionsOnOpen": selected_roles}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** mentions on open updated successfully.",
+            content=f"  **{interaction.user.display_name},** mentions on open updated successfully.",
             view=None,
         )
 
@@ -1246,7 +1246,7 @@ class AccessControl(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -1255,7 +1255,7 @@ class AccessControl(discord.ui.RoleSelect):
             {"$set": {"AccessControl": [role.id for role in self.values]}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** access control updated successfully.",
+            content=f"  **{interaction.user.display_name},** access control updated successfully.",
             view=None,
             embed=None
         )
@@ -1295,7 +1295,7 @@ class CustomiseButton(discord.ui.Modal):
             color = "Grey"
         if not color in ["Blurple", "Green", "Red", "Grey"]:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** invalid button color.",
+                content=f"  **{interaction.user.display_name},** invalid button color.",
                 ephemeral=True,
             )
         if not emoji:
@@ -1319,6 +1319,6 @@ class CustomiseButton(discord.ui.Modal):
             },
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** button updated successfully.",
+            content=f"  **{interaction.user.display_name},** button updated successfully.",
             ephemeral=True,
         )

@@ -138,7 +138,7 @@ class CaseApproval(discord.ui.View):
         Settings = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Result:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"  **{interaction.user.display_name}**, I couldn't find the data for this."
             )
         Infraction = InfractItem(Result)
 
@@ -192,7 +192,7 @@ class CaseApproval(discord.ui.View):
         Settings = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Result:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"  **{interaction.user.display_name}**, I couldn't find the data for this."
             )
         Infraction = InfractItem(Result)
 

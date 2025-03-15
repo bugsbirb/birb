@@ -216,7 +216,7 @@ class NoEmbed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -257,7 +257,7 @@ class NoEmbed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -311,7 +311,7 @@ class NoEmbed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -327,7 +327,7 @@ class NoEmbed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -343,7 +343,7 @@ class NoEmbed(discord.ui.View):
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -419,7 +419,7 @@ class NoEmbed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -465,7 +465,7 @@ class Embed(discord.ui.View):
         print(self.data)
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -500,7 +500,7 @@ class Embed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -516,7 +516,7 @@ class Embed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -574,7 +574,7 @@ class Embed(discord.ui.View):
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -595,7 +595,7 @@ class Embed(discord.ui.View):
     async def Desc(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -616,7 +616,7 @@ class Embed(discord.ui.View):
     async def Thu(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -640,7 +640,7 @@ class Embed(discord.ui.View):
     async def Im(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -664,7 +664,7 @@ class Embed(discord.ui.View):
     async def Au(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -693,7 +693,7 @@ class Embed(discord.ui.View):
     async def Colo(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -709,7 +709,7 @@ class Embed(discord.ui.View):
     async def Fields(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -726,7 +726,7 @@ class Embed(discord.ui.View):
     async def Ping(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -745,7 +745,7 @@ class Embed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -764,7 +764,7 @@ class Embed(discord.ui.View):
     ):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -781,7 +781,7 @@ class Embed(discord.ui.View):
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -949,7 +949,7 @@ class Ping(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -957,7 +957,7 @@ class Ping(discord.ui.RoleSelect):
         await interaction.response.defer()
         self.data["ping"] = [role.id for role in self.values]
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the ping has been updated.",
+            content=f" **{interaction.user.display_name},** the ping has been updated.",
             view=None,
             embed=None,
         )
@@ -977,7 +977,7 @@ class ForumsChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -985,7 +985,7 @@ class ForumsChannel(discord.ui.ChannelSelect):
         await interaction.response.defer()
         self.data["channel_id"] = self.values[0].id if self.values else None
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the channel has been updated.",
+            content=f" **{interaction.user.display_name},** the channel has been updated.",
             view=None,
             embed=None,
         )
@@ -1004,7 +1004,7 @@ class PermissionRoles(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -1012,7 +1012,7 @@ class PermissionRoles(discord.ui.RoleSelect):
         await interaction.response.defer()
         self.data["permissionroles"] = [role.id for role in self.values]
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the command has been updated.",
+            content=f" **{interaction.user.display_name},** the command has been updated.",
             view=None,
             embed=None,
         )
@@ -1039,7 +1039,7 @@ class Title(discord.ui.Modal, title="Title"):
             await interaction.response.edit_message(embed=embed)
         except discord.HTTPException():
             return await interaction.response.send_message(
-                f"{no} {interaction.user.display_name}, had an error adding the title please try again.",
+                f"  {interaction.user.display_name}, had an error adding the title please try again.",
                 ephemeral=True,
             )
 
@@ -1067,7 +1067,7 @@ class Buttons(discord.ui.Select):
                     }
                 )
                 await interaction.response.edit_message(
-                    content=f"{tick} **@{interaction.user.name}** I've succesfully added voting buttons. (This doesn't support other button types)",
+                    content=f" **@{interaction.user.name}** I've succesfully added voting buttons. (This doesn't support other button types)",
                     view=None,
                     embed=None,
                 )
@@ -1087,7 +1087,7 @@ class Buttons(discord.ui.Select):
                 self.data["Lock"] = False
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f" **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -1135,7 +1135,7 @@ class CustomButton(discord.ui.Modal, title="Custom Button"):
             color = "Grey"
         if self.color.value not in ["Red", "Blue", "Grey", "Green"]:
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name},** you can only select from the following colors: Red, Blue, Grey, Green",
+                content=f" **{interaction.user.display_name},** you can only select from the following colors: Red, Blue, Grey, Green",
                 embed=None,
                 view=None,
             )
@@ -1156,7 +1156,7 @@ class CustomButton(discord.ui.Modal, title="Custom Button"):
         )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f" **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -1213,7 +1213,7 @@ class LinkButton(discord.ui.Modal, title="Link Button"):
         )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f" **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -1259,7 +1259,7 @@ class Colour(discord.ui.Modal, title="Colour"):
         color_value = self.color.value
         if len(color_value) != 6:
             await interaction.response.send_message(
-                f" {no} Please provide a valid hex color. (A hex is 6 characters long without the hashtag.)",
+                f"   Please provide a valid hex color. (A hex is 6 characters long without the hashtag.)",
                 ephemeral=True,
             )
             return
@@ -1268,7 +1268,7 @@ class Colour(discord.ui.Modal, title="Colour"):
             color = discord.Color(int(color_value, 16))
         except ValueError:
             await interaction.response.send_message(
-                f" {no} Please provide a valid hex color without the hashtag.",
+                f"   Please provide a valid hex color without the hashtag.",
                 ephemeral=True,
             )
             return
@@ -1327,7 +1327,7 @@ class Thumbnail(discord.ui.Modal, title="Thumbnail"):
 
         except discord.HTTPException:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"  **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1359,7 +1359,7 @@ class Image(discord.ui.Modal, title="Image"):
             self.data["image"] = url
         except discord.HTTPException:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"  **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1406,7 +1406,7 @@ class Author(discord.ui.Modal, title="Author"):
             self.data["author_url"] = icon_url
         except discord.HTTPException:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"  **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1445,7 +1445,7 @@ class componentmanager(discord.ui.View):
     ):
         if not self.data.get("components") or len(self.data.get("components")) == 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no buttons to remove.",
+                content=f"  **{interaction.user.display_name},** there are no buttons to remove.",
                 ephemeral=True,
             )
         options = [
@@ -1475,7 +1475,7 @@ class EraseButtons(discord.ui.Select):
             c for c in self.data["components"] if c.get("ix") != Selected
         ]
         await interaction.response.edit_message(
-            content=f"{tick} succesfully removed component.", view=None, embed=None
+            content=f" succesfully removed component.", view=None, embed=None
         )
 
 
@@ -1534,7 +1534,7 @@ class EmbedFieldEditor(discord.ui.Modal, title="Edit Embed Field"):
             await msg.edit(embed=embed)
         except discord.NotFound:
             await interaction.response.send_message(
-                content=f"{crisis} **@{interaction.user.display_name},** to be able to edit fields you must be in a channel I can access so I can add the fields.",
+                content=f"  **@{interaction.user.display_name},** to be able to edit fields you must be in a channel I can access so I can add the fields.",
                 ephemeral=True,
             )
         await interaction.response.edit_message(content="")
@@ -1564,7 +1564,7 @@ class EmbedFieldManager(discord.ui.View):
         embed = self.msg.embeds[0]
         if not embed.fields or len(embed.fields) == 0:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no fields to edit.",
+                content=f"  **{interaction.user.display_name},** there are no fields to edit.",
                 ephemeral=True,
             )
             return
@@ -1587,7 +1587,7 @@ class EmbedFieldManager(discord.ui.View):
         embed = self.msg.embeds[0]
         if not embed.fields or len(embed.fields) == 0:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no fields to edit.",
+                content=f"  **{interaction.user.display_name},** there are no fields to edit.",
                 ephemeral=True,
             )
             return

@@ -242,20 +242,20 @@ class Voting(discord.ui.View):
             )
             if not suggestion_data:
                 await interaction.followup.send(
-                    f"{crisis} **Suggestion** data for this suggestion can not be found.",
+                    f"  **Suggestion** data for this suggestion can not be found.",
                     ephemeral=True,
                 )
                 return
             if suggestion_data is None:
                 await interaction.followup.send(
-                    f"{crisis} **Suggestion** data for this suggestion can not be found.",
+                    f"  **Suggestion** data for this suggestion can not be found.",
                     ephemeral=True,
                 )
                 return
             view = discord.ui.View()
             view.add_item(ManageSuggestion(interaction.message))
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name}**, here are the settings for this suggestion.",
+                f"  **{interaction.user.display_name}**, here are the settings for this suggestion.",
                 view=view,
                 ephemeral=True,
             )
@@ -303,7 +303,7 @@ class ManageSuggestion(discord.ui.Select):
                 "suggestion_edit", result.get("_id"), settings, "Accepted Suggestion"
             )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, it has been marked as accepted.",
+                content=f"  **{interaction.user.display_name}**, it has been marked as accepted.",
                 view=None,
             )
 
@@ -338,7 +338,7 @@ class DenialReason(discord.ui.Modal, title="Denial Reason"):
             "suggestion_edit", result.get("_id"), settings, "Denied Suggestion"
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** suggestion marked as denied.",
+            content=f"  **{interaction.user.display_name},** suggestion marked as denied.",
             view=None,
         )
 

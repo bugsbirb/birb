@@ -150,7 +150,7 @@ class Infractions(commands.Cog):
     ):
         if self.client.infractions_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
             )
             return
         if not await has_admin_role(ctx, "Infraction Permissions"):
@@ -174,7 +174,7 @@ class Infractions(commands.Cog):
             return await ctx.send(embed=ModuleNotSetup(), view=Support())
         if staff is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user can not be found.",
+                f"  **{ctx.author.display_name}**, this user can not be found.",
             )
             return
 
@@ -183,12 +183,12 @@ class Infractions(commands.Cog):
         )
         if staff.id == self.client.user.id:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** what did I do to you?"
+                content=f"  **{ctx.author.display_name},** what did I do to you?"
             )
             return
         if staff.bot:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
+                content=f"  **{ctx.author.display_name},** I'm not gonna infract my own kind."
             )
             return
 
@@ -214,7 +214,7 @@ class Infractions(commands.Cog):
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                content=f"  **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
         if expiration:
@@ -278,7 +278,7 @@ class Infractions(commands.Cog):
             await view.wait()
             if view.value is None:
                 return await msg.edit(
-                    content=f"{crisis} **{ctx.author.display_name},** you didn't respond in time.",
+                    content=f"  **{ctx.author.display_name},** you didn't respond in time.",
                     view=None,
                     embed=None,
                 )
@@ -286,7 +286,7 @@ class Infractions(commands.Cog):
                 pass
             else:
                 return await msg.edit(
-                    content=f"{no} **{ctx.author.display_name},** infraction cancelled.",
+                    content=f"  **{ctx.author.display_name},** infraction cancelled.",
                     view=None,
                     embed=None,
                 )
@@ -294,7 +294,7 @@ class Infractions(commands.Cog):
         InfractionResult = await self.client.db["infractions"].insert_one(FormeData)
         if not InfractionResult.inserted_id:
             await msg.edit(
-                content=f"{crisis} **{ctx.author.display_name},** hi I had a issue submitting this infraction please head to support!",
+                content=f"  **{ctx.author.display_name},** hi I had a issue submitting this infraction please head to support!",
             )
             return
         if (
@@ -318,7 +318,7 @@ class Infractions(commands.Cog):
                 "infraction_approval", InfractionResult.inserted_id, Config
             )
             return await msg.edit(
-                content=f"{tick} **{ctx.author.display_name},** I've succesfully sent the infraction to approval. ",
+                content=f"  **{ctx.author.display_name},** I've succesfully sent the infraction to approval. ",
                 embed=None,
                 view=None,
             )
@@ -328,7 +328,7 @@ class Infractions(commands.Cog):
         )
 
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {'(Escalated)' if isEscalated else ''}",
+            content=f"  **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {'(Escalated)' if isEscalated else ''}",
             embed=None,
             view=None,
         )
@@ -347,7 +347,7 @@ class Infractions(commands.Cog):
         await ctx.defer()
         if self.client.infractions_maintenance:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "infractions"):
@@ -379,7 +379,7 @@ class Infractions(commands.Cog):
                 else "expired" if scope == "Expired" else "any"
             )
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, no {scope_text} infractions were found{f' for **@{staff.display_name}**' if staff else ''}."
+                f"  **{ctx.author.display_name}**, no {scope_text} infractions were found{f' for **@{staff.display_name}**' if staff else ''}."
             )
             return
 
@@ -482,7 +482,7 @@ class Infractions(commands.Cog):
     async def view(self, ctx: commands.Context, id: str, voided: bool = False):
         if self.client.infractions_maintenance is True:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
+                f"  **{ctx.author.display_name}**, the infractions module is currently under maintenance. Please try again later.",
             )
             return
         if not await ModuleCheck(ctx.guild.id, "infractions"):
@@ -507,7 +507,7 @@ class Infractions(commands.Cog):
 
         if infraction is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.",
+                f"  **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.",
             )
             return
 
@@ -579,7 +579,7 @@ class InfractionMultiple(discord.ui.UserSelect):
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await interaction.response.edit_message(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 view=None,
                 embed=None,
             )
@@ -589,7 +589,7 @@ class InfractionMultiple(discord.ui.UserSelect):
         for user in self.values:
             if user is None:
                 await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name}**, this user can not be found.",
+                    f"  **{interaction.user.display_name}**, this user can not be found.",
                     ephemeral=True,
                 )
                 return
@@ -613,7 +613,7 @@ class InfractionMultiple(discord.ui.UserSelect):
             )
             if not InfractionResult.inserted_id:
                 await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
+                    content=f"  **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
                     embed=None,
                     view=None,
                 )
@@ -622,7 +622,7 @@ class InfractionMultiple(discord.ui.UserSelect):
                 "infraction", InfractionResult.inserted_id, Config, TypeActions
             )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name}**, I have infracted all the staff members!",
+            content=f"  **{interaction.user.display_name}**, I have infracted all the staff members!",
             view=None,
         )
 
@@ -648,7 +648,7 @@ class ManageInfraction(discord.ui.View):
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -666,7 +666,7 @@ class ManageInfraction(discord.ui.View):
     async def void(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -677,7 +677,7 @@ class ManageInfraction(discord.ui.View):
                 {"_id": infraction["_id"]}
             )
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, I've deleted the infraction permanently.",
+                content=f"  **{interaction.user.display_name}**, I've deleted the infraction permanently.",
                 view=None,
                 embed=None,
             )
@@ -688,7 +688,7 @@ class ManageInfraction(discord.ui.View):
             upsert=False,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've voided the infraction.",
+            content=f"  **{interaction.user.display_name}**, I've voided the infraction.",
             view=None,
             embed=None,
         )
@@ -715,7 +715,7 @@ class EditInfraction(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -789,7 +789,7 @@ class UpdateInfraction(discord.ui.Modal):
             expiration = self.exp.value
             if expiration and not re.match(r"^\d+[mhdws]$", expiration):
                 await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                    f"  **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                     ephemeral=True,
                 )
                 return
@@ -845,7 +845,7 @@ class ImDone(discord.ui.View):
     async def done(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -876,7 +876,7 @@ class UpdateAction(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)

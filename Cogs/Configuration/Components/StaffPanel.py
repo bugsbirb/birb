@@ -29,7 +29,7 @@ class StaffPanelOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -75,7 +75,7 @@ class StaffPanelOptions(discord.ui.Select):
 
         else:
             await interaction.response.send_message(
-                f"{redx} **{interaction.user.display_name},** an error occurred. Please try again later.",
+                f"  **{interaction.user.display_name},** an error occurred. Please try again later.",
                 ephemeral=True,
             )
 
@@ -151,7 +151,7 @@ class DropDownLabel(discord.ui.Modal):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -165,7 +165,7 @@ class DropDownLabel(discord.ui.Modal):
             {"_id": interaction.guild.id}, {"$set": Config}, upsert=True
         )
         embed = discord.Embed(
-            description=f"{greencheck} **{interaction.user.display_name},** you have successfully updated the panel label to **{self.label.value}**!",
+            description=f"  **{interaction.user.display_name},** you have successfully updated the panel label to **{self.label.value}**!",
             color=discord.Colour.brand_green(),
         )
         return await interaction.followup.send(embed=embed, ephemeral=True)

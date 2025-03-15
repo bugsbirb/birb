@@ -20,7 +20,7 @@ class Integrations(discord.ui.Select):
     async def callback(self, interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -77,7 +77,7 @@ class GroupOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -99,7 +99,7 @@ class EnterGroup(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -116,7 +116,7 @@ class EnterGroup(discord.ui.Modal):
         group = await GetGroup2(self.group_id.value, interaction.user)
         if not group or not group.get('owner'):
             return await interaction.response.edit_message(
-                content=f"{crisis} **{interaction.user.display_name},** I couldn't find the roblox group from your account.",
+                content=f"  **{interaction.user.display_name},** I couldn't find the roblox group from your account.",
                 view=None,
                 embed=None,
             )
@@ -134,7 +134,7 @@ class EnterGroup(discord.ui.Modal):
         OwnerID = int(group.get("owner").split("/")[1])
         if not OwnerID == RobloxID:
             return await interaction.response.edit_message(
-                content=f"{crisis} **{interaction.user.display_name},** you aren't the owner of this group. Please get the owner of it to link it.",
+                content=f"  **{interaction.user.display_name},** you aren't the owner of this group. Please get the owner of it to link it.",
                 view=None,
                 embed=None,
             )
@@ -144,7 +144,7 @@ class EnterGroup(discord.ui.Modal):
             {"_id": interaction.guild.id}, {"$set": config}, upsert=True
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, group succesfully linked.",
+            content=f" **{interaction.user.display_name}**, group succesfully linked.",
             view=None,
         )
 
@@ -168,7 +168,7 @@ class KeyButton(discord.ui.View):
     async def apikey(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                description=f"  **{interaction.user.display_name},** this is not your panel!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -178,7 +178,7 @@ class KeyButton(discord.ui.View):
             upsert=True,
         )
         embed = discord.Embed(
-            description=f"{greencheck} **API Key has been successfully updated!**",
+            description=f"  **API Key has been successfully updated!**",
             color=discord.Colour.brand_green(),
         )
         await interaction.response.edit_message(embed=embed, view=None)
