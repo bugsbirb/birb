@@ -125,6 +125,9 @@ class APIRoutes:
             "guilds": len(self.client.guilds),
             "users": await self.get_total_users(),
         }
+    
+    async def POST_google(self, auth: str, Request: Request):
+        return Request
 
     async def get_total_users(self):
         total_members = sum(guild.member_count for guild in self.client.guilds)
