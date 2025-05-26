@@ -17,6 +17,7 @@ from scipy.interpolate import CubicSpline
 class Ping(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
+        self.SavePing.start()
 
     async def Gen(self, data: dict) -> BytesIO:
         blurple = "#5865F2"
@@ -105,6 +106,7 @@ class Ping(commands.Cog):
         if Latency > 700:
             return
 
+        DbLatency = None
         try:
             Start = datetime.now()
             await self.client.db.command("ping")
@@ -112,8 +114,9 @@ class Ping(commands.Cog):
             if DbLatency > 700:
                 return
         except Exception:
-            return
+            DbLatency = None
 
+        API = None
         try:
             Start = datetime.now()
             await self.APIConnection()
@@ -121,7 +124,7 @@ class Ping(commands.Cog):
             if API > 700:
                 return
         except Exception:
-            return
+            API = None
 
         await self.client.db["Ping"].update_one(
             {"_id": 0},
@@ -129,10 +132,10 @@ class Ping(commands.Cog):
                 "$push": {
                     "Latency": {"$each": [str(Latency)], "$slice": -30},
                     "DB": {
-                        "$each": [str(DbLatency) if DbLatency else "100"],
+                        "$each": [str(DbLatency) if DbLatency is not None else "100"],
                         "$slice": -30,
                     },
-                    "API": {"$each": [str(API) if API else "100"], "$slice": -30},
+                    "API": {"$each": [str(API) if API is not None else "100"], "$slice": -30},
                 },
                 "$setOnInsert": {"_id": 0},
             },
