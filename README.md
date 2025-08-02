@@ -30,7 +30,7 @@ Birb is designed to simplify tasks related to managing staff, staff punishment, 
 - !!unwhitelist
 - !!sync (Owner Only)
 
-## Liscensing
+## Licensing
 
 Birb is licensed under the Attribution-NonCommercial-ShareAlike (CC BY-NC-SA) license. This license allows for the copy, distribution, and creation of adaptations of the material for non-commercial purposes, as long as proper attribution is given to the original creator and any adaptations are licensed under the same terms.
 
