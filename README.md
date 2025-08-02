@@ -3,7 +3,6 @@
 Birb is designed to simplify tasks related to managing staff, staff punishment, activity tracking.
 
 ## 🧱 Features
->
 > - Tickets
 > - Modmail
 > - Message Quota
