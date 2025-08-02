@@ -67,10 +67,26 @@ class expiration(commands.Cog):
                 if not Channel:
                     continue
                 try:
-                    message = await Channel.fetch_message(infraction.get("msg_id"))
-                    if not message:
+                    MsgID = infraction.get("msg_id")
+                    WebhookID = infraction.get("WebhookID")
+                    message = None
+
+                    if WebhookID:
+                        try:
+                            webhook = await self.client.fetch_webhook(WebhookID)
+                            message = await webhook.fetch_message(MsgID)
+                        except (discord.HTTPException, discord.NotFound):
+                            pass
+                    else:
+                        try:
+                            message = await Channel.fetch_message(MsgID)
+                        except (discord.HTTPException, discord.NotFound):
+                            pass
+
+                    if not message or not message.embeds:
                         continue
-                    embed = message.embeds[0]
+
+                    existing = message.embeds
                     exp = discord.Embed(
                         color=discord.Color.orange(),
                     ).set_author(
@@ -78,7 +94,7 @@ class expiration(commands.Cog):
                         icon_url="https://cdn.discordapp.com/emojis/1345821183328784506.webp?size=96",
                     )
                     await message.edit(
-                        embeds=[embed, exp],
+                        embeds=existing + [exp],
                     )
                     staff = self.client.get_user(int(infraction.get("staff")))
                     if staff:

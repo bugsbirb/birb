@@ -241,29 +241,57 @@ class Infractions(commands.Cog):
             Roblox = await GetValidToken(user=ctx.author)
             if not Roblox:
                 return await msg.edit(embed=NotRobloxLinked())
-        NextType = None
-        if TypeActions and TypeActions.get("Escalation", None):
+        Org = action
+        CheckedActions = []
+        isEscalated = False
+
+        Max = 30
+        Min = 0
+
+        while Min < Max:
+            TypeActions = await self.client.db["infractiontypeactions"].find_one(
+                {"guild_id": ctx.guild.id, "name": action}
+            )
+            if not TypeActions:
+                break
 
             Escalation = TypeActions.get("Escalation")
-            Threshold = Escalation.get("Threshold", None)
+            if not Escalation:
+                break
+
+            Threshold = Escalation.get("Threshold")
             NextType = Escalation.get("Next Type")
-            if Threshold and NextType:
-                InfractionsWithType = await self.client.db[
-                    "infractions"
-                ].count_documents(
+
+            try:
+                Threshold = int(Threshold)
+            except (ValueError, TypeError):
+                break
+
+            if not NextType or action in CheckedActions:
+                break
+
+            InfractionsOfType = await self.client.db["infractions"].count_documents(
+                {
+                    "guild_id": ctx.guild.id,
+                    "staff": staff.id,
+                    "action": action,
+                    "Upscaled": {"$exists": False},
+                }
+            )
+            Current = InfractionsOfType + 1
+            if InfractionsOfType + 1 >= Threshold:
+                CheckedActions.append(
                     {
-                        "guild_id": ctx.guild.id,
-                        "staff": staff.id,
                         "action": action,
-                        "Upscaled": {"$exists": False},
+                        "count": Current,
+                        "threshold": Threshold,
                     }
                 )
-                if isinstance(Threshold, str):
-                    if InfractionsWithType + 1 >= int(Threshold):
-                        isEscalated = True
-                        Org = action
-                        action = NextType
-
+                Org = action
+                action = NextType
+                isEscalated = True
+            else:
+                break
         FormeData = {
             "guild_id": ctx.guild.id,
             "staff": staff.id,
@@ -276,20 +304,30 @@ class Infractions(commands.Cog):
             "annonymous": anonymous,
             "timestamp": datetime.now(),
         }
-        if isEscalated:
-            FormeData[
-                "reason"
-            ] += f"\n-# Automatically escalated to **{action}** from **{Org}**"
+
+        embeds = []
+        EscFrom = None
         if NextType and isEscalated:
-                await self.client.db["infractions"].update_many(
-                    {
-                        "guild_id": ctx.guild.id,
-                        "staff": staff.id,
-                        "action": Org,
-                        "Upscaled": {"$exists": False},
-                    },
-                    {"$set": {"Upscaled": True}},
-                )            
+            FormeData["EscalatedFrom"] = Org
+            FormeData["EscalationChain"] = list(CheckedActions)
+
+            parts = []
+            for step in CheckedActions:
+                count = step["count"]
+                Action = step["action"]
+                plural = "s" if count != 1 else ""
+                parts.append(f"{count} {Action}{plural}")
+
+            if len(parts) > 1:
+                Text = " and ".join(parts[-2:])
+            else:
+                Text = parts[0]
+
+            EscFrom = discord.Embed(color=discord.Color.blue()).set_author(
+                name=f"Automatically escalated from {Text} to {action}",
+                icon_url="https://cdn.discordapp.com/emojis/1401307998260822028.webp?size=96",
+            )
+
         if Config.get("Module Options", {}).get("Infraction Confirmation", False):
             custom = await self.client.db["Customisation"].find_one(
                 {"guild_id": ctx.guild.id, "type": "Infractions"}
@@ -304,9 +342,13 @@ class Infractions(commands.Cog):
                 embed = await DisplayEmbed(custom, ctx.author, replaces)
             else:
                 embed = DefaultEmbed(FormeData, staff, ctx.author)
+            embeds.append(embed)
+            if EscFrom:
+                embeds.append(EscFrom)
+
             view = YesOrNo()
             msg = await msg.edit(
-                embed=embed,
+                embeds=embeds,
                 view=view,
                 content=f"<:Tip:1238599473429483612> **{ctx.author.display_name}**, are you sure?\n-# Infraction Preview",
             )
@@ -325,6 +367,17 @@ class Infractions(commands.Cog):
                     view=None,
                     embed=None,
                 )
+
+        if NextType and isEscalated:
+            await self.client.db["infractions"].update_many(
+                {
+                    "guild_id": ctx.guild.id,
+                    "staff": staff.id,
+                    "action": Org,
+                    "Upscaled": {"$exists": False},
+                },
+                {"$set": {"Upscaled": True}},
+            )
 
         InfractionResult = await self.client.db["infractions"].insert_one(FormeData)
         if not InfractionResult.inserted_id:
@@ -363,7 +416,7 @@ class Infractions(commands.Cog):
         )
 
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {f'(Escalated to {NextType})' if isEscalated else ''}",
+            content=f"{tick} **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {f'(Escalated to {action})' if isEscalated else ''}",
             embed=None,
             view=None,
         )

@@ -73,6 +73,8 @@ def InfractItem(data):
         guild_id=data.get("guild_id"),
         annonymous=data.get("annonymous"),
         msg_id=data.get("msg_id"),
+        webhook_id=data.get("WebhookID"),
+        escalated_from=data.get("EscalatedFrom"),
     )
 
 
@@ -103,6 +105,8 @@ class InfractionItem:
         guild_id,
         annonymous,
         msg_id,
+        webhook_id,
+        escalated_from,
     ):
         self.staff = staff
         self.management = management
@@ -116,6 +120,8 @@ class InfractionItem:
         self.guild_id = guild_id
         self.annonymous = annonymous
         self.msg_id = msg_id
+        self.webhook_id = webhook_id
+        self.escalated_from = escalated_from
 
 
 class Embed:
@@ -235,6 +241,31 @@ class on_infractions(commands.Cog):
                 N = None
             if N:
                 channel = N
+
+        embeds = [embed]
+
+        if Infraction.escalated_from:
+            CheckedActions = InfractionData.get('EscalationChain', [])
+            Org = Infraction.escalated_from
+            action = Infraction.action
+
+            parts = []
+            for step in CheckedActions:
+                count = step["count"]
+                Action = step["action"]
+                plural = "s" if count != 1 else ""
+                parts.append(f"{count} {Action}{plural}")
+
+            if len(parts) > 1:
+                Text = " and ".join(parts[-2:])
+            else:
+                Text = parts[0]
+
+            EscFrom = discord.Embed(color=discord.Color.blue()).set_author(
+                name=f"Automatically escalated from {Text} to {action}",
+                icon_url="https://cdn.discordapp.com/emojis/1401307998260822028.webp?size=96",
+            )
+            embeds.append(EscFrom)
         msg = None
         hook = None
         Status = await premium(guild.id)
@@ -244,6 +275,7 @@ class on_infractions(commands.Cog):
             and Status
             and Settings.get("Infraction", {}).get("Webhook", {}).get("Enabled") is True
         ):
+            hook = None
             Webhook = await self.client.db["Webhooks"].find_one(
                 {"Type": "IF", "Channel": channel.id, "Guild": guild.id}
             )
@@ -256,7 +288,6 @@ class on_infractions(commands.Cog):
                         Btyes = await resp.read()
                 try:
                     hook = await channel.create_webhook(name="Birb", avatar=Btyes)
-
                     await self.client.db["Webhooks"].update_one(
                         {"Type": "IF", "Channel": channel.id, "Guild": guild.id},
                         {"$set": {"Id": hook.id}},
@@ -264,27 +295,23 @@ class on_infractions(commands.Cog):
                     )
                     return hook
                 except discord.Forbidden:
-                    return
+                    return None
 
-            if not Webhook or Webhook.get("Id"):
+            if not Webhook or not Webhook.get("Id"):
                 hook = await CreateHook(channel)
-
-            hook = (
-                hook
-                or await self.client.fetch_webhook(webhook_id=Webhook.get("Id"))
-                or await CreateHook(channel)
-            )
+            else:
+                try:
+                    hook = await self.client.fetch_webhook(Webhook.get("Id"))
+                except discord.NotFound:
+                    hook = await CreateHook(channel)
 
             if not hook:
                 return
-
-            hook: discord.Webhook
-
             WS = Settings.get("Infraction").get("Webhook", {})
             if view is not None:
                 msg = await hook.send(
                     staff.mention,
-                    embed=embed,
+                    embeds=embeds,
                     view=view,
                     allowed_mentions=discord.AllowedMentions(users=True),
                     avatar_url=WS.get("Avatar") or None,
@@ -294,7 +321,7 @@ class on_infractions(commands.Cog):
             else:
                 msg: discord.WebhookMessage = await hook.send(
                     staff.mention,
-                    embed=embed,
+                    embeds=embeds,
                     allowed_mentions=discord.AllowedMentions(users=True),
                     avatar_url=WS.get("Avatar") or None,
                     username=WS.get("Username") or "Birb",
@@ -305,7 +332,7 @@ class on_infractions(commands.Cog):
             try:
                 msg: discord.Message = await channel.send(
                     staff.mention,
-                    embed=embed,
+                    embeds=[embed],
                     view=view,
                     allowed_mentions=discord.AllowedMentions(users=True),
                 )
@@ -316,7 +343,14 @@ class on_infractions(commands.Cog):
         if Type is None:
             await self.client.db["infractions"].update_one(
                 {"_id": objectid},
-                {"$set": {"jump_url": msg.jump_url, "msg_id": msg.id, "Updated": ch}},
+                {
+                    "$set": {
+                        "jump_url": msg.jump_url,
+                        "msg_id": msg.id,
+                        "Updated": ch,
+                        "WebhookID": hook.id if hook else None,
+                    }
+                },
             )
         else:
             await self.client.db["Suspensions"].update_one(

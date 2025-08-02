@@ -61,23 +61,28 @@ class on_infraction_void(commands.Cog):
                 except:
                     pass
         if channel:
-                try:
+            try:
+
+                if inf.get("WebhookID"):
+                    Msg = await self.client.fetch_webhook(inf.get("WebhookID"))
+
+                else:
                     Msg = await channel.fetch_message(MsgID)
-                except (discord.NotFound, discord.HTTPException):
-                    return
-                if not channel:
-                    return
-                E = Msg.embeds[0]
-                E2 = discord.Embed(
-                    color=discord.Color.orange(),
-                ).set_author(
-                    name="Infraction Voided",
-                    icon_url="https://cdn.discordapp.com/emojis/1345821183328784506.webp?size=96",
-                )
-                try:
-                    await Msg.edit(embeds=[E, E2])
-                except (discord.NotFound, discord.Forbidden):
-                    return
+            except (discord.NotFound, discord.HTTPException):
+                return
+            if not channel:
+                return
+            E = Msg.embeds
+            E2 = discord.Embed(
+                color=discord.Color.orange(),
+            ).set_author(
+                name="Infraction Voided",
+                icon_url="https://cdn.discordapp.com/emojis/1345821183328784506.webp?size=96",
+            )
+            try:
+                await Msg.edit(embeds=E + [E2])
+            except (discord.NotFound, discord.Forbidden):
+                return
 
 
 async def setup(client: commands.Bot) -> None:

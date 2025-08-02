@@ -97,13 +97,17 @@ class on_infraction_edit(commands.Cog):
         embed.set_footer(text=f"Infraction ID | {Infraction.random_string}")
 
         try:
-            msg = await channel.fetch_message(Infraction.msg_id)
+            if Infraction.webhook_id:
+                webhook = await self.client.fetch_webhook(Infraction.webhook_id)
+                msg = await webhook.fetch_message(Infraction.msg_id)
+            else:
+                msg = await channel.fetch_message(Infraction.msg_id)
+
             await msg.edit(embed=embed)
-            print(
-                f"[✅] Updated infraction message with ID: {Infraction.random_string}"
-            )
+            print(f"[✅] Updated infraction message with ID: {Infraction.random_string}")
         except (discord.Forbidden, discord.HTTPException, discord.NotFound):
             return
+
 
 
 async def setup(client: commands.Bot) -> None:
