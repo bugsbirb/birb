@@ -22,7 +22,6 @@ Birb is designed to simplify tasks related to managing staff, staff punishment, 
 > - Auto Response
 
 ## `STAFF` Commands
->
 > These are the commands you can use if your User ID is listed in *.env* var `STAFF`:
 
 - !!guilds
