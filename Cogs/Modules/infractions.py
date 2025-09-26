@@ -387,7 +387,7 @@ class Infractions(commands.Cog):
         InfractionResult = await self.client.db["infractions"].insert_one(FormeData)
         if not InfractionResult.inserted_id:
             await msg.edit(
-                content=f"{crisis} **{ctx.author.display_name},** hi I had a issue submitting this infraction please head to support!",
+                content=f"{crisis} **{ctx.author.display_name},** I had an issue submitting this infraction. Please head to our support server!",
             )
             return
         if isApproval:
@@ -464,9 +464,14 @@ class Infractions(commands.Cog):
                 else "expired" if scope == "Expired" else "any"
             )
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, no {scope_text} infractions were found{f' for **@{staff.display_name}**' if staff else ''}."
-            )
-            return
+            f"{no} **{ctx.author.display_name}**, no "
+            + (f"{scope_text} " if scope_text else "")
+            + "infractions were found"
+            + (f" for **@{staff.display_name}**" if staff else "")
+            + "."
+        )
+        return
+
 
         if IsSeperateBot():
             msg = await ctx.send(
