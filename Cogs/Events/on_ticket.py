@@ -786,26 +786,26 @@ class TicketsPublic(commands.Cog):
                         except:
                             pass
                 try:
-
-                    msg = await TranscriptChannel.send(embed=embed, view=ButtonLink)
-                    if P.get("AllowReviews", False):
-                        if msg:
-                            await self.client.db["Tickets"].update_one(
-                                {"_id": ObjectID},
-                                {
-                                    "$set": {
-                                        "ReviewMSG": msg.id if msg else None,
-                                        "ReviewChannel": (
-                                            TranscriptChannel.id
-                                            if TranscriptChannel
-                                            else None
-                                        ),
-                                        "ReviewerMsg": (
-                                            ReviewerMsg.id if ReviewerMsg else None
-                                        ),
-                                    }
-                                },
-                            )
+                    if TranscriptChannel:
+                        msg = await TranscriptChannel.send(embed=embed, view=ButtonLink)
+                        if P.get("AllowReviews", False):
+                            if msg:
+                                await self.client.db["Tickets"].update_one(
+                                    {"_id": ObjectID},
+                                    {
+                                        "$set": {
+                                            "ReviewMSG": msg.id if msg else None,
+                                            "ReviewChannel": (
+                                                TranscriptChannel.id
+                                                if TranscriptChannel
+                                                else None
+                                            ),
+                                            "ReviewerMsg": (
+                                                ReviewerMsg.id if ReviewerMsg else None
+                                            ),
+                                        }
+                                    },
+                                )
                 except discord.Forbidden:
                     pass
 
