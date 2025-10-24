@@ -12,12 +12,11 @@ fuzzywuzzy
 fastapi
 uvicorn
 memory_profiler 
-
 sentry_sdk
 aioboto3
 pillow
 ffmpeg-python
-
 scipy
 matplotlib
 numpy
+python-Levenshtein
