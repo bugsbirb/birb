@@ -188,6 +188,10 @@ class TicketsPublic(commands.Cog):
                 ActivityReminder = P.get("Automations", {}).get("Inactivity", {})
                 if not ActivityReminder:
                     return
+                try:
+                    Inactivity = int(ActivityReminder)
+                except (ValueError, TypeError):
+                    return
 
                 if Ticket.get("LastMessageWasBot", False) is True:
                     return
@@ -198,7 +202,7 @@ class TicketsPublic(commands.Cog):
                 if (
                     not LastMessagSent
                     or datetime.datetime.utcnow() - LastMessagSent
-                    > datetime.timedelta(minutes=ActivityReminder)
+                    > datetime.timedelta(minutes=Inactivity)
                 ):
                     await self.client.db["Tickets"].update_one(
                         {"_id": Ticket.get("_id")},

@@ -41,6 +41,7 @@ async def Create(name, user: discord.User):
         "appName": f"custom-{name}",
         "description": f"{user.id} - {datetime.now().isoformat()}",
         "projectId": project_id,
+        "environmentId": "env_prod_AnhFqj439TjExphKiI7-x_1757255169.949818"
     }
 
     async with aiohttp.ClientSession() as session:
