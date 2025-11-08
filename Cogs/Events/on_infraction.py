@@ -393,6 +393,7 @@ class on_infractions(commands.Cog):
                     if role is not None
                 ]
                 roles = [role for role in roles if role]
+                roles = [role for role in roles if role in staff.roles]
                 if roles:
                     try:
                         await staff.add_roles(*roles)
@@ -424,6 +425,7 @@ class on_infractions(commands.Cog):
                     if role is not None
                 ]
                 roles = [role for role in roles if role]
+                roles = [role for role in roles if role in staff.roles]
                 if roles:
                     try:
                         await staff.remove_roles(*roles)
