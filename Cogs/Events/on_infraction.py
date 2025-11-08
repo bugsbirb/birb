@@ -383,18 +383,16 @@ class on_infractions(commands.Cog):
         try:
             channel = False
             if data.get("givenroles"):
-                roles = data.get("givenroles")
-                if not staff.guild.chunked:
-                    await staff.guild.chunk()
-
-                roles = [
-                    discord.utils.get(staff.guild.roles, id=r)
-                    for role in roles
-                    if role is not None
-                ]
-                roles = [role for role in roles if role]
-                roles = [role for role in roles if role in staff.roles]
-                if roles:
+                    roles = data.get("givenroles")
+                    if not staff.guild.chunked:
+                        await staff.guild.chunk()
+                    roles = [
+                        discord.utils.get(staff.guild.roles, id=role)
+                        for role in roles
+                        if role is not None
+                    ]
+                    roles = [role for role in roles if role]
+                    if roles:
                     try:
                         await staff.add_roles(*roles)
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
@@ -418,7 +416,7 @@ class on_infractions(commands.Cog):
                 roles = data.get("removedroles")
                 if not staff.guild.chunked:
                     await staff.guild.chunk()
-
+            
                 roles = [
                     discord.utils.get(staff.guild.roles, id=role)
                     for role in roles
@@ -432,6 +430,7 @@ class on_infractions(commands.Cog):
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["RemovedRoles"] = [role.id for role in roles]
+                    
             if data.get("staffdatabaseremoval", False) is True:
                 OriginalData = await self.client.db["staff database"].find_one(
                     {"staff_id": staff.id, "guild_id": staff.guild.id}
