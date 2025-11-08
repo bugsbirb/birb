@@ -388,15 +388,17 @@ class on_infractions(commands.Cog):
                     await staff.guild.chunk()
 
                 roles = [
-                    discord.utils.get(staff.guild.roles, id=role)
+                    discord.utils.get(staff.guild.roles, id=r)
                     for role in roles
                     if role is not None
                 ]
-                try:
-                    await staff.add_roles(*roles)
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                Actions["AddedRoles"] = [role.id for role in roles]
+                roles = [role for role in roles if role]
+                if roles:
+                    try:
+                        await staff.add_roles(*roles)
+                    except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                        pass
+                    Actions["AddedRoles"] = [role.id for role in roles]
             if data.get("changegrouprole") and data.get("grouprole"):
                 from utils.roblox import UpdateMembership
 
@@ -421,11 +423,13 @@ class on_infractions(commands.Cog):
                     for role in roles
                     if role is not None
                 ]
-                try:
-                    await staff.remove_roles(*roles)
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                Actions["RemovedRoles"] = [role.id for role in roles]
+                roles = [role for role in roles if role]
+                if roles:
+                    try:
+                        await staff.remove_roles(*roles)
+                    except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                        pass
+                    Actions["RemovedRoles"] = [role.id for role in roles]
             if data.get("staffdatabaseremoval", False) is True:
                 OriginalData = await self.client.db["staff database"].find_one(
                     {"staff_id": staff.id, "guild_id": staff.guild.id}
