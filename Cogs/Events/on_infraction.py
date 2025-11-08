@@ -74,7 +74,7 @@ def InfractItem(data):
         msg_id=data.get("msg_id"),
         webhook_id=data.get("WebhookID"),
         escalated_from=data.get("EscalatedFrom"),
-        skipExec = data.get('skipExec')
+        skipExec=data.get("skipExec"),
     )
 
 
@@ -107,7 +107,7 @@ class InfractionItem:
         msg_id,
         webhook_id,
         escalated_from,
-        skipExec
+        skipExec,
     ):
         self.staff = staff
         self.management = management
@@ -248,7 +248,7 @@ class on_infractions(commands.Cog):
         embeds = [embed]
 
         if Infraction.escalated_from and not Infraction.skipExec:
-            CheckedActions = InfractionData.get('EscalationChain', [])
+            CheckedActions = InfractionData.get("EscalationChain", [])
             Org = Infraction.escalated_from
             action = Infraction.action
 
@@ -372,67 +372,76 @@ class on_infractions(commands.Cog):
                     )
                 except:
                     pass
-        
-    async def InfractionTypes(self, data, staff: discord.Member, manager: discord.Member, config: dict):
-            print(f"[InfractionTypes] START - Guild: {staff.guild.name}, Staff: {staff.display_name}") # temp bc big bug that i cant find out
-        
-            if not data:
-                print("[InfractionTypes] No data provided")
-                return {}
-        
-            Actions = {}
-        
-            try:
-                channel = False
-        
-                if data.get("givenroles"):
-                    print(f"[InfractionTypes] givenroles - {data.get('givenroles')}")
-                    if not staff.guild.chunked:
-                        print("[InfractionTypes] - Chunking guild for given roles")
-                    roles = [
-                        discord.utils.get(staff.guild.roles, id=role)
-                        for role in data.get("givenroles")
-                        if role is not None
-                    ]
-                    print(f"[InfractionTypes] Resolved given roles - {roles}")
-                    if roles:
-                        print(f"[InfractionTypes] About to add roles - {[role.id for role in roles]}")
-        
-                if data.get("changegrouprole") and data.get("grouprole"):
-                    print(f"[InfractionTypes] changegrouprole is True, grouprole: {data.get('grouprole')}")
-        
-                if data.get("removedroles"):
-                    print(f"[InfractionTypes] removedroles - {data.get('removedroles')}")
-                    if not staff.guild.chunked:
-                        print("[InfractionTypes] Chunking guild for removed roles")
-                    roles = [
-                        discord.utils.get(staff.guild.roles, id=role)
-                        for role in data.get("removedroles")
-                        if role is not None
-                    ]
-                    print(f"[InfractionTypes] Resolved removed roles - {roles}")
-        
-                if data.get("staffdatabaseremoval", False):
-                    print(f"[InfractionTypes] staffdatabaseremoval - True")
-        
-                if data.get("channel"):
-                    print(f"[InfractionTypes] Channel override ID: {data.get('channel')}")
-        
-                if channel:
-                    print(f"[InfractionTypes] Channel permissions check")
-                    client = await staff.guild.fetch_member(self.client.user.id)
-                    if channel.permissions_for(client).send_messages is False:
-                        print("[InfractionTypes] Bot cannot send messages in channel")
-                        return
-        
-                print(f"[InfractionTypes] END - Actions - {Actions}")
-                return Actions
-        
-            except Exception as e:
-                print(f"[InfractionTypes] Exception - {e}")
-                traceback.format_exc(e)
-                return Actions
 
+    async def InfractionTypes(self, data, staff: discord.Member, manager: discord.Member, config: dict):
+        if not data:
+            return {}
+        Actions = {}
+
+        try:
+            channel = False
+
+            if data.get("givenroles"):
+                roles = [
+                    discord.utils.get(staff.guild.roles, id=role)
+                    for role in data.get("givenroles")
+                    if role is not None
+                ]
+                if roles:
+                    try:
+                        await staff.add_roles(*roles)
+                    except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                        pass
+                    Actions["AddedRoles"] = [role.id for role in roles]
+
+            if data.get("changegrouprole") and data.get("grouprole"):
+                from utils.roblox import UpdateMembership
+                try:
+                    await UpdateMembership(
+                        user=staff,
+                        role=data.get("grouprole"),
+                        author=manager,
+                        config=config,
+                    )
+                except Exception:
+                    pass
+                Actions["ChangedGroupRole"] = True
+
+            if data.get("removedroles"):
+                roles = [
+                    discord.utils.get(staff.guild.roles, id=role)
+                    for role in data.get("removedroles")
+                    if role is not None
+                ]
+                if roles:
+                    try:
+                        await staff.remove_roles(*roles)
+                    except (discord.Forbidden, discord.HTTPException, discord.NotFound):
+                        pass
+                    Actions["RemovedRoles"] = [role.id for role in roles]
+
+            if data.get("staffdatabaseremoval", False) is True:
+                OriginalData = await self.client.db["staff database"].find_one(
+                    {"staff_id": staff.id, "guild_id": staff.guild.id}
+                )
+                await self.client.db["staff database"].delete_one(
+                    {"staff_id": staff.id, "guild_id": staff.guild.id}
+                )
+                Actions["DbRemoval"] = OriginalData
+
+            if data.get("channel"):
+                channel = await staff.guild.fetch_channel(data.get("channel"))
+                Actions["Channel"] = data.get("channel")
+
+            if channel:
+                client = await staff.guild.fetch_member(self.client.user.id)
+                if channel.permissions_for(client).send_messages is False:
+                    return
+
+            return Actions
+
+        except Exception:
+            return Actions
 
 
 class InfractionIssuer(discord.ui.View):
