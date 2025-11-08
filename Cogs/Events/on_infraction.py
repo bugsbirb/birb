@@ -391,12 +391,11 @@ class on_infractions(commands.Cog):
                         for role in roles
                         if role is not None
                     ]
-                    roles = [role for role in roles if role]
                     if roles:
                         try:
                             await staff.add_roles(*roles)
                         except (discord.Forbidden, discord.HTTPException, discord.NotFound):
-                            pass
+                            print("[on_infraction] Unable to add givenroles.")
                         Actions["AddedRoles"] = [role.id for role in roles]
             if data.get("changegrouprole") and data.get("grouprole"):
                 from utils.roblox import UpdateMembership
@@ -422,13 +421,12 @@ class on_infractions(commands.Cog):
                     for role in roles
                     if role is not None
                 ]
-                roles = [role for role in roles if role]
                 roles = [role for role in roles if role in staff.roles]
                 if roles:
                     try:
                         await staff.remove_roles(*roles)
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
-                        pass
+                            print("[on_infraction] Unable to add removedroles.")
                     Actions["RemovedRoles"] = [role.id for role in roles]
                     
             if data.get("staffdatabaseremoval", False) is True:
@@ -450,8 +448,9 @@ class on_infractions(commands.Cog):
                     return
 
             return Actions
-        except:
-            pass
+        except Exception as e:
+            traceback.format_exc(e)
+            return Actions
 
 
 class InfractionIssuer(discord.ui.View):
