@@ -373,7 +373,7 @@ class on_infractions(commands.Cog):
                 except:
                     pass
         
-        async def InfractionTypes(self, data, staff: discord.Member, manager: discord.Member, config: dict):
+    async def InfractionTypes(self, data, staff: discord.Member, manager: discord.Member, config: dict):
             print(f"[InfractionTypes] START - Guild: {staff.guild.name}, Staff: {staff.display_name}") # temp bc big bug that i cant find out
         
             if not data:
