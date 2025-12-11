@@ -446,8 +446,8 @@ class Modmail(commands.Cog):
                     ephemeral=True,
                 )
                 return
-        except Exception as e:
-            traceback.print_exc(e)
+        except Exception:
+            traceback.print_exc() # same here as config and modmail
 
     @modmail.command(description="Close a modmail channel.")
     @app_commands.describe(reason="The reason for closing the modmail channel.")

@@ -86,7 +86,7 @@ class ConfigMenu(discord.ui.Select):
                 name=f"{interaction.guild.name}", icon_url=interaction.guild.icon
             )
             embed.set_thumbnail(url=interaction.guild.icon)
-            embed.description = "> This is where you can toggle your server's modules! If you wanna know more about what these modules do head to the [documentation](https:/docs.astrobirb.dev)"
+            embed.description = "> This is where you can toggle your server's modules! If you wanna know more about what these modules do head to the [documentation](https://docs.astrobirb.dev)"
 
             view.add_item(
                 ModuleToggle(
@@ -214,10 +214,10 @@ class ConfigMenu(discord.ui.Select):
                         interaction.user,
                     )
                 )
-            except Exception as e:
+            except Exception:
                 import traceback
 
-                print(traceback.format_exc(e))
+                print(traceback.format_exc()) # should take no arguments? same in modmail
         elif selection == "Forums":
             from Cogs.Configuration.Components.Forums import ForumsOptions, ForumsEmbed
 
