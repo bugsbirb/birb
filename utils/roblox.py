@@ -354,7 +354,7 @@ async def UpdateMembership(
                 print(
                     f"[UpdateMembership] Failed to update role. Status: {response.status}"
                 )
-                return 404
+                return response.status
 
 
 # /v1/users

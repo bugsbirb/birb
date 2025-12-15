@@ -301,10 +301,14 @@ class Link(commands.Cog):
         update = await UpdateMembership(
             roblox_id=RobloxUser[0].get("id"), author=ctx.author, config=c, role=role
         )
-        if update == 404:
+        if update == 401:
             return await ctx.send(
                 f"{no} **{ctx.author.display_name},** you don't have permission to update this user to that role. Make sure you actually have permission to do this.",
                 ephemeral=True,
+            )
+        elif update != 200:
+            return await ctx.send(
+                f"{no} **{ctx.author.display_name},** internal error. HTTP CODE: {update}",
             )
         await ctx.send(
             f"{tick} **{ctx.author.name},** successfully updated members role."
