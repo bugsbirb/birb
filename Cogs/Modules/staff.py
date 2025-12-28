@@ -30,6 +30,7 @@ from utils.HelpEmbeds import (
     Support,
     ModuleNotSetup,
     NotYourPanel,
+    NoPermissionChannel,
 )
 
 
@@ -171,7 +172,7 @@ class StaffManage(discord.ui.View):
     )
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -187,7 +188,7 @@ class StaffManage(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -201,7 +202,7 @@ class StaffManage(discord.ui.View):
     )
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -216,7 +217,7 @@ class StaffManage(discord.ui.View):
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
         staff_id = self.staff_id
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -347,16 +348,30 @@ class quota(commands.Cog):
                     )
         embed.description = description
         if ctx.interaction:
-            msg = await ctx.channel.send(
-                embed=embed, allowed_mentions=discord.AllowedMentions().none()
-            )
+            try:
+                msg = await ctx.channel.send(
+                    embed=embed, allowed_mentions=discord.AllowedMentions().none()
+                )
+            except (discord.Forbidden, discord.HTTPException):
+                await ctx.send(
+                    embed=NoPermissionChannel(ctx.channel if ctx.channel else 0),
+                    view=Support(),
+                )
+                return
             await ctx.send(f"{tick} successfully sent the staff list.", ephemeral=True)
         else:
-            await ctx.message.delete()
-            msg = await ctx.send(
-                embed=embed, allowed_mentions=discord.AllowedMentions().none()
-            )
+            try:
 
+                await ctx.message.delete()
+                msg = await ctx.send(
+                    embed=embed, allowed_mentions=discord.AllowedMentions().none()
+                )
+            except (discord.Forbidden, discord.HTTPException):
+                await ctx.send(
+                    embed=NoPermissionChannel(ctx.channel if ctx.channel else 0),
+                    view=Support(),
+                )
+                return
         await self.client.db["Active Staff List"].update_one(
             {"guild_id": ctx.guild.id},
             {"$set": {"msg": msg.id, "channel_id": ctx.channel.id}},
@@ -641,7 +656,7 @@ class quota(commands.Cog):
         failedembed.description = failedembed.description[:4096]
         loaembed.description = loaembed.description[:4096]
         passedembed.description = passedembed.description[:4096]
-        
+
         await msg.edit(embeds=[passedembed, loaembed, failedembed])
 
     def GetQuota(self, member: discord.Member, config: dict) -> int:
@@ -1548,7 +1563,7 @@ class ArmFire(discord.ui.View):
     @discord.ui.button(label="Arm", disabled=False)
     async def Arm(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -1561,7 +1576,7 @@ class ArmFire(discord.ui.View):
     @discord.ui.button(label="Reset", disabled=True, style=discord.ButtonStyle.red)
     async def Fire(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user.id != self.author.id:
-             
+
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
