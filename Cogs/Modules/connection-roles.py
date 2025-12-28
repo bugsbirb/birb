@@ -56,7 +56,7 @@ class ConnectionRoles(commands.Cog):
                     if Parent in member.roles:
                         if Child not in member.roles:
                             try:
-                                await member.add_roles(Child)
+                                await member.add_roles(Child, reason=f"[Connection Roles] Added {Child.name} to {member.display_name}.")
                                 Updated += 1
                                 print(
                                     f"[Connection Roles] Added {Child.name} to {member.display_name}."

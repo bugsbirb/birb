@@ -469,7 +469,7 @@ class SuspensionPanel(discord.ui.View):
                         view=None,
                     )
                     try:
-                        await member.add_roles(*roles_to_return)
+                        await member.add_roles(*roles_to_return, reason=f"Suspension voided by {interaction.user.display_name}")
                         await interaction.edit_original_response(
                             content=f"{tick} Suspension has been voided. Roles have been restored.",
                             view=None,

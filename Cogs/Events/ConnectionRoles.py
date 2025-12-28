@@ -25,7 +25,7 @@ class ConnectionRolesEvent(commands.Cog):
                 child_role = after.guild.get_role(child_role_id)
                 if child_role:
                     try:
-                        await after.add_roles(child_role)
+                        await after.add_roles(child_role, reason="Connection Roles updated")
                     except discord.Forbidden:
                         print("[⚠️] I don't have permission to add roles to this user")
                         return
@@ -47,7 +47,7 @@ class ConnectionRolesEvent(commands.Cog):
 
                 if not has_other_parent_role and child_role:
                     try:
-                        await after.remove_roles(child_role)
+                        await after.remove_roles(child_role, reason="Connection Roles updated")
                     except discord.Forbidden:
                         print(
                             "[⚠️] I don't have permission to remove roles from this user"

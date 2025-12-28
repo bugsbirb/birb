@@ -551,7 +551,7 @@ class on_leave(commands.Cog):
                             role = G.get_role(int(C.get("LOA", {}).get("role", 0)))
 
                             if role and member:
-                                await member.add_roles(role, reason="Leave Accepted")
+                                await member.add_roles(role, reason=f"Leave Accepted initiated by {author.name}")
                         except (discord.NotFound, discord.HTTPException):
                             pass
                 try:

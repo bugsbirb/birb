@@ -11,16 +11,6 @@ from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
 
 logger = logging.getLogger(__name__)
 
-MONGO_URL = os.getenv("MONGO_URL")
-
-
-def replace_variables(message, replacements):
-    for placeholder, value in replacements.items():
-        if value is not None:
-            message = str(message).replace(placeholder, str(value))
-        else:
-            message = str(message).replace(placeholder, "")
-    return message
 
 
 def DefaultEmbed(data, staff, manager):
@@ -106,6 +96,7 @@ async def PromotionSystem(
     settings: dict,
     guild: discord.Guild,
     member: discord.Member,
+    manager: discord.Member
 ):
     if not settings.get("Module Options", {}).get("autorole", True):
         return await self.db["promotions"].find_one({"_id": PromotionData.get("_id")})
@@ -124,7 +115,7 @@ async def PromotionSystem(
         if not newrole:
             return
         try:
-            await member.add_roles(newrole, reason="Staff Promotion")
+            await member.add_roles(newrole, reason=f"Staff Promotion initiated by {manager.name}")
         except (discord.Forbidden, discord.NotFound, discord.HTTPException):
             pass
 
@@ -172,7 +163,7 @@ async def PromotionSystem(
             if SkipRole and SkipRole in SortedRoles:
                 try:
                     await member.add_roles(
-                        SkipRole, reason=f"Staff Promotion (Skipped) in {Department}"
+                        SkipRole, reason=f"Staff Promotion (Skipped) in {Department} initiated by {manager.name}"
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -181,7 +172,7 @@ async def PromotionSystem(
                     if Role in MemberRoles and Role != SkipRole:
                         try:
                             await member.remove_roles(
-                                Role, reason=f"Replaced by {SkipRole.name}"
+                                Role, reason=f"Replaced by {SkipRole.name} initiated by {manager.name}"
                             )
                         except (discord.Forbidden, discord.HTTPException):
                             pass
@@ -198,7 +189,7 @@ async def PromotionSystem(
                 NextRole = SortedRoles[Index + 1]
                 try:
                     await member.add_roles(
-                        NextRole, reason=f"Staff Promotion in {Department}"
+                        NextRole, reason=f"Staff Promotion in {Department} initiated by {manager.name}"
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -214,7 +205,7 @@ async def PromotionSystem(
                 FirstRole = SortedRoles[0]
                 try:
                     await member.add_roles(
-                        FirstRole, reason=f"Staff Promotion in {Department}"
+                        FirstRole, reason=f"Staff Promotion in {Department} initiated by {manager.name}"
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -257,7 +248,7 @@ async def PromotionSystem(
 
             if SkipRole and SkipRole in SortedRoles:
                 try:
-                    await member.add_roles(SkipRole, reason="Staff Promotion (Skipped)")
+                    await member.add_roles(SkipRole, reason=f"Staff Promotion (Skipped) initiated by {manager.name}")
                 except (discord.Forbidden, discord.HTTPException):
                     pass
 
@@ -281,7 +272,7 @@ async def PromotionSystem(
             if CurrentRole in MemberRoles and Index + 1 < len(SortedRoles):
                 NextRole = SortedRoles[Index + 1]
                 try:
-                    await member.add_roles(NextRole, reason="Staff Promotion")
+                    await member.add_roles(NextRole, reason=f"Staff Promotion initiated by {manager.name}")
                 except (discord.Forbidden, discord.HTTPException):
                     pass
                 try:
@@ -295,7 +286,7 @@ async def PromotionSystem(
             if not any(role in MemberRoles for role in SortedRoles):
                 FirstRole = SortedRoles[0]
                 try:
-                    await member.add_roles(FirstRole, reason="Staff Promotion")
+                    await member.add_roles(FirstRole, reason=f"Staff Promotion initiated by {manager.name}")
                 except (discord.Forbidden, discord.HTTPException):
                     pass
 
@@ -382,7 +373,7 @@ class on_promotion(commands.Cog):
         )
         embed = discord.Embed()
         PromotionData = await PromotionSystem(
-            self.client, PromotionData, Settings, guild, staff
+            self.client, PromotionData, Settings, guild, staff, manager
         )
         if PromotionData:
             Infraction = Promotion(PromotionData)
@@ -400,6 +391,10 @@ class on_promotion(commands.Cog):
                 "{author.avatar}": (
                     manager.display_avatar.url if manager.display_avatar else None
                 ),
+                "{notes}": Infraction.notes if Infraction.notes else "",
+                "{promotion.id}": Infraction.random_string if hasattr(Infraction, "random_string") else "",
+                "{guild.name}": guild.name,
+                "{guild.id}": str(guild.id),
             }
             embed = await DisplayEmbed(
                 data=custom, user=staff, replacements=replacements

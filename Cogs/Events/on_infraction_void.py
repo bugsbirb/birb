@@ -21,6 +21,10 @@ class on_infraction_void(commands.Cog):
             staff = await guild.fetch_member(int(inf.get("staff")))
         except (discord.NotFound, discord.HTTPException, discord.NotFound):
             return
+        try:
+            manager = await guild.fetch_member(int(inf.get("management")))
+        except (discord.NotFound, discord.HTTPException, discord.NotFound):
+            return
         channel = None
         MsgID = None
         Jump = inf.get("jump_url")
@@ -45,13 +49,13 @@ class on_infraction_void(commands.Cog):
 
             if Add:
                 try:
-                    await staff.remove_roles(*Add)
+                    await staff.remove_roles(*Add, reason=f"Infraction void initated by {manager.name}.")
                 except:
                     pass
 
             if Remove:
                 try:
-                    await staff.add_roles(*Remove)
+                    await staff.add_roles(*Remove, reason=f"Infraction void initated by {manager.name}.")
                 except:
                     pass
 

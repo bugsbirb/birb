@@ -389,7 +389,7 @@ class on_infractions(commands.Cog):
                 ]
                 if roles:
                     try:
-                        await staff.add_roles(*roles)
+                        await staff.add_roles(*roles, reason=f"Infraction Types initated by {manager.name}.")
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["AddedRoles"] = [role.id for role in roles]
@@ -415,7 +415,7 @@ class on_infractions(commands.Cog):
                 ]
                 if roles:
                     try:
-                        await staff.remove_roles(*roles)
+                        await staff.remove_roles(*roles, reason=f"Infraction Types initated by {manager.name}.")
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["RemovedRoles"] = [role.id for role in roles]

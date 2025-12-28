@@ -82,7 +82,7 @@ class EmptyCog(commands.Cog):
 
                     if roles_to_return:
                         try:
-                            await member.add_roles(*roles_to_return)
+                            await member.add_roles(*roles_to_return, reason="Suspension roles returned.")
                         except discord.Forbidden:
                             print(
                                 f"[⚠️] Failed to restore roles to {member.name} in {guild.name}"
