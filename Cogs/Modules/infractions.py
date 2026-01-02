@@ -916,7 +916,6 @@ class UpdateInfraction(discord.ui.Modal):
             self.add_item(self.notes)
         elif type == "expiration":
             self.exp = discord.ui.TextInput(
-                default=infraction.get("expiration"),
                 label="Expiration",
                 placeholder="1d (1 day), 2h (2 hours), etc.",
             )
