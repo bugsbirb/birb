@@ -10,7 +10,7 @@ import string
 from utils.permissions import has_admin_role, has_staff_role
 from utils.Module import ModuleCheck
 from utils.autocompletes import DepartmentAutocomplete, RoleAutocomplete
-
+from utils.format import IsSeperateBot
 # TODO: Merge the 3 commands together some how, extremely inefficient, and it's hard to update.
 
 
@@ -735,12 +735,20 @@ class promo(commands.Cog):
             )
             return
 
-        msg = await ctx.send(
-            embed=discord.Embed(
-                description="<a:astroloading:1245681595546079285>",
-                color=discord.Color.dark_embed(),
+        if IsSeperateBot():
+            msg = await ctx.send(
+                embed=discord.Embed(
+                    description="Loading...", color=discord.Color.dark_embed()
+                )
             )
-        )
+
+        else:
+            msg = await ctx.send(
+                embed=discord.Embed(
+                    description="<a:astroloading:1245681595546079285>",
+                    color=discord.Color.dark_embed(),
+                )
+            )
 
         embeds = []
         embed = discord.Embed(color=discord.Color.dark_embed())
