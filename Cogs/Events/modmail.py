@@ -20,7 +20,7 @@ async def Reply(
     try:
         Channel = await Guild.fetch_channel(int(ModmailData.get("channel_id", 0)))
     except (discord.NotFound, discord.HTTPException):
-        traceback.format_exc(e)
+        traceback.format_exc() # same here
         return await self.db["modmail"].delete_one({"user_id": message.author.id})
     if not Channel:
         return await message.add_reaction("⚠️")
@@ -44,12 +44,12 @@ async def Reply(
                     f"<:messagereceived:1201999712593383444> {message.author.name}: {message.content}",
                     files=files,
                 )
-            except Exception as e:
+            except Exception:
                 return await message.add_reaction("⚠️")
             return await message.add_reaction("📨")
     try:
         await Channel.send(embed=embed, files=files)
-    except Exception as e:
+    except Exception:
         print(e)
         return await message.add_reaction("⚠️")
     return await message.add_reaction("📨")
@@ -646,8 +646,8 @@ class ModmailEvent(commands.Cog):
                     )
 
                     await Message.edit(view=view, embed=embed, content=None)
-                except Exception as e:
-                    traceback.format_exc(e)
+                except Exception:
+                    traceback.format_exc() # same here again
             else:
                 Config = await self.client.config.find_one(
                     {"_id": Modmail.get("guild_id")}
