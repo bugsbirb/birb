@@ -1,7 +1,11 @@
 from discord.ext import commands
 import time
 import logging
+
 logger = logging.getLogger(__name__)
+import os
+from sentry_sdk import metrics
+
 
 class analyticss(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -15,7 +19,7 @@ class analyticss(commands.Cog):
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
 
         prfx = f"[🤖] {prfx}"
-        await self.client.db['analytics'].update_one(
+        await self.client.db["analytics"].update_one(
             {}, {"$inc": {f"{ctx.command.qualified_name}": 1}}, upsert=True
         )
 
@@ -26,8 +30,17 @@ class analyticss(commands.Cog):
 
         logger.info(
             prfx
-            + f" Command '{command}' executed in {execution_duration} seconds by @{(ctx.author)} at {ctx.guild}"
+            + f" Command '{command}' executed in {execution_duration} seconds by @{(ctx.author)} at {ctx.guild}",
+            extra={
+                "command": ctx.command.qualified_name,
+                "user": str(ctx.author),
+                "guild": str(ctx.guild),
+                "channel": str(ctx.channel),
+                "duration": execution_duration,
+            },
         )
+        if os.getenv("SENTRY_URL", None):
+            metrics.incr("cmdExecuted", tags={"command": ctx.command.qualified_name})
 
 
 async def setup(client: commands.Bot) -> None:
