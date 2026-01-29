@@ -12,7 +12,7 @@ fuzzywuzzy
 fastapi
 uvicorn
 memory_profiler 
-sentry_sdk
+sentry-sdk>=2.44.0
 aioboto3
 pillow
 ffmpeg-python
