@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 import discord
 from utils import Paginator
 import os
-
+import random
 
 def DefaultTypes():
     return [
@@ -13,6 +13,26 @@ def DefaultTypes():
         "Demotion",
         "Termination",
     ]
+
+
+def Replacements(server: discord.Guild, author: discord.Member,  channel=discord.TextChannel):
+    timestamp = datetime.utcnow().timestamp()
+    return {
+        "{author.mention}": author.mention if author else "",
+        "{author.name}": author.display_name if author else "",
+        "{author.id}": str(author.id) if author else "",
+        "{timestamp}": f"<t:{int(timestamp)}:F>" if timestamp else "",
+        "{guild.name}": server.name if server else "",
+        "{guild.id}": str(server.id) if server else "",
+        "{guild.owner.mention}": server.owner.mention if server and server.owner else "",
+        "{guild.owner.name}": server.owner.display_name if server and server.owner else "",
+        "{guild.owner.id}": str(server.owner.id) if server and server.owner else "",
+        "{random}": random.randint(1, 1000000),
+        "{guild.members}": str(server.member_count) if server else "",
+        "{channel.name}": channel.name if channel else "",
+        "{channel.id}": str(channel.id) if channel else "",
+        "{channel.mention}": channel.mention if channel else "",
+    }
 
 
 def IsSeperateBot():
@@ -57,7 +77,13 @@ async def PaginatorButtons(extra: list = None):
     return paginator
 
 
-async def strtotime(duration: str, *, back: bool = False, Interger: bool = False, DifferentNow: bool = False):
+async def strtotime(
+    duration: str,
+    *,
+    back: bool = False,
+    Interger: bool = False,
+    DifferentNow: bool = False,
+):
 
     now = datetime.now() if not DifferentNow else DifferentNow
     units = {
