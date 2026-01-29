@@ -36,9 +36,10 @@ class On_suggestions(commands.Cog):
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
-            return print(
+            logger.error(
                 f"[🏠 on_feedback] @{guild.name} the feedback channel can't be found. [1]"
             )
+            return
         if channel is None:
             logging.warning(
                 f"[🏠 on_feedback] @{guild.name} the feedback channel can't be found. [2]"
@@ -242,7 +243,7 @@ class Voting(discord.ui.View):
             from utils.permissions import has_admin_role
 
             if not await has_admin_role(interaction, ephemeral=True):
-                print("check")
+                logger.debug("check")
                 return
 
             await interaction.response.defer(ephemeral=True)
@@ -269,7 +270,7 @@ class Voting(discord.ui.View):
                 ephemeral=True,
             )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
 
 
 class ManageSuggestion(discord.ui.Select):

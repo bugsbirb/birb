@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 import asyncio
 from utils.emojis import *
-
+import logging
+logger = logging.getLogger(__name__)
 from utils.permissions import has_staff_role
 
 class ForumCreaton(commands.Cog):
@@ -62,9 +63,9 @@ class ForumCreaton(commands.Cog):
             try:
                 await msg.pin()
             except discord.Forbidden:
-                print("[ERROR] Unable to pin message.")
+                logger.warning("[ERROR] Unable to pin message.")
             except discord.HTTPException:
-                print("[ERROR] Unable to pin message.")
+                logger.warning("[ERROR] Unable to pin message.")
 
 
 class CloseLock(discord.ui.View):

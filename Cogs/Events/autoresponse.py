@@ -6,7 +6,8 @@ import random
 from fuzzywuzzy import fuzz
 from datetime import datetime
 from utils.permissions import premium
-
+import logging
+logger = logging.getLogger(__name__)
 
 class autoresponse(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -94,7 +95,7 @@ class autoresponse(commands.Cog):
                     await message.reply(response_text)
                     break
             except re.error as e:
-                print(f"regex issue: {trigger} - {e}")
+                logger.error(f"regex issue: {trigger} - {e}")
 
     @staticmethod
     async def replace_variables(message, replacements):

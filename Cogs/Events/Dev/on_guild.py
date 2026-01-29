@@ -6,6 +6,9 @@ from utils.emojis import *
 from Cogs.Modules.promotions import SyncServer
 from datetime import datetime
 
+import logging
+logger = logging.getLogger(__name__)
+
 PrimaryServers = [int(x) for x in os.getenv("DEFAULT_ALLOWED_SERVERS").split(",")] if os.getenv("DEFAULT_ALLOWED_SERVERS") else []
 class GuildJoins(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -85,11 +88,11 @@ class GuildJoins(commands.Cog):
                             f"🎉 Thank you for adding **Astro Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1163171628050563153> Guild `#{len(self.client.guilds)}`"
                         )
                     except discord.Forbidden:
-                        print(
+                        logger.warning(
                             "[⚠️] I couldn't DM the owner of the guild for the guild join."
                         )
             except discord.Forbidden:
-                print("[⚠️] I couldn't DM the owner of the guild for the guild join.")
+                logger.warning("[⚠️] I couldn't DM the owner of the guild for the guild join.")
 
     async def LogLeave(self, guild: discord.Guild):
 

@@ -13,7 +13,10 @@ from utils.emojis import *
 from utils.Module import ModuleCheck
 from utils.permissions import *
 from datetime import timedelta, datetime
+import logging
 import sentry_sdk
+
+logger = logging.getLogger(__name__)
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
@@ -55,7 +58,7 @@ class activityauto(commands.Cog):
                 channel = self.client.get_channel(data.get("channel_id"))
                 if not channel:
                     if IsGod:
-                        print("[]")
+                        logger.debug("[]")
                     continue
 
                 days = [
@@ -98,7 +101,7 @@ class activityauto(commands.Cog):
                     {"$set": {"nextdate": NextDate, "lastposted": datetime.now()}},
                 )
 
-                print(f"[⏰] Sending Activity @{guild.name} next post is {NextDate}!")
+                logger.info(f"[⏰] Sending Activity @{guild.name} next post is {NextDate}!")
 
                 result = (
                     await self.client.qdb["messages"]
@@ -106,7 +109,7 @@ class activityauto(commands.Cog):
                     .to_list(length=None)
                 )
                 if not result:
-                    print("e")
+                    logger.debug("e")
                     continue
 
                 passed = []
@@ -205,14 +208,14 @@ class activityauto(commands.Cog):
                     view = ResetLeaderboard(failedids)
                     try:
                         await channel.send(embeds=embeds, view=view)
-                        print(f"[Activity Auto] successfully sent @{guild.name}")
+                        logger.info(f"[Activity Auto] successfully sent @{guild.name}")
                     except discord.Forbidden:
-                        print("[ERROR] Cannot send to channel.")
+                        logger.error("[ERROR] Cannot send to channel.")
                 else:
-                    print("[NOTFOUND] Channel not found")
+                    logger.warning("[NOTFOUND] Channel not found")
 
             except Exception as e:
-                print(f"[QUOTA ERROR] {e}")
+                logger.error(f"[QUOTA ERROR] {e}")
                 continue
 
         del autoactivityresult

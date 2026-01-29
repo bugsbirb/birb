@@ -7,12 +7,15 @@ from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
 import pymongo
 
 import typing
+import logging
 from Cogs.Events.on_ticket import TicketPermissions
 from discord import app_commands
 import string
 import random
 from utils.permissions import has_admin_role, check_admin_and_staff, has_staff_role
 import asyncio
+
+logger = logging.getLogger(__name__)
 from utils.Module import ModuleCheck
 from utils.HelpEmbeds import ModuleNotEnabled, Support, ModuleNotSetup, BotNotConfigured
 from utils.autocompletes import CloseReason
@@ -281,7 +284,7 @@ class Debug(discord.ui.View):
             {"UserID": interaction.user.id, "closed": None}
         )
         if New:
-            print(f"[Debug Issue] Ticket {R.get('_id')} has been purged.")
+            logger.debug(f"[Debug Issue] Ticket {R.get('_id')} has been purged.")
             await interaction.client.db["Tickets"].delete_one({"_id": R.get("_id")})
 
 

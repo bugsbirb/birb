@@ -3,8 +3,10 @@ from discord.ext import commands, tasks
 import os
 from utils.emojis import *
 from datetime import datetime
-
+import logging
 import sentry_sdk
+
+logger = logging.getLogger(__name__)
 
 
 environment = os.getenv("ENVIRONMENT")
@@ -21,7 +23,7 @@ class EmptyCog(commands.Cog):
     @sentry_sdk.trace()
     async def check_suspensions(self):
 
-        print("[👀] Checking suspensions")
+        logger.info("[👀] Checking suspensions")
         current_time = datetime.now()
         if environment == "custom":
             filter = {
@@ -71,7 +73,7 @@ class EmptyCog(commands.Cog):
                 }
 
                 await suspensions.delete_one(delete_filter)
-                print(f"[Suspensions] @{user.name} suspension has concluded.")
+                logger.info(f"[Suspensions] @{user.name} suspension has concluded.")
 
                 roles_removed = request.get("roles_removed", None)
                 if roles_removed:
@@ -87,7 +89,7 @@ class EmptyCog(commands.Cog):
                         try:
                             await member.add_roles(*roles_to_return, reason="Suspension roles returned.")
                         except discord.Forbidden:
-                            print(
+                            logger.warning(
                                 f"[⚠️] Failed to restore roles to {member.name} in {guild.name}"
                             )
                             continue
@@ -98,7 +100,7 @@ class EmptyCog(commands.Cog):
                             f"{tick} Your suspension in **@{guild.name}** has ended."
                         )
                     except discord.Forbidden:
-                        print(
+                        logger.warning(
                             f"[⚠️] Failed to send message to {user.name} in {guild.name}"
                         )
                         continue

@@ -1,4 +1,5 @@
 import discord
+import logging
 
 from utils.emojis import *
 
@@ -6,6 +7,8 @@ from utils.emojis import *
 from utils.permissions import premium
 from Cogs.Modules.commands import SyncCommand, Unsync
 from utils.HelpEmbeds import NoPremium, Support, NotYourPanel
+
+logger = logging.getLogger(__name__)
 
 
 class CustomCommands(discord.ui.Select):
@@ -335,7 +338,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
         {"$set": data},
         upsert=True,
     )
-    print(f"Modified count: {result.modified_count}, Upserted ID: {result.upserted_id}")
+    logger.debug(f"Modified count: {result.modified_count}, Upserted ID: {result.upserted_id}")
 
     await SyncCommand(interaction.client, datad.get("name"), interaction.guild.id)
 

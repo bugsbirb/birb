@@ -3,7 +3,10 @@ from discord import app_commands
 from utils.format import DefaultTypes
 import datetime
 import typing
+import logging
+import logging
 
+logger = logging.getLogger(__name__)
 
 Current = {}
 
@@ -100,7 +103,7 @@ async def ConnectionRoles(
 
         return choices
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 
 async def infractiontypes(interaction: discord.Interaction, current: str):

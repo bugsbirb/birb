@@ -4,6 +4,9 @@ import discord
 import os
 from discord.ext import commands
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 MONGO_URL = os.getenv("MONGO_URL")
 client = AsyncIOMotorClient(MONGO_URL)
@@ -23,15 +26,15 @@ async def GetValidToken(user: discord.User = None, server: int = None):
         user_result = await Tokens.find_one({"server": str(server)})
 
     if not user_result:
-        print("[GetValidToken] No token found.")
+        logger.debug("[GetValidToken] No token found.")
         return None
 
     token = user_result.get("access_token")
     token_expiration = user_result.get("token_expiration")
     if not token or not token_expiration or time.time() > token_expiration:
-        print("[Oauth Refresh] Token expired, refreshing...")
+        logger.debug("[Oauth Refresh] Token expired, refreshing...")
         if await RefreshToken(user, server) != 0:
-            print("[Oauth Refresh] Token refresh failed.")
+            logger.debug("[Oauth Refresh] Token refresh failed.")
             return None
 
         user_result = (
@@ -51,7 +54,7 @@ async def Fallback(user: discord.User):
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
                 data = await response.json()
-                print("[Fallback] Successfully retrieved Bloxlink data.")
+                logger.info("[Fallback] Successfully retrieved Bloxlink data.")
                 return data.get("resolved")
     return None
 
@@ -63,7 +66,7 @@ async def GetUser(user: discord.User):
         user_info = await GetInfo(token)
 
     if not user_info:
-        print("[Unknown Token] Falling back to Bloxlink.")
+        logger.info("[Unknown Token] Falling back to Bloxlink.")
         user_info = await Fallback(user)
 
     return user_info
@@ -82,7 +85,7 @@ async def GetInfo(token: str = None):
 async def GetGroup2(group: int, user: discord.User):
     result = await Tokens.find_one({"discord_id": str(user.id)})
     if not result:
-        print("[GetGroup] No token found in DB.")
+        logger.debug("[GetGroup] No token found in DB.")
         return None
 
     token = await GetValidToken(user=user)
@@ -91,45 +94,45 @@ async def GetGroup2(group: int, user: discord.User):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                print("[GetGroup2] Successfully retrieved group data.")
+                logger.info("[GetGroup2] Successfully retrieved group data.")
                 return await response.json()
             else:
-                print(
+                logger.error(
                     f"[GetGroup2] Failed to fetch group data. Status: {response.status}"
                 )
                 return None
 
 
 async def GetGroup(server):
-    print(f"[GetGroup] Fetching token for server {server}")
+    logger.debug(f"[GetGroup] Fetching token for server {server}")
 
     result = await Tokens.find_one({"server": str(server)})
     if not result:
-        print("[GetGroup] No token found in DB.")
+        logger.debug("[GetGroup] No token found in DB.")
         return None
 
     token = await GetValidToken(server=server)
 
     if not token:
-        print("[GetGroup] Failed to retrieve valid token.")
+        logger.debug("[GetGroup] Failed to retrieve valid token.")
         return None
 
     group = result.get("group")
     if not group:
-        print("[GetGroup] No group ID found.")
+        logger.debug("[GetGroup] No group ID found.")
         return None
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{group}"
     headers = {"Authorization": f"Bearer {token}"}
 
-    print(f"[GetGroup] Making request to {url}")
+    logger.debug(f"[GetGroup] Making request to {url}")
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                print("[GetGroup] Successfully retrieved group data.")
+                logger.info("[GetGroup] Successfully retrieved group data.")
                 return await response.json()
             else:
-                print(
+                logger.error(
                     f"[GetGroup] Failed to fetch group data. Status: {response.status}"
                 )
                 return None
@@ -143,12 +146,12 @@ async def RefreshToken(user: discord.User = None, server=None):
     )
 
     if not result:
-        print("[RefreshToken] No token found in DB.")
+        logger.debug("[RefreshToken] No token found in DB.")
         return 1
 
     refresh_token = result.get("refresh_token")
     if not refresh_token:
-        print("[RefreshToken] No refresh token available.")
+        logger.debug("[RefreshToken] No refresh token available.")
         return 2
 
     token_expiration = result.get("token_expiration")
@@ -168,7 +171,7 @@ async def RefreshToken(user: discord.User = None, server=None):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data=data) as response:
             if response.status != 200:
-                print(
+                logger.error(
                     f"[RefreshToken] Refresh failed: {response.status} {await response.json()}"
                 )
                 return 3
@@ -176,7 +179,7 @@ async def RefreshToken(user: discord.User = None, server=None):
             New = await response.json()
             expires_in = New.get("expires_in", 899)
 
-            print(
+            logger.info(
                 f"[RefreshToken] Token refreshed. New Expiration: {time.time() + expires_in}"
             )
 
@@ -197,7 +200,7 @@ async def RefreshToken(user: discord.User = None, server=None):
 async def GetRequest(group_id: int, roblox_id: int, user: discord.User):
     token = await GetValidToken(user=user)
     if not token:
-        print("[GetRequest] No valid token found.")
+        logger.debug("[GetRequest] No valid token found.")
         return None
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{group_id}/join-requests?filter=user == 'users/{roblox_id}'"
@@ -206,10 +209,10 @@ async def GetRequest(group_id: int, roblox_id: int, user: discord.User):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                print("[GetRequest] Successfully retrieved join request data.")
+                logger.info("[GetRequest] Successfully retrieved join request data.")
                 return await response.json()
             else:
-                print(
+                logger.error(
                     f"[GetRequest] Failed to fetch join request data. Status: {response.status}"
                 )
                 return None
@@ -218,7 +221,7 @@ async def GetRequest(group_id: int, roblox_id: int, user: discord.User):
 async def GetRequests(interaction: discord.Interaction):
     token = await GetValidToken(user=interaction.user)
     if not token:
-        print("[GetRequests] No valid token found.")
+        logger.debug("[GetRequests] No valid token found.")
         return None
     result = await interaction.client.config.find_one({"_id": interaction.guild.id})
     if not result.get("groups"):
@@ -233,13 +236,13 @@ async def GetRequests(interaction: discord.Interaction):
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                print("[GetRequests] Successfully retrieved join requests.")
+                logger.info("[GetRequests] Successfully retrieved join requests.")
                 resp = await response.json()
 
                 return resp.get("groupJoinRequests", None)
             else:
-                print(await response.json())
-                print(
+                logger.error(await response.json())
+                logger.error(
                     f"[GetRequests] Failed to fetch join requests. Status: {response.status}"
                 )
                 return response.status
@@ -249,7 +252,7 @@ async def GetRequests(interaction: discord.Interaction):
 async def RejectRequest(group_id: int, join_request_id: int, user: discord.User):
     token = await GetValidToken(user=user)
     if not token:
-        print("[RejectRequest] No valid token found.")
+        logger.debug("[RejectRequest] No valid token found.")
         return None
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{str(group_id)}/join-requests/{str(join_request_id)}:decline"
@@ -258,11 +261,11 @@ async def RejectRequest(group_id: int, join_request_id: int, user: discord.User)
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data='{}') as response:
             if response.status == 200:
-                print("[AcceptRequest] Successfully accepted join request.")
+                logger.info("[AcceptRequest] Successfully accepted join request.")
                 return True
             else:
-                print(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
-                print(await response.json())  
+                logger.error(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
+                logger.error(await response.json())  
                 return None
 
 
@@ -270,23 +273,23 @@ async def RejectRequest(group_id: int, join_request_id: int, user: discord.User)
 async def AcceptRequest(group_id: int, join_request_id: int, user: discord.User):
     token = await GetValidToken(user=user)
     if not token:
-        print("[AcceptRequest] No valid token found.")
+        logger.debug("[AcceptRequest] No valid token found.")
         return None
-    print(join_request_id)
-    print(group_id)
+    logger.debug(join_request_id)
+    logger.debug(group_id)
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{str(group_id)}/join-requests/{str(join_request_id)}:accept"
-    print(url)
+    logger.debug(url)
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data='{}') as response:
             if response.status == 200:
-                print("[AcceptRequest] Successfully accepted join request.")
+                logger.info("[AcceptRequest] Successfully accepted join request.")
                 return True
             else:
-                print(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
-                print(await response.json())  
+                logger.error(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
+                logger.error(await response.json())  
                 return None
 
 
@@ -300,18 +303,18 @@ async def UpdateMembership(
 ):
     result = await Tokens.find_one({"discord_id": str(author.id)})
     if not result:
-        print("[UpdateMembership] No token found for author.")
+        logger.debug("[UpdateMembership] No token found for author.")
         return 0
 
     token = await GetValidToken(user=author)
     if not token:
-        print("[UpdateMembership] No access token found.")
+        logger.debug("[UpdateMembership] No access token found.")
         return 2
 
     if user:
         roblox_result = await GetUser(user)
         if not roblox_result:
-            print("[UpdateMembership] No Roblox user info found.")
+            logger.debug("[UpdateMembership] No Roblox user info found.")
             return
         roblox_id = (
             roblox_result.get("roblox", {}).get("id")
@@ -327,14 +330,14 @@ async def UpdateMembership(
         name = "Unknown"
 
     if not roblox_id:
-        print("[UpdateMembership] No Roblox ID provided.")
+        logger.debug("[UpdateMembership] No Roblox ID provided.")
         return None
 
     if not config.get("groups"):
-        print("[UpdateMembership] No group config found.")
+        logger.debug("[UpdateMembership] No group config found.")
         return None
     if not config.get("groups", {}).get("id", None):
-        print("[UpdateMembership] No group ID found in config.")
+        logger.debug("[UpdateMembership] No group ID found in config.")
         return None
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{config.get('groups', {}).get('id', None)}/memberships/{str(roblox_id)}"
@@ -344,14 +347,14 @@ async def UpdateMembership(
     async with aiohttp.ClientSession() as session:
         async with session.patch(url, headers=headers, json=data) as response:
             response_data = await response.json()
-            print(f"[UpdateMembership] Response: {response_data}")
+            logger.debug(f"[UpdateMembership] Response: {response_data}")
             if response.ok:
-                print(
+                logger.info(
                     f"[Updated Membership] {name} role has successfully been changed."
                 )
                 return 200
             else:
-                print(
+                logger.error(
                     f"[UpdateMembership] Failed to update role. Status: {response.status}"
                 )
                 return response.status
@@ -370,10 +373,10 @@ async def FetchUsersByID(ids):
                 if response_data.get("data"):
                     return response_data["data"]
                 else:
-                    print("[FetchRobloxUser] No user data found.")
+                    logger.warning("[FetchRobloxUser] No user data found.")
                     return None
             else:
-                print(
+                logger.error(
                     f"[FetchRobloxUser] Failed to fetch user data. Status: {response.status}"
                 )
                 return None
@@ -392,10 +395,10 @@ async def FetchRobloxUser(roblox):
                 if response_data.get("data"):
                     return response_data["data"]
                 else:
-                    print("[FetchRobloxUser] No user data found.")
+                    logger.warning("[FetchRobloxUser] No user data found.")
                     return None
             else:
-                print(
+                logger.error(
                     f"[FetchRobloxUser] Failed to fetch user data. Status: {response.status}"
                 )
                 return None
@@ -407,12 +410,12 @@ async def GetGroupMembership(
 ):
     token = await GetValidToken(user=author)
     if not token:
-        print("[GetGroupMembership] No valid token found.")
+        logger.debug("[GetGroupMembership] No valid token found.")
         return None
 
     group_id = config.get("groups", {}).get("id", None)
     if not group_id:
-        print("[GetGroupMembership] No group ID found in config.")
+        logger.debug("[GetGroupMembership] No group ID found in config.")
         return None
 
     url = f"https://apis.roblox.com/cloud/v2/groups/{group_id}/memberships?filter=user == 'users/{roblox}'"
@@ -421,10 +424,10 @@ async def GetGroupMembership(
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                print("[GetGroupMembership] Successfully retrieved membership data.")
+                logger.info("[GetGroupMembership] Successfully retrieved membership data.")
                 return await response.json()
             else:
-                print(
+                logger.error(
                     f"[GetGroupMembership] Failed to fetch membership data. Status: {response.status}"
                 )
                 return None

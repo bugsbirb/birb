@@ -5,10 +5,13 @@ from utils.emojis import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import aiohttp
 import re
+import logging
 from utils.patreon import SubscriptionUser
 from utils.format import IsSeperateBot
 from datetime import datetime
 from utils.HelpEmbeds import NotYourPanel
+
+logger = logging.getLogger(__name__)
 
 
 MONGO_URL = os.getenv("MONGO_URL")
@@ -48,10 +51,10 @@ async def Create(name, user: discord.User):
         async with session.post(url, headers=headers, json=data) as response:
             if response.status == 200:
                 Response = await response.json()
-                print(Response)
+                logger.debug(Response)
                 return Response["applicationId"]
             else:
-                print(await response.text())
+                logger.error(await response.text())
                 return None
 
 
@@ -85,7 +88,7 @@ async def GetProjects():
                 data = await r.json()
                 return data
             else:
-                print(await r.text())
+                logger.error(await r.text())
 
                 return None
 
@@ -414,7 +417,7 @@ class Depl(commands.Cog):
                 continue            
             _, _, HasPremium = Z
             if not HasPremium:
-                print(f"Premium expired for user {P.get('user')}")
+                logger.info(f"Premium expired for user {P.get('user')}")
                 for guild_id in P.get("guilds", []):
                     config = await self.client.db["Config"].find_one({"_id": guild_id})
                     if config is not None:
@@ -491,7 +494,7 @@ class Depl(commands.Cog):
                 if Projects:
                     for project in Projects.get("applications", []):
                         if project.get("name") == name:
-                            print(
+                            logger.info(
                                 f"Branding expired for user {B.get('user')} - stopping application {project.get('applicationId')}"
                             )
                             await StopApplication(project.get("applicationId"))
@@ -592,7 +595,7 @@ class Depl(commands.Cog):
                     await after.send(embed=embed)
             if botrole:
                 if botrole in before.roles and botrole in after.roles:
-                    print("[KICKING] Bot Account")
+                    logger.info("[KICKING] Bot Account")
                     await after.kick(reason="Bot account")
                     return
 

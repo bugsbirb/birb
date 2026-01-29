@@ -1,6 +1,7 @@
 import discord
 import discord.http
 import traceback
+import logging
 
 from utils.emojis import *
 import re
@@ -8,6 +9,8 @@ import re
 from utils.HelpEmbeds import NotYourPanel
 
 from utils.format import IsSeperateBot
+
+logger = logging.getLogger(__name__)
 from utils.permissions import premium
 from utils.HelpEmbeds import NoPremium, Support
 
@@ -743,7 +746,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         else:
             assert isinstance(self.name.component, discord.ui.Select)
             Value = self.name.component.values[0]
-        print(Value)
+        logger.debug(Value)
 
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if config is None:

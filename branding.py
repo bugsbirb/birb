@@ -1,5 +1,8 @@
 import os
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 def ClearEmojis(condition, folder_path):
     if condition:
@@ -22,8 +25,8 @@ def ClearEmojis(condition, folder_path):
                     if new_content != content:
                         with open(file_path, 'w', encoding='utf-8') as file:
                             file.write(new_content)
-                        print(f"Updated file: {file_path}")
+                        logger.info(f"Updated file: {file_path}")
                     else:
-                        print(f"No changes made in {file_path}")
+                        logger.info(f"No changes made in {file_path}")
 
 

@@ -9,8 +9,11 @@ import random
 import re
 from utils.Module import ModuleCheck
 import asyncio
+import logging
 from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed, HandleButton
 from utils.format import Replace
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -128,7 +131,7 @@ async def run(
             try:
                 await loggingchannel.send(embed=log_embed)
             except (discord.Forbidden, discord.HTTPException):
-                print(
+                logger.warning(
                     f"I could not send the log message in the specified channel (guild: {ctx.guild.name})"
                 )
 
@@ -163,7 +166,7 @@ async def SyncCommand(self: commands.Bot, name: str, guild: int):
     except discord.app_commands.errors.CommandAlreadyRegistered:
         return
     except Exception as e:
-        print(f"Error syncing command '{name}' in guild {guild}: {e}")
+        logger.error(f"Error syncing command '{name}' in guild {guild}: {e}")
 
 
 async def Unsync(self: commands.Bot, name: str, guild: int):
@@ -282,7 +285,7 @@ class CustomCommands(commands.Cog):
                 continue
             SyncedServers += 1
             await asyncio.sleep(3)
-        print("[💻] Finished Syncing Custom Commands")
+        logger.info("[💻] Finished Syncing Custom Commands")
 
     @staticmethod
     async def replace_variables(message, replacements):

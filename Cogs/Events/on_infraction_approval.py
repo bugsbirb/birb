@@ -85,9 +85,10 @@ class on_infraction_approval(commands.Cog):
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
-            return print(
+            logger.error(
                 f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [1]"
             )
+            return
         if channel is None:
             logging.warning(
                 f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [2]"
@@ -95,7 +96,7 @@ class on_infraction_approval(commands.Cog):
             return
         embed = await CaseEmbed(InfractionData, staff, guild)
         if not embed:
-            print("[on_infraction_approval] couldn't send embed.")
+            logger.warning("[on_infraction_approval] couldn't send embed.")
             return
         DataPing = Settings.get("Infraction", {}).get("Approval", {}).get("Ping", None)
 
@@ -109,7 +110,7 @@ class on_infraction_approval(commands.Cog):
                 allowed_mentions=discord.AllowedMentions.all(),
             )
         except (discord.Forbidden, discord.NotFound):
-            print("[on_infraction_approval] couldn't send approval.")
+            logger.warning("[on_infraction_approval] couldn't send approval.")
 
             return
         try:
@@ -117,7 +118,7 @@ class on_infraction_approval(commands.Cog):
                 name=f"Infraction Discussion | #{Infraction.random_string}"
             )
         except (discord.Forbidden, discord.NotFound):
-            print("[on_infraction_approval] couldn't set thread.")
+            logger.warning("[on_infraction_approval] couldn't set thread.")
             pass
         await self.client.db['infractions'].update_one(
             {"_id": objectid}, {"$set": {"ApprovalMSG": msg.id}}

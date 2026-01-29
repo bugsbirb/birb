@@ -12,6 +12,9 @@ from utils.format import IsSeperateBot, PaginatorButtons
 from utils.Module import ModuleCheck
 from datetime import datetime
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 from utils.permissions import has_admin_role, has_staff_role
@@ -1106,7 +1109,7 @@ class quota(commands.Cog):
                 }
             )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
 
         await ctx.send(
             f"{tick} **{ctx.author.display_name},** staff member added successfully.\n-# You should now be able to see them on </staff panel:1165258229102682124>!"
@@ -1134,7 +1137,7 @@ class quota(commands.Cog):
                 {"guild_id": ctx.guild.id, "staff_id": staff.id}
             )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
         await ctx.send(
             f"{tick} **{ctx.author.display_name},** staff member removed successfully."
         )
@@ -1182,7 +1185,7 @@ class quota(commands.Cog):
                 },
             )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
         await ctx.send(
             f"{tick} **{ctx.author.display_name},** staff member edited successfully."
         )

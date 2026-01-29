@@ -1,7 +1,11 @@
 import aiohttp
 
 import os
+import logging
+import logging
 from motor.motor_asyncio import AsyncIOMotorClient
+
+logger = logging.getLogger(__name__)
 
 ClientID = os.getenv("PatreonClientID")
 ClientSecret = os.getenv("PatreonClientSecret")
@@ -198,7 +202,7 @@ async def PremiumMembers():
         while NextURL:
             async with Session.get(NextURL, headers=headers, params=Params) as Resp:
                 if Resp.status != 200:
-                    print("Failed to get members:", Resp.status)
+                    logger.error("Failed to get members: " + str(Resp.status))
                     break
 
                 Data = await Resp.json()

@@ -8,6 +8,9 @@ import random
 from utils.format import PaginatorButtons
 import string
 from utils.permissions import has_admin_role, has_staff_role
+import logging
+
+logger = logging.getLogger(__name__)
 from utils.Module import ModuleCheck
 from utils.autocompletes import DepartmentAutocomplete, RoleAutocomplete
 from utils.format import IsSeperateBot
@@ -532,9 +535,8 @@ SyncedAmount = 0
 async def SyncCommands(self: commands.Bot):
     global SyncedAmount
     global TotalNeedingSynced
-    import logging
 
-    print("[Promotions] Syncing commands...")
+    logger.info("[Promotions] Syncing commands...")
     Multi = set()
     Single = set()
     TheOG = set()

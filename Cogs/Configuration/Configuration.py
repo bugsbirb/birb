@@ -1,10 +1,13 @@
 import discord
 from discord.ext import commands
 from utils.emojis import *
+import logging
 
 from utils.permissions import premium
 from utils.HelpEmbeds import NoPremium, Support, NotYourPanel
 from utils.ui import PMButton
+
+logger = logging.getLogger(__name__)
 
 
 async def Reset(i: discord.Interaction, *F):
@@ -217,7 +220,7 @@ class ConfigMenu(discord.ui.Select):
             except Exception as e:
                 import traceback
 
-                print(traceback.format_exc(e))
+                logger.error(traceback.format_exc(e))
         elif selection == "Forums":
             from Cogs.Configuration.Components.Forums import ForumsOptions, ForumsEmbed
 

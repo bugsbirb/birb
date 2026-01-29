@@ -1,10 +1,13 @@
 import discord
 from utils.emojis import *
 from utils.permissions import premium
+import logging
 
 from utils.format import Replace, Replace, IsSeperateBot
 from utils.HelpEmbeds import NoPremium, NotYourPanel
 import discord
+
+logger = logging.getLogger(__name__)
 
 
 async def HandleButton(data: dict):
@@ -392,7 +395,7 @@ class NoEmbed(discord.ui.View):
                     view=view,
                 )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
 
     @discord.ui.button(
         label="Finish",
@@ -873,7 +876,7 @@ class Embed(discord.ui.View):
                 )
 
         except Exception as e:
-            print(e)
+            logger.error(str(e))
 
     @discord.ui.button(
         label="Finish",

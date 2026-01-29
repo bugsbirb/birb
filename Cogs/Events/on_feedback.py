@@ -36,9 +36,10 @@ class OnFEEDABCKS(commands.Cog):
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
-            return print(
+            logger.error(
                 f"[🏠 on_feedback] @{guild.name} the feedback channel can't be found. [1]"
             )
+            return
         if channel is None:
             logging.warning(
                 f"[🏠 on_feedback] @{guild.name} the feedback channel can't be found. [2]"

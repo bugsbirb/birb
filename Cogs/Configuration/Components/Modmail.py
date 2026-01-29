@@ -2,10 +2,13 @@ import discord
 import discord.http
 import os
 import traceback
+import logging
 
 from utils.emojis import *
 from utils.HelpEmbeds import NotYourPanel
 from utils.permissions import premium
+
+logger = logging.getLogger(__name__)
 
 
 class ModmailOptions(discord.ui.Select):
@@ -257,7 +260,7 @@ class ThreadsChannel(discord.ui.ChannelSelect):
                 ),
             )
         except Exception as e:
-            print(f"Failed to edit message: {e}")
+            logger.error(f"Failed to edit message: {e}")
 
 
 class Preferences(discord.ui.View):
@@ -387,7 +390,7 @@ class SelectModmailType(discord.ui.Select):
                 view=view,
             )
         except Exception as e:
-            print(e)
+            logger.error(str(e))
 
 
 ################################# MODMAIL CATEGORIES

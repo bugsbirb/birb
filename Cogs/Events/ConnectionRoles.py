@@ -1,8 +1,11 @@
 import discord
 from discord.ext import commands
 from utils.emojis import *
+import logging
 
 from utils.Module import ModuleCheck
+
+logger = logging.getLogger(__name__)
 
 
 class ConnectionRolesEvent(commands.Cog):
@@ -30,7 +33,7 @@ class ConnectionRolesEvent(commands.Cog):
                             reason=f"Connection Roles updated. Connection Name: {Parents.get('name')}",
                         )
                     except discord.Forbidden:
-                        print("[⚠️] I don't have permission to add roles to this user")
+                        logger.warning("[⚠️] I don't have permission to add roles to this user")
                         return
 
         for role in removedRoles:
@@ -59,7 +62,7 @@ class ConnectionRolesEvent(commands.Cog):
                             reason=f"Connection Roles updated. Connection Name: {Parents.get('name')}",
                         )
                     except discord.Forbidden:
-                        print(
+                        logger.warning(
                             "[⚠️] I don't have permission to remove roles from this user"
                         )
                         return

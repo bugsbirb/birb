@@ -4,10 +4,12 @@ from datetime import datetime, timedelta
 
 
 from utils.emojis import *
-import chat_exporter
 import traceback
 import random
 import io
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 async def Reply(
@@ -50,7 +52,7 @@ async def Reply(
     try:
         await Channel.send(embed=embed, files=files)
     except Exception as e:
-        print(e)
+        logger.error(str(e))
         return await message.add_reaction("⚠️")
     return await message.add_reaction("📨")
 
@@ -231,7 +233,7 @@ async def Close(interaction: discord.Interaction, reason=None):
             await msg.delete()
             await channel.edit(archived=True, locked=True)
         except (discord.Forbidden, discord.HTTPException):
-            print("[Modmail Skill Issue] couldn't lock the thread or anything.")
+            logger.warning("[Modmail Skill Issue] couldn't lock the thread or anything.")
             if msg:
                 try:
                     await msg.add_reaction("⚠️")

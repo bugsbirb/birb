@@ -8,6 +8,9 @@ from datetime import timedelta
 from utils.emojis import *
 import re
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from datetime import datetime
 
@@ -458,8 +461,8 @@ class SuspensionPanel(discord.ui.View):
                 except:
                     member = None
 
-                print(f"roles_removed: {roles_removed}")
-                print(f"roles_to_return: {roles_to_return}")
+                logger.debug(f"roles_removed: {roles_removed}")
+                logger.debug(f"roles_to_return: {roles_to_return}")
 
                 if roles_to_return and member:
                     await interaction.response.defer()
@@ -491,7 +494,7 @@ class SuspensionPanel(discord.ui.View):
                             f"<:bin:1235001855721865347> Your suspension has been voided **@{interaction.guild.name}**"
                         )
                     except discord.Forbidden:
-                        print("Failed to send suspension message to user")
+                        logger.warning("Failed to send suspension message to user")
                         pass
             else:
                 member = await interaction.guild.fetch_member(self.user.id)
@@ -507,7 +510,7 @@ class SuspensionPanel(discord.ui.View):
                     )
 
                 except discord.Forbidden:
-                    print("Failed to send suspension message to user")
+                    logger.warning("Failed to send suspension message to user")
 
         else:
             await interaction.response.send_message(

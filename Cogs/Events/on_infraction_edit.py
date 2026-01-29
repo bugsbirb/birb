@@ -52,9 +52,10 @@ class on_infraction_edit(commands.Cog):
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
-            return print(
+            logger.error(
                 f"[🏠 on_infraction_edit] @{guild.name} the infraction channel can't be found. [1]"
             )
+            return
         if channel is None:
             logging.warning(
                 f"[🏠 on_infraction_edit] @{guild.name} the infraction channel can't be found. [2]"
@@ -104,7 +105,7 @@ class on_infraction_edit(commands.Cog):
                 msg = await channel.fetch_message(Infraction.msg_id)
 
             await msg.edit(embed=embed)
-            print(f"[✅] Updated infraction message with ID: {Infraction.random_string}")
+            logger.info(f"[✅] Updated infraction message with ID: {Infraction.random_string}")
         except (discord.Forbidden, discord.HTTPException, discord.NotFound):
             return
 

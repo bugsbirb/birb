@@ -3,6 +3,8 @@ from discord.ext import commands
 from utils.emojis import *
 import os
 
+import logging
+logger = logging.getLogger(__name__)
 
 class welcome(commands.Cog):
     def __init__(self, client: commands.Bot):

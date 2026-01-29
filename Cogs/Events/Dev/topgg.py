@@ -8,6 +8,8 @@ environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 dbl_token = os.getenv("DBL_TOKEN")
 
+import logging
+logger = logging.getLogger(__name__)
 
 class Topgg(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -22,9 +24,9 @@ class Topgg(commands.Cog):
             return
         try:
             await self.topggpy.post_guild_count()
-            print(f"[🔝] Posted server count ({self.topggpy.guild_count})")
+            logger.info(f"[🔝] Posted server count ({self.topggpy.guild_count})")
         except Exception as e:
-            print("[⬇️] Failed to post server count")
+            logger.error("[⬇️] Failed to post server count")
 
 
 async def setup(client: commands.Bot) -> None:

@@ -7,8 +7,10 @@ from utils.emojis import *
 from datetime import datetime
 from utils.Module import ModuleCheck
 import asyncio
-
+import logging
 import sentry_sdk
+
+logger = logging.getLogger(__name__)
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
@@ -23,7 +25,7 @@ class StaffList(commands.Cog):
     @tasks.loop(minutes=30, reconnect=True)
     @sentry_sdk.trace()
     async def updatelist(self):
-        print("Checking Staff List")
+        logger.info("Checking Staff List")
         if environment == "custom":
             activelistresult = (
                 await self.client.db["Active Staff List"]
@@ -121,7 +123,7 @@ class StaffList(commands.Cog):
                 except (discord.HTTPException, discord.NotFound):
                     return            
         except Exception as e:
-            print(f"[ERROR] {e}")
+            logger.error(f"[ERROR] {e}")
 
     @updatelist.before_loop
     async def before_updatelist(self):

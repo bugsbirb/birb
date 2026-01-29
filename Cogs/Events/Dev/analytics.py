@@ -1,5 +1,8 @@
 from discord.ext import commands
 import time
+import logging
+logger = logging.getLogger(__name__)
+
 class analyticss(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -21,7 +24,7 @@ class analyticss(commands.Cog):
         execution_duration = end_execution_time - start_execution_time
         execution_duration = round(execution_duration, 3)
 
-        print(
+        logger.info(
             prfx
             + f" Command '{command}' executed in {execution_duration} seconds by @{(ctx.author)} at {ctx.guild}"
         )

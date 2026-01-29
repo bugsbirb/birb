@@ -5,8 +5,11 @@ from utils.format import PaginatorButtons
 from utils.emojis import *
 from utils.autocompletes import ConnectionRoles
 from utils.Module import ModuleCheck
+import logging
 
 from utils.HelpEmbeds import ModuleNotEnabled, Support
+
+logger = logging.getLogger(__name__)
 
 class ConnectionRoles(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -58,7 +61,7 @@ class ConnectionRoles(commands.Cog):
                             try:
                                 await member.add_roles(Child, reason=f"[Connection Roles] Added {Child.name} to {member.display_name}.")
                                 Updated += 1
-                                print(
+                                logger.info(
                                     f"[Connection Roles] Added {Child.name} to {member.display_name}."
                                 )
                             except discord.Forbidden:

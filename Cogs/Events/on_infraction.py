@@ -147,7 +147,7 @@ class on_infractions(commands.Cog):
     async def on_infraction(
         self, objectid: ObjectId, Settings: dict, Actions: dict, Type: str = None
     ):
-        print("[🏠 on_infraction] Trigged")
+        logger.info("[🏠 on_infraction] Trigged")
         if Type is None:
             InfractionData = await self.client.db["infractions"].find_one(
                 {"_id": objectid}
@@ -195,9 +195,10 @@ class on_infractions(commands.Cog):
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
-            return print(
+            logger.error(
                 f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [1]"
             )
+            return
         if channel is None:
             logging.warning(
                 f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [2]"

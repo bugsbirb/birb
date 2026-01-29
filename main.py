@@ -62,7 +62,7 @@ staffdb = db["staff database"]
 
 
 if not (TOKEN or MONGO_URL, PREFIX):
-    print("[❌] Missing .env variables. [TOKEN, MONGO_URL]")
+    logger.error("[❌] Missing .env variables. [TOKEN, MONGO_URL]")
     sys.exit(1)
 
 if os.getenv("REMOVE_EMOJIS", False) == "True" or environment == "custom":
@@ -79,7 +79,8 @@ if os.getenv("SENTRY_URL", None):
         dsn=os.getenv("SENTRY_URL"),
         integrations=[AioHttpIntegration(), LoggingIntegration(level=logging.INFO)],
         traces_sample_rate = 0.2,
-        profiles_sample_rate = 0.05
+        profiles_sample_rate = 0.05,
+        enable_logs=True
     )
 
     logger.info("Sentry SDK initialized")
@@ -116,7 +117,7 @@ class Client(commands.AutoShardedBot):
 
     def _initialize_super(self, intents):
         if environment == "custom":
-            print("Custom Branding Loaded")
+            logger.info("Custom Branding Loaded")
             super().__init__(
                 command_prefix=commands.when_mentioned_or(self.get_prefix),
                 intents=intents,
@@ -128,7 +129,7 @@ class Client(commands.AutoShardedBot):
                 tree_cls=Tree,
             )
         elif environment == "development":
-            print("Development Loaded")
+            logger.info("Development Loaded")
             super().__init__(
                 command_prefix=commands.when_mentioned_or(PREFIX),
                 intents=intents,
@@ -140,7 +141,7 @@ class Client(commands.AutoShardedBot):
                 tree_cls=Tree,
             )
         else:
-            print("Production Loaded")
+            logger.info("Production Loaded")
             super().__init__(
                 command_prefix=commands.when_mentioned_or(PREFIX),
                 intents=intents,
@@ -214,7 +215,7 @@ class Client(commands.AutoShardedBot):
     async def load_jishaku(self):
         await self.wait_until_ready()
         await self.load_extension("jishaku")
-        print("[🔄] Jishaku Loaded")
+        logger.info("[🔄] Jishaku Loaded")
 
     async def get_prefix(self, message: discord.Message) -> tasks.List[str] | str:
         if message.guild is None:
@@ -240,13 +241,13 @@ class Client(commands.AutoShardedBot):
             filter["guild"] = int(guildid)
         TicketViews = await self.db["Panels"].find(filter).to_list(length=None)
         V = await Views.find(filter).to_list(length=None)
-        print("[Views] Loading Any Views")
+        logger.info("[Views] Loading Any Views")
         for view in V:
             if not view:
                 continue
             if view.get("type") == "staff":
                 await self._load_staff_view(view)
-        print("[Views] Loading Ticket Views")
+        logger.info("[Views] Loading Ticket Views")
         for view in TicketViews:
             await self._load_ticket_view(view)
         del TicketViews
@@ -361,9 +362,9 @@ class Client(commands.AutoShardedBot):
         for ext in self.cogslist:
             try:
                 await self.load_extension(ext)
-                print(f"[✅] Loaded cog: {ext}")
+                logger.info(f"[✅] Loaded cog: {ext}")
             except Exception as e:
-                print(f"[❌] Failed to load cog {ext}: {e}")
+                logger.error(f"[❌] Failed to load cog {ext}: {e}")
 
     async def GetVersion(self):
         V = await SupportVariables.find_one({"_id": 1})
@@ -395,47 +396,47 @@ class Client(commands.AutoShardedBot):
 
     async def _handle_custom_environment(self):
         if not guildid:
-            print("[❌] CUSTOM_GUILD not defined in .env")
+            logger.error("[❌] CUSTOM_GUILD not defined in .env")
             sys.exit(1)
         guild = None
         try:
             guild = await self.fetch_guild(guildid)
         except (discord.HTTPException, discord.Forbidden, discord.NotFound):
-            print(f"[❌] Failed to fetch guild {guildid}")
+            logger.error(f"[❌] Failed to fetch guild {guildid}")
         if guild:
             try:
                 await guild.chunk(cache=False)
             except (discord.NotFound, discord.HTTPException, discord.Forbidden):
-                print(f"[❌] Failed to chunk guild {guild.name} ({guild.id})")
-            print(f"[✅] Connected to guild {guild.name} ({guild.id})")
+                logger.error(f"[❌] Failed to chunk guild {guild.name} ({guild.id})")
+            logger.info(f"[✅] Connected to guild {guild.name} ({guild.id})")
             try:
                 await self.tree.sync()
             except (discord.NotFound, discord.HTTPException, discord.Forbidden):
-                print(f"[❌] Failed to sync commands")
+                logger.error(f"[❌] Failed to sync commands")
 
     async def _print_startup_info(self):
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
         prfx = f"[📖] {prfx}"
-        print(prfx + " Logged in as " + self.user.name)
-        print(prfx + " Bot ID " + str(self.user.id))
-        print(prfx + " Discord Version " + discord.__version__)
-        print(prfx + " Python Version " + str(platform.python_version()))
-        print(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
+        logger.info(prfx + " Logged in as " + self.user.name)
+        logger.info(prfx + " Bot ID " + str(self.user.id))
+        logger.info(prfx + " Discord Version " + discord.__version__)
+        logger.info(prfx + " Python Version " + str(platform.python_version()))
+        logger.info(prfx + " Bot is in " + str(len(self.guilds)) + " servers")
         try:
             await db.command("ping")
-            print("[✅] successfully connected to MongoDB")
+            logger.info("[✅] successfully connected to MongoDB")
         except Exception as e:
-            print(f"[❌] Failed to connect to MongoDB: {e}")
+            logger.error(f"[❌] Failed to connect to MongoDB: {e}")
         T = "\n".join(f"- {task}" for task in self.Tasks)
         if len(self.Tasks) > 0:
-            print(f"[📝] Tasks Loaded:\n{T}")
+            logger.info(f"[📝] Tasks Loaded:\n{T}")
 
     async def _set_custom_status(self):
         activity2 = discord.CustomActivity(name=f"{STATUS}")
         if STATUS:
             await self.change_presence(activity=activity2)
         else:
-            print("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
+            logger.warning("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
 
     async def _cache_enabled_servers(self):
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
@@ -465,15 +466,15 @@ class Client(commands.AutoShardedBot):
             except:
                 continue
 
-        print(prfx + f" Successfully cached {cached} servers.")
+        logger.info(prfx + f" Successfully cached {cached} servers.")
 
         del Modmail, Enabled, ID
 
     async def on_disconnect(self):
-        print("[⚠️] Disconnected from Discord Gateway!")
+        logger.warning("[⚠️] Disconnected from Discord Gateway!")
 
     async def on_resumed(self):
-        print("[✅] Resumed connection to Discord Gateway!")
+        logger.info("[✅] Resumed connection to Discord Gateway!")
 
     async def is_owner(self, user: discord.User):
         if (
@@ -485,13 +486,13 @@ class Client(commands.AutoShardedBot):
         return await super().is_owner(user)
 
     async def on_shard_ready(self, shard_id):
-        print(f"[✅] Shard {shard_id} is ready.")
+        logger.info(f"[✅] Shard {shard_id} is ready.")
 
     async def on_shard_connect(self, shard_id):
-        print(f"[✅] Shard {shard_id} connected.")
+        logger.info(f"[✅] Shard {shard_id} connected.")
 
     async def on_shard_disconnect(self, shard_id):
-        print(f"[⚠️] Shard {shard_id} disconnected.")
+        logger.warning(f"[⚠️] Shard {shard_id} disconnected.")
 
 
 client = Client()

@@ -6,8 +6,11 @@ from utils.emojis import *
 from utils.ui import YesOrNo
 import asyncio
 from utils.permissions import has_admin_role
+import logging
 
 from discord import app_commands
+
+logger = logging.getLogger(__name__)
 
 
 class Link(commands.Cog):
@@ -439,7 +442,7 @@ class Link(commands.Cog):
             ):
                 return True
             attempts += 1
-            print("Checking token...")
+            logger.debug("Checking token...")
             await asyncio.sleep(3)
         return False
 
