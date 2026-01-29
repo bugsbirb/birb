@@ -13,7 +13,7 @@ from utils.emojis import *
 from utils.Module import ModuleCheck
 from utils.permissions import *
 from datetime import timedelta, datetime
-
+import sentry_sdk
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
@@ -26,7 +26,8 @@ class activityauto(commands.Cog):
         self.Task.start()
         client.Tasks.add("Activity Expiration")
 
-    @tasks.loop(minutes=3, reconnect=True)
+    @tasks.loop(minutes=5, reconnect=True)
+    @sentry_sdk.trace()
     async def Task(self):
 
         if environment == "custom":

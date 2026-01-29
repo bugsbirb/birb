@@ -78,6 +78,8 @@ if os.getenv("SENTRY_URL", None):
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_URL"),
         integrations=[AioHttpIntegration(), LoggingIntegration(level=logging.INFO)],
+        traces_sample_rate = 0.2,
+        profiles_sample_rate = 0.05
     )
 
     logger.info("Sentry SDK initialized")
@@ -371,6 +373,7 @@ class Client(commands.AutoShardedBot):
 
     async def CacheCommands(self):
         self.cached_commands = []
+    
 
         def recursive_cache(command, parent=""):
             full_name = f"{parent} {command.name}".strip()

@@ -14,7 +14,7 @@ environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
 import asyncio
-
+import sentry_sdk
 
 class qotd(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -23,6 +23,7 @@ class qotd(commands.Cog):
         self.semaphore = asyncio.Semaphore(10)
         client.Tasks.add("QOTD")
 
+    @sentry_sdk.trace()
     async def FetchQuestion(self, Used, server: discord.Guild):
         questionresult = (
             await self.client.db["Question Database"].find({}).to_list(length=None)
@@ -36,7 +37,8 @@ class qotd(commands.Cog):
             return random.choice(questionresult).get("question")
         del questionresult
         return random.choice(Unusued).get("question")
-
+    
+    @sentry_sdk.trace()
     async def ProcesssQOTD(self, results):
         async with self.semaphore:
             try:
@@ -190,7 +192,8 @@ class qotd(commands.Cog):
 
             except Exception as e:
                 await self.ProcessErrors(results, e)
-
+                
+    @sentry_sdk.trace()
     async def ProcessErrors(self, results, e):
         GuildID = results.get("guild_id")
         attempts = results.get("attempts", 0) + 1
@@ -204,6 +207,7 @@ class qotd(commands.Cog):
             )
 
     @tasks.loop(minutes=5, reconnect=True)
+    @sentry_sdk.trace()
     async def sendqotd(self) -> None:
         result = None
         filter = {"nextdate": {"$lte": datetime.datetime.utcnow()}}
@@ -214,6 +218,7 @@ class qotd(commands.Cog):
             return
         tasks = [self.ProcesssQOTD(results) for results in result]
         await asyncio.gather(*tasks)
+        del result
 
     @commands.Cog.listener()
     async def on_ready(self):

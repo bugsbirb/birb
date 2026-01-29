@@ -213,11 +213,9 @@ class ConnectionRoles(commands.Cog):
         paginator = await PaginatorButtons()
         await paginator.start(ctx, pages=embeds, msg=msg)
 
-    @connectionrole_add.error
-    @connectionrole_remove.error
-    @connectionrole_list.error
+
     @sync.error
-    async def permissionerror(self, ctx: commands.Context, error):
+    async def SyncError(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, you can only use this command once every hour.",
@@ -227,7 +225,6 @@ class ConnectionRoles(commands.Cog):
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n<:Arrow:1115743130461933599>**Required:** ``Manage Roles``",
             )
-
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(ConnectionRoles(client))

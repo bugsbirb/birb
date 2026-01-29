@@ -4,7 +4,7 @@ from bson import ObjectId
 from typing import Union
 from discord.ext import commands, tasks
 import os
-
+import sentry_sdk
 
 async def TimeLeftz(loa: dict) -> Union[int, str]:
     if not loa or not loa.get("start_time") or not loa.get("end_time"):
@@ -34,6 +34,7 @@ class Leave(commands.Cog):
         self.client.Tasks.add("SchTask")
 
     @tasks.loop(seconds=10)
+    @sentry_sdk.trace()
     async def ExpTask(self):
         if os.getenv("CUSTOM_GUILD"):
             LOAs = (
@@ -76,8 +77,10 @@ class Leave(commands.Cog):
                     self.client.dispatch("leave_end", loa.get("_id"))
 
         await asyncio.gather(*(Process(loa) for loa in LOAs))
+        del LOAs
 
     @tasks.loop(seconds=10)
+    @sentry_sdk.trace()
     async def SchTasks(self):
         if os.getenv("CUSTOM_GUILD"):
             LOAs = (
@@ -125,6 +128,7 @@ class Leave(commands.Cog):
                     self.client.dispatch("leave_start", loa.get("_id"))
 
         await asyncio.gather(*(Process(loa) for loa in LOAs))
+        del LOAs
 
 
 async def setup(client: commands.Bot) -> None:

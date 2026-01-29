@@ -8,6 +8,7 @@ from datetime import datetime
 from utils.Module import ModuleCheck
 import asyncio
 
+import sentry_sdk
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
@@ -19,7 +20,8 @@ class StaffList(commands.Cog):
         self.updatelist.start()
         client.Tasks.add("Staff List")
 
-    @tasks.loop(seconds=360, reconnect=True)
+    @tasks.loop(minutes=30, reconnect=True)
+    @sentry_sdk.trace()
     async def updatelist(self):
         print("Checking Staff List")
         if environment == "custom":
@@ -44,6 +46,7 @@ class StaffList(commands.Cog):
         await asyncio.gather(*(process(data) for data in activelistresult))
         del activelistresult
 
+    @sentry_sdk.trace()
     async def UpdateList(self, data):
         try:
             guild = self.client.get_guild(data.get("guild_id"))
@@ -116,7 +119,7 @@ class StaffList(commands.Cog):
                     if msg:
                         await msg.edit(embed=embed)
                 except (discord.HTTPException, discord.NotFound):
-                    return
+                    return            
         except Exception as e:
             print(f"[ERROR] {e}")
 

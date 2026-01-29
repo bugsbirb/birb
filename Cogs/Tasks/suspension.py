@@ -4,6 +4,8 @@ import os
 from utils.emojis import *
 from datetime import datetime
 
+import sentry_sdk
+
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
@@ -16,6 +18,7 @@ class EmptyCog(commands.Cog):
         client.Tasks.add("Suspension")
 
     @tasks.loop(minutes=5, reconnect=True)
+    @sentry_sdk.trace()
     async def check_suspensions(self):
 
         print("[👀] Checking suspensions")

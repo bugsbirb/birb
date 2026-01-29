@@ -5,7 +5,7 @@ import discord
 from datetime import datetime
 from discord.ext import tasks
 
-
+import sentry_sdk
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
@@ -17,6 +17,7 @@ class expiration(commands.Cog):
         client.Tasks.add("Infraction Exp")
 
     @tasks.loop(minutes=30, reconnect=True)
+    @sentry_sdk.trace()
     async def Task(self):
         if self.client.maintenance:
             return
