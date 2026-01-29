@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from utils.emojis import *
 import os
-
+from sentry_sdk import metrics
 import logging
 logger = logging.getLogger(__name__)
 class Shards(commands.Cog):
@@ -21,6 +21,11 @@ class Shards(commands.Cog):
             )
         except discord.Forbidden:
             return
+        if os.getenv("SENTRY_URL", None):
+            metrics.count("shard_connect", 1)
+
+
+        
 
     @commands.Cog.listener()
     async def on_shard_disconnect(self, shard: int):
@@ -34,6 +39,8 @@ class Shards(commands.Cog):
             )
         except discord.Forbidden:
             return
+        if os.getenv("SENTRY_URL", None):
+            metrics.count("shard_disconnect", 1)
 
 
 async def setup(client: commands.Bot) -> None:

@@ -60,7 +60,7 @@ class InfractionOption(discord.ui.Select):
 
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send_message(
+            return await interaction.followup.send(
                 embed=NotYourPanel(), ephemeral=selection
             )
 

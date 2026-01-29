@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from bson import ObjectId
-
+import logging
+logger = logging.getLogger(__name__)
 
 class on_infraction_void(commands.Cog):
     def __init__(self, client: commands.Bot):
@@ -9,10 +10,10 @@ class on_infraction_void(commands.Cog):
 
     @commands.Cog.listener()
     async def on_infraction_void(self, _id: ObjectId):
+        logger.info("[on_infraction_void] Trigged", extra={"objectId": str(_id)})
         inf = await self.client.db["infractions"].find_one({"_id": _id})
         if not inf:
             return
-
         try:
             guild = await self.client.fetch_guild(inf.get("guild_id"))
         except (discord.NotFound, discord.HTTPException, discord.NotFound):

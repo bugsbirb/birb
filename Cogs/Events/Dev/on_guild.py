@@ -5,11 +5,19 @@ import os
 from utils.emojis import *
 from Cogs.Modules.promotions import SyncServer
 from datetime import datetime
+from sentry_sdk import metrics
 
 import logging
+
 logger = logging.getLogger(__name__)
 
-PrimaryServers = [int(x) for x in os.getenv("DEFAULT_ALLOWED_SERVERS").split(",")] if os.getenv("DEFAULT_ALLOWED_SERVERS") else []
+PrimaryServers = (
+    [int(x) for x in os.getenv("DEFAULT_ALLOWED_SERVERS").split(",")]
+    if os.getenv("DEFAULT_ALLOWED_SERVERS")
+    else []
+)
+
+
 class GuildJoins(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -92,7 +100,9 @@ class GuildJoins(commands.Cog):
                             "[⚠️] I couldn't DM the owner of the guild for the guild join."
                         )
             except discord.Forbidden:
-                logger.warning("[⚠️] I couldn't DM the owner of the guild for the guild join.")
+                logger.warning(
+                    "[⚠️] I couldn't DM the owner of the guild for the guild join."
+                )
 
     async def LogLeave(self, guild: discord.Guild):
 
@@ -123,17 +133,17 @@ class GuildJoins(commands.Cog):
             await channel.send(embed=embed)
         except (discord.HTTPException, discord.Forbidden):
             return
-        
+
     async def HandlePrimaryServers(self, guild: discord.Guild):
         Whitelist = await self.client.db["whitelist"].find_one({"_id": str(guild.id)})
         if not guild.id in PrimaryServers and not Whitelist:
             try:
-             await guild.leave()
+                await guild.leave()
             except discord.Forbidden:
                 return False
             return False
         return True
-           
+
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         if not guild:
@@ -142,11 +152,18 @@ class GuildJoins(commands.Cog):
             return
         if os.getenv("DEFAULT_ALLOWED_SERVERS") or os.getenv("STAFF"):
             if not await self.HandlePrimaryServers(guild):
-                return        
+                return
         await self.LogJoin(guild)
         await self.LogWebhookJoin(guild)
         await self.UpdateData(datetime.now().strftime("%Y-%m-%d"), "new")
         await SyncServer(self.client, guild)
+        if os.getenv("SENTRY_URL", None):
+            mCount = guild.member_count if guild.member_count else 0
+            metrics.count(
+                "on_guild_join",
+                1,
+                attributes={">=1000": (mCount >= 1000), ">=5000": (mCount >= 5000)},
+            )
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
@@ -156,6 +173,11 @@ class GuildJoins(commands.Cog):
             return
         await self.LogLeave(guild)
         await self.UpdateData(datetime.now().strftime("%Y-%m-%d"), "left")
+        if os.getenv("SENTRY_URL", None):
+            metrics.count(
+                "on_guild_leave",
+                1,
+            )
 
     async def UpdateData(self, TodayDate, action):
         Data = await self.client.db["Servers"].find_one({"_id": "Data"})

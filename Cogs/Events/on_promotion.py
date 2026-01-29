@@ -317,7 +317,7 @@ class on_promotion(commands.Cog):
 
         if guild is None:
             logging.warning(
-                f"[🏠 on_promotion] {Infraction.guild_id} is None and can't be found..?"
+                f"[🏠 on_promotion] {Infraction.guild_id} is None and can't be found..?", extra={"objectId": str(objectid)}
             )
             return
 
@@ -327,7 +327,7 @@ class on_promotion(commands.Cog):
             staff = None
         if staff is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} staff member {Infraction.staff} can't be found."
+                f"[🏠 on_promotion] @{guild.name} staff member {Infraction.staff} can't be found.", extra={"objectId": str(objectid)}
             )
             return
         await self.client.db["Cooldown"].update_one(
@@ -342,26 +342,26 @@ class on_promotion(commands.Cog):
             manager = None
         if manager is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} manager {Infraction.management} can't be found."
+                f"[🏠 on_promotion] @{guild.name} manager {Infraction.management} can't be found.", extra={"objectId": str(objectid)}
             )
             return
 
         ChannelID = Settings.get("Promo", {}).get("channel")
         if not ChannelID:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} no channel ID found in settings."
+                f"[🏠 on_promotion] @{guild.name} no channel ID found in settings.", extra={"objectId": str(objectid)}
             )
             return
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
             logger.error(
-                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [1]"
+                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [1]", extra={"objectId": str(objectid)}
             )
             return
         if channel is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [2]"
+                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [2]", extra={"objectId": str(objectid)}
             )
             return
         Options = Settings.get("Module Options", {})

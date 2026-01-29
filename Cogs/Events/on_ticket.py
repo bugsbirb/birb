@@ -656,19 +656,46 @@ class TicketsPublic(commands.Cog):
         Guild = self.client.get_guild(Result.get("GuildID"))
         if not Guild:
             return logging.critical(
-                f"[TICKETS] Guild with ID {Result.get('GuildID')} not found"
+                f"[TICKETS] Guild with ID {Result.get('GuildID')} not found",
+                extra={
+                    "GuildId": Result.get("GuildID"),
+                    "ChannelId": Result.get("ChannelId"),
+                    "Author": f"{member.name}/{member.id}",
+                },
             )
 
         Channel = Guild.get_channel(Result.get("ChannelID"))
         if not Channel:
             return logging.critical(
-                f"[TICKETS] Channel with ID {Result.get('ChannelID')} not found"
+                f"[TICKETS] Channel with ID {Result.get('ChannelID')} not found",
+                extra={
+                    "GuildId": Result.get("GuildID"),
+                    "ChannelId": Result.get("ChannelId"),
+                    "Author": f"{member.name}/{member.id}",
+                },
             )
         try:
             user = await Guild.fetch_member(Result.get("UserID"))
         except (discord.NotFound, discord.HTTPException):
             user = None
-        msg = await Channel.send("<a:Loading:1167074303905386587> Ticket closing...")
+        try:
+            msg = await Channel.send(
+                "<a:Loading:1167074303905386587> Ticket closing...",
+                extra={
+                    "GuildId": Result.get("GuildID"),
+                    "ChannelId": Result.get("ChannelId"),
+                    "Author": f"{member.name}/{member.id}",
+                },
+            )
+        except (discord.NotFound, discord.Forbidden):
+            logging.warning(
+                "[on_ticket_close] The channel wasn't found",
+                extra={
+                    "GuildId": Result.get("GuildID"),
+                    "ChannelId": Result.get("ChannelId"),
+                    "Author": f"{member.name}/{member.id}",
+                },
+            )
         messages = []
         compact = []
 

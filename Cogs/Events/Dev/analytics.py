@@ -33,10 +33,10 @@ class analyticss(commands.Cog):
             + f" Command '{command}' executed in {execution_duration} seconds by @{(ctx.author)} at {ctx.guild}",
             extra={
                 "command": ctx.command.qualified_name,
-                "user": str(ctx.author),
                 "guild": str(ctx.guild),
                 "channel": str(ctx.channel),
                 "duration": execution_duration,
+                "Author": f"{ctx.author.name}/{ctx.author.id}",
             },
         )
         if os.getenv("SENTRY_URL", None):

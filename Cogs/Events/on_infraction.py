@@ -4,13 +4,8 @@ import os
 from bson import ObjectId
 import aiohttp
 import logging
-import asyncio
-import datetime
 from utils.permissions import premium
-import random
-import string
 from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
-import traceback
 
 logger = logging.getLogger(__name__)
 MONGO_URL = os.getenv("MONGO_URL")
@@ -147,7 +142,7 @@ class on_infractions(commands.Cog):
     async def on_infraction(
         self, objectid: ObjectId, Settings: dict, Actions: dict, Type: str = None
     ):
-        logger.info("[🏠 on_infraction] Trigged")
+        logger.info("[on_infraction] Trigged", extra={"objectId": str(objectid)})
         if Type is None:
             InfractionData = await self.client.db["infractions"].find_one(
                 {"_id": objectid}
@@ -160,7 +155,8 @@ class on_infractions(commands.Cog):
         guild = await self.client.fetch_guild(Infraction.guild_id)
         if guild is None:
             logging.warning(
-                f"[🏠 on_infraction] {Infraction.guild_id} is None and can't be found..?"
+                f"[🏠 on_infraction] {Infraction.guild_id} is None and can't be found..?",
+                extra={"objectId": str(objectid)},
             )
             return
 
@@ -170,7 +166,8 @@ class on_infractions(commands.Cog):
             staff = None
         if staff is None:
             logging.warning(
-                f"[🏠 on_infraction] @{guild.name} staff member {Infraction.staff} can't be found."
+                f"[🏠 on_infraction] @{guild.name} staff member {Infraction.staff} can't be found.",
+                extra={"objectId": str(objectid)},
             )
             return
 
@@ -180,7 +177,8 @@ class on_infractions(commands.Cog):
             manager = None
         if manager is None:
             logging.warning(
-                f"[🏠 on_infraction] @{guild.name} manager {Infraction.management} can't be found."
+                f"[🏠 on_infraction] @{guild.name} manager {Infraction.management} can't be found.",
+                extra={"objectId": str(objectid)},
             )
             return
 
@@ -189,19 +187,22 @@ class on_infractions(commands.Cog):
         ).get("channel")
         if not ChannelID:
             logging.warning(
-                f"[🏠 on_infraction] @{guild.name} no channel ID found in settings."
+                f"[🏠 on_infraction] @{guild.name} no channel ID found in settings.",
+                extra={"objectId": str(objectid)},
             )
             return
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
             logger.error(
-                f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [1]"
+                f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [1]",
+                extra={"objectId": str(objectid)},
             )
             return
         if channel is None:
             logging.warning(
-                f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [2]"
+                f"[🏠 on_infraction] @{guild.name} the infraction channel can't be found. [2]",
+                extra={"objectId": str(objectid)},
             )
             return
 
@@ -374,7 +375,9 @@ class on_infractions(commands.Cog):
                 except:
                     pass
 
-    async def InfractionTypes(self, data, staff: discord.Member, manager: discord.Member, config: dict):
+    async def InfractionTypes(
+        self, data, staff: discord.Member, manager: discord.Member, config: dict
+    ):
         if not data:
             return {}
         Actions = {}
@@ -390,13 +393,17 @@ class on_infractions(commands.Cog):
                 ]
                 if roles:
                     try:
-                        await staff.add_roles(*roles, reason=f"Infraction Types initated by {manager.name}.")
+                        await staff.add_roles(
+                            *roles,
+                            reason=f"Infraction Types initated by {manager.name}.",
+                        )
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["AddedRoles"] = [role.id for role in roles]
 
             if data.get("changegrouprole") and data.get("grouprole"):
                 from utils.roblox import UpdateMembership
+
                 try:
                     await UpdateMembership(
                         user=staff,
@@ -416,7 +423,10 @@ class on_infractions(commands.Cog):
                 ]
                 if roles:
                     try:
-                        await staff.remove_roles(*roles, reason=f"Infraction Types initated by {manager.name}.")
+                        await staff.remove_roles(
+                            *roles,
+                            reason=f"Infraction Types initated by {manager.name}.",
+                        )
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["RemovedRoles"] = [role.id for role in roles]
