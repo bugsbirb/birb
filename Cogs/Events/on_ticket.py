@@ -681,11 +681,6 @@ class TicketsPublic(commands.Cog):
         try:
             msg = await Channel.send(
                 "<a:Loading:1167074303905386587> Ticket closing...",
-                extra={
-                    "GuildId": Result.get("GuildID"),
-                    "ChannelId": Result.get("ChannelId"),
-                    "Author": f"{member.name}/{member.id}",
-                },
             )
         except (discord.NotFound, discord.Forbidden):
             logging.warning(
