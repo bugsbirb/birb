@@ -40,7 +40,9 @@ class analyticss(commands.Cog):
             },
         )
         if os.getenv("SENTRY_URL", None):
-            metrics.incr("cmdExecuted", tags={"command": ctx.command.qualified_name})
+            metrics.count(
+                "cmdExecuted", 1, attributes={"command": ctx.command.qualified_name}
+            )
 
 
 async def setup(client: commands.Bot) -> None:
