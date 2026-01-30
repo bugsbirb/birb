@@ -70,6 +70,17 @@ if os.getenv("REMOVE_EMOJIS", False) == "True" or environment == "custom":
 
     ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
 
+def beforeSend(event, hint): # Temp Solution for Unknown Interaction flooding error logs, too time consuming to fix.
+    exc = hint.get("exc_info")
+    if exc:
+        error = exc[1]
+        msg = str(error)
+
+        if "10062" in msg or "Unknown interaction" in msg:
+            return None  
+
+    return event
+
 if os.getenv("SENTRY_URL", None):
     import sentry_sdk
     from sentry_sdk.integrations.aiohttp import AioHttpIntegration
@@ -80,7 +91,8 @@ if os.getenv("SENTRY_URL", None):
         integrations=[AioHttpIntegration(), LoggingIntegration(level=logging.INFO)],
         traces_sample_rate = 0.2,
         profiles_sample_rate = 0.05,
-        enable_logs=True
+        enable_logs=True,
+        before_send=beforeSend
     )
 
     logger.info("Sentry SDK initialized")
