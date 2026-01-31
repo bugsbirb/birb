@@ -65,9 +65,7 @@ class On_error(commands.Cog):
             return False
         return True
 
-    async def ErrorResponse(
-        self, interactionType, error: Exception
-    ):
+    async def ErrorResponse(self, interactionType, error: Exception):
         if self.client.maintenance:
             return
         try:
@@ -138,6 +136,8 @@ class On_error(commands.Cog):
             if isinstance(error, commands.BadArgument):
                 return
 
+            if guild is None:
+                return
             errorId = self.captureSentry(
                 error,
                 {
@@ -148,8 +148,6 @@ class On_error(commands.Cog):
                 },
             )
 
-            if guild is None:
-                return
             error_id = (
                 errorId or f"error-{''.join(random.choices(string.digits, k=24))}"
             )
