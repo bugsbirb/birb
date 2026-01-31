@@ -118,6 +118,9 @@ class Client(commands.AutoShardedBot):
         if os.getenv("STAFF"):
             self.cogslist.append("Cogs.Modules.Developer.admin")
 
+        if os.getenv("SUPPORT"):
+            self.cogslist.append("Cogs.Modules.Developer.support")
+
     def _initialize_databases(self):
         self.db = db
         self.qdb = qdb

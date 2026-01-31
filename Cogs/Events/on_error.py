@@ -147,7 +147,7 @@ class On_error(commands.Cog):
                     "command": (command.qualified_name if command else "unknown"),
                 },
             )
-
+            sentry = True if errorId != None else False
             error_id = (
                 errorId or f"error-{''.join(random.choices(string.digits, k=24))}"
             )
@@ -162,6 +162,7 @@ class On_error(commands.Cog):
                     "traceback": TRACEBACK,
                     "timestamp": datetime.now(),
                     "guild_id": guild.id,
+                    "sentry": sentry,
                 }
             )
             view = discord.ui.View()
