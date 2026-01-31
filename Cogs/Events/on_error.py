@@ -176,7 +176,7 @@ class On_error(commands.Cog):
             )
             embed = discord.Embed(
                 title="<:x21:1214614676772626522> Command Error",
-                description=f"Error ID: `{error_id}`\n -# We can't fix bugs without you, please report this to our support services.",
+                description=f"Error ID: `{error_id}`\n-# We can't fix bugs without you, please report this to our support services.",
                 color=discord.Color.brand_red(),
             )
 
