@@ -7,6 +7,8 @@ import string
 from utils.HelpEmbeds import *
 import random
 import traceback
+import sentry_sdk
+import os
 
 
 class Tree(app_commands.CommandTree):
@@ -63,20 +65,24 @@ class On_error(commands.Cog):
             return False
         return True
 
-    async def ErrorResponse(self, ctx_or_interaction, error: Exception):
+    async def ErrorResponse(
+        self, interactionType, error: Exception, errorId: str = None
+    ):
         if self.client.maintenance:
             return
         try:
-            if isinstance(ctx_or_interaction, commands.Context):
-                author = ctx_or_interaction.author
-                guild = ctx_or_interaction.guild
-                send = ctx_or_interaction.send
-                command = ctx_or_interaction.command
-            elif isinstance(ctx_or_interaction, discord.Interaction):
-                author = ctx_or_interaction.user
-                guild = ctx_or_interaction.guild
-                send = ctx_or_interaction.response.send_message
-                command = ctx_or_interaction.command
+            if isinstance(interactionType, commands.Context):
+                author = interactionType.author
+                guild = interactionType.guild
+                send = interactionType.send
+                command = interactionType.command
+            elif isinstance(interactionType, discord.Interaction):
+                author = interactionType.user
+                guild = interactionType.guild
+                if not interactionType.response.is_done():
+                    await interactionType.response.defer(ephemeral=True)
+                send = interactionType.followup.send
+                command = interactionType.command
             else:
                 return
 
@@ -85,7 +91,7 @@ class On_error(commands.Cog):
                     f"{no} **{author.display_name},** I can't execute commands in DMs. Please use me in a server.",
                     ephemeral=(
                         True
-                        if isinstance(ctx_or_interaction, discord.Interaction)
+                        if isinstance(interactionType, discord.Interaction)
                         else False
                     ),
                 )
@@ -99,7 +105,7 @@ class On_error(commands.Cog):
                     f"{no} **{author.display_name}**, you have used an invalid argument.",
                     ephemeral=(
                         True
-                        if isinstance(ctx_or_interaction, discord.Interaction)
+                        if isinstance(interactionType, discord.Interaction)
                         else False
                     ),
                 )
@@ -109,7 +115,7 @@ class On_error(commands.Cog):
                     f"{no} **{author.display_name}**, that member isn't in the server.",
                     ephemeral=(
                         True
-                        if isinstance(ctx_or_interaction, discord.Interaction)
+                        if isinstance(interactionType, discord.Interaction)
                         else False
                     ),
                 )
@@ -121,7 +127,7 @@ class On_error(commands.Cog):
                     f"{no} **{author.display_name}**, you are missing a requirement.",
                     ephemeral=(
                         True
-                        if isinstance(ctx_or_interaction, discord.Interaction)
+                        if isinstance(interactionType, discord.Interaction)
                         else False
                     ),
                 )
@@ -131,8 +137,9 @@ class On_error(commands.Cog):
 
             if guild is None:
                 return
-            error_id = "".join(random.choices(string.digits, k=24))
-            error_id = f"error-{error_id}"
+            error_id = (
+                errorId or f"error-{''.join(random.choices(string.digits, k=24))}"
+            )
             TRACEBACK = "".join(
                 traceback.format_exception(type(error), error, error.__traceback__)
             )
@@ -156,7 +163,7 @@ class On_error(commands.Cog):
             )
             embed = discord.Embed(
                 title="<:x21:1214614676772626522> Command Error",
-                description=f"Error ID: `{error_id}`",
+                description=f"Error ID: `{error_id}`\n -# We can't fix bugs without you, please report this to our support services.",
                 color=discord.Color.brand_red(),
             )
 
@@ -165,7 +172,7 @@ class On_error(commands.Cog):
                 view=view,
                 ephemeral=(
                     True
-                    if isinstance(ctx_or_interaction, discord.Interaction)
+                    if isinstance(interactionType, discord.Interaction)
                     else False
                 ),
             )
@@ -193,17 +200,54 @@ class On_error(commands.Cog):
         except discord.ClientException:
             return
 
+    def captureSentry(self, error, info: dict):
+        if not os.getenv("SENTRY_URL"):
+            return None
+        sentry_sdk.metrics.count(
+            "errorCount", 1, attributes={"command": info.get("command", "unknown")}
+        )
+        with sentry_sdk.push_scope() as scope:
+            scope.set_tag("authorId", str(info.get("authorId", 0)))
+            scope.set_tag("guildId", str(info.get("guildId", 0)))
+            scope.set_tag("channelId", str(info.get("channelId", 0)))
+            scope.set_tag("command", info.get("command", "unknown"))
+
+            eventId = sentry_sdk.capture_exception(error)
+            return eventId
+
     @commands.Cog.listener()
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ):
-        await self.ErrorResponse(ctx, error)
+        eventId = self.captureSentry(
+            error,
+            {
+                "guildId": ctx.guild.id,
+                "authorId": ctx.author.id,
+                "channelId": ctx.channel.id,
+                "command": ctx.command.qualified_name if ctx.command else "unknown",
+            },
+        )
+        await self.ErrorResponse(ctx, error, eventId)
 
     @commands.Cog.listener()
     async def on_application_command_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
     ):
-        await self.ErrorResponse(interaction, error)
+        eventId = self.captureSentry(
+            error,
+            {
+                "guildId": interaction.guild.id,
+                "authorId": interaction.user.id,
+                "channelId": interaction.channel.id,
+                "command": (
+                    interaction.command.qualified_name
+                    if interaction.command
+                    else "unknown"
+                ),
+            },
+        )
+        await self.ErrorResponse(interaction, error, eventId)
 
 
 async def setup(client: commands.Bot) -> None:

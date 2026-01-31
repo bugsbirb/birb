@@ -70,16 +70,20 @@ if os.getenv("REMOVE_EMOJIS", False) == "True" or environment == "custom":
 
     ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
 
-def beforeSend(event, hint): # Temp Solution for Unknown Interaction flooding error logs, too time consuming to fix.
+
+def beforeSend(
+    event, hint
+):  # Temp Solution for Unknown Interaction flooding error logs, too time consuming to fix.
     exc = hint.get("exc_info")
     if exc:
         error = exc[1]
         msg = str(error)
 
         if "10062" in msg or "Unknown interaction" in msg:
-            return None  
+            return None
 
     return event
+
 
 if os.getenv("SENTRY_URL", None):
     import sentry_sdk
@@ -89,10 +93,10 @@ if os.getenv("SENTRY_URL", None):
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_URL"),
         integrations=[AioHttpIntegration(), LoggingIntegration(level=logging.INFO)],
-        traces_sample_rate = 0.2,
-        profiles_sample_rate = 0.05,
+        traces_sample_rate=0.2,
+        profiles_sample_rate=0.05,
         enable_logs=True,
-        before_send=beforeSend
+        before_send=beforeSend,
     )
 
     logger.info("Sentry SDK initialized")
@@ -119,7 +123,6 @@ class Client(commands.AutoShardedBot):
         self.qdb = qdb
         self.config = Config
         self.customcommands = db["customcommands"]
-
 
     def _initialize_intents(self):
         intents = discord.Intents.default()
@@ -386,7 +389,6 @@ class Client(commands.AutoShardedBot):
 
     async def CacheCommands(self):
         self.cached_commands = []
-    
 
         def recursive_cache(command, parent=""):
             full_name = f"{parent} {command.name}".strip()
@@ -448,7 +450,9 @@ class Client(commands.AutoShardedBot):
         if STATUS:
             await self.change_presence(activity=activity2)
         else:
-            logger.warning("[⚠️] STATUS not defined in .env, bot will not set a custom status.")
+            logger.warning(
+                "[⚠️] STATUS not defined in .env, bot will not set a custom status."
+            )
 
     async def _cache_enabled_servers(self):
         prfx = time.strftime("%H:%M:%S GMT", time.gmtime())
