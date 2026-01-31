@@ -66,19 +66,22 @@ class On_error(commands.Cog):
         return True
 
     async def ErrorResponse(
-        self, interactionType, error: Exception, errorId: str = None
+        self, interactionType, error: Exception
     ):
         if self.client.maintenance:
             return
         try:
             if isinstance(interactionType, commands.Context):
                 author = interactionType.author
+                channel = interactionType.channel
                 guild = interactionType.guild
                 send = interactionType.send
                 command = interactionType.command
             elif isinstance(interactionType, discord.Interaction):
                 author = interactionType.user
                 guild = interactionType.guild
+                channel = interactionType.channel
+
                 if not interactionType.response.is_done():
                     await interactionType.response.defer(ephemeral=True)
                 send = interactionType.followup.send
@@ -135,6 +138,16 @@ class On_error(commands.Cog):
             if isinstance(error, commands.BadArgument):
                 return
 
+            errorId = self.captureSentry(
+                error,
+                {
+                    "guildId": guild.id,
+                    "authorId": author.id,
+                    "channelId": channel.id,
+                    "command": (command.qualified_name if command else "unknown"),
+                },
+            )
+
             if guild is None:
                 return
             error_id = (
@@ -171,9 +184,7 @@ class On_error(commands.Cog):
                 embed=embed,
                 view=view,
                 ephemeral=(
-                    True
-                    if isinstance(interactionType, discord.Interaction)
-                    else False
+                    True if isinstance(interactionType, discord.Interaction) else False
                 ),
             )
             Channel = self.client.get_channel(1333545239930994801)
@@ -219,35 +230,13 @@ class On_error(commands.Cog):
     async def on_command_error(
         self, ctx: commands.Context, error: commands.CommandError
     ):
-        eventId = self.captureSentry(
-            error,
-            {
-                "guildId": ctx.guild.id,
-                "authorId": ctx.author.id,
-                "channelId": ctx.channel.id,
-                "command": ctx.command.qualified_name if ctx.command else "unknown",
-            },
-        )
-        await self.ErrorResponse(ctx, error, eventId)
+        await self.ErrorResponse(ctx, error)
 
     @commands.Cog.listener()
     async def on_application_command_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
     ):
-        eventId = self.captureSentry(
-            error,
-            {
-                "guildId": interaction.guild.id,
-                "authorId": interaction.user.id,
-                "channelId": interaction.channel.id,
-                "command": (
-                    interaction.command.qualified_name
-                    if interaction.command
-                    else "unknown"
-                ),
-            },
-        )
-        await self.ErrorResponse(interaction, error, eventId)
+        await self.ErrorResponse(interaction, error)
 
 
 async def setup(client: commands.Bot) -> None:
