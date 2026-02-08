@@ -85,6 +85,213 @@ class Infractions(commands.Cog):
     async def infraction(self, ctx: commands.Context):
         pass
 
+    async def promptHI(
+        self,
+        C: dict,
+        msg: discord.Message,
+        member: discord.Member,
+        manager: discord.Member,
+    ):
+        if not C:
+            return None, None, None
+
+        PromoSystemType = C.get("Promo", {}).get("System", {}).get("type", "")
+        if not PromoSystemType:
+            return None, None, None, 500
+
+        class SkipButton(discord.ui.Button):
+            async def callback(self, interaction: discord.Interaction):
+                await interaction.response.defer()
+                self.view.stop()
+
+        if PromoSystemType == "multi":
+            Departments = (
+                C.get("Promo", {})
+                .get("System", {})
+                .get("multi", {})
+                .get("Departments", [])
+            )
+
+            if not Departments:
+                return None, None, None, 500
+
+            selectedDept = None
+
+            class DeptSelect(discord.ui.Select):
+                async def callback(self, interaction: discord.Interaction):
+                    nonlocal selectedDept
+                    selectedDept = self.values[0]
+                    await interaction.response.defer()
+                    self.view.stop()
+
+            view = discord.ui.View()
+            options = [
+                discord.SelectOption(label=dept.get("name"), value=dept.get("name"))
+                for dept in Departments[0]
+            ]
+            view.add_item(DeptSelect(placeholder="Department", options=options))
+            await msg.edit(
+                view=view,
+                embed=discord.Embed(
+                    description="> Select the department from which you want to demote this user in.\nFrom the "
+                ).set_author(name="Hierarchy"),
+            )
+            await view.wait()
+
+            selectedDept2 = next(
+                (d for d in Departments[0] if d.get("name") == selectedDept), None
+            )
+            if not selectedDept2:
+                return None, None, None, 500
+
+            Roles = [
+                role
+                for role in [
+                    msg.guild.get_role(int(role_id))
+                    for role_id in selectedDept2.get("ranks", [])
+                ]
+                if role is not None
+            ]
+            if len(Roles) == 0:
+             return None, None, None, 500
+            Roles.sort(key=lambda r: r.position)
+
+            rankSelected = None
+
+            class RankSelect(discord.ui.Select):
+                async def callback(self, interaction: discord.Interaction):
+                    if interaction.user.id != manager.id:
+                        return await interaction.response.send_message(
+                            embed=NotYourPanel(), ephemeral=True
+                        )
+                    nonlocal rankSelected
+                    rankSelected = self.values[0]
+                    await interaction.response.defer()
+                    self.view.stop()
+
+            view = discord.ui.View()
+            options = [
+                discord.SelectOption(label=rank.name, value=rank.id) for rank in Roles
+            ]
+            view.add_item(
+                RankSelect(placeholder="Skip To", options=options, required=False)
+            )
+            view.add_item(
+                SkipButton(label="Continue", style=discord.ButtonStyle.secondary)
+            )
+            await msg.edit(
+                view=view,
+                embed=discord.Embed(
+                    description="> Do you want to skip to a role in this hierarchy instead?"
+                ),
+            )
+            await view.wait()
+
+            SkipRole = msg.guild.get_role(int(rankSelected)) if rankSelected else None
+            if SkipRole and SkipRole in Roles:
+                if manager.top_role.position <= SkipRole.position:
+                    await msg.edit(
+                        content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
+                        view=None,
+                        embed=None,
+                    )
+                    return None, None, None, 403
+
+            UserRolesInHierarchy = [role for role in Roles if role in member.roles]
+            NextRole = None
+            if UserRolesInHierarchy:
+                highestRole = max(UserRolesInHierarchy, key=lambda r: r.position)
+                try:
+                    idx = Roles.index(highestRole)
+                except ValueError:
+                    idx = -1
+                if idx > 0:
+                    NextRole = Roles[idx - 1]
+
+            if NextRole and manager.top_role.position <= NextRole.position:
+                await msg.edit(
+                    content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
+                    view=None,
+                    embed=None,
+                )
+                return None, None, None, 403
+            return rankSelected, selectedDept, PromoSystemType, 200
+
+        elif PromoSystemType == "single":
+            Roles = [
+                role
+                for role in [
+                    msg.guild.get_role(int(roleId))
+                    for roleId in C.get("Promo", {})
+                    .get("System", {})
+                    .get("single", {})
+                    .get("Hierarchy", [])
+                ]
+                if role is not None
+            ]
+            if len(Roles) == 0:
+             return None, None, None, 500            
+            Roles.sort(key=lambda r: r.position)
+
+            rankSelected = None
+
+            class RankSelect(discord.ui.Select):
+                async def callback(self, interaction: discord.Interaction):
+                    if interaction.user.id != manager.id:
+                        return await interaction.response.send_message(
+                            embed=NotYourPanel(), ephemeral=True
+                        )
+                    nonlocal rankSelected
+                    rankSelected = self.values[0]
+                    await interaction.response.defer()
+                    self.view.stop()
+
+            view = discord.ui.View()
+            options = [
+                discord.SelectOption(label=rank.name, value=rank.id) for rank in Roles
+            ]
+            view.add_item(
+                RankSelect(placeholder="Skip To", options=options, required=False)
+            )
+            view.add_item(
+                SkipButton(label="Continue", style=discord.ButtonStyle.secondary)
+            )
+            await msg.edit(
+                view=view,
+                embed=discord.Embed(description="> Select a rank to skip to."),
+            )
+            await view.wait()
+
+            SkipRole = msg.guild.get_role(int(rankSelected)) if rankSelected else None
+            if SkipRole and SkipRole in Roles:
+                if manager.top_role.position <= SkipRole.position:
+                    await msg.edit(
+                        content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
+                        view=None,
+                        embed=None,
+                    )
+                    return None, None, None, 403
+
+            UserRolesInHierarchy = [role for role in Roles if role in member.roles]
+            NextRole = None
+            if UserRolesInHierarchy:
+                highestRole = max(UserRolesInHierarchy, key=lambda r: r.position)
+                try:
+                    idx = Roles.index(highestRole)
+                except ValueError:
+                    idx = -1
+                if idx > 0:
+                    NextRole = Roles[idx - 1]
+
+            if NextRole and manager.top_role.position <= NextRole.position:
+                await msg.edit(
+                    content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
+                    view=None,
+                    embed=None,
+                )
+                return None, None, None, 403
+            return rankSelected, None, PromoSystemType, 200
+
     @infraction.command(name="multiple", description="Infract multiple staff members")
     @app_commands.autocomplete(action=infractiontypes)
     @app_commands.describe(
@@ -240,6 +447,17 @@ class Infractions(commands.Cog):
             Roblox = await GetValidToken(user=ctx.author)
             if not Roblox:
                 return await msg.edit(embed=NotRobloxLinked())
+
+        skipRole, Department, Type, Status = None, None, None, 200
+        if TypeActions.get("DemotionRole", False):
+            if not await premium(ctx.guild.id):
+                return
+            skipRole, Department, Type, Status = await self.promptHI(
+                Config, msg, staff, ctx.author
+            )
+            if Status == 403:
+                return
+
         Org = action
         CheckedActions = []
         isEscalated = False
@@ -303,8 +521,14 @@ class Infractions(commands.Cog):
             "random_string": random_string,
             "annonymous": anonymous,
             "timestamp": datetime.now(),
-            "SkipExec": None,
         }
+
+        try:
+            if Type:
+                FormeData[Type] = {"SkipTo": skipRole, "Department": Department}
+        except Exception:
+            pass
+
         embeds = []
         EscFrom = None
         if isApproval:
@@ -1027,6 +1251,7 @@ class UpdateAction(discord.ui.Select):
             embed=await InfractionEmbed(interaction.client, self.infraction),
             view=ManageInfraction(self.infraction, self.author),
         )
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Infractions(client))

@@ -716,7 +716,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
                 component=discord.ui.TextInput(
                     required=True,
                     max_length=50,
-                )
+                ),
             )
         else:
             self.name = discord.ui.Label(
@@ -727,10 +727,13 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
                         options=self.options or [],
                         min_values=1,
                         max_values=1,
-                        disabled=True if self.options is None or len(self.options) == 0 else False,
-
+                        disabled=(
+                            True
+                            if self.options is None or len(self.options) == 0
+                            else False
+                        ),
                     )
-                )
+                ),
             )
         self.add_item(self.name)
 
@@ -738,7 +741,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
-        
+
         Value = ""
         if self.type == "add":
             assert isinstance(self.name.component, discord.ui.TextInput)
@@ -1081,6 +1084,43 @@ class LogChannel(discord.ui.ChannelSelect):
             pass
 
 
+class UseHierarchyToggle(discord.ui.View):
+    def __init__(self, author: discord.Member, typeName: str):
+        super().__init__()
+        self.author = author
+        self.typeName = typeName
+
+    @discord.ui.button(label="Use Hierarchy (Disabled)", style=discord.ButtonStyle.red)
+    async def ToggleHierarchy(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await interaction.response.defer()
+        if interaction.user.id != self.author.id:
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
+
+        config = await interaction.client.db["infractiontypeactions"].find_one(
+            {"guild_id": interaction.guild.id, "name": self.typeName}
+        )
+        if config is None:
+            config = {"guild_id": interaction.guild.id, "name": self.typeName}
+
+        state = config.get("DemoteRole", False)
+        config["DemoteRole"] = not state
+
+        await interaction.client.db["infractiontypeactions"].update_one(
+            {"guild_id": interaction.guild.id, "name": self.typeName},
+            {"$set": config},
+            upsert=True,
+        )
+
+        button.style = (
+            discord.ButtonStyle.green if not state else discord.ButtonStyle.red
+        )
+        button.label = f"Use Hierarchy ({'Enabled' if not state else 'Disabled'})"
+
+        await interaction.edit_original_response(view=self)
+
+
 class InfractionTypesAction(discord.ui.Select):
     def __init__(self, author, name):
         self.author = author
@@ -1091,6 +1131,11 @@ class InfractionTypesAction(discord.ui.Select):
             ),
             discord.SelectOption(
                 label="Required Permissions", emoji="<:Permissions:1207365901956026368>"
+            ),
+            discord.SelectOption(
+                label="Use Hierarchy",
+                description="This will use a demotion system with the Hierarchy system.",
+                emoji="<:hierarchy:1341493421503676517>",
             ),
             discord.SelectOption(
                 label="Give Roles", emoji="<:Promotion:1234997026677198938>"
@@ -1151,6 +1196,23 @@ class InfractionTypesAction(discord.ui.Select):
                         seen.add(t)
             await interaction.response.send_modal(Escalate(self.name, types=options))
             return
+
+        elif option == "Use Hierarchy":
+            await interaction.response.defer()
+            if not await premium(interaction.guild.id):
+                return await interaction.followup.send(
+                    embed=NoPremium(), view=Support()
+                )
+            embed = discord.Embed(
+                description="> The Infraction Hierarchy allows you to automate role demotions using Department Hierarchy and singular list hierarchies.",
+                color=discord.Color.dark_embed()
+            )
+            view = UseHierarchyToggle(interaction.user, self.name)
+            return await interaction.followup.send(
+                embed=embed,
+                view=view
+            )
+
         elif option == "Change Group Role":
             await interaction.response.defer()
             Roles = await GroupRoles(interaction)

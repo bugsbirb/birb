@@ -97,6 +97,19 @@ class ConfigMenu(discord.ui.Select):
                     await ModuleOptions(Config),
                 )
             )
+        elif selection == "Hirearchy":
+            from Cogs.Configuration.Components.Hirearchys import (
+                HSELECT,
+                HiEmbed
+            )
+            embed = await HiEmbed(interaction, Config, embed)
+            view = discord.ui.View()
+            view.add_item(
+                HSELECT(
+                    interaction.user,
+                    Config.get("Promo", {}).get("System", {}).get("type", "og"),
+                )
+            )          
         elif selection == "infractions":
             from Cogs.Configuration.Components.Infractions import (
                 InfractionEmbed,
@@ -121,7 +134,6 @@ class ConfigMenu(discord.ui.Select):
             view.add_item(
                 PSelect(
                     interaction.user,
-                    Config.get("Promo", {}).get("System", {}).get("type", "og"),
                 )
             )
         elif selection == "Modmail":
@@ -405,6 +417,11 @@ def Options(Config: dict = None):
             label="Integrations",
             description="Use External APIs.",
             emoji="<:link:1206670134064717904>",
+        ),
+        discord.SelectOption(
+            label="Hirearchy",
+            description="Hierachys for both promotions & infractions.",
+            emoji="<:hierarchy:1341493421503676517>",
         ),
     ]
 

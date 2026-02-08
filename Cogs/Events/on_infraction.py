@@ -238,7 +238,9 @@ class on_infractions(commands.Cog):
         if not Type:
             embed.set_footer(text=f"Infraction ID | {Infraction.random_string}")
 
-        ch = await self.InfractionTypes(Actions, staff, manager, config=Settings)
+        ch = await self.InfractionTypes(
+            Actions, staff, manager, config=Settings, Infraction=InfractionData
+        )
         if ch and ch.get("Channel"):
             try:
                 N = await self.client.fetch_channel(int(ch.get("Channel")))
@@ -376,15 +378,21 @@ class on_infractions(commands.Cog):
                     pass
 
     async def InfractionTypes(
-        self, data, staff: discord.Member, manager: discord.Member, config: dict
+        self,
+        data,
+        staff: discord.Member,
+        manager: discord.Member,
+        config: dict,
+        Infraction: dict,
     ):
+        print("1")
         if not data:
             return {}
         Actions = {}
-
+        print("2")
+        print(data)
         try:
             channel = False
-
             if data.get("givenroles"):
                 roles = [
                     discord.utils.get(staff.guild.roles, id=role)
@@ -400,6 +408,18 @@ class on_infractions(commands.Cog):
                     except (discord.Forbidden, discord.HTTPException, discord.NotFound):
                         pass
                     Actions["AddedRoles"] = [role.id for role in roles]
+
+            if data.get("DemotionRole"):
+                print("omg")
+
+                await DemotionSystem(
+                    self=self.client,
+                    DemotionData=Infraction,
+                    settings=config,
+                    guild=staff.guild,
+                    member=manager,
+                    manager=manager,
+                )
 
             if data.get("changegrouprole") and data.get("grouprole"):
                 from utils.roblox import UpdateMembership
@@ -453,6 +473,292 @@ class on_infractions(commands.Cog):
 
         except Exception:
             return Actions
+
+
+async def DemotionSystem(
+    self: commands.bot,
+    DemotionData: dict,
+    settings: dict,
+    guild: discord.Guild,
+    member: discord.Member,
+    manager: discord.Member,
+):
+    logger.info(f"[Demotion] Started for member {member.id} in guild {guild.id}")
+
+    if not settings.get("Promo"):
+        logger.warning(f"[Demotion] No Promo settings found for guild {guild.id}")
+        return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
+
+    DemoSystemType = settings.get("Promo", {}).get("System", {}).get("type", None)
+    logger.info(f"[Demotion] Using system type: {DemoSystemType}")
+    PrevRole = None
+    SkipRole = None
+
+    if not DemoSystemType:
+        return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
+
+    if DemoSystemType == "multi":
+        Department = DemotionData.get("multi", {}).get("Department")
+        SkipTo = DemotionData.get("multi", {}).get("SkipTo")
+        logger.info(
+            f"[Demotion] Multi-department mode - Department: {Department}, SkipTo: {SkipTo}"
+        )
+
+        DepartmentHierarchies = [
+            dept
+            for sublist in settings.get("Promo", {})
+            .get("System", {})
+            .get("multi", {})
+            .get("Departments", [])
+            for dept in sublist
+        ]
+        if not DepartmentHierarchies or not Department:
+            logger.warning(f"[Demotion] No department hierarchies or department found")
+            return await self.db["infractions"].find_one(
+                {"_id": DemotionData.get("_id")}
+            )
+        DepartmentHierarchy = next(
+            (dept for dept in DepartmentHierarchies if dept.get("name") == Department),
+            None,
+        )
+        if not DepartmentHierarchy:
+            logger.warning(
+                f"[Demotion] Department {Department} not found in hierarchies"
+            )
+            return await self.db["infractions"].find_one(
+                {"_id": DemotionData.get("_id")}
+            )
+
+        RoleIDs = DepartmentHierarchy.get("ranks", [])
+        logger.info(f"[Demotion] Found {len(RoleIDs)} roles in hierarchy")
+
+        MemberRoles = set(member.roles)
+        SortedRoles = [
+            guild.get_role(int(RoleID))
+            for RoleID in RoleIDs
+            if guild.get_role(int(RoleID))
+        ]
+        SortedRoles.sort(key=lambda Role: Role.position)
+
+        if SkipTo:
+            SkipRole = guild.get_role(int(SkipTo))
+            logger.info(
+                f"[Demotion] SkipRole set: {SkipRole.name if SkipRole else 'None'}"
+            )
+            if SkipRole and SkipRole in SortedRoles:
+                try:
+                    await member.add_roles(
+                        SkipRole,
+                        reason=f"Staff Demotion (Skipped) in {Department} initiated by {manager.name}",
+                    )
+                    logger.info(
+                        f"[Demotion] Added skip role {SkipRole.name} to {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(f"[Demotion] Failed to add skip role: {e}")
+                    pass
+
+                for Role in SortedRoles:
+                    if Role in MemberRoles and Role != SkipRole:
+                        try:
+                            await member.remove_roles(
+                                Role,
+                                reason=f"Replaced by {SkipRole.name} initiated by {manager.name}",
+                            )
+                            logger.info(
+                                f"[Demotion] Removed role {Role.name} from {member.name}"
+                            )
+                        except (discord.Forbidden, discord.HTTPException) as e:
+                            logger.error(
+                                f"[Demotion] Failed to remove role {Role.name}: {e}"
+                            )
+                            pass
+
+                await self.db["infractions"].update_one(
+                    {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
+                )
+                logger.info(f"[Demotion] Updated infraction with skip role ID")
+                return await self.db["infractions"].find_one(
+                    {"_id": DemotionData.get("_id")}
+                )
+
+        for Index, CurrentRole in enumerate(SortedRoles):
+            if CurrentRole in MemberRoles and Index - 1 >= 0:
+                PrevRole = SortedRoles[Index - 1]
+                logger.info(
+                    f"[Demotion] Demoting from {CurrentRole.name} to {PrevRole.name}"
+                )
+                try:
+                    await member.add_roles(
+                        PrevRole,
+                        reason=f"Staff Demotion in {Department} initiated by {manager.name}",
+                    )
+                    logger.info(
+                        f"[Demotion] Added role {PrevRole.name} to {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(f"[Demotion] Failed to add role {PrevRole.name}: {e}")
+                    pass
+                try:
+                    await member.remove_roles(
+                        CurrentRole, reason=f"Replaced by {PrevRole.name}"
+                    )
+                    logger.info(
+                        f"[Demotion] Removed role {CurrentRole.name} from {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(
+                        f"[Demotion] Failed to remove role {CurrentRole.name}: {e}"
+                    )
+                    pass
+                break
+            elif CurrentRole in MemberRoles and Index - 1 < 0:
+                logger.info(
+                    f"[Demotion] At bottom of hierarchy, removing {CurrentRole.name}"
+                )
+                try:
+                    await member.remove_roles(
+                        CurrentRole,
+                        reason=f"Removed from bottom of hierarchy by {manager.name}",
+                    )
+                    logger.info(
+                        f"[Demotion] Removed role {CurrentRole.name} from {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(
+                        f"[Demotion] Failed to remove role {CurrentRole.name}: {e}"
+                    )
+                    pass
+                break
+
+        RoleID = SkipRole.id if SkipTo else PrevRole.id if PrevRole else None
+        if RoleID:
+            await self.db["infractions"].update_one(
+                {"_id": DemotionData.get("_id")}, {"$set": {"new": RoleID}}
+            )
+
+    if DemoSystemType == "single":
+        HierarchyRoles = (
+            settings.get("Promo", {})
+            .get("System", {})
+            .get("single", {})
+            .get("Hierarchy", [])
+        )
+        SkipTo = DemotionData.get("single", {}).get("SkipTo")
+        logger.info(
+            f"[Demotion] Single system mode - SkipTo: {SkipTo}, Hierarchy roles: {len(HierarchyRoles)}"
+        )
+
+        if not HierarchyRoles:
+            logger.warning("[Demotion] No hierarchy roles found in single system")
+            return await self.db["infractions"].find_one(
+                {"_id": DemotionData.get("_id")}
+            )
+
+        MemberRoles = set(member.roles)
+        SortedRoles = [
+            guild.get_role(int(RoleID))
+            for RoleID in HierarchyRoles
+            if guild.get_role(int(RoleID))
+        ]
+        SortedRoles.sort(key=lambda Role: Role.position)
+
+        if SkipTo:
+            SkipRole = guild.get_role(int(SkipTo))
+            logger.info(
+                f"[Demotion] SkipRole set: {SkipRole.name if SkipRole else 'None'}"
+            )
+
+            if SkipRole and SkipRole in SortedRoles:
+                try:
+                    await member.add_roles(
+                        SkipRole,
+                        reason=f"Staff Demotion (Skipped) initiated by {manager.name}",
+                    )
+                    logger.info(
+                        f"[Demotion] Added skip role {SkipRole.name} to {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(f"[Demotion] Failed to add skip role: {e}")
+                    pass
+
+                for Role in MemberRoles:
+                    if Role in SortedRoles and Role != SkipRole:
+                        try:
+                            await member.remove_roles(
+                                Role, reason=f"Replaced by {SkipRole.name}"
+                            )
+                            logger.info(
+                                f"[Demotion] Removed role {Role.name} from {member.name}"
+                            )
+                        except (discord.Forbidden, discord.HTTPException) as e:
+                            logger.error(
+                                f"[Demotion] Failed to remove role {Role.name}: {e}"
+                            )
+                            pass
+
+                await self.db["infractions"].update_one(
+                    {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
+                )
+                return await self.db["infractions"].find_one(
+                    {"_id": DemotionData.get("_id")}
+                )
+
+        for Index, CurrentRole in enumerate(SortedRoles):
+            if CurrentRole in MemberRoles and Index - 1 >= 0:
+                PrevRole = SortedRoles[Index - 1]
+                logger.info(
+                    f"[Demotion] Demoting from {CurrentRole.name} to {PrevRole.name}"
+                )
+                try:
+                    await member.add_roles(
+                        PrevRole, reason=f"Staff Demotion initiated by {manager.name}"
+                    )
+                    logger.info(
+                        f"[Demotion] Added role {PrevRole.name} to {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(f"[Demotion] Failed to add role {PrevRole.name}: {e}")
+                    pass
+                try:
+                    await member.remove_roles(
+                        CurrentRole, reason=f"Replaced by {PrevRole.name}"
+                    )
+                    logger.info(
+                        f"[Demotion] Removed role {CurrentRole.name} from {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(
+                        f"[Demotion] Failed to remove role {CurrentRole.name}: {e}"
+                    )
+                    pass
+                break
+            elif CurrentRole in MemberRoles and Index - 1 < 0:
+                logger.info(
+                    f"[Demotion] At bottom of hierarchy, removing {CurrentRole.name}"
+                )
+                try:
+                    await member.remove_roles(
+                        CurrentRole,
+                        reason=f"Removed from bottom of hierarchy by {manager.name}",
+                    )
+                    logger.info(
+                        f"[Demotion] Removed role {CurrentRole.name} from {member.name}"
+                    )
+                except (discord.Forbidden, discord.HTTPException) as e:
+                    logger.error(
+                        f"[Demotion] Failed to remove role {CurrentRole.name}: {e}"
+                    )
+                    pass
+                break
+        RoleID = SkipRole.id if SkipTo else PrevRole.id if PrevRole else None
+        if RoleID:
+            await self.db["infractions"].update_one(
+                {"_id": DemotionData.get("_id")}, {"$set": {"new": RoleID}}
+            )
+
+    logger.info(f"[Demotion] Completed for member {member.id}")
+    return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
 
 
 class InfractionIssuer(discord.ui.View):
