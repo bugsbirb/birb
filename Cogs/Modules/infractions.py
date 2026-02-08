@@ -449,7 +449,7 @@ class Infractions(commands.Cog):
                 return await msg.edit(embed=NotRobloxLinked())
 
         skipRole, Department, Type, Status = None, None, None, 200
-        if TypeActions.get("DemotionRole", False):
+        if TypeActions and TypeActions.get("DemotionRole", False):
             if not await premium(ctx.guild.id):
                 return
             skipRole, Department, Type, Status = await self.promptHI(
