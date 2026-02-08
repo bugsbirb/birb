@@ -311,7 +311,6 @@ async def FinalFunction(interaction: discord.Interaction, d=None):
     view.add_item(
         PSelect(
             interaction.user,
-            Config.get("Promo", {}).get("System", {}).get("type", "og"),
         )
     )
     view.add_item(ConfigMenu(Options(Config=Config), interaction.user))

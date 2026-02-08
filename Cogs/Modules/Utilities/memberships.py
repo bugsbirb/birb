@@ -15,7 +15,7 @@ class Membership(commands.Cog):
         embed = discord.Embed(color=discord.Color.dark_embed())
         embed.add_field(
             name="🕹️ Premium - $2.50",
-            value="> **Whitelabel Lite** - Allow you to send infraction, promotion, qotd messages as webhooks.\n> **Unlimited Modmail Categories**\n> **More Custom Commands** - (10 -> ∞)\n> **Auto Response** - Automatically responds to keywords, uses similarity detection aswell.\n> **Infraction Reason Presets** - Add reasons which you can pick from while creating an infraction.\n>  **Forums Controls** - Adds controls to manage the thread with buttons.\n> **Mass Infractions** - You are able to select a bunch of people and infract them for the same reason + type.",
+            value="> **Whitelabel Lite** - Allow you to send infraction, promotion, qotd messages as webhooks.\n> **Infraction Hierarchies**\n> **Unlimited Modmail Categories**\n> **More Custom Commands** - (10 -> ∞)\n> **Auto Response** - Automatically responds to keywords, uses similarity detection aswell.\n> **Infraction Reason Presets** - Add reasons which you can pick from while creating an infraction.\n>  **Forums Controls** - Adds controls to manage the thread with buttons.\n> **Mass Infractions** - You are able to select a bunch of people and infract them for the same reason + type.",
             inline=False,
         )
         embed.add_field(
