@@ -1,4 +1,4 @@
-discord.py
+git+https://github.com/rapptz/discord.py
 jishaku
 datetime
 python-dotenv

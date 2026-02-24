@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from utils.emojis import *
 import logging
-
 from utils.permissions import premium
 from utils.HelpEmbeds import NoPremium, Support, NotYourPanel
 from utils.ui import PMButton
@@ -84,6 +83,13 @@ class ConfigMenu(discord.ui.Select):
                 )
             )
             view.add_item(PermissionsDropdown(interaction.user))
+        elif selection == "Edit Profile":
+            from Cogs.Configuration.Components.WLite import WLiteOption, WLiteEmbed
+
+            embed = await WLiteEmbed(interaction)
+            view = discord.ui.View()
+            view.add_item(WLiteOption(interaction.user))
+
         elif selection == "Modules":
             embed.set_author(
                 name=f"{interaction.guild.name}", icon_url=interaction.guild.icon
@@ -98,10 +104,8 @@ class ConfigMenu(discord.ui.Select):
                 )
             )
         elif selection == "Hirearchy":
-            from Cogs.Configuration.Components.Hirearchys import (
-                HSELECT,
-                HiEmbed
-            )
+            from Cogs.Configuration.Components.Hirearchys import HSELECT, HiEmbed
+
             embed = await HiEmbed(interaction, Config, embed)
             view = discord.ui.View()
             view.add_item(
@@ -109,7 +113,7 @@ class ConfigMenu(discord.ui.Select):
                     interaction.user,
                     Config.get("Promo", {}).get("System", {}).get("type", "og"),
                 )
-            )          
+            )
         elif selection == "infractions":
             from Cogs.Configuration.Components.Infractions import (
                 InfractionEmbed,
@@ -409,6 +413,11 @@ def Options(Config: dict = None):
             emoji="<:Modules:1296530049381568522>",
         ),
         discord.SelectOption(
+            label="Edit Profile",
+            description="Edit the bots avatar & nickname.",
+            emoji="<:Pen:1235001839036923996>",
+        ),
+        discord.SelectOption(
             label="Subscriptions",
             description="Manage your server's subscriptions",
             emoji="<:subscription:1334962057073655858>",
@@ -420,7 +429,7 @@ def Options(Config: dict = None):
         ),
         discord.SelectOption(
             label="Hirearchy",
-            description="Hierachys for both promotions & infractions.",
+            description="Hierachies for both promotions & infractions.",
             emoji="<:hierarchy:1341493421503676517>",
         ),
     ]
