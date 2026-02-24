@@ -1,5 +1,5 @@
 import discord
-
+from sentry_sdk import metrics
 
 class Support(discord.ui.View):
     def __init__(self):
@@ -60,6 +60,7 @@ def NoPermissionChannel(channel: discord.TextChannel):
 
 
 def NoPremium():
+    metrics.count("Popup:Premium", 1)
     return discord.Embed(
         description="```\nThis feature is only available for premium servers.\n```",
         color=discord.Color.blurple(),
