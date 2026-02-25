@@ -105,8 +105,8 @@ if os.getenv("SENTRY_URL", None):
 class Client(commands.AutoShardedBot):
     def __init__(self):
         self._initialize_databases()
-        self.maintenance = False
-        self.maintenanceReason = ""
+        self.maintenance = True
+        self.maintenanceReason = "Will be offline unoperational for 30 minutes."
         self.cached_commands = {}
         intents = self._initialize_intents()
         self._initialize_super(intents)
@@ -375,7 +375,7 @@ class Client(commands.AutoShardedBot):
         self.add_view(PTicketControl())
 
         self.loop.create_task(self.load_jishaku())
-        DoNotLoad = os.getenv("DoNotLoad", "").replace(" ", "").split(",")
+        DoNotLoad = [str(x).strip() for x in os.getenv("DoNotLoad").split(",")] if os.getenv("DoNotLoad") else []
         self.cogslist = [cog for cog in self.cogslist if cog and cog not in DoNotLoad]
         for ext in self.cogslist:
             try:
@@ -409,7 +409,7 @@ class Client(commands.AutoShardedBot):
         await SyncCommands(self)
         await self._print_startup_info()
         await self._set_custom_status()
-        await self._cache_enabled_servers()
+        # await self._cache_enabled_servers() # Test1
 
     async def _handle_custom_environment(self):
         if not guildid:
