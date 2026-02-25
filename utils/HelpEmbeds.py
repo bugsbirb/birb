@@ -16,7 +16,7 @@ class Support(discord.ui.View):
         self.add_item(
             discord.ui.Button(
                 label="Documentation",
-                url="https://docs.astrobirb.dev/overview",
+                url="https://docs.astrobirb.dev",
                 style=discord.ButtonStyle.blurple,
                 emoji="📚",
             )
