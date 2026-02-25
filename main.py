@@ -249,9 +249,9 @@ class Client(commands.AutoShardedBot):
         return commands.when_mentioned_or(prefix)(self, message)
 
     async def setup_hook(self):
-        await self._load_views()
+        # await self._load_views()
         await self._load_cogs()
-        await self.CacheCommands()
+        # await self.CacheCommands()
 
     async def _load_views(self):
         filter = {}
