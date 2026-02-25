@@ -14,6 +14,8 @@ import os
 class Tree(app_commands.CommandTree):
     async def interaction_check(self, interaction: discord.Interaction):
         if self.client.maintenance is True:
+            if interaction.command and interaction.command.name in {"jsk", "jishaku"}:
+                return True
             await interaction.response.send_message(
                 embed=GlobalMaintenance(self.client.maintenanceReason), view=Support()
             )
