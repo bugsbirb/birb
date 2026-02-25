@@ -406,7 +406,7 @@ class Client(commands.AutoShardedBot):
     async def on_ready(self):
         if environment == "custom":
             await self._handle_custom_environment()
-        await SyncCommands(self)
+        # await SyncCommands(self)
         await self._print_startup_info()
         await self._set_custom_status()
         # await self._cache_enabled_servers() # Test1

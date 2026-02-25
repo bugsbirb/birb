@@ -184,7 +184,8 @@ class CustomCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.RegisterCustomCommands()
+        # await self.RegisterCustomCommands()
+        pass
 
     @commands.command()
     async def prefix(self, ctx: commands.Context, prefix: str = None):
