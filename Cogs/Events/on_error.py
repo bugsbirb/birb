@@ -61,6 +61,8 @@ class On_error(commands.Cog):
 
     async def CheckStatus(self, ctx: commands.Context):
         if self.client.maintenance:
+            if ctx.command and ctx.command.name == "jishaku":
+                return True
             await ctx.send(
                 embed=GlobalMaintenance(self.client.maintenanceReason), view=Support()
             )
