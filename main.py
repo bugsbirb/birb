@@ -113,8 +113,8 @@ class Client(commands.AutoShardedBot):
         self.client = client
         self.cogslist = self._initialize_cogslist()
         self.Tasks = set()
-        if environment != "custom":
-            self.cogslist.extend(["utils.api", "utils.dokploy"])
+        # if environment != "custom":
+        #     self.cogslist.extend(["utils.api", "utils.dokploy"])
         if os.getenv("STAFF"):
             self.cogslist.append("Cogs.Modules.Developer.admin")
 
