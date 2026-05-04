@@ -6,6 +6,7 @@ from discord.ext import commands, tasks
 import os
 import sentry_sdk
 
+
 async def TimeLeftz(loa: dict) -> Union[int, str]:
     if not loa or not loa.get("start_time") or not loa.get("end_time"):
         return "N/A"
@@ -93,6 +94,7 @@ class Leave(commands.Cog):
                         "active": False,
                         "request": False,
                         "guild_id": int(os.getenv("CUSTOM_GUILD")),
+                        "Declined": {"$exists": False},
                     }
                 )
                 .to_list(length=None)
@@ -107,6 +109,7 @@ class Leave(commands.Cog):
                         "scheduled": True,
                         "active": False,
                         "request": False,
+                        "Declined": {"$exists": False},
                     }
                 )
                 .to_list(length=None)
