@@ -93,6 +93,8 @@ class Leave(commands.Cog):
                         "active": False,
                         "request": False,
                         "guild_id": int(os.getenv("CUSTOM_GUILD")),
+                        "Declined": {"$exists": False}
+
                     }
                 )
                 .to_list(length=None)
@@ -107,6 +109,7 @@ class Leave(commands.Cog):
                         "scheduled": True,
                         "active": False,
                         "request": False,
+                        "Declined": {"$exists": False}
                     }
                 )
                 .to_list(length=None)
