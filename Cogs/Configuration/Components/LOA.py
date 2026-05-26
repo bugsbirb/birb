@@ -67,7 +67,8 @@ class LOAOptions(discord.ui.Select):
         if Selection == "Leave Mentions":
             view.add_item(
                 Mentions(
-                    author=interaction.user, roles=Config.get("LOA", {}).get("Mentions", {})
+                    author=interaction.user,
+                    roles=Config.get("LOA", {}).get("Mentions", {}),
                 )
             )
 
