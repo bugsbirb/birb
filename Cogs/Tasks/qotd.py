@@ -28,17 +28,26 @@ class qotd(commands.Cog):
         Config = await self.client.db['Config'].find_one({"_id": server.id})
         if not isinstance(Config, dict):
             Config = {}
+        if not isinstance(Used, list):
+            Used = []
         Questions = (
             await self.client.db["Question Database"].find({"guild": {"$exists": False}}).to_list(length=None)
         )
-        if Config.get("QOTD", {}).get('Premade', False) is False:
+        Config = Config.get("QOTD", {})
+        if not isinstance(Config, dict):
+            Config = {}
+        if Config.get('Premade', True) is False:
             Questions = []
+
         guildQuestions = (
             await self.client.db["Question Database"].find({"guild": server.id}).to_list(length=None)
-        )
+        ) or []
         Questions.extend(guildQuestions)
 
-        Unusued = [q for q in Questions if q["question"] not in Used]
+        if not Questions:
+            return None, False
+
+        Unusued = [q for q in Questions if isinstance(q, dict) and q.get("question") not in Used]
 
         if not Unusued:
             await self.client.db["qotd"].update_one(
@@ -68,6 +77,9 @@ class qotd(commands.Cog):
                 question, UserGenerated = await self.FetchQuestion(messages, guild)
                 if question:
                     messages.append(question)
+                else:
+                    await self.ProcessErrors(results, "No questions available")
+                    return
 
                 ChannelID = results.get("channel_id", None)
                 if ChannelID is None:
@@ -201,7 +213,10 @@ class qotd(commands.Cog):
                 )
 
                 if results.get("qotdthread"):
-                    await msg.create_thread(name="QOTD Discussion")
+                    try:
+                        await msg.create_thread(name="QOTD Discussion")
+                    except Exception:
+                        pass
 
             except Exception as e:
                 await self.ProcessErrors(results, e)
@@ -209,6 +224,8 @@ class qotd(commands.Cog):
     @sentry_sdk.trace()
     async def ProcessErrors(self, results, e):
         GuildID = results.get("guild_id")
+        if GuildID is None:
+            return
         attempts = results.get("attempts", 0) + 1
         if attempts > 10:
             await self.client.db["qotd"].delete_one({"guild_id": GuildID})
