@@ -10,7 +10,7 @@ class WLiteOption(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Edit Profile", emoji="<:Pen:1235001839036923996>"
+                    label="Edit Profile", emoji="<:Pen:1235001839036923996>", description="Premium Required."
                 ),
             ]
         )

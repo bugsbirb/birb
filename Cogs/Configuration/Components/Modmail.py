@@ -17,17 +17,22 @@ class ModmailOptions(discord.ui.Select):
             options = [
                 discord.SelectOption(
                     label="Threads Channel",
+                    description="Channel where modmail threads are created",
                     emoji="<:category:1248312604733210735>",
                 ),
                 discord.SelectOption(
-                    label="Modmail Pings", emoji="<:Ping:1298301862906298378>"
+                    label="Modmail Pings",
+                    description="Roles or users to ping for new modmail messages",
+                    emoji="<:Ping:1298301862906298378>"
                 ),
                 discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
+                    label="Preferences",
+                    description="Configure general modmail behavior and settings",
+                    emoji="<:leaf:1160541147320553562>"
                 ),
                 discord.SelectOption(
                     label="Modmail Categories",
-                    description="Allows users to make different categories in the modmail system. ",
+                    description="Manage different categories for organizing modmail threads",
                     emoji="<:integrations:1272191311234990131>",
                 ),
             ]
@@ -35,21 +40,28 @@ class ModmailOptions(discord.ui.Select):
         else:
             options = [
                 discord.SelectOption(
-                    label="Category", emoji="<:category:1248312604733210735>"
+                    label="Category",
+                    description="Main category channel for modmail threads",
+                    emoji="<:category:1248312604733210735>"
                 ),
                 discord.SelectOption(
                     label="Transcripts Channel",
+                    description="Channel where modmail transcripts are saved",
                     emoji="<:tag:1234998802948034721>",
                 ),
                 discord.SelectOption(
-                    label="Modmail Pings", emoji="<:Ping:1298301862906298378>"
+                    label="Modmail Pings",
+                    description="Roles or users to ping for new modmail messages",
+                    emoji="<:Ping:1298301862906298378>"
                 ),
                 discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
+                    label="Preferences",
+                    description="Configure general modmail behavior and settings",
+                    emoji="<:leaf:1160541147320553562>"
                 ),
                 discord.SelectOption(
                     label="Modmail Categories",
-                    description="Allows users to make different categories in the modmail system. ",
+                    description="Manage different categories for organizing modmail threads",
                     emoji="<:integrations:1272191311234990131>",
                 ),
             ]

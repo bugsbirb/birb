@@ -46,8 +46,11 @@ class on_leave(commands.Cog):
         embed.set_thumbnail(url=L.get("ExtendedUser", {}).get("thumbnail"))
         embed.set_footer(text=L.get("LoaID"))
 
+        mentions = C.get("LOA", {}).get("Mentions", {}).get("Leave", [])
+        mentions = " ".join(f"<@&{roleId}>" for roleId in mentions if roleId)
+
         try:
-            CM = await CH.send(embed=embed, view=PendingActions())
+            CM = await CH.send(content=mentions ,embed=embed, view=PendingActions())
         except (discord.HTTPException, discord.Forbidden):
             return
 
@@ -254,8 +257,12 @@ class on_leave(commands.Cog):
         )
         embed.set_thumbnail(url=L.get("ExtendedUser", {}).get("thumbnail"))
         embed.set_footer(text=L.get("LoaID"))
+
+        mentions = C.get("LOA", {}).get("Mentions", {}).get("Ext", [])
+        mentions = " ".join(f"<@&{roleId}>" for roleId in mentions if roleId)
+
         try:
-            CM = await CH.send(embed=embed, view=ExtRequest())
+            CM = await CH.send(content=mentions or None, embed=embed, view=ExtRequest())
         except (discord.HTTPException, discord.Forbidden):
             return
         await self.client.db["ExtRequests"].update_one(

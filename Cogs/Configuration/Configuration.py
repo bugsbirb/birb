@@ -275,11 +275,16 @@ class ConfigMenu(discord.ui.Select):
                     ),
                     discord.SelectOption(
                         label="Webhook",
-                        description="Send it as a webhook.",
+                        description="Premium Required. Send it as a webhook.",
                         emoji="<:Webhook:1400197752339824821>",
                     ),
                     discord.SelectOption(
                         label="Ping", emoji="<:Ping:1298301862906298378>"
+                    ),
+                    discord.SelectOption(
+                        label="Custom Questions",
+                        emoji="<:MEssage:1297957000440844382>",
+                        description="Premium Required.",
                     ),
                     discord.SelectOption(
                         label="Preferences", emoji="<:leaf:1160541147320553562>"
@@ -297,11 +302,16 @@ class ConfigMenu(discord.ui.Select):
                     ),
                     discord.SelectOption(
                         label="Webhook",
-                        description="Send it as a webhook.",
+                        description="Premium Required. Send it as a webhook. ",
                         emoji="<:Webhook:1400197752339824821>",
                     ),
                     discord.SelectOption(
                         label="Ping", emoji="<:Ping:1298301862906298378>"
+                    ),
+                    discord.SelectOption(
+                        label="Custom Questions",
+                        emoji="<:MEssage:1297957000440844382>",
+                        description="Premium Required.",
                     ),
                     discord.SelectOption(
                         label="Preferences", emoji="<:leaf:1160541147320553562>"
@@ -389,7 +399,7 @@ def DefaultEmbed(guild: discord.Guild):
     )
     embed.add_field(
         name="<:Help:1184535847513624586> Documentation",
-        value="> The best way to learn how to use **Astro Birb** is through the [**documentation**](https://astrobirb.dev)!",
+        value="> The best way to learn how to use **Birb** is through the [**documentation**](https://astrobirb.dev)!",
         inline=False,
     )
     embed.set_thumbnail(url=guild.icon)

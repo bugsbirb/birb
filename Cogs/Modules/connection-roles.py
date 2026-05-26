@@ -158,7 +158,7 @@ class ConnectionRoles(commands.Cog):
         )
         if len(roleresult) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, There are no connection roles.",
+                f"{no} **{ctx.author.display_name}**, there are no connection roles.",
             )
             return
 

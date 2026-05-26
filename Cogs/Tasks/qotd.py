@@ -25,18 +25,30 @@ class qotd(commands.Cog):
 
     @sentry_sdk.trace()
     async def FetchQuestion(self, Used, server: discord.Guild):
-        questionresult = (
-            await self.client.db["Question Database"].find({}).to_list(length=None)
+        Config = await self.client.db['Config'].find_one({"_id": server.id})
+        if not isinstance(Config, dict):
+            Config = {}
+        Questions = (
+            await self.client.db["Question Database"].find({"guild": {"$exists": False}}).to_list(length=None)
         )
-        Unusued = [q for q in questionresult if q["question"] not in Used]
+        if Config.get("QOTD", {}).get('Premade', False) is False:
+            Questions = []
+        guildQuestions = (
+            await self.client.db["Question Database"].find({"guild": server.id}).to_list(length=None)
+        )
+        Questions.extend(guildQuestions)
+
+        Unusued = [q for q in Questions if q["question"] not in Used]
 
         if not Unusued:
             await self.client.db["qotd"].update_one(
                 {"guild_id": server.id}, {"$set": {"messages": []}}
             )
-            return random.choice(questionresult).get("question")
-        del questionresult
-        return random.choice(Unusued).get("question")
+            question = random.choice(Questions)
+            return question.get("question"), bool(question.get("guild"))
+        del Questions
+        question = random.choice(Unusued)
+        return question.get("question"), bool(question.get("guild"))
     
     @sentry_sdk.trace()
     async def ProcesssQOTD(self, results):
@@ -53,7 +65,7 @@ class qotd(commands.Cog):
                     return
 
                 messages = results.get("messages", [])
-                question = await self.FetchQuestion(messages, guild)
+                question, UserGenerated = await self.FetchQuestion(messages, guild)
                 if question:
                     messages.append(question)
 
@@ -82,8 +94,9 @@ class qotd(commands.Cog):
                 )
 
                 day = results.get("day", 0) + 1
+                UserGeneratedMO = " • This question is user generated and doesn't reflect on Birb as a whole." if UserGenerated else ""
                 embed.set_footer(
-                    text=f"Day #{day}",
+                    text=f"Day #{day}{UserGeneratedMO}",
                     icon_url="https://cdn.discordapp.com/emojis/1231270156647403630.webp?size=96&quality=lossless",
                 )
                 msg = None

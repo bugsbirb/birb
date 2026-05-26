@@ -2,6 +2,7 @@ import discord
 from utils.emojis import *
 from datetime import datetime, timedelta
 import re
+import io
 from utils.permissions import premium
 from utils.HelpEmbeds import NoPremium, Support, NotYourPanel
 
@@ -80,6 +81,25 @@ class QOTDOptions(discord.ui.Select):
                     interaction, discord.Embed(color=discord.Color.dark_embed())
                 ),
                 view=view,
+            )
+        elif option == "Custom Questions":
+            if not await premium(interaction.guild.id):
+                return await interaction.followup.send(
+                    embed=NoPremium(), view=Support(), ephemeral=True
+                )
+            view = CustomQuestions(interaction.user)
+            current = Config.get("QOTD", {}).get("Premade", True)
+            if current:
+                view.Premade.label = "Premade Questions: Enabled"
+                view.Premade.style = discord.ButtonStyle.green
+            else:
+                view.Premade.label = "Premade Questions: Disabled"
+                view.Premade.style = discord.ButtonStyle.red
+
+            await interaction.followup.send(
+                files=[await customQuestionsMessage(interaction)],
+                view=view,
+                ephemeral=True
             )
         elif option == "Webhook":
             if not await premium(interaction.guild.id):
@@ -197,6 +217,128 @@ class QOTDOptions(discord.ui.Select):
             view = discord.ui.View()
             view.add_item(PingRole(interaction.user, interaction.message))
             await interaction.followup.send(view=view, ephemeral=True)
+
+
+class CreateQuestion(discord.ui.Modal):
+    def __init__(self, author: discord.Member):
+        super().__init__(title="Create Question")
+        self.author = author
+        self.question = discord.ui.TextInput(
+            label="Question",
+            placeholder="Enter the question of the day",
+            style=discord.TextStyle.paragraph,
+            required=True,
+            max_length=500,
+        )
+        self.add_item(self.question)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
+        await interaction.client.db["Question Database"].insert_one(
+            {
+                "guild": interaction.guild.id,
+                "question": self.question.value.strip(),
+                "createdBy": interaction.user.id,
+                "createdAt": datetime.now(),
+            }
+        )
+        await interaction.response.edit_message(
+            attachments=[await customQuestionsMessage(interaction)],
+        )
+
+
+class DeleteQuestion(discord.ui.Modal):
+    def __init__(self, author: discord.Member):
+        super().__init__(title="Delete Question")
+        self.author = author
+        self.question = discord.ui.TextInput(
+            label="Question (exact)",
+            placeholder="Paste the exact question text to delete",
+            style=discord.TextStyle.paragraph,
+            required=True,
+            max_length=500,
+        )
+        self.add_item(self.question)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
+        Question = self.question.value.strip()
+        result = await interaction.client.db["Question Database"].delete_one(
+            {"guild": interaction.guild.id, "question": Question}
+        )
+        if result.deleted_count == 0:
+            return await interaction.response.send_message(
+                content=f"{no} **{interaction.user.display_name}**, no question matched that exact text.",
+                ephemeral=True,
+            )
+
+        await interaction.response.edit_message(
+            attachments=[await customQuestionsMessage(interaction)],
+        )
+
+
+class CustomQuestions(discord.ui.View):
+    def __init__(self, author: discord.Member, config=None):
+        super().__init__(timeout=1600)
+        self.author = author
+        self.config = config
+    
+    @discord.ui.button(label="Create", style=discord.ButtonStyle.green)
+    async def Create(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+        await interaction.response.send_modal(CreateQuestion(self.author))
+
+    @discord.ui.button(label="Delete", style=discord.ButtonStyle.red)
+    async def Delete(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+        await interaction.response.send_modal(DeleteQuestion(self.author))
+
+    @discord.ui.button(label="Premade Questions: Enabled")
+    async def Premade(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
+        Config = await interaction.client.db["Config"].find_one(
+            {"_id": interaction.guild.id}
+        )
+        if not Config:
+            Config = {"_id": interaction.guild.id, "QOTD": {}}
+        if "QOTD" not in Config:
+            Config["QOTD"] = {}
+
+        current = Config["QOTD"].get("Premade", True)
+        new = not current
+        Config["QOTD"]["Premade"] = new
+
+        await interaction.client.db["Config"].update_one(
+            {"_id": interaction.guild.id}, {"$set": {"QOTD": Config["QOTD"]}}, upsert=True
+        )
+
+        if new:
+            button.label = "Premade Questions: Enabled"
+            button.style = discord.ButtonStyle.green
+        else:
+            button.label = "Premade Questions: Disabled"
+            button.style = discord.ButtonStyle.red
+
+        await interaction.response.edit_message(attachments=[await customQuestionsMessage(interaction)], view=self)
+
 
 
 class PingRole(discord.ui.RoleSelect):
@@ -493,7 +635,19 @@ async def QOTDEMbed(interaction: discord.Interaction, embed: discord.Embed):
     embed.description = "> This is where you can manage your server's QOTD settings! QOTD is a way for members to answer a question of the day. You can find out more at [the documentation](https://docs.astrobirb.dev/Modules/qotd)."
     embed.add_field(
         name="<:settings:1207368347931516928> Daily Questions",
-        value=f"{replytop} `Channel:` {channel}\n{replymiddle} `Ping`: {ping}\n{replybottom} `Next Date:` {NextDate} (Not 100% accurate)\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev/Modules/qotd).",
+        value=f"{replytop} `Channel:` {channel}\n{replymiddle} `Ping`: {ping}\n{replybottom} `Next Date:` {NextDate}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev/Modules/qotd).",
         inline=False,
     )
     return embed
+
+
+async def customQuestionsMessage(interaction: discord.Interaction):
+    guildQuestions = (
+        await interaction.client.db["Question Database"]
+        .find({"guild": interaction.guild.id})
+        .to_list(length=None)
+    )
+    listedQuestions = [guild.get("question") for guild in guildQuestions]
+    text = "\n".join(c for c in listedQuestions if c)
+    fp = io.BytesIO(text.encode("utf-8"))
+    return discord.File(fp=fp, filename="Questions.txt")

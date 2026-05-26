@@ -59,13 +59,13 @@ class Utility(commands.Cog):
 
         bot_user = self.client.user
         embed = discord.Embed(
-            description="Encountering issues with Astro Birb? Our support team is here to help! Join our official support server using the link below.",
+            description="Encountering issues with Birb? Our support team is here to help! Join our official support server using the link below.",
             color=0x2B2D31,
         )
         embed.set_author(name=bot_user.display_name, icon_url=bot_user.display_avatar)
         await interaction.response.send_message(embed=embed, view=view)
 
-    @app_commands.command(description="Invite Astro Birb to your server")
+    @app_commands.command(description="Invite Birb to your server")
     @app_commands.allowed_installs(guilds=False, users=True)
     @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def invite(self, interaction: discord.Interaction):

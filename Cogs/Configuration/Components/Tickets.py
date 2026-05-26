@@ -13,13 +13,13 @@ class Tickets(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Panels", emoji="<:Panel:1340741181965078642>"
+                    label="Panels", emoji="<:Panel:1340741181965078642>", description="Singular ticket panels that include one button."
                 ),
                 discord.SelectOption(
-                    label="Multi Panels", emoji="<:MultiPanel:1340741183579885690>"
+                    label="Multi Panels", emoji="<:MultiPanel:1340741183579885690>", description="Merge multiple singular panels together: Adds multiple buttons to one panel."
                 ),
                 discord.SelectOption(
-                    label="Quota", emoji="<:counting:1343598685749252227>"
+                    label="Quota", emoji="<:counting:1343598685749252227>", description="Track the amount of claimed tickets staff members claim."
                 ),
             ]
         )

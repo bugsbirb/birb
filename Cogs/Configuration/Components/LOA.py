@@ -8,15 +8,23 @@ class LOAOptions(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="LOA Channel", emoji="<:tag:1234998802948034721>"
+                    label="Leave Channel",
+                    emoji="<:tag:1234998802948034721>",
+                    description="The channel where leaves will be sent.",
                 ),
                 discord.SelectOption(
-                    label="LOA Audit Log",
+                    label="Leave Audit Log",
                     emoji="<:Log:1349431938926252115>",
                     description="Logs for modify/force end.",
                 ),
                 discord.SelectOption(
-                    label="LOA Role", emoji="<:Ping:1298301862906298378>"
+                    label="Leave Role",
+                    emoji="<:Ping:1298301862906298378>",
+                    description="Gives the user a role for when they are on LOA.",
+                ),
+                discord.SelectOption(
+                    label="Leave Mentions",
+                    description="Allows for roles to be mentioned for extension & leave requests.",
                 ),
             ]
         )
@@ -45,7 +53,7 @@ class LOAOptions(discord.ui.Select):
         )
         Selection = self.values[0]
         view = discord.ui.View()
-        if Selection == "LOA Role":
+        if Selection == "Leave Role":
             view.add_item(
                 LOARole(
                     self.author,
@@ -56,7 +64,14 @@ class LOAOptions(discord.ui.Select):
                 )
             )
 
-        if Selection == "LOA Channel":
+        if Selection == "Leave Mentions":
+            view.add_item(
+                Mentions(
+                    author=interaction.user, roles=Config.get("LOA").get("Mentions")
+                )
+            )
+
+        if Selection == "Leave Channel":
             view.add_item(
                 LOAChannel(
                     author=self.author,
@@ -67,7 +82,7 @@ class LOAOptions(discord.ui.Select):
                 )
             )
 
-        if Selection == "LOA Audit Log":
+        if Selection == "Leave Audit Log":
             view.add_item(
                 LogChannel(
                     author=self.author,
@@ -79,6 +94,125 @@ class LOAOptions(discord.ui.Select):
             )
 
         await interaction.followup.send(view=view, ephemeral=True)
+
+
+class Mentions(discord.ui.Select):
+    def __init__(self, author: discord.Member, roles):
+        super().__init__(
+            placeholder="Leave Types",
+            min_values=0,
+            max_values=1,
+            options=[
+                discord.SelectOption(
+                    label="Extension Requests",
+                    description="Pings & mentions for extension requests.",
+                ),
+                discord.SelectOption(
+                    label="Leave Requests",
+                    description="Pings & mentions for leave requests.",
+                ),
+            ],
+        )
+        self.author = author
+        self.roles = roles
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
+        Selection = self.values[0] if self.values else None
+        view = discord.ui.View()
+
+        if Selection == "Extension Requests":
+            view.add_item(
+                Pings(
+                    author=self.author,
+                    Ltype="Ext",
+                    roles=[
+                        role
+                        for role in interaction.guild.roles
+                        if role.id in self.roles.get("Ext", [])
+                    ],
+                )
+            )
+
+        elif Selection == "Leave Requests":
+            view.add_item(
+                Pings(
+                    author=self.author,
+                    Ltype="Leave",
+                    roles=[
+                        role
+                        for role in interaction.guild.roles
+                        if role.id in self.roles.get("Ext", [])
+                    ],
+                )
+            )
+
+        await interaction.response.send_message(
+            content=f"<:info:1245364500874399864> **{interaction.user.display_name}**, this allows for pings to be attached to leave messages.",
+            view=view,
+            ephemeral=True,
+        )
+
+
+class Pings(discord.ui.RoleSelect):
+    def __init__(
+        self,
+        author: discord.Member,
+        roles: list[discord.Role] = None,
+        message: discord.Message = None,
+        Ltype: str = "Ext",
+    ):
+        super().__init__(
+            placeholder=f"{Ltype} Pings",
+            min_values=0,
+            max_values=25,
+            default_values=roles or [],
+        )
+        self.author = author
+        self.roles = roles
+        self.message = message
+        self.Ltype = Ltype
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
+        config = await interaction.client.config.find_one({"_id": interaction.guild.id})
+        if config is None:
+            config = {"_id": interaction.guild.id, "LOA": {"Mentions": {}}}
+        elif "LOA" not in config:
+            config["LOA"] = {"Mentions": {}}
+        elif "Mentions" not in config["LOA"]:
+            config["LOA"]["Mentions"] = {}
+
+        config["LOA"]["Mentions"][self.Ltype] = [role.id for role in self.values]
+        await interaction.client.config.update_one(
+            {"_id": interaction.guild.id}, {"$set": config}
+        )
+        Updated = await interaction.client.config.find_one(
+            {"_id": interaction.guild.id}
+        )
+
+        await interaction.response.send_message(
+            f"{tick} **{interaction.user.display_name}**, successfully updated mentions.",
+            ephemeral=True,
+        )
+        try:
+            await self.message.edit(
+                embed=await LOAEmbed(
+                    interaction,
+                    Updated,
+                    discord.Embed(color=discord.Color.dark_embed()),
+                ),
+            )
+        except:
+            pass
 
 
 class LogChannel(discord.ui.ChannelSelect):
@@ -114,7 +248,7 @@ class LogChannel(discord.ui.ChannelSelect):
         elif "LogChannel" not in config.get("Infraction", {}):
             config["LOA"]["LogChannel"] = None
         if self.values:
-         config["LOA"]["LogChannel"] = self.values[0].id
+            config["LOA"]["LogChannel"] = self.values[0].id
         else:
             config["LOA"].pop("LogChannel", None)
 

@@ -9,7 +9,7 @@ from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
 import datetime
 from utils.format import Replace
 import asyncio
-from utils.r2 import upload_file_to_r2, ClearOldFiles
+from utils.r2 import upload_file_to_r2
 
 
 async def TicketPermissions(interaction: discord.Interaction):
@@ -158,7 +158,6 @@ class TicketsPublic(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
         self.AutomAtions.start()
-        self.ClearOld.start()
 
     @tasks.loop(seconds=360)
     async def AutomAtions(self):
@@ -341,21 +340,6 @@ class TicketsPublic(commands.Cog):
             return logging.critical(
                 f"[on_pticket_claim] Bot does not have permission to edit the channel {Channel.id}"
             )
-
-    @tasks.loop(hours=12)
-    async def ClearOld(self):
-        if not (
-            os.getenv("R2_URL")
-            and os.getenv("ACCESS_KEY_ID")
-            and os.getenv("SECRET_ACCESS_KEY")
-            and os.getenv("BUCKET")
-        ):
-            return
-        if os.getenv("ENVIRONMENT") in ["development", "custom"] and (
-            not os.getenv("VIDEO_DAYS") or not os.getenv("IMAGE_DAYS")
-        ):
-            return
-        await ClearOldFiles()
 
     @commands.Cog.listener()
     async def on_unclaim(self, objectID: ObjectId):

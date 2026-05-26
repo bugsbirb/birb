@@ -6,11 +6,12 @@ sys.dont_write_bytecode = True
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 from utils.emojis import *
-
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 MONGO_URL = os.getenv("MONGO_URL")
-mongo = AsyncIOMotorClient(MONGO_URL)
-db = mongo["astro"]
+client = AsyncIOMotorClient(MONGO_URL)
+db = client["BETA"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
+
 
 premiums = db["Subscriptions"]
 blacklist = db["blacklists"]
@@ -152,7 +153,7 @@ async def has_admin_role(
     blacklists = await blacklist.find_one({"user": author.id})
     if blacklists:
         await send(
-            f"{no} **{author.display_name}**, you are blacklisted from using **Astro Birb.** You are probably a shitty person and that might be why?",
+            f"{no} **{author.display_name}**, you are blacklisted from using **Birb.**",
             ephemeral=ephemeral,
         )
         return False

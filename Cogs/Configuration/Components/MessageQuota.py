@@ -11,16 +11,24 @@ class QuotaOptions(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Quota Amount", emoji="<:uilsortamountup:1248315081154887761>"
+                    label="Quota Amount",
+                    description="Set the minimum message count required.",
+                    emoji="<:uilsortamountup:1248315081154887761>",
                 ),
                 discord.SelectOption(
-                    label="Role Quota", emoji="<:RoleQuota:1400797914011271231>"
+                    label="Role Quota",
+                    description="Manage role based quota requirements.",
+                    emoji="<:RoleQuota:1400797914011271231>",
                 ),
                 discord.SelectOption(
-                    label="Ignored Channels", emoji="<:tag:1234998802948034721>"
+                    label="Ignored Channels",
+                    description="Choose channels excluded from quota tracking.",
+                    emoji="<:tag:1234998802948034721>",
                 ),
                 discord.SelectOption(
-                    label="Auto Activity", emoji="<:suspensions:1234998406938755122>"
+                    label="Auto Activity",
+                    description="Configure automatic activity-based quota behavior.",
+                    emoji="<:suspensions:1234998406938755122>",
                 ),
             ]
         )

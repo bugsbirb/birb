@@ -47,12 +47,13 @@ TOKEN = os.getenv("TOKEN")
 STATUS = os.getenv("STATUS")
 MONGO_URL = os.getenv("MONGO_URL")
 SHARDS = os.getenv("SHARDS")
-
+ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 client = AsyncIOMotorClient(MONGO_URL)
 # client = pymongo.AsyncMongoClient(MONGO_URL)
-qdb = client["quotadb"]
-db = client["astro"]
+qdb = client["QBeta"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
+db = client["BETA"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
+
 prefixdb = db["prefixes"]
 qotdd = db["qotd"]
 Config = db["Config"]
@@ -61,11 +62,11 @@ SupportVariables = db["Support Variables"]
 staffdb = db["staff database"]
 
 
-if not (TOKEN or MONGO_URL, PREFIX):
-    logger.error("[❌] Missing .env variables. [TOKEN, MONGO_URL]")
+if not (TOKEN and MONGO_URL and PREFIX):
+    logger.error("[❌] Missing .env variables. [TOKEN, MONGO_URL, PREFIX]")
     sys.exit(1)
 
-if os.getenv("REMOVE_EMOJIS", False) == "True" or environment == "custom":
+if os.getenv("REMOVE_EMOJIS", "False") == "True" or (ENVIRONMENT and ENVIRONMENT.lower() == "custom"):
     from branding import ClearEmojis
 
     ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
