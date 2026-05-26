@@ -20,7 +20,9 @@ class InfractionOption(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Infraction Channel", emoji="<:tag:1234998802948034721>", description="Channel where infractions are sent."
+                    label="Infraction Channel",
+                    emoji="<:tag:1234998802948034721>",
+                    description="Channel where infractions are sent.",
                 ),
                 discord.SelectOption(
                     label="Infraction Audit Log",
@@ -30,7 +32,7 @@ class InfractionOption(discord.ui.Select):
                 discord.SelectOption(
                     label="Infraction Types",
                     emoji="<:gridiconstypes:1248299279513161829>",
-                    description="Configure custom actions for each punishment type."
+                    description="Configure custom actions for each punishment type.",
                 ),
                 discord.SelectOption(
                     label="Infraction Approval",
@@ -39,21 +41,23 @@ class InfractionOption(discord.ui.Select):
                 ),
                 discord.SelectOption(
                     label="Webhook",
-                    description="Send infraction messages through a webhook.",
+                    description="Premium Required. Send infraction messages through a webhook.",
                     emoji="<:Webhook:1400197752339824821>",
-                    description="Premium Required.",
                 ),
                 discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>", description="General settings for notifications and defaults."
+                    label="Preferences",
+                    emoji="<:leaf:1160541147320553562>",
+                    description="General settings for notifications and defaults.",
                 ),
                 discord.SelectOption(
                     label="Customise Embed",
                     emoji="<:Customisation:1223063306131210322>",
-                    description="Customise infraction embeds and messages sent to the channel."
+                    description="Customise infraction embeds and messages sent to the channel.",
                 ),
                 discord.SelectOption(
-                    label="Preset Reasons", emoji="<:auto:1280563201662255137>",
-                    description="Premium required. Manage preset reasons for infractions."
+                    label="Preset Reasons",
+                    emoji="<:auto:1280563201662255137>",
+                    description="Premium required. Manage preset reasons for infractions.",
                 ),
             ]
         )

@@ -67,7 +67,7 @@ class LOAOptions(discord.ui.Select):
         if Selection == "Leave Mentions":
             view.add_item(
                 Mentions(
-                    author=interaction.user, roles=Config.get("LOA").get("Mentions")
+                    author=interaction.user, roles=Config.get("LOA", {}).get("Mentions", {})
                 )
             )
 
@@ -97,7 +97,7 @@ class LOAOptions(discord.ui.Select):
 
 
 class Mentions(discord.ui.Select):
-    def __init__(self, author: discord.Member, roles):
+    def __init__(self, author: discord.Member, roles: dict):
         super().__init__(
             placeholder="Leave Types",
             min_values=0,
