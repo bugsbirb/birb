@@ -20,12 +20,6 @@ class PSelect(discord.ui.Select):
                 description="Set the channel for promotion messages.",
             ),
             discord.SelectOption(
-                label="Promotions System",
-                value="Promotions System",
-                emoji="<:system:1341493634733703300>",
-                description="Choose which promotions system you want to use.",
-            ),
-            discord.SelectOption(
                 label="Webhook",
                 value="Webhook",
                 emoji="<:Webhook:1400197752339824821>",
