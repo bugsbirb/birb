@@ -50,7 +50,7 @@ class on_leave(commands.Cog):
         mentions = " ".join(f"<@&{roleId}>" for roleId in mentions if roleId)
 
         try:
-            CM = await CH.send(content=mentions ,embed=embed, view=PendingActions())
+            CM = await CH.send(content=mentions ,embed=embed, view=PendingActions(), allowed_mentions=discord.AllowedMentions(roles=True))
         except (discord.HTTPException, discord.Forbidden):
             return
 
@@ -262,7 +262,7 @@ class on_leave(commands.Cog):
         mentions = " ".join(f"<@&{roleId}>" for roleId in mentions if roleId)
 
         try:
-            CM = await CH.send(content=mentions or None, embed=embed, view=ExtRequest())
+            CM = await CH.send(content=mentions or None, embed=embed, view=ExtRequest(), allowed_mentions=discord.AllowedMentions(roles=True))
         except (discord.HTTPException, discord.Forbidden):
             return
         await self.client.db["ExtRequests"].update_one(
