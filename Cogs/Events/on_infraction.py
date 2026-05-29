@@ -4,11 +4,31 @@ import os
 from bson import ObjectId
 import aiohttp
 import logging
+from datetime import datetime
 from utils.permissions import premium
 from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 logger = logging.getLogger(__name__)
 MONGO_URL = os.getenv("MONGO_URL")
+SignalSecret = os.getenv("SIGNALR_SECRET")
+SignalURL = os.getenv("SignalURL")
+
+
+def HubConnection(serverId: str):
+    Connect = HubConnectionBuilder().with_url(f"{SignalURL}/hub").build()
+    Connect.start()
+
+    import time
+
+    time.sleep(0.5)
+
+    Connect.invoke("JoinGroupBot", [serverId, SignalSecret])
+    return Connect
+
+
+def normalize(value):
+    return str(value) if isinstance(value, int) else value
 
 
 def Replacements(staff: discord.Member, Infraction: dict, manager: discord.Member):
@@ -70,6 +90,7 @@ def InfractItem(data):
         webhook_id=data.get("WebhookID"),
         escalated_from=data.get("EscalatedFrom"),
         skipExec=data.get("skipExec"),
+        jumpUrl=data.get("jump_url"),
     )
 
 
@@ -103,6 +124,7 @@ class InfractionItem:
         webhook_id,
         escalated_from,
         skipExec,
+        jumpUrl,
     ):
         self.staff = staff
         self.management = management
@@ -119,6 +141,7 @@ class InfractionItem:
         self.webhook_id = webhook_id
         self.escalated_from = escalated_from
         self.skipExec = skipExec
+        self.jumpUrl = jumpUrl
 
 
 class Embed:
@@ -205,6 +228,26 @@ class on_infractions(commands.Cog):
                 extra={"objectId": str(objectid)},
             )
             return
+        Hub = HubConnection(str(guild.id))
+        payload = {
+            "id": str(objectid),
+            "GuildId": normalize(Infraction.guild_id),
+            "staff": normalize(Infraction.staff),
+            "staffAvatar": str(staff.display_avatar),
+            "staffName": staff.display_name,
+            "management": normalize(Infraction.management),
+            "msgId": normalize(Infraction.msg_id),
+            "action": Infraction.action,
+            "reason": Infraction.reason,
+            "notes": Infraction.notes,
+            "approvalStatus": False,
+            "expiration": (
+                Infraction.expiration.isoformat() if Infraction.expiration else None
+            ),
+            "timestamp": datetime.now().isoformat(),
+            "jumpUrl": Infraction.jumpUrl,
+        }
+        Hub.send("SendInfractionBot", [payload, SignalSecret])
 
         custom = await self.client.db["Customisation"].find_one(
             {
