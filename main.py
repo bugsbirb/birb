@@ -188,6 +188,7 @@ class Client(commands.AutoShardedBot):
             "Cogs.Modules.integrations",
             "Cogs.Modules.tickets",
             # Utilities
+            "Cogs.Modules.analytics",
             "Cogs.Modules.Utilities.extras",
             "Cogs.Modules.Utilities.ping",
             "Cogs.Modules.Utilities.info",
