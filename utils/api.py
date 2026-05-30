@@ -118,7 +118,15 @@ class APIRoutes:
             return header[7:]
         return None
 
-    async def POST_mutual_servers(self, request: Request, auth: str):
+    async def POST_mutual_servers(self, request: Request):
+        auth = self.Bearer(request)
+
+        if not auth:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid Authorization header",
+            )
+
         if not await RestrictedValidation(auth):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Key"
@@ -132,6 +140,8 @@ class APIRoutes:
 
         guilds = body.get("guilds")
         user = body.get("user")
+        print(user)
+        print(guilds)
 
         if not guilds or not user:
             raise HTTPException(
@@ -184,7 +194,7 @@ class APIRoutes:
 
         mutual = [result for result in results if result is not None]
 
-        return {"status": "success", "mutual": mutual}
+        return {"status": "success", "mutuals": mutual}
 
     async def GET_get_staff(self, request: Request, body: dict):
         auth = self.Bearer(request)
