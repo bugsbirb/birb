@@ -118,6 +118,74 @@ class APIRoutes:
             return header[7:]
         return None
 
+    async def POST_mutual_servers(self, request: Request, auth: str):
+        if not await RestrictedValidation(auth):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Key"
+            )
+        try:
+            body = await request.json()
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON"
+            )
+
+        guilds = body.get("guilds")
+        user = body.get("user")
+
+        if not guilds or not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Missing guilds or user"
+            )
+
+        async def Process(GuilID):
+            guild = self.client.get_guild(int(GuilID))
+            if not guild:
+                return None
+            if not guild.chunked:
+                await guild.chunk()
+            member = guild.get_member(int(user))
+            if not member:
+                return None
+            Admin = member.guild_permissions.administrator
+            Manager = member.guild_permissions.manage_guild
+            if not Admin and not Manager:
+                return None
+
+            return {
+                "name": guild.name,
+                "icon": guild.icon.url if guild.icon else None,
+                "id": str(guild.id),
+                "membercount": guild.member_count,
+                "roles": [
+                    {
+                        "id": str(role.id),
+                        "name": role.name,
+                    }
+                    for role in guild.roles
+                ],
+                "channels": [
+                    {
+                        "id": str(channel.id),
+                        "name": channel.name,
+                    }
+                    for channel in guild.channels
+                ],
+                "isAdmin": member.guild_permissions.administrator,
+                "isManager": (
+                    guild.owner_id is not None and guild.owner_id == member.id
+                )
+                or await isStaff(guild, member)
+                or member.guild_permissions.administrator,
+            }
+
+        tasks = [Process(GuilID) for GuilID in guilds]
+        results = await asyncio.gather(*tasks)
+
+        mutual = [result for result in results if result is not None]
+
+        return {"status": "success", "mutual": mutual}
+
     async def GET_get_staff(self, request: Request, body: dict):
         auth = self.Bearer(request)
         if not auth:
