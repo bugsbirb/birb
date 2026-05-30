@@ -153,6 +153,7 @@ class APIRoutes:
             if not guild:
                 return None
             if not guild.chunked:
+                print("betco")
                 await guild.chunk()
             member = guild.get_member(int(user))
             if not member:
@@ -196,7 +197,7 @@ class APIRoutes:
 
         return {"status": "success", "mutuals": mutual}
 
-    async def GET_get_staff(self, request: Request, body: dict):
+    async def POST_staff(self, request: Request, body: dict):
         auth = self.Bearer(request)
         if not auth:
             raise HTTPException(
@@ -205,17 +206,25 @@ class APIRoutes:
             )
 
         self.HandleRatelimits(auth)
+        if not await RestrictedValidation(auth):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Key"
+            )
 
         guildId = body.get("guildId")
-
-        guild = self.client.get_guild(guildId)
-        if not guild:
-            raise HTTPException(status_code=404, detail="Guild not found")
+        try:
+            guild = self.client.get_guild(int(guildId))
+        except (discord.Forbidden, discord.NotFound):
+            guild = None
 
         if not guild.chunked:
             await guild.chunk()
 
-        config = self.client.db["Config"].find_one({"_id": guild.id})
+        if not guild:
+            raise HTTPException(status_code=404, detail="Guild not found")
+        print(guild.chunked)
+
+        config = await self.client.db["Config"].find_one({"_id": guild.id})
         if not config:
             return HTTPException(status_code=404, detail="Not configured.")
 
@@ -223,15 +232,23 @@ class APIRoutes:
         staffRoles = config.get("Permissions").get("staffrole", []) + config.get(
             "Permissions"
         ).get("staffrole", [])
+        print(staffRoles)
         for roleId in staffRoles:
             role = guild.get_role(roleId)
             if role:
+                print(role.members)
                 staff.update(role.members)
 
-        serialized = set()
+        serialized = []
 
         for s in staff:
-            serialized.add({"Username": s.name, "Avatar": s.avatar, "Id": str(s.id)})
+            serialized.append(
+                {
+                    "Username": s.name,
+                    "Avatar": s.avatar.url if s.avatar else None,
+                    "Id": str(s.id),
+                }
+            )
 
         return {"status": "Ok", "data": serialized}
 
