@@ -13,7 +13,7 @@ from utils.emojis import *
 import time
 from utils.Module import ModuleCheck
 from utils.permissions import check_admin_and_staff
-
+from bson import ObjectId
 import pymongo
 from datetime import datetime
 from discord.ext import commands
@@ -21,7 +21,12 @@ from discord.ext import commands
 MONGO_URL = os.getenv("MONGO_URL")
 KEY = os.getenv("KEY")
 client = AsyncIOMotorClient(MONGO_URL)
-db = client["astro"]
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+db = (
+    client["BETA"]
+    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
+    else client["astro"]
+)
 config = db["Config"]
 Keys = db["Keys"]
 dbq = client["quotadb"]
@@ -89,6 +94,7 @@ class APIRoutes:
                     getattr(self, i),
                     methods=[i.split("_")[0].upper()],
                 )
+        print(self.router.routes)
 
     async def GET_shards(self):
         shards = []
@@ -196,6 +202,55 @@ class APIRoutes:
         mutual = [result for result in results if result is not None]
 
         return {"status": "success", "mutuals": mutual}
+
+    async def POST_update_infraction(self, server: int, request: Request):
+        auth = self.Bearer(request)
+        if not auth:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid Authorization header",
+            )
+        if not await RestrictedValidation(auth):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Key"
+            )
+        try:
+            body = await request.json()
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON"
+            )
+
+        guild = self.client.get_guild(server)
+        if not guild:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Server not found"
+            )
+        
+        result = await collection.update_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id},
+            {
+                "$set": {
+                    "reason": body.get("Reason", "N/A"),
+                    "action": body.get("Action", "N/A"),
+                    "notes": body.get("Notes", "N/A")
+                }
+            },
+            upsert=True,
+        )
+
+        resulted = await collection.find_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id}
+        )
+        print(resulted)
+        self.client.dispatch("infraction_edit", resulted)
+
+        # TODO: Audit Log Dispatch
+
+        if result.modified_count > 0:
+            return {"status": "success", "message": "Infraction updated successfully"}
+        else:
+            return {"status": "success", "message": "No changes made"}
 
     async def POST_staff(self, request: Request, body: dict):
         auth = self.Bearer(request)
