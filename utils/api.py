@@ -107,6 +107,25 @@ class APIRoutes:
                 {"id": shard_id, "latency": shard_info, "guilds": guild_count}
             )
         return shards
+    
+    
+    #// For the old admin panel
+    async def GET_transcript(self, id: str, auth: str):
+        if not await RestrictedValidation(auth):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Key"
+            )
+        Result = await db["Tickets"].find_one({"_id": id})
+        if not Result:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found"
+            )
+
+        return {
+            "status": "success",
+            "transcript": Result.get("transcript"),
+            "GuildID": str(Result.get("GuildID")),
+        }
 
     async def GET_stats(self):
         return {
