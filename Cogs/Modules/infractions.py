@@ -404,11 +404,11 @@ class Infractions(commands.Cog):
                 content=f"{no} **{ctx.author.display_name},** what did I do to you?"
             )
             return
-        if staff.bot:
-            await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
-            )
-            return
+        # if staff.bot:
+        #     await msg.edit(
+        #         content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
+        #     )
+        #     return
 
         if Config.get("Infraction", {}).get("channel") is None:
             return await msg.edit(content="", embed=NoChannelSet(), view=Support())
