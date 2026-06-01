@@ -228,26 +228,26 @@ class on_infractions(commands.Cog):
                 extra={"objectId": str(objectid)},
             )
             return
-        Hub = HubConnection(str(guild.id))
-        payload = {
-            "id": str(objectid),
-            "GuildId": normalize(Infraction.guild_id),
-            "staff": normalize(Infraction.staff),
-            "staffAvatar": str(staff.display_avatar),
-            "staffName": staff.display_name,
-            "management": normalize(Infraction.management),
-            "msgId": normalize(Infraction.msg_id),
-            "action": Infraction.action,
-            "reason": Infraction.reason,
-            "notes": Infraction.notes,
-            "approvalStatus": False,
-            "expiration": (
-                Infraction.expiration.isoformat() if Infraction.expiration else None
-            ),
-            "timestamp": datetime.now().isoformat(),
-            "jumpUrl": Infraction.jumpUrl,
-        }
-        Hub.send("SendInfractionBot", [payload, SignalSecret])
+        # Hub = HubConnection(str(guild.id))
+        # payload = {
+        #     "id": str(objectid),
+        #     "GuildId": normalize(Infraction.guild_id),
+        #     "staff": normalize(Infraction.staff),
+        #     "staffAvatar": str(staff.display_avatar),
+        #     "staffName": staff.display_name,
+        #     "management": normalize(Infraction.management),
+        #     "msgId": normalize(Infraction.msg_id),
+        #     "action": Infraction.action,
+        #     "reason": Infraction.reason,
+        #     "notes": Infraction.notes,
+        #     "approvalStatus": False,
+        #     "expiration": (
+        #         Infraction.expiration.isoformat() if Infraction.expiration else None
+        #     ),
+        #     "timestamp": datetime.now().isoformat(),
+        #     "jumpUrl": Infraction.jumpUrl,
+        # }
+        # Hub.send("SendInfractionBot", [payload, SignalSecret])
 
         custom = await self.client.db["Customisation"].find_one(
             {
