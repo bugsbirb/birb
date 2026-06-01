@@ -192,7 +192,7 @@ class APIRoutes:
                 "isManager": (
                     guild.owner_id is not None and guild.owner_id == member.id
                 )
-                or await isStaff(guild, member)
+                or await isAdmin(guild, member)
                 or member.guild_permissions.administrator,
             }
 
@@ -287,7 +287,6 @@ class APIRoutes:
         staffRoles = config.get("Permissions").get("staffrole", []) + config.get(
             "Permissions"
         ).get("staffrole", [])
-        print(staffRoles)
         for roleId in staffRoles:
             role = guild.get_role(roleId)
             if role:

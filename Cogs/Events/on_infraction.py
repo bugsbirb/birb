@@ -453,7 +453,6 @@ class on_infractions(commands.Cog):
                     Actions["AddedRoles"] = [role.id for role in roles]
 
             if data.get("DemotionRole"):
-                print("omg")
 
                 await DemotionSystem(
                     self=self.client,
@@ -533,7 +532,6 @@ async def DemotionSystem(
         return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
 
     DemoSystemType = settings.get("Promo", {}).get("System", {}).get("type", None)
-    logger.info(f"[Demotion] Using system type: {DemoSystemType}")
     PrevRole = None
     SkipRole = None
 
@@ -631,6 +629,12 @@ async def DemotionSystem(
                 logger.info(
                     f"[Demotion] Demoting from {CurrentRole.name} to {PrevRole.name}"
                 )
+
+                if PrevRole.position <= manager.top_role.position:
+                    return await self.db["infractions"].find_one(
+                        {"_id": DemotionData.get("_id")}
+                    )
+
                 try:
                     await member.add_roles(
                         PrevRole,
@@ -659,6 +663,10 @@ async def DemotionSystem(
                 logger.info(
                     f"[Demotion] At bottom of hierarchy, removing {CurrentRole.name}"
                 )
+                if PrevRole.position <= manager.top_role.position:
+                    return await self.db["infractions"].find_one(
+                        {"_id": DemotionData.get("_id")}
+                    )
                 try:
                     await member.remove_roles(
                         CurrentRole,
@@ -712,40 +720,52 @@ async def DemotionSystem(
                 f"[Demotion] SkipRole set: {SkipRole.name if SkipRole else 'None'}"
             )
 
-            if SkipRole and SkipRole in SortedRoles:
-                try:
-                    await member.add_roles(
-                        SkipRole,
-                        reason=f"Staff Demotion (Skipped) initiated by {manager.name}",
-                    )
-                    logger.info(
-                        f"[Demotion] Added skip role {SkipRole.name} to {member.name}"
-                    )
-                except (discord.Forbidden, discord.HTTPException) as e:
-                    logger.error(f"[Demotion] Failed to add skip role: {e}")
-                    pass
-
-                for Role in MemberRoles:
-                    if Role in SortedRoles and Role != SkipRole:
-                        try:
-                            await member.remove_roles(
-                                Role, reason=f"Replaced by {SkipRole.name}"
-                            )
-                            logger.info(
-                                f"[Demotion] Removed role {Role.name} from {member.name}"
-                            )
-                        except (discord.Forbidden, discord.HTTPException) as e:
-                            logger.error(
-                                f"[Demotion] Failed to remove role {Role.name}: {e}"
-                            )
-                            pass
-
-                await self.db["infractions"].update_one(
-                    {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
-                )
+            if not SkipRole:
+                logger.warning("[Demotion] Invalid SkipTo role")
                 return await self.db["infractions"].find_one(
                     {"_id": DemotionData.get("_id")}
                 )
+
+            if SkipRole not in SortedRoles:
+                logger.warning("[Demotion] SkipTo not in hierarchy")
+                return await self.db["infractions"].find_one(
+                    {"_id": DemotionData.get("_id")}
+                )
+
+            if not guild.me.top_role > SkipRole:
+                logger.warning("[Demotion] Bot cannot assign SkipRole (hierarchy)")
+                return await self.db["infractions"].find_one(
+                    {"_id": DemotionData.get("_id")}
+                )
+
+            if manager.top_role.position <= SkipRole.position:
+                return await self.db["infractions"].find_one(
+                    {"_id": DemotionData.get("_id")}
+                )
+
+            try:
+                await member.add_roles(
+                    SkipRole,
+                    reason=f"Staff Demotion (Skipped) in {Department} initiated by {manager.name}",
+                )
+            except (discord.Forbidden, discord.HTTPException) as e:
+                logger.error(f"[Demotion] Failed to add skip role: {e}")
+
+            for Role in SortedRoles:
+                if Role in MemberRoles and Role != SkipRole:
+                    try:
+                        await member.remove_roles(
+                            Role,
+                            reason=f"Replaced by {SkipRole.name} initiated by {manager.name}",
+                        )
+                    except (discord.Forbidden, discord.HTTPException) as e:
+                        logger.error(
+                            f"[Demotion] Failed to remove role {Role.name}: {e}"
+                        )
+
+            await self.db["infractions"].update_one(
+                {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
+            )
 
         for Index, CurrentRole in enumerate(SortedRoles):
             if CurrentRole in MemberRoles and Index - 1 >= 0:
@@ -753,6 +773,10 @@ async def DemotionSystem(
                 logger.info(
                     f"[Demotion] Demoting from {CurrentRole.name} to {PrevRole.name}"
                 )
+                if PrevRole.position <= manager.top_role.position:
+                    return await self.db["infractions"].find_one(
+                        {"_id": DemotionData.get("_id")}
+                    )
                 try:
                     await member.add_roles(
                         PrevRole, reason=f"Staff Demotion initiated by {manager.name}"
@@ -763,6 +787,7 @@ async def DemotionSystem(
                 except (discord.Forbidden, discord.HTTPException) as e:
                     logger.error(f"[Demotion] Failed to add role {PrevRole.name}: {e}")
                     pass
+
                 try:
                     await member.remove_roles(
                         CurrentRole, reason=f"Replaced by {PrevRole.name}"

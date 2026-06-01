@@ -775,7 +775,7 @@ class TicketsPublic(commands.Cog):
                 ButtonLink.add_item(
                     discord.ui.Button(
                         label="View Transcript",
-                        url=f"https://astrobirb.dev/transcript/{Result.get('_id')}",
+                        url=f"https://astrobirb.dev/transcript/{Guild.id}/{Result.get('_id')}",
                         emoji="<:Website:1132252914082127882>",
                         style=discord.ButtonStyle.blurple,
                     )
