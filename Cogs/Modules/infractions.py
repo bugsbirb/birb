@@ -133,7 +133,7 @@ class Infractions(commands.Cog):
             await msg.edit(
                 view=view,
                 embed=discord.Embed(
-                    description="> Select the department from which you want to demote this user in.\nFrom the "
+                    description="> Select the department from which you want to demote this user in."
                 ).set_author(name="Hierarchy"),
             )
             await view.wait()
@@ -449,7 +449,7 @@ class Infractions(commands.Cog):
                 return await msg.edit(embed=NotRobloxLinked())
 
         skipRole, Department, Type, Status = None, None, None, 200
-        if TypeActions and TypeActions.get("DemotionRole", False):
+        if TypeActions and TypeActions.get("DemoteRole", False):
             if not await premium(ctx.guild.id):
                 return
             skipRole, Department, Type, Status = await self.promptHI(
