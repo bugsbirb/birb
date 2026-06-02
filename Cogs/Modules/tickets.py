@@ -32,6 +32,18 @@ async def AccessControl(interaction: discord.Interaction, Panel: dict):
             return True
 
 
+def safeTime(value):
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value)
+    try:
+        return datetime.fromtimestamp(float(value))
+    except (ValueError, TypeError):
+        return None
+
 class ButtonHandler(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -856,7 +868,7 @@ class TicketsPub(commands.Cog):
                 "$set": {
                     "claimed": {
                         "claimer": interaction.user.id,
-                        "claimedAt": interaction.created_at.timestamp(),
+                        "claimedAt": datetime.now(),
                     }
                 }
             },
@@ -1006,8 +1018,11 @@ class TicketsPub(commands.Cog):
         TotalClaimed = len(ClaimedTickets)
         TotalMessagesSent = 0
         for Ticket in ClaimedTickets:
-            OpenedTime = datetime.fromtimestamp(Ticket["opened"])
-            ClaimedTime = datetime.fromtimestamp(Ticket["claimed"]["claimedAt"])
+            OpenedRaw = Ticket.get("opened")
+            ClaimedRaw = Ticket.get("claimed", {}).get("claimedAt")
+
+            OpenedTime = safeTime(OpenedRaw)
+            ClaimedTime = safeTime(ClaimedRaw)
             TotalResponseTime += ClaimedTime - OpenedTime
             Transcript = Ticket.get("transcript", [])
             for entry in Transcript:

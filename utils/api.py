@@ -107,9 +107,8 @@ class APIRoutes:
                 {"id": shard_id, "latency": shard_info, "guilds": guild_count}
             )
         return shards
-    
-    
-    #// For the old admin panel
+
+    # // For the old admin panel
     async def GET_transcript(self, id: str, auth: str):
         if not await RestrictedValidation(auth):
             raise HTTPException(
@@ -245,14 +244,18 @@ class APIRoutes:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Server not found"
             )
-        
+
+        Org = await collection.find_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id}
+        )
+
         result = await collection.update_one(
             {"_id": ObjectId(body.get("Id")), "guild_id": guild.id},
             {
                 "$set": {
                     "reason": body.get("Reason", "N/A"),
                     "action": body.get("Action", "N/A"),
-                    "notes": body.get("Notes", "N/A")
+                    "notes": body.get("Notes", "N/A"),
                 }
             },
             upsert=True,
@@ -261,8 +264,15 @@ class APIRoutes:
         resulted = await collection.find_one(
             {"_id": ObjectId(body.get("Id")), "guild_id": guild.id}
         )
-        print(resulted)
         self.client.dispatch("infraction_edit", resulted)
+        if Org:
+            self.client.dispatch(
+                "infraction_log",
+                resulted.get("_id"),
+                "modify",
+                self.client.get_user(body.get("AuthorId")),
+                Org,
+            )
 
         # TODO: Audit Log Dispatch
 
