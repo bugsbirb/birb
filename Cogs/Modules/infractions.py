@@ -783,6 +783,139 @@ class Infractions(commands.Cog):
 
         await paginator.start(ctx, pages=embeds[:45], msg=msg)
 
+    @infraction.command(description="Search infractions by type, reason, or date range.")
+    @app_commands.describe(
+        staff="Filter by staff member",
+        action="Filter by infraction type",
+        reason="Search by reason text",
+        after="Only show infractions after this time (e.g. 7d, 30d, 2w)",
+        before="Only show infractions before this time (e.g. 7d, 30d, 2w)",
+    )
+    @app_commands.autocomplete(action=infractiontypes)
+    async def search(
+        self,
+        ctx: commands.Context,
+        staff: discord.User = None,
+        action: str = None,
+        reason: str = None,
+        after: str = None,
+        before: str = None,
+    ):
+        await ctx.defer()
+        if not await ModuleCheck(ctx.guild.id, "infractions"):
+            return await ctx.send(embed=ModuleNotEnabled(), view=Support())
+        if not await has_admin_role(ctx, "Infraction Permissions"):
+            return
+
+        filter = {
+            "guild_id": ctx.guild.id,
+            "voided": {"$ne": True},
+            "$or": [{"ApprovalStatus": {"$exists": False}}, {"ApprovalStatus": False}],
+        }
+
+        if staff:
+            filter["staff"] = staff.id
+        if action:
+            filter["action"] = action
+        if reason:
+            filter["reason"] = {"$regex": reason, "$options": "i"}
+
+        time_filter = {}
+        if after:
+            try:
+                after_dt = await strtotime(after, back=True)
+                time_filter["$gte"] = after_dt
+            except ValueError:
+                return await ctx.send(
+                    f"{no} **{ctx.author.display_name}**, invalid duration format for `after`. Use formats like `7d`, `2w`, `30d`."
+                )
+        if before:
+            try:
+                before_dt = await strtotime(before, back=True)
+                time_filter["$lte"] = before_dt
+            except ValueError:
+                return await ctx.send(
+                    f"{no} **{ctx.author.display_name}**, invalid duration format for `before`. Use formats like `7d`, `2w`, `30d`."
+                )
+        if time_filter:
+            filter["timestamp"] = time_filter
+
+        infractions_found = await self.client.db["infractions"].find(filter).sort("timestamp", -1).to_list(125)
+
+        if not infractions_found:
+            return await ctx.send(
+                f"{no} **{ctx.author.display_name}**, no infractions matched your search."
+            )
+
+        type_summary = {}
+        for inf in infractions_found:
+            t = inf.get("action", "Unknown")
+            type_summary[t] = type_summary.get(t, 0) + 1
+        summary_text = " | ".join(f"`{t}` ({c})" for t, c in type_summary.items())
+
+        if IsSeperateBot():
+            msg = await ctx.send(
+                embed=discord.Embed(description="Loading...", color=discord.Color.dark_embed())
+            )
+        else:
+            msg = await ctx.send(
+                embed=discord.Embed(
+                    description="<a:astroloading:1245681595546079285>",
+                    color=discord.Color.dark_embed(),
+                )
+            )
+
+        embed = discord.Embed(color=discord.Color.dark_embed())
+        embed.set_author(
+            name=f"Search Results ({len(infractions_found)})",
+            icon_url=staff.display_avatar if staff else ctx.guild.icon,
+        )
+        embed.set_thumbnail(url=staff.display_avatar if staff else ctx.guild.icon)
+
+        embeds = []
+        for i, infraction_entry in enumerate(infractions_found):
+            voided = "**(Voided)**" if infraction_entry.get("voided") else ""
+            jump_url = (
+                f"\n> **[Jump to Infraction]({infraction_entry.get('jump_url', '')})**"
+                if infraction_entry.get("jump_url")
+                else ""
+            )
+            exp = infraction_entry.get("expiration")
+            expiration = (
+                f"\n> **Expiration:** <t:{int(exp.timestamp())}:D>{' **(Infraction Expired)**' if exp and exp < datetime.now() else ''}"
+                if exp
+                else ""
+            )
+            ts = infraction_entry.get("timestamp")
+            timestamp_text = f"\n> **Date:** <t:{int(ts.timestamp())}:D>" if ts else ""
+
+            value = (
+                f"> **Staff:** <@{infraction_entry.get('staff')}>\n"
+                f"> **Infracted By:** <@{infraction_entry.get('management')}>\n"
+                f"> **Action:** {infraction_entry.get('action')}\n"
+                f"> **Reason:** {infraction_entry.get('reason')}"
+                f"{timestamp_text}{expiration}{jump_url}"
+            )[:1025]
+
+            embed.add_field(
+                name=f"<:Document:1223063264322125844> {infraction_entry['random_string']} {voided}",
+                value=value[:1021] + "..." if len(value) > 1024 else value,
+                inline=False,
+            )
+            if (i + 1) % 5 == 0 or i == len(infractions_found) - 1 or self.EmbedSize(embed) > 5999:
+                if i < 5:
+                    embed.description = f"-# {summary_text}"
+                embeds.append(embed)
+                embed = discord.Embed(color=discord.Color.dark_embed())
+                embed.set_author(
+                    name=f"Search Results ({len(infractions_found)})",
+                    icon_url=staff.display_avatar if staff else ctx.guild.icon,
+                )
+                embed.set_thumbnail(url=staff.display_avatar if staff else ctx.guild.icon)
+
+        paginator = await PaginatorButtons()
+        await paginator.start(ctx, pages=embeds[:45], msg=msg)
+
     @infraction.command(description="View an infraction and manage it.")
     @app_commands.describe(
         id="The ID of the infraction to view",
