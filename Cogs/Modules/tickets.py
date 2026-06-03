@@ -968,8 +968,12 @@ class TicketsPub(commands.Cog):
                 view=Support(),
                 ephemeral=True,
             )
-        if not await has_admin_role(interaction):
-            return
+        if user and user.id != interaction.user.id:
+            if not await has_admin_role(interaction):
+                return
+        else:
+            if not await has_staff_role(interaction):
+                return
         if not user:
             user = interaction.user
 
