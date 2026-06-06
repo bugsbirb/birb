@@ -1223,22 +1223,13 @@ class quota(commands.Cog):
         embed = discord.Embed(
             color=discord.Color.dark_embed(),
         )
+        embed.set_author(name=f"@{staff.name}", icon_url=staff.display_avatar)
+        embed.set_thumbnail(url=staff.display_avatar)
         embed.add_field(
             name="Information",
             value=f"> **Staff:** <@{staff.id}> (`{staff.id}`)\n> **Rank:** {result.get('rolename')}{timezone}\n> **Joined Staff:** <t:{int(result.get('joinestaff').timestamp())}:F>{introduction}",
         )
-        if result:
-            embed = discord.Embed(
-                title=staff.display_name,
-                color=discord.Color.dark_embed(),
-            )
-            embed.set_thumbnail(url=staff.display_avatar)
-            embed.set_author(name=staff.name, icon_url=staff.display_avatar)
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(
-                f"{ctx.author.display_name}, I couldn't find this user on the staff database.."
-            )
+        await ctx.send(embed=embed)
 
     @staff.command(description="Give yourself an introduction (Staff Database)")
     @app_commands.describe(
