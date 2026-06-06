@@ -621,8 +621,7 @@ class Next(discord.ui.View):
             "-# Any concerns please lay them onto the admins or developers. "
         )
         embed.set_footer(text=f"Setup started by @{interaction.user.display_name}")
-        view = discord.ui.View()
-        view.add_item(Continue(interaction.user))
+        view = Continue(interaction.user)
         view.add_item(
             discord.ui.Button(
                 label="Developer Portal",
