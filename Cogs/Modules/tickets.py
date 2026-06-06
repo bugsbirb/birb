@@ -912,6 +912,55 @@ class TicketsPub(commands.Cog):
         )
         self.client.dispatch("unclaim", Result.get("_id"))
 
+    @tickets.command(description="Transfer a claimed ticket to another staff member.")
+    @app_commands.describe(user="The staff member to transfer the ticket to")
+    async def transfer(self, interaction: discord.Interaction, user: discord.Member):
+        await interaction.response.defer()
+        if not await TicketPermissions(interaction):
+            return await interaction.followup.send(
+                content=f"{no} You don't have permission to use this command."
+            )
+        if not await ModuleCheck(interaction.guild.id, "Tickets"):
+            return await interaction.followup.send(
+                embed=ModuleNotEnabled(),
+                view=Support(),
+                ephemeral=True,
+            )
+        if user.bot:
+            return await interaction.followup.send(
+                content=f"{no} **{interaction.user.display_name}**, you can't transfer a ticket to a bot."
+            )
+        Result = await interaction.client.db["Tickets"].find_one(
+            {"ChannelID": interaction.channel.id}
+        )
+        if not Result:
+            return await interaction.followup.send(
+                content=f"{no} This isn't a ticket channel."
+            )
+        if not Result.get("claimed", {}).get("claimer"):
+            return await interaction.followup.send(
+                content=f"{no} This ticket isn't claimed. Use `/ticket claim` first."
+            )
+        if Result.get("claimed", {}).get("claimer") == user.id:
+            return await interaction.followup.send(
+                content=f"{no} **{interaction.user.display_name}**, this ticket is already claimed by that user."
+            )
+        await interaction.client.db["Tickets"].update_one(
+            {"ChannelID": interaction.channel.id},
+            {
+                "$set": {
+                    "claimed": {
+                        "claimer": user.id,
+                        "claimedAt": interaction.created_at.timestamp(),
+                    }
+                }
+            },
+        )
+        await interaction.followup.send(
+            content=f"{tick} **{interaction.user.display_name},** the ticket has been transferred to **@{user.display_name}**!"
+        )
+        self.client.dispatch("pticket_claim", Result.get("_id"), user)
+
     @tickets.command(description="Toggle automations in the ticket.")
     async def automation(self, interaction: discord.Interaction):
         await interaction.response.defer()
@@ -980,8 +1029,12 @@ class TicketsPub(commands.Cog):
                 view=Support(),
                 ephemeral=True,
             )
-        if not await has_admin_role(interaction):
-            return
+        if user and user.id != interaction.user.id:
+            if not await has_admin_role(interaction):
+                return
+        else:
+            if not await has_staff_role(interaction):
+                return
         if not user:
             user = interaction.user
 
