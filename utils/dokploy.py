@@ -616,6 +616,7 @@ class Next(discord.ui.View):
             "__You'll need to gather the following information.__\n"
             "- `Bot Token` (Found in the [Discord Developer Portal](https://discord.com/developers/applications)) (This is sensitive, don't post it in a public channel)\n"
             "- `Server ID` [How?](https://dis.gd/findmyid)\n\n"
+            "- You MUST enable Message & Guild intents.\n\n"
             "Click **Setup** to enter these details.\n"
             "-# At the moment we don't allow for a unsupervised setup. We are still ironing out potential ways to give people more independence.\n"
             "-# Any concerns please lay them onto the admins or developers. "

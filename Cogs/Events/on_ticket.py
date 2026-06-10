@@ -198,10 +198,15 @@ class TicketsPublic(commands.Cog):
                 LastMessagSent = Ticket.get("lastMessageSent", None)
                 if not Ticket.get("automations", True):
                     return
+
+                try:
+                    InactivityDelta = datetime.timedelta(minutes=Inactivity)
+                except OverflowError:
+                    return
+
                 if (
                     not LastMessagSent
-                    or datetime.datetime.utcnow() - LastMessagSent
-                    > datetime.timedelta(minutes=Inactivity)
+                    or datetime.datetime.utcnow() - LastMessagSent > InactivityDelta
                 ):
                     await self.client.db["Tickets"].update_one(
                         {"_id": Ticket.get("_id")},

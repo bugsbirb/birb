@@ -409,9 +409,7 @@ class on_infractions(commands.Cog):
             )
         self.client.dispatch("infraction_log", objectid, "create", manager)
 
-        consreult = await self.client.db["consent"].find_one({"user_id": staff.id})
         if Settings.get("Module Options", {}).get("Direct Message", True):
-            if not consreult or consreult.get("infractionalert") is not False:
                 try:
                     await staff.send(
                         content=f"<:SmallArrow:1140288951861649418>From  **{guild.name}**",

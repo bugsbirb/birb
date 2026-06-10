@@ -38,7 +38,7 @@ class messageevent(commands.Cog):
             guild_id = message.guild.id
             author_id = message.author.id
 
-            await self.client.qdb["messages"].update_one(
+            await self.client.db["messages"].update_one(
                 {"guild_id": guild_id, "user_id": author_id},
                 {"$inc": {"message_count": 1}},
                 upsert=True,
@@ -48,7 +48,7 @@ class messageevent(commands.Cog):
             guild_id = message.guild.id
             author_id = message.author.id
 
-            await self.client.qdb["messages"].update_one(
+            await self.client.db["messages"].update_one(
                 {"guild_id": guild_id, "user_id": author_id},
                 {"$inc": {"message_count": 1}},
                 upsert=True,

@@ -61,7 +61,7 @@ class SetMessages(discord.ui.Modal, title="Set Message Count"):
             )
             return
 
-        await interaction.client.qdb["messages"].update_one(
+        await interaction.client.db["messages"].update_one(
             {"guild_id": interaction.guild.id, "user_id": self.user_id},
             {"$set": {"message_count": message_count_value}},
             upsert=True,
@@ -96,7 +96,7 @@ class AddMessage(discord.ui.Modal, title="Add Messages"):
                 ephemeral=True,
             )
             return
-        result = await interaction.client.qdb["messages"].update_one(
+        result = await interaction.client.db["messages"].update_one(
             {"guild_id": interaction.guild.id, "user_id": self.user_id},
             {"$inc": {"message_count": message_count_value}},
             upsert=True,
@@ -138,7 +138,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
             return
 
         guild_id = interaction.guild.id
-        result = await interaction.client.qdb["messages"].find_one(
+        result = await interaction.client.db["messages"].find_one(
             {"guild_id": guild_id, "user_id": self.user_id}
         )
         if not result:
@@ -149,7 +149,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
             return
 
         NewMessageCount = max(0, int(result["message_count"]) - MSGCount)
-        await interaction.client.qdb["messages"].update_one(
+        await interaction.client.db["messages"].update_one(
             {"guild_id": guild_id, "user_id": self.user_id},
             {"$set": {"message_count": NewMessageCount}},
         )
@@ -226,7 +226,7 @@ class StaffManage(discord.ui.View):
             )
         filter = {"guild_id": interaction.guild.id, "user_id": staff_id}
         update = {"$set": {"message_count": 0}}
-        await interaction.client.qdb["messages"].update_one(filter, update)
+        await interaction.client.db["messages"].update_one(filter, update)
 
         await interaction.response.edit_message(
             content=f"**{tick} {interaction.user.display_name}**, I have reset the staff member's ",
@@ -451,7 +451,7 @@ class quota(commands.Cog):
         message_users = []
         if Config.get("Message Quota"):
             message_users = (
-                await self.client.qdb["messages"]
+                await self.client.db["messages"]
                 .find({"guild_id": ctx.guild.id})
                 .sort("message_count", pymongo.DESCENDING)
                 .to_list(length=750)
@@ -572,7 +572,7 @@ class quota(commands.Cog):
         message_users = []
         if Config.get("Message Quota"):
             message_users = (
-                await self.client.qdb["messages"]
+                await self.client.db["messages"]
                 .find({"guild_id": ctx.guild.id})
                 .sort("message_count", pymongo.DESCENDING)
                 .to_list(length=750)
@@ -689,7 +689,7 @@ class quota(commands.Cog):
             return
         if not await has_admin_role(ctx, "Message Quota Permissions"):
             return
-        MessageData = await self.client.qdb["messages"].find_one(
+        MessageData = await self.client.db["messages"].find_one(
             {"guild_id": ctx.guild.id, "user_id": staff.id}
         )
 
@@ -728,7 +728,7 @@ class quota(commands.Cog):
                 )
             )
             users = (
-                await self.client.qdb["messages"]
+                await self.client.db["messages"]
                 .find({"guild_id": ctx.guild.id})
                 .sort("message_count", pymongo.DESCENDING)
                 .to_list(length=None)
@@ -762,7 +762,7 @@ class quota(commands.Cog):
         if not await has_staff_role(ctx, "Message Quota Permissions"):
             return
         await ctx.defer()
-        MessageData = await self.client.qdb["messages"].find_one(
+        MessageData = await self.client.db["messages"].find_one(
             {"guild_id": ctx.guild.id, "user_id": staff.id}
         )
         if not MessageData:
@@ -803,7 +803,7 @@ class quota(commands.Cog):
 
             if MessageData:
                 users = (
-                    await self.client.qdb["messages"]
+                    await self.client.db["messages"]
                     .find({"guild_id": ctx.guild.id})
                     .sort("message_count", pymongo.DESCENDING)
                     .to_list(length=None)
@@ -834,7 +834,7 @@ class quota(commands.Cog):
         await ctx.defer(ephemeral=True)
         msg = await ctx.send("<a:Loading:1167074303905386587> Exporting to CSV...")
         users = (
-            await self.client.qdb["messages"]
+            await self.client.db["messages"]
             .find({"guild_id": ctx.guild.id})
             .sort("message_count", pymongo.DESCENDING)
             .to_list(length=None)
@@ -910,7 +910,7 @@ class quota(commands.Cog):
         if Config is None:
             return await msg.edit(embed=BotNotConfigured(), view=Support())
         message_users = (
-            await self.client.qdb["messages"]
+            await self.client.db["messages"]
             .find({"guild_id": ctx.guild.id})
             .sort("message_count", pymongo.DESCENDING)
             .to_list(length=750)
@@ -1575,7 +1575,7 @@ class ArmFire(discord.ui.View):
                 embed=NotYourPanel(), ephemeral=True
             )
         if self.action == "Messages":
-            await interaction.client.qdb["messages"].update_many(
+            await interaction.client.db["messages"].update_many(
                 {"guild_id": interaction.guild.id},
                 {"$set": {"message_count": 0}},
             )
@@ -1585,7 +1585,7 @@ class ArmFire(discord.ui.View):
                 {"$set": {"ClaimedTickets": 0}},
             )
         elif self.action == "Both":
-            await interaction.client.qdb["messages"].update_many(
+            await interaction.client.db["messages"].update_many(
                 {"guild_id": interaction.guild.id},
                 {"$set": {"message_count": 0}},
             )

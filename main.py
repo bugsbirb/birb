@@ -51,7 +51,6 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 client = AsyncIOMotorClient(MONGO_URL)
 # client = pymongo.AsyncMongoClient(MONGO_URL)
-qdb = client["QBeta"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
 db = client["BETA"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
 
 prefixdb = db["prefixes"]
@@ -124,7 +123,6 @@ class Client(commands.AutoShardedBot):
 
     def _initialize_databases(self):
         self.db = db
-        self.qdb = qdb
         self.config = Config
         self.customcommands = db["customcommands"]
 
@@ -199,7 +197,7 @@ class Client(commands.AutoShardedBot):
             # Events
             "Cogs.Events.Dev.on_guild",
             "Cogs.Events.Dev.welcome",
-            "Cogs.Events.quota",
+            "Cogs.Events.on_message",
             "Cogs.Events.modmail",
             "Cogs.Events.on_thread_create",
             "Cogs.Events.Dev.topgg",
