@@ -128,7 +128,6 @@ class Button(discord.ui.Button):
         self.custom_id = custom_id
 
     async def callback(self, interaction: discord.Interaction):
-
         AlreadyOpen = await interaction.client.db["Tickets"].count_documents(
             {
                 "UserID": interaction.user.id,
@@ -145,6 +144,15 @@ class Button(discord.ui.Button):
                 content=f"{no} **{interaction.user.display_name}**, you're blacklisted from this servers tickets.",
                 ephemeral=True,
             )
+        
+        Config = await interaction.client.config.find_one({"_id": interaction.guild.id}) or {}
+        blacklistRoles = Config.get("Tickets", {}).get("BlacklistRoles", [])
+        if blacklistRoles and any(r.id in blacklistRoles for r in interaction.user.roles):
+            return await interaction.response.send_message(
+                content=f"{no} **{interaction.user.display_name}**, you're not allowed to open tickets.",
+                ephemeral=True,
+            )
+        
         Cli = await interaction.guild.fetch_member(interaction.client.user.id)
         if not Cli.guild_permissions.manage_channels:
             return await interaction.response.send_message(

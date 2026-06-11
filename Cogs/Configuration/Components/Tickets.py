@@ -6,20 +6,29 @@ from utils.HelpEmbeds import NotYourPanel
 from typing import Literal
 
 
-
-
 class Tickets(discord.ui.Select):
     def __init__(self, author: discord.Member):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Panels", emoji="<:Panel:1340741181965078642>", description="Singular ticket panels that include one button."
+                    label="Panels",
+                    emoji="<:Panel:1340741181965078642>",
+                    description="Singular ticket panels that include one button.",
                 ),
                 discord.SelectOption(
-                    label="Multi Panels", emoji="<:MultiPanel:1340741183579885690>", description="Merge multiple singular panels together: Adds multiple buttons to one panel."
+                    label="Multi Panels",
+                    emoji="<:MultiPanel:1340741183579885690>",
+                    description="Merge multiple singular panels together: Adds multiple buttons to one panel.",
                 ),
                 discord.SelectOption(
-                    label="Quota", emoji="<:counting:1343598685749252227>", description="Track the amount of claimed tickets staff members claim."
+                    label="Quota",
+                    emoji="<:counting:1343598685749252227>",
+                    description="Track the amount of claimed tickets staff members claim.",
+                ),
+                discord.SelectOption(
+                    label="Blacklist",
+                    emoji="<:staff:1206248655359840326>",
+                    description="Blacklists roles from opening tickets.",
                 ),
                 discord.SelectOption(
                     label="Audit Log",
@@ -89,19 +98,10 @@ class TicketQuota(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
         quota = self.quota.value
-        Config = await interaction.client.config.find_one(
-            {"guild": interaction.guild.id}
-        )
-        if not Config:
-            Config = {
-                "_id": interaction.guild.id,
-                "Tickets": {"quota": 0, "TimeFrame": None},
-            }
-
-        Config["Tickets"]["quota"] = quota
         await interaction.client.config.update_one(
             {"_id": interaction.guild.id},
-            {"$set": Config},
+            {"$set": {"Tickets.quota": quota}},
+            upsert=True,
         )
         await interaction.response.send_message(
             content=f"{tick} **{interaction.user.display_name},** ticket quota updated successfully.",
@@ -274,8 +274,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         view = discord.ui.View()
         view.add_item(EmbedSelection(interaction.user, "Panel", self.name))
         await interaction.response.send_message(view=view)
@@ -285,8 +287,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
 
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
@@ -304,8 +308,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -328,8 +334,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -353,8 +361,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -373,7 +383,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         embed = discord.Embed(
             description="Select the roles that can manage the ticket.",
-            color=discord.Color.dark_embed()
+            color=discord.Color.dark_embed(),
         ).set_author(name="Permissions", icon_url=interaction.guild.icon)
 
         await interaction.response.send_message(view=view, embed=embed, ephemeral=True)
@@ -387,8 +397,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -415,8 +427,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -435,7 +449,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         embed = discord.Embed(
             description="Select the roles that can open tickets.",
-            color=discord.Color.dark_embed()
+            color=discord.Color.dark_embed(),
         ).set_author(name="Access Control", icon_url=interaction.guild.icon)
         await interaction.response.send_message(view=view, embed=embed, ephemeral=True)
 
@@ -448,8 +462,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -486,8 +502,10 @@ class SingelPanelCustomisation(discord.ui.View):
     )
     async def Forms(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -496,7 +514,7 @@ class SingelPanelCustomisation(discord.ui.View):
         if IsSeperateBot():
             view.DeleteQuestion.label = "Delete"
             view.AddQuestion.label = f"Add ({len(custom.get('Questions', []))}/5)"
-        
+
         else:
             view.AddQuestion.label = f"({len(custom.get('Questions', []))}/5)"
         if len(custom.get("Questions", [])) >= 5:
@@ -514,8 +532,10 @@ class SingelPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         custom = await interaction.client.db["Panels"].find_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name}
         )
@@ -633,8 +653,10 @@ class MultiPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         view = discord.ui.View()
         view.add_item(EmbedSelection(interaction.user, "Multi", self.name))
         await interaction.response.send_message(view=view)
@@ -644,8 +666,10 @@ class MultiPanelCustomisation(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         panels = (
             await interaction.client.db["Panels"]
             .find({"guild": interaction.guild.id, "type": "single"})
@@ -824,12 +848,11 @@ async def FinalFunction(interaction: discord.Interaction, d={}):
     await interaction.client.db["Panels"].update_one(
         {"guild": interaction.guild.id, "name": d.get("name")}, Update, upsert=True
     )
-    
 
     await interaction.response.send_message(
         content=f"{tick} **{interaction.user.display_name}**, successfully updated `{d.get('option')}` embed.",
         embed=None,
-        ephemeral=True
+        ephemeral=True,
     )
     try:
         await interaction.message.delete()
@@ -856,8 +879,10 @@ class EmbedSelection(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
 
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
 
         option = self.values[0]
         await CustomiseEmbed(interaction, option, self.name)
@@ -865,14 +890,18 @@ class EmbedSelection(discord.ui.Select):
 
 class MultiToSingle(discord.ui.Select):
     def __init__(self, author: discord.Member, name: str, options: list):
-        super().__init__(options=options[:25], max_values=len(options), min_values=0, required=False)
+        super().__init__(
+            options=options[:25], max_values=len(options), min_values=0, required=False
+        )
         self.name = name
         self.author = author
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         await interaction.client.db["Panels"].update_one(
             {"guild": interaction.guild.id, "type": "multi", "name": self.name},
             {"$set": {"Panels": self.values}},
@@ -908,8 +937,10 @@ class Permissions(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
 
         selected_roles = [role.id for role in self.values]
         await interaction.client.db["Panels"].update_one(
@@ -919,7 +950,7 @@ class Permissions(discord.ui.RoleSelect):
         await interaction.response.edit_message(
             content=f"{tick} **{interaction.user.display_name},** permissions updated successfully.",
             view=None,
-            embed=None
+            embed=None,
         )
 
 
@@ -936,8 +967,10 @@ class TranscriptChannel(discord.ui.ChannelSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         await interaction.client.db["Panels"].update_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name},
             {"$set": {"TranscriptChannel": self.values[0].id if self.values else None}},
@@ -1042,7 +1075,7 @@ class DeleteQuestionSelect(discord.ui.Select):
         if IsSeperateBot():
             view.DeleteQuestion.label = "Delete"
             view.AddQuestion.label = f"Add ({len(Config.get('Questions', []))}/5)"
-        
+
         else:
             view.AddQuestion.label = f"({len(Config.get('Questions', []))}/5)"
         await interaction.response.edit_message(
@@ -1140,7 +1173,7 @@ class Question(discord.ui.Modal):
         if IsSeperateBot():
             view.DeleteQuestion.label = "Delete"
             view.AddQuestion.label = f"Add ({len(Config.get('Questions', []))}/5)"
-        
+
         else:
             view.AddQuestion.label = f"({len(Config.get('Questions', []))}/5)"
         await interaction.response.edit_message(
@@ -1164,8 +1197,10 @@ class Category(discord.ui.ChannelSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         await interaction.client.db["Panels"].update_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name},
             {"$set": {"Category": self.values[0].id if self.values else None}},
@@ -1189,9 +1224,11 @@ class MentionsOnOpen(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
-        
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+
         Roles = [role.id for role in self.values] if self.values else None
         await interaction.client.db["Panels"].update_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name},
@@ -1216,16 +1253,24 @@ class AccessControl(discord.ui.RoleSelect):
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         await interaction.client.db["Panels"].update_one(
             {"guild": interaction.guild.id, "type": "single", "name": self.name},
-            {"$set": {"AccessControl": [role.id for role in self.values] if self.values else None}},
+            {
+                "$set": {
+                    "AccessControl": (
+                        [role.id for role in self.values] if self.values else None
+                    )
+                }
+            },
         )
         await interaction.response.edit_message(
             content=f"{tick} **{interaction.user.display_name},** access control updated successfully.",
             view=None,
-            embed=None
+            embed=None,
         )
 
 
