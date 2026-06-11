@@ -22,7 +22,6 @@ from utils.Module import ModuleCheck
 from utils.format import ordinal
 from utils.permissions import check_admin_and_staff
 
-
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
@@ -1043,12 +1042,17 @@ class quota(commands.Cog):
         self, ctx: commands.Context, quota: Literal["Messages", "Tickets", "Both"]
     ):
         await ctx.defer()
-        if not await ModuleCheck(ctx.guild.id, "Quota"):
-            await ctx.send(
-                embed=ModuleNotEnabled(),
-                view=Support(),
-            )
+        Quota = await ModuleCheck(ctx.guild.id, "Quota")
+        Tickets = await ModuleCheck(ctx.guild.id, "Tickets")
+
+        if (
+            (quota == "Messages" and not Quota) or
+            (quota == "Tickets" and not Tickets) or
+            (quota == "Both" and not (Quota and Tickets))
+        ):
+            await ctx.send(embed=ModuleNotEnabled(), view=Support())
             return
+        
         if not await has_admin_role(ctx, "Message Quota Permissions"):
             return
 
@@ -1570,7 +1574,6 @@ class ArmFire(discord.ui.View):
     @discord.ui.button(label="Reset", disabled=True, style=discord.ButtonStyle.red)
     async def Fire(self, interaction: discord.Interaction, button: discord.Button):
         if interaction.user.id != self.author.id:
-
             return await interaction.response.send_message(
                 embed=NotYourPanel(), ephemeral=True
             )
@@ -1597,6 +1600,14 @@ class ArmFire(discord.ui.View):
             content=f"{tick} **{interaction.user.display_name}**, I have reset the staff leaderboard.",
             embed=None,
             view=None,
+        )
+
+        interaction.client.dispatch(
+            "counter_reset",
+            interaction.guild.id,
+            "reset",
+            interaction.user,
+            self.action,
         )
 
 

@@ -30,6 +30,11 @@ class QuotaOptions(discord.ui.Select):
                     description="Configure automatic activity-based quota behavior.",
                     emoji="<:suspensions:1234998406938755122>",
                 ),
+                discord.SelectOption(
+                    label="Audit Log",
+                    emoji="<:Log:1349431938926252115>",
+                    description="Logs message quota resets.",
+                ),
             ]
         )
         self.author = author
@@ -104,6 +109,17 @@ class QuotaOptions(discord.ui.Select):
             await interaction.followup.send(view=view, embed=embeds[0], ephemeral=True)
 
             return
+        if selection == "Audit Log":
+            view.add_item(
+                LogChannel(
+                    interaction.user,
+                    interaction.guild.get_channel(
+                        Config.get("Tickets", {}).get("LogChannel"),
+                    ),
+                    interaction.message,
+                )
+            )
+            await interaction.followup.send(view=view, ephemeral=True)
         if selection == "Ignored Channels":
             Config = await interaction.client.config.find_one(
                 {"_id": interaction.guild.id}
@@ -475,6 +491,62 @@ class AutoActivity(discord.ui.Select):
             await interaction.response.send_modal(PostDate())
 
 
+class LogChannel(discord.ui.ChannelSelect):
+    def __init__(
+        self,
+        author: discord.Member,
+        channel: discord.TextChannel = None,
+        message: discord.Message = None,
+    ):
+        super().__init__(
+            placeholder="Audit Log Channel",
+            min_values=0,
+            max_values=1,
+            default_values=[channel] if channel else [],
+            channel_types=[discord.ChannelType.text, discord.ChannelType.news],
+        )
+        self.author = author
+        self.channel = channel
+        self.message = message
+
+    async def callback(self, interaction):
+        await interaction.response.defer()
+        if interaction.user.id != self.author.id:
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
+
+        config = await interaction.client.config.find_one(
+            {"_id": interaction.guild.id}
+        ) or {
+            "_id": interaction.guild.id,
+            "Message Quota": {},
+        }
+        if "Message Quota" not in config:
+            config["Message Quota"] = {}
+
+        if self.values:
+            config["Message Quota"]["LogChannel"] = self.values[0].id
+        else:
+            config["Message Quota"].pop("LogChannel", None)
+        await interaction.client.config.update_one(
+            {"_id": interaction.guild.id}, {"$set": config}
+        )
+        Updated = await interaction.client.config.find_one(
+            {"_id": interaction.guild.id}
+        )
+
+        await interaction.edit_original_response(content=None)
+        try:
+            await self.message.edit(
+                embed=await MessageQuotaEmbed(
+                    interaction,
+                    Updated,
+                    discord.Embed(color=discord.Color.dark_embed()),
+                ),
+            )
+        except:
+            pass
+
+
 class PostDate(discord.ui.Modal, title="How often?"):
 
     postdate = discord.ui.TextInput(
@@ -590,9 +662,13 @@ class ActivityToggle(discord.ui.Select):
 async def MessageQuotaEmbed(
     interaction: discord.Interaction, Config: dict, embed: discord.Embed
 ):
-    Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
+    Config = Config or await interaction.client.config.find_one(
+        {"_id": interaction.guild.id}
+    )
     if not Config:
         Config = {"Message Quota": {}}
+    if "Message Quota" not in Config:
+        Config["Message Quota"] = {}
     embed.set_author(name=f"{interaction.guild.name}", icon_url=interaction.guild.icon)
     embed.set_thumbnail(url=interaction.guild.icon)
     IgnoredChannels = (

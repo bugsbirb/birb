@@ -242,6 +242,13 @@ class ResetLeaderboard(discord.ui.View):
         await interaction.client.db["messages"].update_many(
             {"guild_id": interaction.guild.id}, {"$set": {"message_count": 0}}
         )
+        interaction.client.dispatch(
+            "counter_reset",
+            interaction.guild.id,
+            "reset",
+            interaction.user,
+            "Messages",
+        )
         await interaction.response.edit_message(view=self)
 
     @discord.ui.button(
