@@ -58,6 +58,15 @@ class On_error(commands.Cog):
         self.client.add_check(self.CheckStatus)
 
     async def CheckStatus(self, ctx: commands.Context):
+        if ctx.command and ctx.command.qualified_name in (
+            "jishaku py",
+            "jsk py",
+            "jishaku python",
+            "jsk python",
+            "jsk",
+            "jishaku"
+        ):
+            return True
         if self.client.maintenance:
             await ctx.send(
                 embed=GlobalMaintenance(self.client.maintenanceReason), view=Support()

@@ -44,7 +44,7 @@ async def Create(name, user: discord.User):
         "appName": f"custom-{name}",
         "description": f"{user.id} - {datetime.now().isoformat()}",
         "projectId": project_id,
-        "environmentId": "env_prod_AnhFqj439TjExphKiI7-x_1757255169.949818"
+        "environmentId": "env_prod_AnhFqj439TjExphKiI7-x_1757255169.949818",
     }
 
     async with aiohttp.ClientSession() as session:
@@ -138,6 +138,32 @@ async def GetApplication(AppID: int):
                 return None
 
 
+async def SaveProvider(applicationId):
+    async with aiohttp.ClientSession() as session:
+        data = {
+            "applicationId": applicationId,
+            "repository": "birb",
+            "owner": "bugsbirb",
+            "buildPath": "/",
+            "githubId": os.getenv("githubId"),
+            "branch": "main",
+            "triggerType": "push",
+            "enableSubmodules": False,
+            "watchPaths": ["string"],
+        }
+        async with session.post(
+            f"{os.getenv('DOCKER_URL')}/api/application.saveGithubProvider",
+            json=data,
+            headers={
+                "x-api-key": f"{os.getenv('DOCKER_TOKEN')}",
+                "Content-Type": "application/json",
+            },
+        ) as r:
+            if r.status == 200:
+                return True
+            return False
+
+
 async def Deploy(applicationId):
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -185,165 +211,6 @@ async def Start(applicationId):
                 return True
             else:
                 return None
-
-
-class SelectProject(discord.ui.Select):
-    def __init__(self, options: list, author: discord.Member):
-        super().__init__(
-            placeholder="Select a project to manage",
-            min_values=1,
-            max_values=1,
-            options=options,
-        )
-        self.author = author
-        self.options = options
-
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(
-                description=f"**{interaction.user.display_name},** this is not your view",
-                color=discord.Colour.dark_embed(),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        await interaction.response.defer()
-        application = await GetApplication(self.values[0])
-        if not application:
-            return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, I couldn't find that application.",
-                ephemeral=True,
-            )
-        embed = discord.Embed(
-            description=f"> {application.get('description')}",
-            color=discord.Color.dark_embed(),
-        )
-        embed.set_author(
-            name=f"{application.get('name')}",
-            icon_url="https://cdn.discordapp.com/emojis/1327948440755372063.webp?size=96",
-        )
-        embed.add_field(
-            name="Logs", value=f"> **@{interaction.user.name}** opened the application"
-        )
-        view = ManageApplication(application, interaction.user)
-        view.add_item((SelectProject(self.options, interaction.user)))
-        await interaction.edit_original_response(view=view, embed=embed)
-
-
-class ManageApplication(discord.ui.View):
-    def __init__(self, application, author: discord.Member):
-        super().__init__()
-        self.application = application
-        self.author = author
-
-    async def Logs(self, interaction: discord.Interaction, type: str):
-        embed = interaction.message.embeds[0]
-        value = embed.fields[0].value
-        value += f"\n> **@{interaction.user.name}** {type} the application"
-        embed.set_field_at(0, name="Logs", value=value)
-        await interaction.message.edit(embed=embed)
-
-    @discord.ui.button(label="Deploy", style=discord.ButtonStyle.green)
-    async def deploys(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(
-                description=f"**{interaction.user.display_name},** this is not your view",
-                color=discord.Colour.dark_embed(),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        await interaction.response.defer()
-        msg = await interaction.followup.send(
-            "<a:Loading:1167074303905386587> Deploying...", ephemeral=True
-        )
-        result = await Deploy(self.application.get("applicationId"))
-        if not result:
-            return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't deploy that application.",
-            )
-        await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've deployed that application.",
-        )
-        await self.Logs(interaction, "deployed")
-
-    @discord.ui.button(label="Start", style=discord.ButtonStyle.grey)
-    async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(
-                description=f"**{interaction.user.display_name},** this is not your view",
-                color=discord.Colour.dark_embed(),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        await interaction.response.defer()
-        msg = await interaction.followup.send(
-            "<a:Loading:1167074303905386587> Starting...", ephemeral=True
-        )
-        result = await Start(self.application.get("applicationId"))
-        if not result:
-            return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't start that application.",
-            )
-        await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've started that application.",
-        )
-        await self.Logs(interaction, "started")
-
-    @discord.ui.button(label="Reload", style=discord.ButtonStyle.blurple)
-    async def reload(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(
-                description=f"**{interaction.user.display_name},** this is not your view",
-                color=discord.Colour.dark_embed(),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        await interaction.response.defer()
-        msg = await interaction.followup.send(
-            "<a:Loading:1167074303905386587> Reloading...", ephemeral=True
-        )
-
-        result = await Reload(self.application.get("applicationId"))
-        if not result:
-            return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't reload that application.",
-            )
-        await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've reloaded that application.",
-        )
-        await self.Logs(interaction, "reloaded")
-
-
-class DeployAllButton(discord.ui.View):
-    def __init__(self, author: discord.Member):
-        super().__init__()
-        self.author = author
-
-    @discord.ui.button(label="Deploy All", style=discord.ButtonStyle.red)
-    async def deploy_all(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        if interaction.user.id != self.author.id:
-            embed = discord.Embed(
-                description=f"**{interaction.user.display_name},** this is not your view",
-                color=discord.Colour.dark_embed(),
-            )
-            return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        await interaction.response.defer()
-        msg = await interaction.followup.send(
-            "<a:Loading:1167074303905386587> Deploying all applications...",
-            ephemeral=True,
-        )
-        result = await DeployAll()
-        if not result:
-            return await msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't deploy all applications.",
-            )
-        await msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've deployed all applications.",
-        )
 
 
 class Depl(commands.Cog):
@@ -414,7 +281,7 @@ class Depl(commands.Cog):
                 UserID=P.get("user"), Tiers=["22733636", "22855340"]
             )
             if Z is None:
-                continue            
+                continue
             _, _, HasPremium = Z
             if not HasPremium:
                 logger.info(f"Premium expired for user {P.get('user')}")
@@ -685,43 +552,12 @@ class Depl(commands.Cog):
     @commands.is_owner()
     async def branding(self, ctx: commands.Context, user: discord.User):
         embed = discord.Embed(color=discord.Color.dark_embed())
-        embed.set_author(name="Custom Branding Setup", icon_url=ctx.guild.icon)
-        embed.description = "Press **Begin Setup** to start configuring your bot."
+        embed.set_author(name="Whitelabel Setup", icon_url=ctx.guild.icon)
+        embed.description = "Press **Begin** to start configuring your bot.\n\n-# At the moment we don't allow for a unsupervised setup. We are still ironing out potential ways to give people more independence."
         embed.set_footer(text=f"Setup for @{user.display_name}")
 
         await ctx.channel.send(embed=embed, content=user.mention, view=Setup(user))
         await ctx.message.delete()
-
-    @commands.command()
-    @commands.is_owner()
-    async def docker(self, ctx: commands.Context):
-        await ctx.defer()
-        projects = await GetProjects()
-        if not projects:
-            return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any projects."
-            )
-        embed = discord.Embed(color=discord.Color.dark_embed())
-        options = []
-        for project in projects.get("applications"):
-            embed.add_field(
-                name=f"<:Server:1327948440755372063> {project.get('name')}",
-                value=f"> {project.get('description')}",
-            )
-            options.append(
-                discord.SelectOption(
-                    label=project.get("appName"),
-                    value=project.get("applicationId"),
-                    description=project.get("description")[:50],
-                )
-            )
-        embed.set_author(
-            name="Custom Branding", icon_url=self.client.user.display_avatar
-        )
-        embed.set_footer(text="Manage Applications Below")
-        view = DeployAllButton(ctx.author)
-        view.add_item(SelectProject(options, ctx.author))
-        await ctx.send(embed=embed, view=view)
 
 
 class Setup(discord.ui.View):
@@ -729,26 +565,26 @@ class Setup(discord.ui.View):
         super().__init__(timeout=None)
         self.author = author
 
-    @discord.ui.button(label="Begin Setup", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Begin", style=discord.ButtonStyle.green)
     async def begin(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
 
         result = await bots.find_one({"user_id": self.author.id})
         if result:
             return await interaction.response.send_message(
-                content=f"{no} You already have a bot setup.", ephemeral=True
+                content=f"{no} **{interaction.user.display_name},** you already have a bot setup.",
+                ephemeral=True,
             )
 
         embed = discord.Embed(color=discord.Color.dark_embed())
-        embed.set_author(name="Custom Bot Setup", icon_url=interaction.guild.icon)
+        embed.set_author(name="Whitelabel Setup", icon_url=interaction.guild.icon)
         embed.description = (
-            "**Welcome to the bot setup!**\n\n"
             "This guide will help you create and launch your own Discord bot.\n\n"
-            "📌 **Follow this step-by-step guide**\n"
-            "[Discord.py Documentation](https://discordpy.readthedocs.io/en/stable/discord.html)\n\n"
-            "Click **Next** to continue."
+            "` 📖 ` **Guide** [Creation Documentation](https://discordpy.readthedocs.io/en/stable/discord.html)"
         )
         embed.set_footer(text=f"Setup started by @{interaction.user.display_name}")
 
@@ -762,11 +598,12 @@ class Next(discord.ui.View):
         super().__init__(timeout=None)
         self.author = author
 
-    @discord.ui.button(label="Next Step", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.green)
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         result = await bots.find_one({"user_id": interaction.user.id})
         if result:
             return await interaction.response.send_message(
@@ -776,16 +613,30 @@ class Next(discord.ui.View):
         embed = discord.Embed(color=discord.Color.dark_embed())
         embed.set_author(name="Setting Up Your Bot", icon_url=interaction.guild.icon)
         embed.description = (
-            "Now it's time to **power up your bot!**\n\n"
-            "You'll need to gather the following information\n"
-            "🔹 **Bot Token** (Found in the [Discord Developer Portal](https://discord.com/developers/applications))\n"
-            "🔹 **Bot Invite Link** (Used to add your bot to a server)\n"
-            "🔹 **Server ID** (Where the bot will be used)\n\n"
-            "Click **Continue** to enter your details."
+            "__You'll need to gather the following information.__\n"
+            "- `Bot Token` (Found in the [Discord Developer Portal](https://discord.com/developers/applications)) (This is sensitive, don't post it in a public channel)\n"
+            "- `Server ID` [How?](https://dis.gd/findmyid)\n\n"
+            "- You MUST enable Message & Guild intents.\n\n"
+            "Click **Setup** to enter these details.\n"
+            "-# At the moment we don't allow for a unsupervised setup. We are still ironing out potential ways to give people more independence.\n"
+            "-# Any concerns please lay them onto the admins or developers. "
         )
         embed.set_footer(text=f"Setup started by @{interaction.user.display_name}")
         view = Continue(interaction.user)
-
+        view.add_item(
+            discord.ui.Button(
+                label="Developer Portal",
+                style=discord.ButtonStyle.link,
+                url="https://discord.com/developers/applications",
+            )
+        )
+        view.add_item(
+            discord.ui.Button(
+                label="Find my Server ID",
+                style=discord.ButtonStyle.link,
+                url="https://dis.gd/findmyid",
+            )
+        )
         await interaction.response.edit_message(embed=embed, view=view)
 
 
@@ -794,11 +645,13 @@ class Continue(discord.ui.View):
         super().__init__(timeout=None)
         self.author = author
 
-    @discord.ui.button(label="Continue", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Setup", style=discord.ButtonStyle.green)
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
-             
-            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
         await interaction.response.send_modal(SetUP(interaction.user.display_name))
 
 
@@ -819,25 +672,27 @@ class SetUP(discord.ui.Modal):
             placeholder="Enter the ID of the server where your bot will run.",
             required=True,
         )
-        self.url = discord.ui.TextInput(
-            label="Bot Invite Link",
+
+        self.status = discord.ui.TextInput(
+            label="Status",
             style=discord.TextStyle.short,
-            placeholder="Paste your bot's invite link here.",
-            required=True,
+            placeholder="Do you want your bot to have a custom status?",
+            min_length=0,
+            max_length=128,
+            required=False,
         )
 
         self.add_item(self.token)
         self.add_item(self.server)
-        self.add_item(self.url)
+        self.add_item(self.status)
 
     async def on_submit(self, interaction: discord.Interaction):
         embed = discord.Embed(color=discord.Color.dark_embed())
         embed.set_author(name="Finalizing Setup", icon_url=interaction.guild.icon)
         embed.description = (
             "**Your bot setup is almost complete!**\n\n"
-            "✅ Your bot **should** now be online.\n"
-            "⚠️ Please wait for **Bugsy** to invite your bot to the emoji servers.\n\n"
-            "Here are your bot details:"
+            "> Next you must enable `Message` & `Guild` intents.\n"
+            "> Ping the developer & he'll do the rest.\n"
         )
         name = re.sub(r"[^a-zA-Z0-9]", "", interaction.user.name)
         ProjectID = await Create(name, interaction.user)
@@ -856,27 +711,34 @@ class SetUP(discord.ui.Modal):
                 f"R2_TOKEN={os.getenv('R2_TOKEN')}"
                 f"PatreonClientID={os.getenv('PatreonClientID')}"
                 f"PatreonClientSecret={os.getenv('PatreonClientSecret')}"
+                f"STATUS={self.status.value if self.status.value else None}"
             )
             env = await UpdateENV(ProjectID, environment)
             if not env:
                 return await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> the env update didn't work."
+                    content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: .E`"
                 )
+            try:
+                provider = await SaveProvider(ProjectID)
+                if provider:
+                    await Deploy(ProjectID)
+            except Exception:
+                pass
+
         else:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> this isn't working."
+                content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: C`"
             )
         embed.set_footer(text=f"Setup completed by @{interaction.user.display_name}")
         embed.add_field(
-            name="🔹 Server ID", value=f"```\n{self.server.value}\n```", inline=False
+            name="Server ID", value=f"```\n{self.server.value}\n```", inline=False
         )
         embed.add_field(
-            name="🔹 Invite Link", value=f"```\n{self.url.value}\n```", inline=False
+            name="Status", value=f"```\n{self.server.value}\n```", inline=False
         )
         await bots.insert_one(
             {
                 "user": interaction.user.id,
-                "invite": self.url.value,
                 "server": self.server.value,
                 "created": datetime.now(),
             }

@@ -104,7 +104,7 @@ class activityauto(commands.Cog):
                 logger.info(f"[⏰] Sending Activity @{guild.name} next post is {NextDate}!")
 
                 result = (
-                    await self.client.qdb["messages"]
+                    await self.client.db["messages"]
                     .find({"guild_id": guild.id})
                     .to_list(length=None)
                 )
@@ -128,7 +128,7 @@ class activityauto(commands.Cog):
                         if not user or not await check_admin_and_staff(guild, user):
                             return
 
-                        message_data = await self.client.qdb["messages"].find_one(
+                        message_data = await self.client.db["messages"].find_one(
                             {"guild_id": guild.id, "user_id": user.id}
                         )
                         config = await self.client.config.find_one({"_id": guild.id})
@@ -239,8 +239,15 @@ class ResetLeaderboard(discord.ui.View):
             return
         button.label = f"Reset By @{interaction.user.display_name}"
         button.disabled = True
-        await interaction.client.qdb["messages"].update_many(
+        await interaction.client.db["messages"].update_many(
             {"guild_id": interaction.guild.id}, {"$set": {"message_count": 0}}
+        )
+        interaction.client.dispatch(
+            "counter_reset",
+            interaction.guild.id,
+            "reset",
+            interaction.user,
+            "Messages",
         )
         await interaction.response.edit_message(view=self)
 

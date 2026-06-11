@@ -1209,14 +1209,14 @@ class InfractionTypesAction(discord.ui.Select):
             await interaction.response.defer()
             if not await premium(interaction.guild.id):
                 return await interaction.followup.send(
-                    embed=NoPremium(), view=Support()
+                    embed=NoPremium(), view=Support(), ephemeral=True
                 )
             embed = discord.Embed(
                 description="> The Infraction Hierarchy allows you to automate role demotions using Department Hierarchy and singular list hierarchies.",
                 color=discord.Color.dark_embed(),
             )
             view = UseHierarchyToggle(interaction.user, self.name)
-            return await interaction.followup.send(embed=embed, view=view)
+            return await interaction.edit_original_response(embed=embed, view=view)
 
         elif option == "Change Group Role":
             await interaction.response.defer()

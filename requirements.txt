@@ -20,3 +20,4 @@ scipy
 matplotlib
 numpy
 python-Levenshtein
+signalrcore

@@ -51,8 +51,11 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 client = AsyncIOMotorClient(MONGO_URL)
 # client = pymongo.AsyncMongoClient(MONGO_URL)
-qdb = client["QBeta"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
-db = client["BETA"] if ENVIRONMENT and ENVIRONMENT.lower() == "development" else client["astro"]
+db = (
+    client["BETA"]
+    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
+    else client["astro"]
+)
 
 prefixdb = db["prefixes"]
 qotdd = db["qotd"]
@@ -66,7 +69,9 @@ if not (TOKEN and MONGO_URL and PREFIX):
     logger.error("[❌] Missing .env variables. [TOKEN, MONGO_URL, PREFIX]")
     sys.exit(1)
 
-if os.getenv("REMOVE_EMOJIS", "False") == "True" or (ENVIRONMENT and ENVIRONMENT.lower() == "custom"):
+if os.getenv("REMOVE_EMOJIS", "False") == "True" or (
+    ENVIRONMENT and ENVIRONMENT.lower() == "custom"
+):
     from branding import ClearEmojis
 
     ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
@@ -124,7 +129,6 @@ class Client(commands.AutoShardedBot):
 
     def _initialize_databases(self):
         self.db = db
-        self.qdb = qdb
         self.config = Config
         self.customcommands = db["customcommands"]
 
@@ -199,7 +203,7 @@ class Client(commands.AutoShardedBot):
             # Events
             "Cogs.Events.Dev.on_guild",
             "Cogs.Events.Dev.welcome",
-            "Cogs.Events.quota",
+            "Cogs.Events.on_message",
             "Cogs.Events.modmail",
             "Cogs.Events.on_thread_create",
             "Cogs.Events.Dev.topgg",
@@ -220,6 +224,7 @@ class Client(commands.AutoShardedBot):
             "Cogs.Events.on_promotion_log",
             "Cogs.Events.on_promotion_void",
             "Cogs.Events.on_leave",
+            "Cogs.Events.on_counter_log",
             "Cogs.Events.Dev.on_shard",
             # Tasks
             "Cogs.Tasks.expiration",

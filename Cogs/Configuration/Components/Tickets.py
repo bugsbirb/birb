@@ -30,6 +30,11 @@ class Tickets(discord.ui.Select):
                     emoji="<:staff:1206248655359840326>",
                     description="Blacklists roles from opening tickets.",
                 ),
+                discord.SelectOption(
+                    label="Audit Log",
+                    emoji="<:Log:1349431938926252115>",
+                    description="Logs ticket quota resets.",
+                ),
             ]
         )
         self.author = author
@@ -57,62 +62,27 @@ class Tickets(discord.ui.Select):
                     ),
                 )
             )
-        elif option == "Blacklist":
-            Config = (
-                await interaction.client.config.find_one({"_id": interaction.guild.id})
-                or {}
-            )
-
+        elif option == "Audit Log":
+            await interaction.response.defer()
+            Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
+            if not Config:
+                Config = {
+                    "Infraction": {},
+                    "Module Options": {},
+                    "_id": interaction.guild.id,
+                }
             view = discord.ui.View()
             view.add_item(
-                BlacklistRoles(
-                    author=interaction.user,
-                    defaults=[
-                        role
-                        for role in interaction.guild.roles
-                        if role.id
-                        in Config.get("Tickets", {}).get("BlacklistRoles", [])
-                    ],
+                LogChannel(
+                    interaction.user,
+                    interaction.guild.get_channel(
+                        Config.get("Message Quota", {}).get("LogChannel"),
+                    ),
+                    interaction.message,
                 )
             )
+            await interaction.followup.send(view=view, ephemeral=True)
 
-            await interaction.response.send_message(view=view, ephemeral=True)
-
-
-class BlacklistRoles(discord.ui.RoleSelect):
-    def __init__(self, author: discord.Member, defaults: list):
-        super().__init__(
-            placeholder="Blacklist roles",
-            min_values=0,
-            max_values=25,
-            default_values=defaults,
-        )
-        self.author = author
-
-    async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author.id:
-            return await interaction.response.send_message(
-                embed=NotYourPanel(), ephemeral=True
-            )
-        await interaction.client.config.update_one(
-            {"_id": interaction.guild.id},
-            {"$set": {"Tickets.BlacklistRoles": [role.id for role in self.values]}},
-            upsert=True,
-        )
-
-        await interaction.response.send_message(
-            f"{tick} **{interaction.user.display_name}**, successfully updated blacklist roles..",
-            ephemeral=True,
-        )
-        try:
-            await self.message.edit(
-                embed=await TicketsEmbed(
-                    interaction,
-                    discord.Embed(color=discord.Color.dark_embed()),
-                ),
-            )
-        except:
-            pass
 
 
 class TicketQuota(discord.ui.Modal):
@@ -1365,3 +1335,59 @@ class CustomiseButton(discord.ui.Modal):
             content=f"{tick} **{interaction.user.display_name},** button updated successfully.",
             ephemeral=True,
         )
+
+
+class LogChannel(discord.ui.ChannelSelect):
+    def __init__(
+        self,
+        author: discord.Member,
+        channel: discord.TextChannel = None,
+        message: discord.Message = None,
+    ):
+        super().__init__(
+            placeholder="Audit Log Channel",
+            min_values=0,
+            max_values=1,
+            default_values=[channel] if channel else [],
+            channel_types=[discord.ChannelType.text, discord.ChannelType.news],
+        )
+        self.author = author
+        self.channel = channel
+        self.message = message
+
+    async def callback(self, interaction):
+        await interaction.response.defer()
+        if interaction.user.id != self.author.id:
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
+
+        config = await interaction.client.config.find_one(
+            {"_id": interaction.guild.id}
+        ) or {
+            "_id": interaction.guild.id,
+            "Tickets": {},
+        }
+        if "Tickets" not in config:
+            config["Tickets"] = {}
+
+        if self.values:
+            config["Tickets"]["LogChannel"] = self.values[0].id
+        else:
+            config["Tickets"].pop("LogChannel", None)
+        await interaction.client.config.update_one(
+            {"_id": interaction.guild.id}, {"$set": config}
+        )
+        Updated = await interaction.client.config.find_one(
+            {"_id": interaction.guild.id}
+        )
+
+        await interaction.edit_original_response(content=None)
+        try:
+            await self.message.edit(
+                embed=await TicketsEmbed(
+                    interaction,
+                    Updated,
+                    discord.Embed(color=discord.Color.dark_embed()),
+                ),
+            )
+        except:
+            pass

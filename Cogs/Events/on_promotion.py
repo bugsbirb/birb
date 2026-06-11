@@ -8,9 +8,7 @@ from datetime import datetime
 import logging
 from Cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
 
-
 logger = logging.getLogger(__name__)
-
 
 
 def DefaultEmbed(data, staff, manager):
@@ -96,7 +94,7 @@ async def PromotionSystem(
     settings: dict,
     guild: discord.Guild,
     member: discord.Member,
-    manager: discord.Member
+    manager: discord.Member,
 ):
     if not settings.get("Module Options", {}).get("autorole", True):
         return await self.db["promotions"].find_one({"_id": PromotionData.get("_id")})
@@ -115,7 +113,9 @@ async def PromotionSystem(
         if not newrole:
             return
         try:
-            await member.add_roles(newrole, reason=f"Staff Promotion initiated by {manager.name}")
+            await member.add_roles(
+                newrole, reason=f"Staff Promotion initiated by {manager.name}"
+            )
         except (discord.Forbidden, discord.NotFound, discord.HTTPException):
             pass
 
@@ -163,7 +163,8 @@ async def PromotionSystem(
             if SkipRole and SkipRole in SortedRoles:
                 try:
                     await member.add_roles(
-                        SkipRole, reason=f"Staff Promotion (Skipped) in {Department} initiated by {manager.name}"
+                        SkipRole,
+                        reason=f"Staff Promotion (Skipped) in {Department} initiated by {manager.name}",
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -172,7 +173,8 @@ async def PromotionSystem(
                     if Role in MemberRoles and Role != SkipRole:
                         try:
                             await member.remove_roles(
-                                Role, reason=f"Replaced by {SkipRole.name} initiated by {manager.name}"
+                                Role,
+                                reason=f"Replaced by {SkipRole.name} initiated by {manager.name}",
                             )
                         except (discord.Forbidden, discord.HTTPException):
                             pass
@@ -189,7 +191,8 @@ async def PromotionSystem(
                 NextRole = SortedRoles[Index + 1]
                 try:
                     await member.add_roles(
-                        NextRole, reason=f"Staff Promotion in {Department} initiated by {manager.name}"
+                        NextRole,
+                        reason=f"Staff Promotion in {Department} initiated by {manager.name}",
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -205,7 +208,8 @@ async def PromotionSystem(
                 FirstRole = SortedRoles[0]
                 try:
                     await member.add_roles(
-                        FirstRole, reason=f"Staff Promotion in {Department} initiated by {manager.name}"
+                        FirstRole,
+                        reason=f"Staff Promotion in {Department} initiated by {manager.name}",
                     )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
@@ -248,7 +252,10 @@ async def PromotionSystem(
 
             if SkipRole and SkipRole in SortedRoles:
                 try:
-                    await member.add_roles(SkipRole, reason=f"Staff Promotion (Skipped) initiated by {manager.name}")
+                    await member.add_roles(
+                        SkipRole,
+                        reason=f"Staff Promotion (Skipped) initiated by {manager.name}",
+                    )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
 
@@ -272,7 +279,9 @@ async def PromotionSystem(
             if CurrentRole in MemberRoles and Index + 1 < len(SortedRoles):
                 NextRole = SortedRoles[Index + 1]
                 try:
-                    await member.add_roles(NextRole, reason=f"Staff Promotion initiated by {manager.name}")
+                    await member.add_roles(
+                        NextRole, reason=f"Staff Promotion initiated by {manager.name}"
+                    )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
                 try:
@@ -286,7 +295,9 @@ async def PromotionSystem(
             if not any(role in MemberRoles for role in SortedRoles):
                 FirstRole = SortedRoles[0]
                 try:
-                    await member.add_roles(FirstRole, reason=f"Staff Promotion initiated by {manager.name}")
+                    await member.add_roles(
+                        FirstRole, reason=f"Staff Promotion initiated by {manager.name}"
+                    )
                 except (discord.Forbidden, discord.HTTPException):
                     pass
 
@@ -317,7 +328,8 @@ class on_promotion(commands.Cog):
 
         if guild is None:
             logging.warning(
-                f"[🏠 on_promotion] {Infraction.guild_id} is None and can't be found..?", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] {Infraction.guild_id} is None and can't be found..?",
+                extra={"objectId": str(objectid)},
             )
             return
 
@@ -327,7 +339,8 @@ class on_promotion(commands.Cog):
             staff = None
         if staff is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} staff member {Infraction.staff} can't be found.", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] @{guild.name} staff member {Infraction.staff} can't be found.",
+                extra={"objectId": str(objectid)},
             )
             return
         await self.client.db["Cooldown"].update_one(
@@ -342,26 +355,30 @@ class on_promotion(commands.Cog):
             manager = None
         if manager is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} manager {Infraction.management} can't be found.", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] @{guild.name} manager {Infraction.management} can't be found.",
+                extra={"objectId": str(objectid)},
             )
             return
 
         ChannelID = Settings.get("Promo", {}).get("channel")
         if not ChannelID:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} no channel ID found in settings.", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] @{guild.name} no channel ID found in settings.",
+                extra={"objectId": str(objectid)},
             )
             return
         try:
             channel = await guild.fetch_channel(int(ChannelID))
         except Exception as e:
             logger.error(
-                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [1]", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [1]",
+                extra={"objectId": str(objectid)},
             )
             return
         if channel is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [2]", extra={"objectId": str(objectid)}
+                f"[🏠 on_promotion] @{guild.name} the promotion channel can't be found. [2]",
+                extra={"objectId": str(objectid)},
             )
             return
         Options = Settings.get("Module Options", {})
@@ -393,7 +410,11 @@ class on_promotion(commands.Cog):
                     manager.display_avatar.url if manager.display_avatar else None
                 ),
                 "{notes}": Infraction.notes if Infraction.notes else "",
-                "{promotion.id}": Infraction.random_string if hasattr(Infraction, "random_string") else "",
+                "{promotion.id}": (
+                    Infraction.random_string
+                    if hasattr(Infraction, "random_string")
+                    else ""
+                ),
                 "{guild.name}": guild.name,
                 "{guild.id}": str(guild.id),
             }
@@ -497,15 +518,13 @@ class on_promotion(commands.Cog):
             {"$set": {"jump_url": msg.jump_url, "msg_id": msg.id}},
         )
         self.client.dispatch("promotion_log", objectid, "create", manager)
-        consreult = await self.client.db["consent"].find_one({"user_id": staff.id})
-        if not consreult or consreult.get("promotionalert") is not False and not edit:
-            try:
-                await staff.send(
-                    content=f"<:SmallArrow:1140288951861649418>From **@{guild.name}**",
-                    embed=embed,
-                )
-            except:
-                pass
+        try:
+            await staff.send(
+                content=f"<:SmallArrow:1140288951861649418>From **@{guild.name}**",
+                embed=embed,
+            )
+        except:
+            pass
 
 
 class PromotionIssuer(discord.ui.View):
