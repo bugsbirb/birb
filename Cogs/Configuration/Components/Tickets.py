@@ -35,6 +35,7 @@ class Tickets(discord.ui.Select):
                     emoji="<:Log:1349431938926252115>",
                     description="Logs ticket quota resets.",
                 ),
+
             ]
         )
         self.author = author
@@ -82,7 +83,61 @@ class Tickets(discord.ui.Select):
                 )
             )
             await interaction.followup.send(view=view, ephemeral=True)
+        elif option == "Blacklist":
+            Config = (
+                await interaction.client.config.find_one({"_id": interaction.guild.id})
+                or {}
+            )
 
+            view = discord.ui.View()
+            view.add_item(
+                BlacklistRoles(
+                    author=interaction.user,
+                    defaults=[
+                        role
+                        for role in interaction.guild.roles
+                        if role.id
+                        in Config.get("Tickets", {}).get("BlacklistRoles", [])
+                    ],
+                )
+            )
+
+            await interaction.response.send_message(view=view, ephemeral=True)
+
+class BlacklistRoles(discord.ui.RoleSelect):
+    def __init__(self, author: discord.Member, defaults: list):
+        super().__init__(
+            placeholder="Blacklist roles",
+            min_values=0,
+            max_values=25,
+            default_values=defaults,
+        )
+        self.author = author
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(
+                embed=NotYourPanel(), ephemeral=True
+            )
+        await interaction.client.config.update_one(
+            {"_id": interaction.guild.id},
+            {"$set": {"Tickets.BlacklistRoles": [role.id for role in self.values]}},
+            upsert=True,
+        )
+
+        await interaction.response.send_message(
+            f"{tick} **{interaction.user.display_name}**, successfully updated blacklist roles..",
+            ephemeral=True,
+        )
+        try:
+            await self.message.edit(
+                embed=await TicketsEmbed(
+                    interaction,
+                    discord.Embed(color=discord.Color.dark_embed()),
+                ),
+            )
+        except:
+            pass
 
 
 class TicketQuota(discord.ui.Modal):
