@@ -133,6 +133,13 @@ class Button(discord.ui.Button):
                 content=f"{no} **{interaction.user.display_name}**, you're blacklisted from this servers tickets.",
                 ephemeral=True,
             )
+        Config = await interaction.client.config.find_one({"_id": interaction.guild.id}) or {}
+        blacklist_role_id = Config.get("Tickets", {}).get("BlacklistRole")
+        if blacklist_role_id and any(r.id == blacklist_role_id for r in interaction.user.roles):
+            return await interaction.response.send_message(
+                content=f"{no} **{interaction.user.display_name}**, you're not allowed to open tickets.",
+                ephemeral=True,
+            )
         Cli = await interaction.guild.fetch_member(interaction.client.user.id)
         if not Cli.guild_permissions.manage_channels:
             return await interaction.response.send_message(

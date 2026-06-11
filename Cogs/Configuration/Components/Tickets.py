@@ -21,6 +21,9 @@ class Tickets(discord.ui.Select):
                 discord.SelectOption(
                     label="Quota", emoji="<:counting:1343598685749252227>", description="Track the amount of claimed tickets staff members claim."
                 ),
+                discord.SelectOption(
+                    label="Blacklist Role", emoji="<:Destroy:1333862072143974421>", description="Users with this role cannot open tickets."
+                ),
             ]
         )
         self.author = author
@@ -47,6 +50,52 @@ class Tickets(discord.ui.Select):
                         {"_id": interaction.guild.id}
                     ),
                 )
+            )
+        elif option == "Blacklist Role":
+            Config = await interaction.client.config.find_one({"_id": interaction.guild.id}) or {}
+            current_role = None
+            role_id = Config.get("Tickets", {}).get("BlacklistRole")
+            if role_id:
+                current_role = interaction.guild.get_role(role_id)
+            view = discord.ui.View()
+            view.add_item(BlacklistRoleSelect(self.author, [current_role] if current_role else []))
+            embed = discord.Embed(
+                description="Select a role. Users with this role will be unable to open tickets.",
+                color=discord.Color.dark_embed(),
+            ).set_author(name="Blacklist Role", icon_url=interaction.guild.icon)
+            await interaction.response.send_message(view=view, embed=embed, ephemeral=True)
+
+
+class BlacklistRoleSelect(discord.ui.RoleSelect):
+    def __init__(self, author: discord.Member, defaults: list):
+        super().__init__(
+            placeholder="Select a blacklist role",
+            min_values=0,
+            max_values=1,
+            default_values=defaults,
+        )
+        self.author = author
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.author.id:
+            return await interaction.response.send_message(embed=NotYourPanel(), ephemeral=True)
+        role_id = self.values[0].id if self.values else None
+        await interaction.client.config.update_one(
+            {"_id": interaction.guild.id},
+            {"$set": {"Tickets.BlacklistRole": role_id}},
+            upsert=True,
+        )
+        if role_id:
+            await interaction.response.edit_message(
+                content=f"{tick} **{interaction.user.display_name},** blacklist role set to <@&{role_id}>.",
+                view=None,
+                embed=None,
+            )
+        else:
+            await interaction.response.edit_message(
+                content=f"{tick} **{interaction.user.display_name},** blacklist role removed.",
+                view=None,
+                embed=None,
             )
 
 
