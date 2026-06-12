@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import os
+from dataclasses import dataclass
 from utils.emojis import *
 import datetime
 import random
@@ -14,8 +15,6 @@ logger = logging.getLogger(__name__)
 from utils.Module import ModuleCheck
 from utils.autocompletes import DepartmentAutocomplete, RoleAutocomplete
 from utils.format import IsSeperateBot
-# TODO: Merge the 3 commands together some how, extremely inefficient, and it's hard to update.
-
 
 environment = os.getenv("ENVIRONMENT")
 
@@ -55,6 +54,110 @@ async def CheckCooldown(
     return False, None
 
 
+@dataclass
+class IPromotionContext:
+    interaction: discord.Interaction
+    msg: discord.Message
+    Config: dict
+    channel: discord.TextChannel
+
+
+async def PromotionContext(
+    interaction: discord.Interaction,
+    target: discord.Member | discord.User,
+):
+    if not await has_admin_role(interaction, "Promotion Permissions"):
+        return None
+
+    await interaction.response.defer()
+
+    msg = await interaction.followup.send(
+        f"<a:Loading:1167074303905386587> Processing promotion..."
+    )
+
+    if not await ModuleCheck(interaction.guild.id, "promotions"):
+        await msg.edit(
+            embed=ModuleNotEnabled(),
+            view=Support(),
+        )
+        return None
+
+    # if target.bot:
+    #     await msg.edit(
+    #         content=f"{no} **{interaction.user.display_name}**, you can't promote bots."
+    #     )
+    #     return None
+
+    if interaction.user.id == target.id:
+        await msg.edit(
+            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself."
+        )
+        return None
+
+    config = await interaction.client.config.find_one({"_id": interaction.guild.id})
+
+    if not config:
+        await msg.edit(
+            embed=BotNotConfigured(),
+            view=Support(),
+        )
+        return None
+
+    channel_id = config.get("Promo", {}).get("channel")
+
+    if not channel_id:
+        await msg.edit(
+            embed=NoChannelSet(),
+            view=Support(),
+        )
+        return None
+
+    try:
+        channel = await interaction.guild.fetch_channel(int(channel_id))
+    except (discord.Forbidden, discord.NotFound):
+        await msg.edit(
+            embed=ChannelNotFound(),
+            view=Support(),
+        )
+        return None
+
+    client = await interaction.guild.fetch_member(interaction.client.user.id)
+
+    if not channel.permissions_for(client).send_messages:
+        await msg.edit(
+            embed=NoPermissionChannel(channel),
+            view=Support(),
+        )
+        return None
+
+    cooldown, lastedPromoted = await CheckCooldown(
+        interaction,
+        target,
+        config.get("Promo", {}).get("Cooldown"),
+    )
+
+    if cooldown:
+        days = int(config.get("Promo", {}).get("Cooldown", 1))
+
+        timestamp = int((lastedPromoted + datetime.timedelta(days=days)).timestamp())
+
+        await msg.edit(
+            content=(
+                f"{no} **{interaction.user.display_name}**, "
+                f"**@{target.display_name}** is on cooldown, "
+                f"you can promote them again <t:{timestamp}:R>."
+            )
+        )
+        return None
+
+    return IPromotionContext(
+        interaction=interaction,
+        msg=msg,
+        Config=config,
+        channel=channel,
+    )
+
+
 @app_commands.autocomplete(rank=RoleAutocomplete)
 @app_commands.describe(
     user="What staff member are you promoting?",
@@ -68,126 +171,81 @@ async def SingleHierarchy(
     rank: str = None,
 ):
 
-    if not await has_admin_role(interaction, "Promotion Permissions"):
-        return
-    await interaction.response.defer()
-    msg: discord.Message = await interaction.followup.send(
-        f"<a:Loading:1167074303905386587> Promoting **@{user.display_name}**...",
-    )
-    if not await ModuleCheck(interaction.guild.id, "promotions"):
-        await msg.edit(
-            embed=ModuleNotEnabled(),
-            view=Support(),
-            ephemeral=True,
-        )
-        return
-    if user is None:
-        await msg.edit(
-            content=f"{no} **{user.display_name}**, this user cannot be found.",
-        )
-        return
-
-    if interaction.user.bot:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
-        )
-        return
-
-    if interaction.user == user:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
-        )
-        return
-
-    Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-    if not Config:
-        return await msg.edit(
-            embed=BotNotConfigured(),
-            view=Support(),
-        )
-    if not Config.get("Promo", {}).get("channel"):
-        return await msg.edit(
-            embed=NoChannelSet(),
-            view=Support(),
-        )
-
     try:
-        channel = await interaction.guild.fetch_channel(
-            int(Config.get("Promo", {}).get("channel"))
-        )
-    except (discord.Forbidden, discord.NotFound):
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
-    if not channel:
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
-    CallDown, LastPromoted = await CheckCooldown(
-        interaction, user, Config.get("Promo", {}).get("Cooldown", None)
-    )
-    if CallDown:
-        Time = int(Config.get("Promo", {}).get("Cooldown", 1))
-        Timestamp = int((LastPromoted + datetime.timedelta(days=Time)).timestamp())
-        return await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is on cooldown, you can promote them again <t:{Timestamp}:R>."
-        )
+        context = await PromotionContext(interaction=interaction, target=user)
+    except Exception as e:
+        print(f"[S Context] {e}")
+    if not context:
+        return
 
     client = await interaction.guild.fetch_member(interaction.client.user.id)
-    if channel.permissions_for(client).send_messages is False:
-        return await msg.edit(
-            embed=NoPermissionChannel(channel),
+    if context.channel.permissions_for(client).send_messages is False:
+        return await context.msg.edit(
+            embed=NoPermissionChannel(context.channel),
             view=Support(),
         )
 
+    NextRole = None
     HierarchyRoles = (
-        Config.get("Promo", {}).get("System", {}).get("single", {}).get("Hierarchy", [])
+        context.Config.get("Promo", {})
+        .get("System", {})
+        .get("single", {})
+        .get("Hierarchy", [])
     )
     if not HierarchyRoles:
-        return await msg.edit(
+        return await context.msg.edit(
             content=f"{no} **{interaction.user.display_name}**, the hierarchy roles have not been set up yet.",
         )
+
     SortedRoles = [
         interaction.guild.get_role(int(roleId))
         for roleId in HierarchyRoles
         if interaction.guild.get_role(int(roleId))
     ]
     SortedRoles.sort(key=lambda r: r.position)
-
+    PreviousRole = None
+    HierarchyRoles = [role for role in SortedRoles if role in user.roles]
+    PreviousRole = (
+        max(HierarchyRoles, key=lambda r: r.position) if HierarchyRoles else None
+    )
     SkipRole = interaction.guild.get_role(int(rank)) if rank else None
-
     if SkipRole and SkipRole in SortedRoles:
         if interaction.user.top_role.position <= SkipRole.position:
-            await msg.edit(
+            await context.msg.edit(
                 content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
             )
             return
 
-    UserRolesInHierarchy = [role for role in SortedRoles if role in user.roles]
+    NextRole = SkipRole
 
-    if not UserRolesInHierarchy:
-        NextRole = SortedRoles[0] if SortedRoles else None
-    else:
-        NextRole = None
-        for i, role in enumerate(SortedRoles):
-            if role in user.roles:
-                if i + 1 < len(SortedRoles):
-                    NextRole = SortedRoles[i + 1]
-                break
-
+    if not SkipRole:
+        UserRolesInHierarchy = [role for role in SortedRoles if role in user.roles]
+        if not UserRolesInHierarchy:
+            NextRole = SortedRoles[0] if SortedRoles else None
+        else:
+            NextRole = None
+            for i, role in enumerate(SortedRoles):
+                if role in user.roles:
+                    if i + 1 < len(SortedRoles):
+                        NextRole = SortedRoles[i + 1]
+                    break
     if NextRole and interaction.user.top_role.position <= NextRole.position:
-        await msg.edit(
+        await context.msg.edit(
             content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
         )
         return
 
     if not NextRole and not SkipRole:
-        await msg.edit(
+        await context.msg.edit(
             content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
         )
         return
+
+    if not NextRole:
+        await context.msg.edit(
+            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** i was unable to calculate which role comes next.",
+            view=Support(),
+        )
 
     Object = await interaction.client.db["promotions"].insert_one(
         {
@@ -197,6 +255,8 @@ async def SingleHierarchy(
             "random_string": "".join(
                 random.choices(string.ascii_uppercase + string.digits, k=10)
             ),
+            "new": NextRole.id,
+            "previous": PreviousRole.id if PreviousRole else None,
             "guild_id": interaction.guild.id,
             "jump_url": None,
             "timestamp": datetime.datetime.now(),
@@ -206,8 +266,8 @@ async def SingleHierarchy(
         }
     )
 
-    interaction.client.dispatch("promotion", Object.inserted_id, Config)
-    await msg.edit(
+    interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
+    await context.msg.edit(
         content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
     )
 
@@ -226,153 +286,108 @@ async def MultiHireachy(
     department: str,
     rank: str = None,
 ):
-
-    if not await has_admin_role(interaction, "Promotion Permissions"):
-        return
-    await interaction.response.defer()
-    msg: discord.Message = await interaction.followup.send(
-        f"<a:Loading:1167074303905386587> Promoting **@{user.display_name}**...",
-    )
-    if not await ModuleCheck(interaction.guild.id, "promotions"):
-        await interaction.followup.send(
-            embed=ModuleNotEnabled(),
-            view=Support(),
-            ephemeral=True,
-        )
-        return
-
-    if user is None:
-        await msg.edit(
-            content=f"{no} **{user.display_name}**, this user cannot be found.",
-        )
-        return
-
-    if interaction.user.bot:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
-        )
-        return
-
-    if interaction.user == user:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
-        )
-        return
-
-    Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-    if not Config:
-        return await msg.edit(
-            embed=BotNotConfigured(),
-            view=Support(),
-        )
-    if not Config.get("Promo", {}).get("channel"):
-        return await msg.edit(
-            embed=NoChannelSet(),
-            view=Support(),
-        )
-
     try:
-        channel = await interaction.guild.fetch_channel(
-            int(Config.get("Promo", {}).get("channel"))
-        )
-    except (discord.Forbidden, discord.NotFound):
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
-    if not channel:
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
+        context = await PromotionContext(interaction=interaction, target=user)
+        if not context:
+            return
 
-    client = await interaction.guild.fetch_member(interaction.client.user.id)
-    if channel.permissions_for(client).send_messages is False:
-        return await msg.edit(
-            embed=NoPermissionChannel(channel),
-            view=Support(),
+        client = await interaction.guild.fetch_member(interaction.client.user.id)
+        if context.channel.permissions_for(client).send_messages is False:
+            return await context.msg.edit(
+                embed=NoPermissionChannel(context),
+                view=Support(),
+            )
+        DepartmentHierarchies = [
+            dept
+            for sublist in context.Config.get("Promo", {})
+            .get("System", {})
+            .get("multi", {})
+            .get("Departments", [])
+            for dept in sublist
+        ]
+        department_data = next(
+            (dept for dept in DepartmentHierarchies if dept.get("name") == department),
+            None,
         )
-    CallDown, LastPromoted = await CheckCooldown(
-        interaction, user, Config.get("Promo", {}).get("Cooldown", None)
-    )
-    if CallDown:
-        Time = int(Config.get("Promo", {}).get("Cooldown", 1))
-        Timestamp = int((LastPromoted + datetime.timedelta(days=Time)).timestamp())
-        return await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is on cooldown, you can promote them again <t:{Timestamp}:R>."
-        )
+        if not department_data:
+            await context.msg.edit(
+                content=f"{no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
+            )
+            return
 
-    DepartmentHierarchies = [
-        dept
-        for sublist in Config.get("Promo", {})
-        .get("System", {})
-        .get("multi", {})
-        .get("Departments", [])
-        for dept in sublist
-    ]
-    department_data = next(
-        (dept for dept in DepartmentHierarchies if dept.get("name") == department),
-        None,
-    )
-    if not department_data:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
-        )
-        return
-
-    RoleIDs = department_data.get("ranks", [])
-    SortedRoles = [
-        interaction.guild.get_role(int(roleId))
-        for roleId in RoleIDs
-        if interaction.guild.get_role(int(roleId))
-    ]
-    SortedRoles.sort(key=lambda r: r.position)
-
-    UserRolesInHierarchy = [role for role in SortedRoles if role in user.roles]
-
-    if not UserRolesInHierarchy:
-        NextRole = SortedRoles[0] if SortedRoles else None
-    else:
         NextRole = None
-        for i, role in enumerate(SortedRoles):
-            if role in user.roles:
-                if i + 1 < len(SortedRoles):
-                    NextRole = SortedRoles[i + 1]
-                break
+        PreviousRole = None
 
-    if NextRole and interaction.user.top_role.position <= NextRole.position:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+        RoleIDs = department_data.get("ranks", [])
+        SortedRoles = [
+            interaction.guild.get_role(int(roleId))
+            for roleId in RoleIDs
+            if interaction.guild.get_role(int(roleId))
+        ]
+        SortedRoles.sort(key=lambda r: r.position)
+
+        HierarchyRoles = [role for role in SortedRoles if role in user.roles]
+        PreviousRole = (
+            max(HierarchyRoles, key=lambda r: r.position) if HierarchyRoles else None
         )
-        return
+        UserRolesInHierarchy = [role for role in SortedRoles if role in user.roles]
+        SkipRole = interaction.guild.get_role(int(rank)) if rank else None
+        if SkipRole and SkipRole in SortedRoles:
+            if interaction.user.top_role.position <= SkipRole.position:
+                await context.msg.edit(
+                    content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
+                )
+                return
 
-    if not NextRole:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+        NextRole = SkipRole
+        if not NextRole:
+            if not UserRolesInHierarchy:
+                NextRole = SortedRoles[0] if SortedRoles else None
+            else:
+                NextRole = None
+                for i, role in enumerate(SortedRoles):
+                    if role in user.roles:
+                        if i + 1 < len(SortedRoles):
+                            NextRole = SortedRoles[i + 1]
+                        break
+
+        if NextRole and interaction.user.top_role.position <= NextRole.position:
+            await context.msg.edit(
+                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+            )
+            return
+
+        if not NextRole:
+            await context.msg.edit(
+                content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+            )
+            return
+
+        Object = await interaction.client.db["promotions"].insert_one(
+            {
+                "management": interaction.user.id,
+                "staff": user.id,
+                "reason": reason,
+                "random_string": "".join(
+                    random.choices(string.ascii_uppercase + string.digits, k=10)
+                ),
+                "guild_id": interaction.guild.id,
+                "jump_url": None,
+                "new": NextRole.id,
+                "previous": PreviousRole.id if PreviousRole else None,
+                "timestamp": datetime.datetime.now(),
+                "annonymous": False,
+                "Modmail System": "Multi Hierarchy",
+                "multi": {"Department": department, "SkipTo": rank},
+            }
         )
-        return
 
-    Object = await interaction.client.db["promotions"].insert_one(
-        {
-            "management": interaction.user.id,
-            "staff": user.id,
-            "reason": reason,
-            "random_string": "".join(
-                random.choices(string.ascii_uppercase + string.digits, k=10)
-            ),
-            "guild_id": interaction.guild.id,
-            "jump_url": None,
-            "timestamp": datetime.datetime.now(),
-            "annonymous": False,
-            "Modmail System": "Multi Hierarchy",
-            "multi": {"Department": department, "SkipTo": rank},
-        }
-    )
-
-    interaction.client.dispatch("promotion", Object.inserted_id, Config)
-    await msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
-    )
+        interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
+        await context.msg.edit(
+            content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
+        )
+    except (Exception) as e:
+        print(e)
 
 
 @app_commands.describe(
@@ -386,91 +401,30 @@ async def issue(
     new: discord.Role,
     reason: str,
 ):
-    await interaction.response.defer()
-    if not await has_admin_role(interaction, "Promotion Permissions"):
-        return    
-    msg: discord.Message = await interaction.followup.send(
-        f"<a:Loading:1167074303905386587> Promoting **@{staff.display_name}**...",
-    )
-    if not await ModuleCheck(interaction.guild.id, "promotions"):
-        await interaction.followup.send(
-            embed=ModuleNotEnabled(),
-            view=Support(),
-            ephemeral=True,
-        )
+    context = await PromotionContext(interaction=interaction, target=staff)
+    if not context:
         return
 
-    if staff is None:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, this user cannot be found.",
-        )
-        return
-
-    if staff.bot:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots.",
-        )
-        return
-
-    if interaction.user == staff:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself.",
-        )
-        return
-
-    if interaction.user.top_role <= new:
-        await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you are below the role `{new.name}` and do not have authority to promote this member.",
-        )
-        return
-
-    Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-    if not Config:
-        return await msg.edit(
-            embed=BotNotConfigured(),
-            view=Support(),
-        )
-    if not Config.get("Promo", {}).get("channel"):
-        return await msg.edit(
-            embed=NoChannelSet(),
-            view=Support(),
-        )
-    try:
-        channel = await interaction.guild.fetch_channel(
-            int(Config.get("Promo", {}).get("channel"))
-        )
-    except (discord.Forbidden, discord.NotFound):
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
-    if not channel:
-        return await msg.edit(
-            embed=ChannelNotFound(),
-            view=Support(),
-        )
     client = await interaction.guild.fetch_member(interaction.client.user.id)
-    if channel.permissions_for(client).send_messages is False:
-        return await msg.edit(
-            embed=NoPermissionChannel(channel),
+    if context.channel.permissions_for(client).send_messages is False:
+        return await context.msg.edit(
+            embed=NoPermissionChannel(context),
             view=Support(),
         )
-    CallDown, LastPromoted = await CheckCooldown(
-        interaction, staff, Config.get("Promo", {}).get("Cooldown", None)
-    )
-    if CallDown:
-        Time = int(Config.get("Promo", {}).get("Cooldown", 1))
-        Timestamp = int((LastPromoted + datetime.timedelta(days=Time)).timestamp())
-        return await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{staff.display_name}** is on cooldown, you can promote them again <t:{Timestamp}:R>."
-        )
 
+    client = await interaction.guild.fetch_member(interaction.client.user.id)
+    if context.channel.permissions_for(client).send_messages is False:
+        return await context.msg.edit(
+            embed=NoPermissionChannel(context.channel),
+            view=Support(),
+        )
     Object = await interaction.client.db["promotions"].insert_one(
         {
             "management": interaction.user.id,
             "staff": staff.id,
             "reason": reason,
             "new": new.id,
+            "previous": None,
             "random_string": "".join(
                 random.choices(string.ascii_uppercase + string.digits, k=10)
             ),
@@ -481,8 +435,8 @@ async def issue(
         }
     )
 
-    interaction.client.dispatch("promotion", Object.inserted_id, Config)
-    await msg.edit(
+    interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
+    await context.msg.edit(
         content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{staff.display_name}** to `{new.name}`!",
     )
 

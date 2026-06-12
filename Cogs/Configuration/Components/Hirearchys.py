@@ -120,25 +120,28 @@ class HSELECT(discord.ui.Select):
                 .get("multi", {})
                 .get("Departments", [])
             )
-            for department in departments:
-                if (
-                    isinstance(department, list)
-                    and len(department) > 0
-                    and isinstance(department[0], dict)
-                ):
-                    department = department[0]
-                if isinstance(department, dict) and "ranks" in department:
-                    roles = [
-                        role.mention
-                        for role_id in department["ranks"]
-                        if (role := interaction.guild.get_role(role_id)) is not None
-                    ]
-                    RolesStr = "> " + ", ".join(roles) if roles else "No roles assigned"
-                    if len(RolesStr) > 1024:
-                        RolesStr = RolesStr[:1021] + "..."
-                    embed.add_field(name=department.get("name"), value=RolesStr)
-                    if len(embed.fields) >= 25:
-                        break
+            if departments and departments.length != 0:
+                for department in departments:
+                    if (
+                        isinstance(department, list)
+                        and len(department) > 0
+                        and isinstance(department[0], dict)
+                    ):
+                        department = department[0]
+                    if isinstance(department, dict) and "ranks" in department:
+                        roles = [
+                            role.mention
+                            for role_id in department["ranks"]
+                            if (role := interaction.guild.get_role(role_id)) is not None
+                        ]
+                        RolesStr = (
+                            "> " + ", ".join(roles) if roles else "No roles assigned"
+                        )
+                        if len(RolesStr) > 1024:
+                            RolesStr = RolesStr[:1021] + "..."
+                        embed.add_field(name=department.get("name"), value=RolesStr)
+                        if len(embed.fields) >= 25:
+                            break
 
             return await interaction.followup.send(
                 view=view,
@@ -474,21 +477,29 @@ class CreateDeleteDepartment(discord.ui.Modal):
 
         DepartmentName = self.name.value
         if self.action == "create":
+            promo = config.setdefault("Promo", {})
+            system = promo.setdefault("System", {})
+            multi = system.setdefault("multi", {})
+
+            departments = multi.get("Departments")
+
+            if not isinstance(departments, list):
+                departments = []
+                multi["Departments"] = departments
+
             if any(
-                department["name"] == DepartmentName
-                for departments_group in config["Promo"]["System"]["multi"][
-                    "Departments"
-                ]
-                for department in departments_group
+                isinstance(dept, dict) and dept.get("name") == DepartmentName
+                for group in departments
+                if isinstance(group, list)
+                for dept in group
+                if isinstance(dept, dict)
             ):
                 return await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name},** I couldn't find the department.",
+                    f"{no} **{interaction.user.display_name},** department already exists.",
                     ephemeral=True,
                 )
 
-            config["Promo"]["System"]["multi"]["Departments"].append(
-                [{"name": DepartmentName, "ranks": []}]
-            )
+            departments.append([{"name": DepartmentName, "ranks": []}])
 
             await interaction.client.config.update_one(
                 {"_id": interaction.guild.id}, {"$set": config}
@@ -496,23 +507,38 @@ class CreateDeleteDepartment(discord.ui.Modal):
 
             view = discord.ui.View()
             view.add_item(MultiHierarchy(interaction.user, DepartmentName, []))
+
             await interaction.response.edit_message(
-                content="<:List:1223063187063308328> Select the roles for this department's hierarchy.\n\n<:Help:1223063068012056576> No need to select them in order, they will be sorted automatically with discords role hierarchy system.",
+                content="Select roles for this department hierarchy.",
                 view=view,
             )
             return
 
         elif self.action == "delete":
-            config["Promo"]["System"]["multi"]["Departments"] = [
-                [
-                    department
-                    for department in departments_group
-                    if department["name"] != DepartmentName
-                ]
-                for departments_group in config["Promo"]["System"]["multi"][
-                    "Departments"
-                ]
-            ]
+            departments = (
+                config.get("Promo", {})
+                .get("System", {})
+                .get("multi", {})
+                .get("Departments")
+            ) or []
+
+            cleaned = []
+
+            for group in departments:
+                if not isinstance(group, list):
+                    continue
+                groups = []
+                for department in group:
+                    if (
+                        isinstance(department, dict)
+                        and department.get("name") != DepartmentName
+                    ):
+                        groups.append(department)
+
+                if groups:
+                    cleaned.append(groups)
+
+            config["Promo"]["System"]["multi"]["Departments"] = cleaned
 
             await interaction.client.config.update_one(
                 {"_id": interaction.guild.id}, {"$set": config}

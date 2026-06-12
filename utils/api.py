@@ -33,6 +33,7 @@ dbq = client["quotadb"]
 Messages = dbq["messages"]
 infractiontypeactions = db["infractiontypeactions"]
 collection = db["infractions"]
+promotions = db["infractions"]
 Tickets = db["Tickets"]
 
 
@@ -274,10 +275,65 @@ class APIRoutes:
                 Org,
             )
 
-        # TODO: Audit Log Dispatch
-
         if result.modified_count > 0:
             return {"status": "success", "message": "Infraction updated successfully"}
+        else:
+            return {"status": "success", "message": "No changes made"}
+
+    async def POST_update_promotion(self, server: int, request: Request):
+        auth = self.Bearer(request)
+        if not auth:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid Authorization header",
+            )
+        if not await RestrictedValidation(auth):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Key"
+            )
+        try:
+            body = await request.json()
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid JSON"
+            )
+
+        guild = self.client.get_guild(server)
+        if not guild:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Server not found"
+            )
+
+        Org = await promotions.find_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id}
+        )
+
+        result = await promotions.update_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id},
+            {
+                "$set": {
+                    "reason": body.get("Reason", "N/A"),
+                    "notes": body.get("Notes", "N/A"),
+                }
+            },
+            upsert=True,
+        )
+
+        resulted = await collection.find_one(
+            {"_id": ObjectId(body.get("Id")), "guild_id": guild.id}
+        )
+        self.client.dispatch("infraction_edit", resulted)
+        if Org:
+            self.client.dispatch(
+                "promotion_log",
+                resulted.get("_id"),
+                "modify",
+                self.client.get_user(body.get("AuthorId")),
+                Org,
+            )
+
+        if result.modified_count > 0:
+            return {"status": "success", "message": "Promotion updated successfully"}
         else:
             return {"status": "success", "message": "No changes made"}
 

@@ -38,6 +38,7 @@ def Promotion(data):
         guild_id=data.get("guild_id"),
         notes=data.get("notes"),
         annonymous=data.get("annonymous"),
+        previous=data.get("previous", None),
     )
 
 
@@ -62,6 +63,7 @@ class PromotionItem:
         reason,
         random_string,
         guild_id,
+        previous,
         notes="N/A",
         annonymous=False,
     ):
@@ -73,6 +75,7 @@ class PromotionItem:
         self.random_string = random_string
         self.guild_id = guild_id
         self.annonymous = annonymous
+        self.previous = previous
 
 
 class Embed:
@@ -88,228 +91,28 @@ class Embed:
         self.title = title
 
 
-async def PromotionSystem(
-    self: commands.bot,
-    PromotionData: dict,
-    settings: dict,
-    guild: discord.Guild,
-    member: discord.Member,
-    manager: discord.Member,
-):
-    if not settings.get("Module Options", {}).get("autorole", True):
-        return await self.db["promotions"].find_one({"_id": PromotionData.get("_id")})
-    if not settings.get("Promo"):
-        return await self.db["promotions"].find_one({"_id": PromotionData.get("_id")})
-
-    PromoSystemType = settings.get("Promo", {}).get("System", {}).get("type", "old")
-    if PromoSystemType == "old" or PromoSystemType == "og":
-        if not PromotionData.get("new"):
-            return
+async def PromotionSystem(self, PromotionData, guild, member, manager):
+    newId = PromotionData.get("new") or 0
+    prevId = PromotionData.get("previous") or 0
+    new = guild.get_role(int(newId)) if newId else None
+    prev = guild.get_role(int(prevId)) if prevId else None
+    if new:
         try:
-            newrole = guild.get_role(int(PromotionData.get("new")))
-        except discord.DiscordException as e:
-            logger.error(f"Error fetching new role: {e}")
-            return
-        if not newrole:
-            return
-        try:
-            await member.add_roles(
-                newrole, reason=f"Staff Promotion initiated by {manager.name}"
-            )
-        except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+            await member.add_roles(new, reason=f"Promotion initiated by {manager.name}")
+        except (discord.Forbidden, discord.HTTPException):
+            logging.warning(f"Unable to add new promotion role to {member.name}")
             pass
-
-    FirstRole = None
-    NextRole = None
-    SkipRole = None
-
-    if PromoSystemType == "multi":
-        Department = PromotionData.get("multi", {}).get("Department")
-        SkipTo = PromotionData.get("multi", {}).get("SkipTo")
-
-        DepartmentHierarchies = [
-            dept
-            for sublist in settings.get("Promo")
-            .get("System", {})
-            .get("multi", {})
-            .get("Departments", [])
-            for dept in sublist
-        ]
-        if not DepartmentHierarchies or not Department:
-            return await self.db["promotions"].find_one(
-                {"_id": PromotionData.get("_id")}
-            )
-        DepartmentHierarchy = next(
-            (dept for dept in DepartmentHierarchies if dept.get("name") == Department),
-            None,
-        )
-        if not DepartmentHierarchy:
-            return await self.db["promotions"].find_one(
-                {"_id": PromotionData.get("_id")}
+    if prev:
+        try:
+            await member.remove_roles(
+                prev, reason=f"Promotion initiated by {manager.name}"
             )
 
-        RoleIDs = DepartmentHierarchy.get("ranks", [])
-
-        MemberRoles = set(member.roles)
-        SortedRoles = [
-            guild.get_role(int(RoleID))
-            for RoleID in RoleIDs
-            if guild.get_role(int(RoleID))
-        ]
-        SortedRoles.sort(key=lambda Role: Role.position)
-
-        if SkipTo:
-            SkipRole = guild.get_role(int(SkipTo))
-            if SkipRole and SkipRole in SortedRoles:
-                try:
-                    await member.add_roles(
-                        SkipRole,
-                        reason=f"Staff Promotion (Skipped) in {Department} initiated by {manager.name}",
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-
-                for Role in SortedRoles:
-                    if Role in MemberRoles and Role != SkipRole:
-                        try:
-                            await member.remove_roles(
-                                Role,
-                                reason=f"Replaced by {SkipRole.name} initiated by {manager.name}",
-                            )
-                        except (discord.Forbidden, discord.HTTPException):
-                            pass
-
-                await self.db["promotions"].update_one(
-                    {"_id": PromotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
-                )
-                return await self.db["promotions"].find_one(
-                    {"_id": PromotionData.get("_id")}
-                )
-
-        for Index, CurrentRole in enumerate(SortedRoles):
-            if CurrentRole in MemberRoles and Index + 1 < len(SortedRoles):
-                NextRole = SortedRoles[Index + 1]
-                try:
-                    await member.add_roles(
-                        NextRole,
-                        reason=f"Staff Promotion in {Department} initiated by {manager.name}",
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                try:
-                    await member.remove_roles(
-                        CurrentRole, reason=f"Replaced by {NextRole.name}"
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                break
-        else:
-            if not any(role in MemberRoles for role in SortedRoles):
-                FirstRole = SortedRoles[0]
-                try:
-                    await member.add_roles(
-                        FirstRole,
-                        reason=f"Staff Promotion in {Department} initiated by {manager.name}",
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-
-        RoleID = (
-            SkipRole.id
-            if SkipTo
-            else FirstRole.id if FirstRole else NextRole.id if NextRole else None
-        )
-        if RoleID:
-            await self.db["promotions"].update_one(
-                {"_id": PromotionData.get("_id")}, {"$set": {"new": RoleID}}
+        except (discord.Forbidden, discord.HTTPException):
+            logging.warning(
+                f"Unable to remove previous promotion role to {member.name}"
             )
-
-    if PromoSystemType == "single":
-        HierarchyRoles = (
-            settings.get("Promo", {})
-            .get("System", {})
-            .get("single", {})
-            .get("Hierarchy", [])
-        )
-        SkipTo = PromotionData.get("single", {}).get("SkipTo")
-
-        if not HierarchyRoles:
-            logger.warning("[Single] No roles found")
-            return await self.db["promotions"].find_one(
-                {"_id": PromotionData.get("_id")}
-            )
-
-        MemberRoles = set(member.roles)
-        SortedRoles = [
-            guild.get_role(int(RoleID))
-            for RoleID in HierarchyRoles
-            if guild.get_role(int(RoleID))
-        ]
-        SortedRoles.sort(key=lambda Role: Role.position)
-
-        if SkipTo:
-            SkipRole = guild.get_role(int(SkipTo))
-
-            if SkipRole and SkipRole in SortedRoles:
-                try:
-                    await member.add_roles(
-                        SkipRole,
-                        reason=f"Staff Promotion (Skipped) initiated by {manager.name}",
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-
-                for Role in MemberRoles:
-                    if Role in SortedRoles and Role != SkipRole:
-                        try:
-                            await member.remove_roles(
-                                Role, reason=f"Replaced by {SkipRole.name}"
-                            )
-                        except (discord.Forbidden, discord.HTTPException):
-                            pass
-
-                await self.db["promotions"].update_one(
-                    {"_id": PromotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
-                )
-                return await self.db["promotions"].find_one(
-                    {"_id": PromotionData.get("_id")}
-                )
-
-        for Index, CurrentRole in enumerate(SortedRoles):
-            if CurrentRole in MemberRoles and Index + 1 < len(SortedRoles):
-                NextRole = SortedRoles[Index + 1]
-                try:
-                    await member.add_roles(
-                        NextRole, reason=f"Staff Promotion initiated by {manager.name}"
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                try:
-                    await member.remove_roles(
-                        CurrentRole, reason=f"Replaced by {NextRole.name}"
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-                break
-        else:
-            if not any(role in MemberRoles for role in SortedRoles):
-                FirstRole = SortedRoles[0]
-                try:
-                    await member.add_roles(
-                        FirstRole, reason=f"Staff Promotion initiated by {manager.name}"
-                    )
-                except (discord.Forbidden, discord.HTTPException):
-                    pass
-
-        RoleID = (
-            SkipRole.id
-            if SkipTo
-            else FirstRole.id if FirstRole else NextRole.id if NextRole else None
-        )
-        if RoleID:
-            await self.db["promotions"].update_one(
-                {"_id": PromotionData.get("_id")}, {"$set": {"new": RoleID}}
-            )
+            pass
 
     return await self.db["promotions"].find_one({"_id": PromotionData.get("_id")})
 
@@ -391,7 +194,7 @@ class on_promotion(commands.Cog):
         )
         embed = discord.Embed()
         PromotionData = await PromotionSystem(
-            self.client, PromotionData, Settings, guild, staff, manager
+            self.client, PromotionData, guild, staff, manager
         )
         if PromotionData:
             Infraction = Promotion(PromotionData)
@@ -405,6 +208,7 @@ class on_promotion(commands.Cog):
                 "{author.mention}": manager.mention,
                 "{author.name}": manager.display_name,
                 "{newrank}": f"<@&{Infraction.new}>",
+                "{previous_rank}": f"<@&{Infraction.previous}>",
                 "{reason}": Infraction.reason,
                 "{author.avatar}": (
                     manager.display_avatar.url if manager.display_avatar else None
