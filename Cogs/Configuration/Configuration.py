@@ -103,7 +103,7 @@ class ConfigMenu(discord.ui.Select):
                     await ModuleOptions(Config),
                 )
             )
-        elif selection == "Hirearchy":
+        elif selection == "Hierarchy":
             from Cogs.Configuration.Components.Hirearchys import HSELECT, HiEmbed
 
             embed = await HiEmbed(interaction, Config, embed)
@@ -438,8 +438,8 @@ def Options(Config: dict = None):
             emoji="<:link:1206670134064717904>",
         ),
         discord.SelectOption(
-            label="Hirearchy",
-            description="Hierachies for both promotions & infractions.",
+            label="Hierarchy",
+            description="Hierarchies for both promotions & infractions.",
             emoji="<:hierarchy:1341493421503676517>",
         ),
     ]
