@@ -120,7 +120,7 @@ class HSELECT(discord.ui.Select):
                 .get("multi", {})
                 .get("Departments", [])
             )
-            if departments and departments.length != 0:
+            if departments and len(departments) != 0:
                 for department in departments:
                     if (
                         isinstance(department, list)
