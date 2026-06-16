@@ -114,24 +114,19 @@ class QuotaOptions(discord.ui.Select):
                 LogChannel(
                     interaction.user,
                     interaction.guild.get_channel(
-                        Config.get("Tickets", {}).get("LogChannel"),
+                        config.get("Tickets", {}).get("LogChannel"),
                     ),
                     interaction.message,
                 )
             )
             await interaction.followup.send(view=view, ephemeral=True)
         if selection == "Ignored Channels":
-            Config = await interaction.client.config.find_one(
-                {"_id": interaction.guild.id}
-            )
-            if not Config:
-                Config = {"Message Quota": {}, "_id": interaction.guild.id}
             view.add_item(
                 IgnoredChannels(
                     author=interaction.user,
                     default=[
-                        interaction.guild.get_channel(int(channel_id))
-                        for channel_id in Config.get("Message Quota", {}).get(
+                        interaction.guild.get_channel(int(channelId))
+                        for channelId in config.get("Message Quota", {}).get(
                             "Ignored Channels", []
                         )
                     ],
