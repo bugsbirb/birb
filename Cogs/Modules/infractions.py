@@ -404,12 +404,11 @@ class Infractions(commands.Cog):
                 content=f"{no} **{ctx.author.display_name},** what did I do to you?"
             )
             return
-        # if staff.bot:
-        #     await msg.edit(
-        #         content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
-        #     )
-        #     return
-
+        if staff.bot:
+            await msg.edit(
+                content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
+            )
+            return
         if Config.get("Infraction", {}).get("channel") is None:
             return await msg.edit(content="", embed=NoChannelSet(), view=Support())
         try:
@@ -788,7 +787,7 @@ class Infractions(commands.Cog):
         id="The ID of the infraction to view",
         voided="Show a hidden infraction",
     )
-    async def view(self, ctx: commands.Context, id: str, voided: bool = False):
+    async def view(self, ctx: commands.Context, id: str, isvoided: bool = False):
         if not await ModuleCheck(ctx.guild.id, "infractions"):
             await ctx.send(
                 embed=ModuleNotEnabled(),
@@ -804,7 +803,7 @@ class Infractions(commands.Cog):
             "random_string": id,
             "voided": {"$ne": True},
         }
-        if voided:
+        if isvoided:
             filter["voided"] = True
 
         infraction = await self.client.db["infractions"].find_one(filter)
