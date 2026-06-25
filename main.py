@@ -389,6 +389,7 @@ class Client(commands.AutoShardedBot):
                 logger.info(f"[✅] Loaded cog: {ext}")
             except Exception as e:
                 logger.error(f"[❌] Failed to load cog {ext}: {e}")
+                raise
 
     async def GetVersion(self):
         V = await SupportVariables.find_one({"_id": 1})
