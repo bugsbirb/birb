@@ -95,7 +95,6 @@ class APIRoutes:
                     getattr(self, i),
                     methods=[i.split("_")[0].upper()],
                 )
-        print(self.router.routes)
 
     async def GET_shards(self):
         shards = []
@@ -109,7 +108,6 @@ class APIRoutes:
             )
         return shards
 
-    # // For the old admin panel
     async def GET_transcript(self, id: str, auth: str):
         if not await RestrictedValidation(auth):
             raise HTTPException(

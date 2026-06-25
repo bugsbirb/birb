@@ -5,3 +5,8 @@ utils/configer.py
 dev.env
 __pycache__/
 migrate.py
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/birb.iml

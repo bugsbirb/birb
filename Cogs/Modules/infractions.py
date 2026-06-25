@@ -785,7 +785,7 @@ class Infractions(commands.Cog):
     @infraction.command(description="View an infraction and manage it.")
     @app_commands.describe(
         id="The ID of the infraction to view",
-        voided="Show a hidden infraction",
+        isvoided="Show a hidden infraction",
     )
     async def view(self, ctx: commands.Context, id: str, isvoided: bool = False):
         if not await ModuleCheck(ctx.guild.id, "infractions"):
