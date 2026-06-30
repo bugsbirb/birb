@@ -418,6 +418,10 @@ async def issue(
             embed=NoPermissionChannel(context.channel),
             view=Support(),
         )
+    if interaction.user.top_role <= new.position:
+        await context.msg.edit(
+          content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{staff.display_name}** to `{new.name}`.",
+        )
     Object = await interaction.client.db["promotions"].insert_one(
         {
             "management": interaction.user.id,
