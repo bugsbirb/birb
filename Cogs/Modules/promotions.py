@@ -185,7 +185,6 @@ async def SingleHierarchy(
             view=Support(),
         )
 
-    NextRole = None
     HierarchyRoles = (
         context.Config.get("Promo", {})
         .get("System", {})
@@ -203,7 +202,6 @@ async def SingleHierarchy(
         if interaction.guild.get_role(int(roleId))
     ]
     SortedRoles.sort(key=lambda r: r.position)
-    PreviousRole = None
     HierarchyRoles = [role for role in SortedRoles if role in user.roles]
     PreviousRole = (
         max(HierarchyRoles, key=lambda r: r.position) if HierarchyRoles else None
@@ -418,9 +416,9 @@ async def issue(
             embed=NoPermissionChannel(context.channel),
             view=Support(),
         )
-    if interaction.user.top_role <= new.position:
+    if interaction.user.top_role.position <= new.position:
         await context.msg.edit(
-          content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{staff.display_name}** to `{new.name}`.",
+              content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{staff.display_name}** to `{new.name}`.",
         )
     Object = await interaction.client.db["promotions"].insert_one(
         {
