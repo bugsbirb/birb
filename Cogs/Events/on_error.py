@@ -21,11 +21,10 @@ class Tree(app_commands.CommandTree):
         return True
 
     async def on_error(
-        self,
-        interaction: discord.Interaction,
-        error: app_commands.AppCommandError | Exception,
+            self,
+            interaction: discord.Interaction,
+            error: app_commands.AppCommandError | Exception,
     ):
-
         if isinstance(error, app_commands.errors.CommandNotFound):
             try:
                 await interaction.response.send_message(
@@ -48,7 +47,11 @@ class Tree(app_commands.CommandTree):
             pass
 
         else:
-            await super().on_error(interaction, error)
+            cog = self.client.get_cog("On_error")
+            if cog:
+                await cog.ErrorResponse(interaction, error)
+            else:
+                await super().on_error(interaction, error)
 
 
 class On_error(commands.Cog):
