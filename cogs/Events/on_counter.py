@@ -20,7 +20,7 @@ class MessageCounter(commands.Cog):
         if message.channel is None:
             return
         config = await self.client.db["Config"].find_one({"_id": message.guild.id})
-        if not config:
+        if not config and not config.get("Permissions"):
             return
         if message.author and message.channel is None:
             return
