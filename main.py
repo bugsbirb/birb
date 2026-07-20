@@ -2,31 +2,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-import discord
 import platform
 import sys
 import gc
-import os
 import time
 import logging
 
-from discord.ext import commands, tasks
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # import pymongo
-from Cogs.Modules.promotions import SyncCommands
-from Cogs.Events.on_suggestion import Voting as Voti
+from cogs.Modules.promotions import SyncCommands
+from cogs.Events.on_suggestion import Voting as Voti
 
-from Cogs.Modules.commands import Voting
-from Cogs.Tasks.activityauto import ResetLeaderboard
-from Cogs.Modules.staff import Staffview
-from Cogs.Events.on_infraction_approval import CaseApproval
-from Cogs.Events.on_ticket import PTicketControl
-from Cogs.Tasks.qotd import *
-from Cogs.Events.on_error import Tree
-from Cogs.Events.modmail import ModmailClosure, Links
-from Cogs.Modules.tickets import ButtonHandler
+from cogs.Modules.commands import Voting
+from cogs.Tasks.activityauto import ResetLeaderboard
+from cogs.Modules.staff import Staffview
+from cogs.Events.on_infraction_approval import CaseApproval
+from cogs.Events.on_ticket import PTicketControl
+from cogs.Tasks.qotd import *
+from cogs.Events.on_error import Tree
+from cogs.Events.modmail import ModmailClosure, Links
+from cogs.Modules.tickets import ButtonHandler
 
 sys.dont_write_bytecode = True
 
@@ -38,9 +34,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
 gc.enable()
-
 
 PREFIX = os.getenv("PREFIX")
 TOKEN = os.getenv("TOKEN")
@@ -50,14 +44,13 @@ SHARDS = os.getenv("SHARDS")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 client = AsyncIOMotorClient(MONGO_URL)
-# client = pymongo.AsyncMongoClient(MONGO_URL)
 db = (
     client["BETA"]
     if ENVIRONMENT and ENVIRONMENT.lower() == "development"
     else client["astro"]
 )
 
-prefixdb = db["prefixes"]
+prefixes = db["prefixes"]
 qotdd = db["qotd"]
 Config = db["Config"]
 Views = db["Views"]
@@ -72,7 +65,7 @@ if not (TOKEN and MONGO_URL and PREFIX):
 if os.getenv("REMOVE_EMOJIS", "False") == "True" or (
     ENVIRONMENT and ENVIRONMENT.lower() == "custom"
 ):
-    from branding import ClearEmojis
+    from core.branding import ClearEmojis
 
     ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
 
@@ -120,12 +113,12 @@ class Client(commands.AutoShardedBot):
         self.cogslist = self._initialize_cogslist()
         self.Tasks = set()
         if environment != "custom":
-            self.cogslist.extend(["utils.api", "utils.dokploy"])
+            self.cogslist.extend(["core.api", "core.integrations.dokploy"])
         if os.getenv("STAFF"):
-            self.cogslist.append("Cogs.Modules.Developer.admin")
+            self.cogslist.append("cogs.Modules.Developer.admin")
 
         if os.getenv("SUPPORT"):
-            self.cogslist.append("Cogs.Modules.Developer.support")
+            self.cogslist.append("cogs.Modules.Developer.support")
 
     def _initialize_databases(self):
         self.db = db
@@ -178,62 +171,62 @@ class Client(commands.AutoShardedBot):
     def _initialize_cogslist(self):
         return [
             # Modules
-            "Cogs.Modules.suggestions",
-            "Cogs.Modules.leaves",
-            "Cogs.Modules.suspension",
-            "Cogs.Modules.feedback",
-            "Cogs.Modules.connection-roles",
-            "Cogs.Modules.staff",
-            "Cogs.Modules.promotions",
-            "Cogs.Modules.infractions",
-            "Cogs.Modules.modmail",
-            "Cogs.Modules.commands",
-            "Cogs.Modules.data",
-            "Cogs.Modules.integrations",
-            "Cogs.Modules.tickets",
+            "cogs.Modules.suggestions",
+            "cogs.Modules.leaves",
+            "cogs.Modules.suspension",
+            "cogs.Modules.feedback",
+            "cogs.Modules.connection-roles",
+            "cogs.Modules.staff",
+            "cogs.Modules.promotions",
+            "cogs.Modules.infractions",
+            "cogs.Modules.modmail",
+            "cogs.Modules.commands",
+            "cogs.Modules.data",
+            "cogs.Modules.integrations",
+            "cogs.Modules.tickets",
             # Utilities
-            "Cogs.Modules.Utilities.extras",
-            "Cogs.Modules.Utilities.ping",
-            "Cogs.Modules.Utilities.info",
-            "Cogs.Modules.Utilities.premium",
-            "Cogs.Modules.Utilities.memberships",
-            "Cogs.Modules.Developer.astro",
+            "cogs.Modules.Utilities.extras",
+            "cogs.Modules.Utilities.ping",
+            "cogs.Modules.Utilities.info",
+            "cogs.Modules.Utilities.premium",
+            "cogs.Modules.Utilities.memberships",
+            "cogs.Modules.Developer.astro",
             # Configuration
-            "Cogs.Configuration.Configuration",
+            "cogs.Configuration.Configuration",
             # Events
-            "Cogs.Events.Dev.on_guild",
-            "Cogs.Events.Dev.welcome",
-            "Cogs.Events.on_message",
-            "Cogs.Events.modmail",
-            "Cogs.Events.on_thread_create",
-            "Cogs.Events.Dev.topgg",
-            "Cogs.Events.Dev.analytics",
-            "Cogs.Events.on_error",
-            "Cogs.Events.autoresponse",
-            "Cogs.Events.on_infraction",
-            "Cogs.Events.ConnectionRoles",
-            "Cogs.Events.on_promotion",
-            "Cogs.Events.on_infraction_edit",
-            "Cogs.Events.on_feedback",
-            "Cogs.Events.on_suggestion",
-            "Cogs.Events.on_suggest_update",
-            "Cogs.Events.on_infraction_approval",
-            "Cogs.Events.on_ticket",
-            "Cogs.Events.on_infraction_log",
-            "Cogs.Events.on_infraction_void",
-            "Cogs.Events.on_promotion_log",
-            "Cogs.Events.on_promotion_void",
-            "Cogs.Events.on_leave",
-            "Cogs.Events.on_counter_log",
-            "Cogs.Events.Dev.on_shard",
+            "cogs.Events.Dev.on_guild",
+            "cogs.Events.Dev.welcome",
+            "cogs.Events.on_counter",
+            "cogs.Events.modmail",
+            "cogs.Events.on_thread_create",
+            "cogs.Events.Dev.topgg",
+            "cogs.Events.Dev.analytics",
+            "cogs.Events.on_error",
+            "cogs.Events.autoresponse",
+            "cogs.Events.on_infraction",
+            "cogs.Events.ConnectionRoles",
+            "cogs.Events.on_promotion",
+            "cogs.Events.on_infraction_edit",
+            "cogs.Events.on_feedback",
+            "cogs.Events.on_suggestion",
+            "cogs.Events.on_suggest_update",
+            "cogs.Events.on_infraction_approval",
+            "cogs.Events.on_ticket",
+            "cogs.Events.on_infraction_log",
+            "cogs.Events.on_infraction_void",
+            "cogs.Events.on_promotion_log",
+            "cogs.Events.on_promotion_void",
+            "cogs.Events.on_leave",
+            "cogs.Events.on_counter_log",
+            "cogs.Events.Dev.on_shard",
             # Tasks
-            "Cogs.Tasks.expiration",
-            "Cogs.Tasks.leave",
-            "Cogs.Tasks.staff-list",
-            "Cogs.Tasks.suspension",
-            "Cogs.Tasks.activityauto",
-            "Cogs.Tasks.UpdateChannel",
-            "Cogs.Tasks.qotd",
+            "cogs.Tasks.expiration",
+            "cogs.Tasks.leave",
+            "cogs.Tasks.staff-list",
+            "cogs.Tasks.suspension",
+            "cogs.Tasks.activityauto",
+            "cogs.Tasks.UpdateChannel",
+            "cogs.Tasks.qotd",
         ]
 
     async def load_jishaku(self):
@@ -246,10 +239,9 @@ class Client(commands.AutoShardedBot):
             return "!!"
         if message.author.bot:
             return None
-        prefixdb = db["prefixes"]
-        prefixresult = await prefixdb.find_one({"guild_id": message.guild.id})
-        if prefixresult:
-            prefix = prefixresult.get("prefix", "!!")
+        result = await prefixes.find_one({"guild_id": message.guild.id})
+        if result:
+            prefix = result.get("prefix", "!!")
         else:
             prefix = PREFIX
         return commands.when_mentioned_or(prefix)(self, message)
