@@ -1,6 +1,5 @@
 import logging
 import re
-import traceback
 
 import discord.http
 
@@ -284,7 +283,7 @@ class InfractionOption(discord.ui.Select):
                 return await interaction.edit_original_response(embed=embed, view=view)
 
             except Exception as e:
-                traceback.print_exc(e)
+                print(e)
         elif selection == "Infraction Approval":
             view.add_item(
                 ApprovalChannel(
