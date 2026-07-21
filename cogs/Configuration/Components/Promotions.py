@@ -1,8 +1,6 @@
 import re
 import traceback
 
-import discord
-
 from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
 from core.bot.emojis import *
 from core.bot.permissions import premium
@@ -17,36 +15,36 @@ class PSelect(discord.ui.Select):
             discord.SelectOption(
                 label="Promotion Channel",
                 value="Promotion Channel",
-                emoji="<:tag:1234998802948034721>",
+                emoji=f"{Emojis.tags}",
                 description="Set the channel for promotion messages.",
             ),
             discord.SelectOption(
                 label="Webhook",
                 value="Webhook",
-                emoji="<:Webhook:1400197752339824821>",
+                emoji=f"{Emojis.webhook}",
                 description="Send promotion messages as a webhook.",
             ),
             discord.SelectOption(
                 label="Cooldown",
                 value="Cooldown",
-                emoji="<:Cooldown:1400468324671819786>",
+                emoji=f"{Emojis.cooldown}",
                 description="Set a cooldown for promoting users.",
             ),
             discord.SelectOption(
                 label="Promotion Audit Log",
                 value="Promotion Audit Log",
-                emoji="<:Log:1349431938926252115>",
+                emoji=f"{Emojis.log}",
                 description="Logs for creation, void, and modification.",
             ),
             discord.SelectOption(
                 label="Customise Embed",
                 value="Customise Embed",
-                emoji="<:Customisation:1223063306131210322>",
+                emoji=f"{Emojis.customisation}",
             ),
             discord.SelectOption(
                 label="Preferences",
                 value="Preferences",
-                emoji="<:leaf:1160541147320553562>",
+                emoji=f"{Emojis.leaf}",
                 description="Set preferences for promotion behaviour.",
             ),
         ]
@@ -571,7 +569,7 @@ class WebhookDesign(discord.ui.Modal):
         pattern = r"^https?://.*\.(png|jpg|jpeg|gif|webp)(\?.*)?$"
         if not re.match(pattern, AV, re.IGNORECASE):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -668,8 +666,8 @@ async def WebhookEmbed(interaction: discord.Interaction, Config: dict):
     username = WebhookSettings.get("Username", None) or "Not Set"
     avatar = WebhookSettings.get("Avatar", None) or "Not Set"
     embed.add_field(
-        name="<:Webhook:1400197752339824821> Webhook Settings",
-        value=f"> {replytop} **Enabled:** {'True' if enabled else 'False'}\n> {replymiddle} **Username:** {username}\n> {replybottom} **Avatar:** {avatar}",
+        name=f"{Emojis.webhook} Webhook Settings",
+        value=f"> {Emojis.replytop} **Enabled:** {'True' if enabled else 'False'}\n> {Emojis.replymiddle} **Username:** {username}\n> {Emojis.replybottom} **Avatar:** {avatar}",
     )
     return embed
 
@@ -694,8 +692,8 @@ async def PromotionEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's promotion settings! Promotions are a way to give staff members more power. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Promotions",
-        value=f"> {replytop} `Promotion Channel:` {Channel}\n> {replybottom} `Cooldown:` {Days}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
+        name=f"{Emojis.settings_gear} Promotions",
+        value=f"> {Emojis.replytop} `Promotion Channel:` {Channel}\n> {Emojis.replybottom} `Cooldown:` {Days}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
         inline=False,
     )
     return embed

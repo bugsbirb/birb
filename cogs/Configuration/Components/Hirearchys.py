@@ -1,7 +1,5 @@
 import typing
 
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 
@@ -16,7 +14,7 @@ class HSELECT(discord.ui.Select):
             discord.SelectOption(
                 label="System",
                 value="System",
-                emoji="<:system:1341493634733703300>",
+                emoji=f"{Emojis.system}",
                 description="Choose which system you want to use.",
             ),
         ]
@@ -25,7 +23,7 @@ class HSELECT(discord.ui.Select):
                 discord.SelectOption(
                     label="Hierarchy",
                     value="Single Hierarchy",
-                    emoji="<:hierarchy:1341493421503676517>",
+                    emoji=f"{Emojis.hierarchy}",
                 )
             )
         elif system == "multi":
@@ -33,7 +31,7 @@ class HSELECT(discord.ui.Select):
                 discord.SelectOption(
                     label="Hierarchy",
                     value="Multi Hierarchy",
-                    emoji="<:hierarchy:1341493421503676517>",
+                    emoji=f"{Emojis.hierarchy}",
                 )
             )
 
@@ -100,7 +98,7 @@ class HSELECT(discord.ui.Select):
             return await interaction.followup.send(
                 view=view,
                 ephemeral=True,
-                content="<:List:1223063187063308328> Select the roles for the hierarchy.\n\n<:Help:1223063068012056576> No need to select them in order, they will be sorted automatically with discords role hierarchy system.",
+                content=f"{Emojis.list} Select the roles for the hierarchy.\n\n{Emojis.help} No need to select them in order, they will be sorted automatically with discords role hierarchy system.",
             )
         elif Selected == "Multi Hierarchy":
             view = discord.ui.View()
@@ -159,7 +157,7 @@ class CreateAndDelete(discord.ui.Select):
             placeholder="Manage Departments",
             options=[
                 discord.SelectOption(
-                    label="Create", value="create", emoji="<:Add:1163095623600447558>"
+                    label="Create", value="create", emoji=f"{Emojis.add}"
                 ),
                 discord.SelectOption(
                     label="Delete",
@@ -167,7 +165,7 @@ class CreateAndDelete(discord.ui.Select):
                     emoji="<:Subtract:1229040262161109003>",
                 ),
                 discord.SelectOption(
-                    label="Modify", value="modify", emoji="<:Pen:1235001839036923996>"
+                    label="Modify", value="modify", emoji=f"{Emojis.pen}"
                 ),
             ],
             min_values=1,
@@ -207,7 +205,7 @@ class CreateAndDelete(discord.ui.Select):
             )
             if IsEmpty:
                 return await interaction.followup.send(
-                    content=f"{no} **{interaction.user.display_name}**, there are no departments to modify.",
+                    content=f"{Emojis.no} **{interaction.user.display_name}**, there are no departments to modify.",
                     ephemeral=True,
                 )
             view = discord.ui.View()
@@ -224,7 +222,7 @@ class CreateAndDelete(discord.ui.Select):
                 )
             )
             await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name}**, select the department to modify.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, select the department to modify.",
                 view=view,
                 embed=None,
             )
@@ -271,7 +269,7 @@ class SingleHierarchy(discord.ui.RoleSelect):
 
         await interaction.response.edit_message(
             view=None,
-            content=f"{tick} **{interaction.user.display_name}**, the hierarchy has been updated!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, the hierarchy has been updated!",
             embed=None,
         )
 
@@ -306,7 +304,7 @@ class ModmailSystem(discord.ui.Select):
             config["Promo"]["System"]["type"] = self.values[0]
         else:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name}**, no system type selected.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name}**, no system type selected.",
                 ephemeral=True,
             )
         await interaction.client.config.update_one(
@@ -314,7 +312,7 @@ class ModmailSystem(discord.ui.Select):
         )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, the promotions system has been updated to {self.values[0]}!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, the promotions system has been updated to {self.values[0]}!",
             view=None,
         )
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
@@ -335,7 +333,7 @@ class ModmailSystem(discord.ui.Select):
             )
         except discord.Forbidden:
             await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, I couldn't update the message. You will need to reload the page to see the new options.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name}**, I couldn't update the message. You will need to reload the page to see the new options.",
             )
         await SyncServer(interaction.client, interaction.guild)
 
@@ -383,7 +381,7 @@ class ModifyDepartment(discord.ui.Select):
 
         if not department:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** department not found!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** department not found!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -396,7 +394,7 @@ class ModifyDepartment(discord.ui.Select):
         view = discord.ui.View()
         view.add_item(MultiHierarchy(interaction.user, selected_department, roles))
         await interaction.response.edit_message(
-            content=f"<:List:1223063187063308328> Select the roles for the department `{selected_department}`.\n\n<:Help:1223063068012056576> No need to select them in order, they will be sorted automatically with discords role hierarchy system.",
+            content=f"{Emojis.list} Select the roles for the department `{selected_department}`.\n\n{Emojis.help} No need to select them in order, they will be sorted automatically with discords role hierarchy system.",
             embed=None,
             view=view,
         )
@@ -445,7 +443,7 @@ class MultiHierarchy(discord.ui.RoleSelect):
         )
         await interaction.response.edit_message(
             view=None,
-            content=f"{tick} **{interaction.user.display_name}**, the hierarchy for the department `{self.department}` has been updated!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, the hierarchy for the department `{self.department}` has been updated!",
             embed=None,
         )
 
@@ -494,7 +492,7 @@ class CreateDeleteDepartment(discord.ui.Modal):
                 if isinstance(dept, dict)
             ):
                 return await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name},** department already exists.",
+                    f"{Emojis.no} **{interaction.user.display_name},** department already exists.",
                     ephemeral=True,
                 )
 
@@ -544,7 +542,7 @@ class CreateDeleteDepartment(discord.ui.Modal):
             )
 
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, the department `{DepartmentName}` has been deleted!",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, the department `{DepartmentName}` has been deleted!",
                 view=None,
             )
 
@@ -559,19 +557,19 @@ async def HiEmbed(interaction: discord.Interaction, Config: dict, embed: discord
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's Hierarchy settings! Hierarchy are a way to automate your role updates. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Hierarchy",
+        name=f"{Emojis.settings_gear} Hierarchy",
         value=f"> `System:` {System}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
         inline=False,
     )
 
     embed.add_field(
         inline=False,
-        name="<:Promotion:1234997026677198938> Promotions",
+        name=f"{Emojis.promotions} Promotions",
         value="> `OG System:` Members get only the role you pick. Simple one-time role assignment.\n> `Single Hierarchy:` Members move up one role at a time when promoted. They follow a ranked ladder (like level 1 → level 2 → level 3).\n> `Multiple Hierarchies:` Like Single, but you can create separate departments. Each department has its own role ladder (e.g., Moderators ladder, Support ladder).",
     )
     embed.add_field(
         inline=False,
-        name="<:Infraction:1223063128275943544> Infractions",
+        name=f"{Emojis.infractions} Infractions",
         value=f"> `✨` **Infractions is locked behind Premium**, if you want to use this feature [join here](https://patreon.com/AstroBirb).\n\n> `OG System:` This will basically disable this system entirely, there's nothing tied to it.\n> `Single Hierarchy:` Members move down one role at a time when given infractions. They follow a ranked ladder in reverse (like level 3 → level 2 → level 1).\n> `Multiple Hierarchies:` Like Single, but you can create separate departments. Each department has its own role ladder that members move down through (e.g., Moderators ladder, Support ladder).\n> `🔔` **To allow this feature to work** you will need to edit a infraction type, and enable `Use Hierarchy`",
     )
     return embed

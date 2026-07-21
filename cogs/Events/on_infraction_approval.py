@@ -146,7 +146,7 @@ class CaseApproval(discord.ui.View):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"{Emojis.no} **{interaction.user.display_name}**, I couldn't find the data for this."
             )
         Infraction = InfractionItem(**Result)
 
@@ -212,7 +212,7 @@ class CaseApproval(discord.ui.View):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"{Emojis.no} **{interaction.user.display_name}**, I couldn't find the data for this."
             )
         Infraction = InfractionItem(Result)
 

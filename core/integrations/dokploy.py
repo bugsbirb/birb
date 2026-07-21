@@ -3,7 +3,6 @@ import re
 from datetime import datetime
 
 import aiohttp
-import discord
 from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -274,7 +273,7 @@ class Depl(commands.Cog):
                         if project.get("name") == name:
                             await StopApplication(project.get("applicationId"))
                             await after.guild.owner.send(
-                                f"{tick} **@{after.name}** branding has been stopped successfully."
+                                f"{Emojis.tick} **@{after.name}** branding has been stopped successfully."
                             )
                             break
 
@@ -416,7 +415,7 @@ class Setup(discord.ui.View):
         result = await bots.find_one({"user_id": self.author.id})
         if result:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** you already have a bot setup.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** you already have a bot setup.",
                 ephemeral=True,
             )
 
@@ -447,7 +446,7 @@ class Next(discord.ui.View):
         result = await bots.find_one({"user_id": interaction.user.id})
         if result:
             return await interaction.response.send_message(
-                content=f"{no} You already have a bot setup.", ephemeral=True
+                content=f"{Emojis.no} You already have a bot setup.", ephemeral=True
             )
 
         embed = discord.Embed(color=discord.Color.dark_embed())
@@ -556,7 +555,7 @@ class SetUP(discord.ui.Modal):
             env = await UpdateENV(ProjectID, environment)
             if not env:
                 return await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: .E`"
+                    content=f"{Emojis.crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: .E`"
                 )
             try:
                 provider = await SaveProvider(ProjectID)
@@ -567,7 +566,7 @@ class SetUP(discord.ui.Modal):
 
         else:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: C`"
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** <@795743076520820776> such unfortunate events have occured, please fix them. `ID: C`"
             )
         embed.set_footer(text=f"Setup completed by @{interaction.user.display_name}")
         embed.add_field(

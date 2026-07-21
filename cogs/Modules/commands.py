@@ -28,7 +28,7 @@ async def run(
 
     if not await ModuleCheck(interaction.guild.id, "customcommands"):
         await interaction.followup.send(
-            f"{no} **{interaction.user.display_name}**, the custom commands module isn't enabled.",
+            f"{Emojis.no} **{interaction.user.display_name}**, the custom commands module isn't enabled.",
             ephemeral=True,
         )
         return
@@ -44,7 +44,7 @@ async def run(
 
         if result is None:
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** That command does not exist.",
+                f"{Emojis.no} **{interaction.user.display_name},** That command does not exist.",
                 ephemeral=True,
             )
             return
@@ -83,7 +83,7 @@ async def run(
                 ),
             )
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name},** The command has been sent",
+                f"{Emojis.tick} **{interaction.user.display_name},** The command has been sent",
                 ephemeral=True,
             )
         else:
@@ -98,7 +98,7 @@ async def run(
 
     except discord.Forbidden:
         await interaction.followup.send(
-            f"{no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.",
+            f"{Emojis.no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.",
             ephemeral=True,
         )
         return
@@ -186,7 +186,7 @@ class CustomCommands(commands.Cog):
 
         if prefix is None:
             await ctx.send(
-                f"<:command1:1223062616872583289> **{ctx.author.display_name},** the prefix is `{currentprefix}`",
+                f"{Emojis.command} **{ctx.author.display_name},** the prefix is `{currentprefix}`",
             )
         else:
             if ctx.author.guild_permissions.manage_guild:
@@ -197,11 +197,11 @@ class CustomCommands(commands.Cog):
                     upsert=True,
                 )
                 await ctx.send(
-                    f"<:whitecheck:1190819388941668362> **{ctx.author.display_name},** I've set the prefix to `{prefix}`",
+                    f"{Emojis.tick} **{ctx.author.display_name},** I've set the prefix to `{prefix}`",
                 )
             else:
                 await ctx.send(
-                    f"<:command1:1223062616872583289> **{ctx.author.display_name},** the prefix is `{currentprefix}`",
+                    f"{Emojis.command} **{ctx.author.display_name},** the prefix is `{currentprefix}`",
                 )
 
     async def RegisterCustomCommands(self):
@@ -281,7 +281,7 @@ class Voting(discord.ui.View):
     @discord.ui.button(
         label="0",
         style=discord.ButtonStyle.green,
-        emoji="<:whitecheck:1223062421212631211>",
+        emoji=f"{Emojis.tick}",
         custom_id="vote",
     )
     async def upvote(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -305,7 +305,7 @@ class Voting(discord.ui.View):
             button.label = str(voting["votes"] - 1)
             await interaction.message.edit(view=self)
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name},** You have successfully unvoted.",
+                f"{Emojis.tick} **{interaction.user.display_name},** You have successfully unvoted.",
                 ephemeral=True,
             )
         else:
@@ -320,14 +320,14 @@ class Voting(discord.ui.View):
             button.label = str(voting["votes"] + 1)
             await interaction.message.edit(view=self)
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name},** You have successfully voted.",
+                f"{Emojis.tick} **{interaction.user.display_name},** You have successfully voted.",
                 ephemeral=True,
             )
 
     @discord.ui.button(
         label="Voters",
         style=discord.ButtonStyle.blurple,
-        emoji="<:folder:1235296135728594965>",
+        emoji=f"{Emojis.folder}",
         custom_id="viewlist",
     )
     async def list(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -371,7 +371,7 @@ async def RequiresPermission(ctx, command):
             return True
         else:
             await send(
-                f"{no} **{author.display_name}**, you don't have permission to use this command.\n<:Arrow:1115743130461933599>**Required:** `Custom Command Permission`"
+                f"{Emojis.no} **{author.display_name}**, you don't have permission to use this command.\n{Emojis.arrow_alt}**Required:** `Custom Command Permission`"
             )
             return False
     else:

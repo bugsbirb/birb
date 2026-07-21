@@ -1,5 +1,3 @@
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 
@@ -10,17 +8,17 @@ class LOAOptions(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Leave Channel",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                     description="The channel where leaves will be sent.",
                 ),
                 discord.SelectOption(
                     label="Leave Audit Log",
-                    emoji="<:Log:1349431938926252115>",
+                    emoji=f"{Emojis.log}",
                     description="Logs for modify/force end.",
                 ),
                 discord.SelectOption(
                     label="Leave Role",
-                    emoji="<:Ping:1298301862906298378>",
+                    emoji=f"{Emojis.ping}",
                     description="Gives the user a role for when they are on LOA.",
                 ),
                 discord.SelectOption(
@@ -154,7 +152,7 @@ class Mentions(discord.ui.Select):
             )
 
         await interaction.response.send_message(
-            content=f"<:info:1245364500874399864> **{interaction.user.display_name}**, this allows for pings to be attached to leave messages.",
+            content=f"{Emojis.info} **{interaction.user.display_name}**, this allows for pings to be attached to leave messages.",
             view=view,
             ephemeral=True,
         )
@@ -202,7 +200,7 @@ class Pings(discord.ui.RoleSelect):
         )
 
         await interaction.response.send_message(
-            f"{tick} **{interaction.user.display_name}**, successfully updated mentions.",
+            f"{Emojis.tick} **{interaction.user.display_name}**, successfully updated mentions.",
             ephemeral=True,
         )
         try:
@@ -405,8 +403,8 @@ async def LOAEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's LOA settings! LOA is a way for staff members to take a break from their duties. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> LOA",
-        value=f"{replytop} `LOA Channel:` {Channel}\n{replymiddle} `LOA Audit Channel`: {LogChannel}\n{replybottom} `LOA Role:` {Role}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+        name=f"{Emojis.settings_gear} LOA",
+        value=f"{Emojis.replytop} `LOA Channel:` {Channel}\n{Emojis.replymiddle} `LOA Audit Channel`: {LogChannel}\n{Emojis.replybottom} `LOA Role:` {Role}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
         inline=False,
     )
     return embed

@@ -1,5 +1,3 @@
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 
@@ -10,7 +8,7 @@ class AutoResponderOptions(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Manage Responses",
-                    emoji="<:autoresponse:1250481563615887391>",
+                    emoji=f"{Emojis.auto_response}",
                 ),
             ]
         )
@@ -36,7 +34,7 @@ class AutoResponderOptions(discord.ui.Select):
             for response in Responses:
                 embed.add_field(
                     name=f"{response.get('trigger')}",
-                    value=f"{replytop} `Responses:` {response.get('response')}\n{replybottom} `Similarity:` {response.get('similarity', 'N/A')}%",
+                    value=f"{Emojis.replytop} `Responses:` {response.get('response')}\n{Emojis.replybottom} `Similarity:` {response.get('similarity', 'N/A')}%",
                     inline=False,
                 )
                 if 25 <= len(embed.fields):
@@ -95,7 +93,7 @@ class Create(discord.ui.Modal):
         )
         if result:
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** another response is using the same trigger.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** another response is using the same trigger.",
                 ephemeral=True,
             )
             return
@@ -115,7 +113,7 @@ class Create(discord.ui.Modal):
             }
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** response created.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** response created.",
             embed=None,
             view=None,
         )
@@ -155,7 +153,7 @@ class EditModal(discord.ui.Modal):
             },
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** response edited.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** response edited.",
             embed=None,
             view=None,
         )
@@ -190,7 +188,7 @@ class DeleteByTrigger2(discord.ui.Modal):
         )
         if not result:
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** no response found with that trigger.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** no response found with that trigger.",
                 ephemeral=True,
             )
             return
@@ -198,7 +196,7 @@ class DeleteByTrigger2(discord.ui.Modal):
             {"guild_id": interaction.guild.id, "trigger": self.trigger.value}
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** response deleted.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** response deleted.",
             embed=None,
             view=None,
         )

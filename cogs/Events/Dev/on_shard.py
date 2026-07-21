@@ -1,8 +1,11 @@
+import logging
+import os
+
 import discord
 from discord.ext import commands
-import os
 from sentry_sdk import metrics
-import logging
+
+from core.bot.emojis import Emojis
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +22,7 @@ class Shards(commands.Cog):
                 os.getenv("SHARD_CHANNEL", 1371586445466407012)
             )
             await channel.send(
-                content=f"<:status_green:1227365520857104405> • `{shard}` has connected."
+                content=f"{Emojis.status_green} • `{shard}` has connected."
             )
         except discord.Forbidden:
             return
@@ -34,7 +37,7 @@ class Shards(commands.Cog):
                 os.getenv("SHARD_CHANNEL", 1371586445466407012)
             )
             await channel.send(
-                content=f"<:status_red:1227365495376711700> • `{shard}` has disconnected."
+                content=f"{Emojis.status_red} • `{shard}` has disconnected."
             )
         except discord.Forbidden:
             return

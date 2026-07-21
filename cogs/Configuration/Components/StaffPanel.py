@@ -1,7 +1,7 @@
-import discord
 import traceback
-from core.bot.emojis import *
+
 from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class StaffPanelOptions(discord.ui.Select):
@@ -10,7 +10,7 @@ class StaffPanelOptions(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Customise Embed",
-                    emoji="<:Customisation:1223063306131210322>",
+                    emoji=f"{Emojis.customisation}",
                 )
             ]
         )
@@ -64,7 +64,7 @@ class StaffPanelOptions(discord.ui.Select):
 
         else:
             await interaction.response.send_message(
-                f"{redx} **{interaction.user.display_name},** an error occurred. Please try again later.",
+                f"{Emojis.tick} **{interaction.user.display_name},** an error occurred. Please try again later.",
                 ephemeral=True,
             )
 
@@ -153,7 +153,7 @@ class DropDownLabel(discord.ui.Modal):
             {"_id": interaction.guild.id}, {"$set": Config}, upsert=True
         )
         embed = discord.Embed(
-            description=f"{greencheck} **{interaction.user.display_name},** you have successfully updated the panel label to **{self.label.value}**!",
+            description=f"{Emojis.green_tick} **{interaction.user.display_name},** you have successfully updated the panel label to **{self.label.value}**!",
             color=discord.Colour.brand_green(),
         )
         return await interaction.followup.send(embed=embed, ephemeral=True)

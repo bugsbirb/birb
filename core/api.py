@@ -443,7 +443,7 @@ class APICog(commands.Cog):
             )
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I've sent your API key to your/their DMs.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, I've sent your API key to your/their DMs.",
             ephemeral=True,
         )
 

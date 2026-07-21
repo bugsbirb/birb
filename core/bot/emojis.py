@@ -128,32 +128,27 @@ class Emojis:
 
 async def upload(bot: discord.Client, name: str, path: str):
     with open(path, "rb") as f:
-        image = f.read()
-    return await bot.create_application_emoji(name=name, image=image)
+        return await bot.create_application_emoji(name=name, image=f.read())
 
 
 async def load(bot: discord.Client):
-    emojis = await bot.fetch_application_emojis()
-    for e in emojis:
-        if hasattr(Emojis, e.name):
-            setattr(Emojis, e.name, str(e))
+    for emoji in await bot.fetch_application_emojis():
+        if hasattr(Emojis, emoji.name):
+            setattr(Emojis, emoji.name, str(emoji))
 
 
 async def uploadAll(bot: discord.Client, folder: str = "emojis"):
-    existing = await bot.fetch_application_emojis()
-    existing_names = {e.name for e in existing}
+    existing = {e.name for e in await bot.fetch_application_emojis()}
 
     for filename in os.listdir(folder):
         name, ext = os.path.splitext(filename)
+
         if ext.lower() not in (".png", ".gif", ".jpg", ".jpeg"):
             continue
 
-        if name in existing_names:
-            print(f"skipping {name}, already uploaded")
+        if name in existing:
             continue
 
-        try:
-            await upload(bot, name, os.path.join(folder, filename))
-            print(f"uploaded {name}")
-        except discord.HTTPException as e:
-            print(f"failed {name}: {e}")
+        await upload(bot, name, os.path.join(folder, filename))
+
+    await load(bot)

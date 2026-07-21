@@ -245,6 +245,7 @@ class Client(commands.AutoShardedBot):
         return commands.when_mentioned_or(prefix)(self, message)
 
     async def setup_hook(self):
+        await uploadAll(self)
         await self._load_views()
         await self._load_cogs()
         await self.CacheCommands()
@@ -291,7 +292,7 @@ class Client(commands.AutoShardedBot):
                     label=member.display_name,
                     value=str(member.id),
                     description=member.get("rolename"),
-                    emoji="<:staff:1206248655359840326>",
+                    emoji=f"{Emojis.staff}",
                 )
             )
             if len(options) >= 24:
@@ -300,7 +301,7 @@ class Client(commands.AutoShardedBot):
                         label="View More",
                         value="more",
                         description="View more staff members",
-                        emoji="<:List:1223063187063308328>",
+                        emoji=f"{Emojis.list}",
                     )
                 )
                 break

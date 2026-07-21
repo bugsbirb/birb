@@ -4,7 +4,6 @@ import string
 from datetime import datetime
 from typing import Literal, Optional
 
-import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -192,7 +191,7 @@ class Infractions(commands.Cog):
             if SkipRole and SkipRole in Roles:
                 if manager.top_role.position <= SkipRole.position:
                     await msg.edit(
-                        content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
+                        content=f"{Emojis.no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
                         view=None,
                         embed=None,
                     )
@@ -211,7 +210,7 @@ class Infractions(commands.Cog):
 
             if NextRole and manager.top_role.position <= NextRole.position:
                 await msg.edit(
-                    content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
+                    content=f"{Emojis.no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
                     view=None,
                     embed=None,
                 )
@@ -267,7 +266,7 @@ class Infractions(commands.Cog):
             if SkipRole and SkipRole in Roles:
                 if manager.top_role.position <= SkipRole.position:
                     await msg.edit(
-                        content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
+                        content=f"{Emojis.no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{SkipRole.name}`.",
                         view=None,
                         embed=None,
                     )
@@ -286,7 +285,7 @@ class Infractions(commands.Cog):
 
             if NextRole and manager.top_role.position <= NextRole.position:
                 await msg.edit(
-                    content=f"{no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
+                    content=f"{Emojis.no} **{manager.display_name}**, you are not authorized to demote **{member.display_name}** to `{NextRole.name}`.",
                     view=None,
                     embed=None,
                 )
@@ -321,7 +320,7 @@ class Infractions(commands.Cog):
 
         view.add_item(InfractionMultiple(action, reason, notes, expiration, anonymous))
         await ctx.send(
-            f"<:List:1223063187063308328> **{ctx.author.display_name}**, select the users you want to infraction!",
+            f"{Emojis.list} **{ctx.author.display_name}**, select the users you want to infraction!",
             view=view,
         )
 
@@ -363,14 +362,14 @@ class Infractions(commands.Cog):
         )
         if not await self.TypePerms(ctx.author, TypeActions):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** you don't have permission to use this shift type."
+                f"{Emojis.no} **{ctx.author.display_name},** you don't have permission to use this shift type."
             )
 
         Config = await EnsureConfig(ctx, "Infraction")
 
         if staff is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user can not be found.",
+                f"{Emojis.no} **{ctx.author.display_name}**, this user can not be found.",
             )
             return
         isApproval = bool(
@@ -379,16 +378,16 @@ class Infractions(commands.Cog):
             is not None
         )
         msg = await ctx.send(
-            content=f"<a:Loading:1167074303905386587> **{ctx.author.display_name},** hold on while I infract this staff member.",
+            content=f"{Emojis.loading} **{ctx.author.display_name},** hold on while I infract this staff member.",
         )
         if staff.id == self.client.user.id:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** what did I do to you?"
+                content=f"{Emojis.no} **{ctx.author.display_name},** what did I do to you?"
             )
             return
         if staff.bot:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
+                content=f"{Emojis.no} **{ctx.author.display_name},** I'm not gonna infract my own kind."
             )
             return
         if Config.get("Infraction", {}).get("channel") is None:
@@ -414,7 +413,7 @@ class Infractions(commands.Cog):
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                content=f"{Emojis.no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
         if expiration:
@@ -563,12 +562,12 @@ class Infractions(commands.Cog):
             msg = await msg.edit(
                 embeds=embeds,
                 view=view,
-                content=f"<:Tip:1238599473429483612> **{ctx.author.display_name}**, are you sure?\n-# Infraction Preview",
+                content=f"{Emojis.tip} **{ctx.author.display_name}**, are you sure?\n-# Infraction Preview",
             )
             await view.wait()
             if view.value is None:
                 return await msg.edit(
-                    content=f"{crisis} **{ctx.author.display_name},** you didn't respond in time.",
+                    content=f"{Emojis.crisis} **{ctx.author.display_name},** you didn't respond in time.",
                     view=None,
                     embed=None,
                 )
@@ -579,7 +578,7 @@ class Infractions(commands.Cog):
                 FormeData["skipExec"] = True
             else:
                 return await msg.edit(
-                    content=f"{no} **{ctx.author.display_name},** infraction cancelled.",
+                    content=f"{Emojis.no} **{ctx.author.display_name},** infraction cancelled.",
                     view=None,
                     embed=None,
                 )
@@ -598,7 +597,7 @@ class Infractions(commands.Cog):
         InfractionResult = await self.client.db["infractions"].insert_one(FormeData)
         if not InfractionResult.inserted_id:
             await msg.edit(
-                content=f"{crisis} **{ctx.author.display_name},** hi I had a issue submitting this infraction please head to support!",
+                content=f"{Emojis.crisis} **{ctx.author.display_name},** hi I had a issue submitting this infraction please head to support!",
             )
             return
         if isApproval:
@@ -618,7 +617,7 @@ class Infractions(commands.Cog):
                 "infraction_approval", InfractionResult.inserted_id, Config
             )
             return await msg.edit(
-                content=f"{tick} **{ctx.author.display_name},** I've successfully sent the infraction to approval.",
+                content=f"{Emojis.tick} **{ctx.author.display_name},** I've successfully sent the infraction to approval.",
                 embed=None,
                 view=None,
             )
@@ -628,7 +627,7 @@ class Infractions(commands.Cog):
         )
 
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {f'(Escalated to {action})' if isEscalated and FormeData.get('skipExec') is None else ''}",
+            content=f"{Emojis.tick} **{ctx.author.display_name},** I've successfully infracted **@{staff.display_name}**! {f'(Escalated to {action})' if isEscalated and FormeData.get('skipExec') is None else ''}",
             embed=None,
             view=None,
         )
@@ -668,7 +667,7 @@ class Infractions(commands.Cog):
                 else "expired" if scope == "Expired" else "any"
             )
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, no {scope_text} infractions were found{f' for **@{staff.display_name}**' if staff else ''}."
+                f"{Emojis.no} **{ctx.author.display_name}**, no {scope_text} infractions were found{f' for **@{staff.display_name}**' if staff else ''}."
             )
             return
 
@@ -682,7 +681,7 @@ class Infractions(commands.Cog):
         else:
             msg = await ctx.send(
                 embed=discord.Embed(
-                    description="<a:astroloading:1245681595546079285>",
+                    description=f"{Emojis.loading_alt}",
                     color=discord.Color.dark_embed(),
                 )
             )
@@ -724,7 +723,7 @@ class Infractions(commands.Cog):
             )[:1025]
 
             embed.add_field(
-                name=f"<:Document:1223063264322125844> Infraction | {infraction['random_string']} {voided}",
+                name=f"{Emojis.document} Infraction | {infraction['random_string']} {voided}",
                 value=value[:1021] + "..." if len(value) > 1024 else value,
                 inline=False,
             )
@@ -783,7 +782,7 @@ class Infractions(commands.Cog):
 
         if infraction is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.",
+                f"{Emojis.no} **{ctx.author.display_name}**, I couldn't find the infraction with ID `{id}` in this guild.",
             )
             return
 
@@ -871,7 +870,7 @@ class InfractionMultiple(discord.ui.UserSelect):
 
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"{Emojis.no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 ephemeral=True,
             )
         if expiration:
@@ -880,7 +879,7 @@ class InfractionMultiple(discord.ui.UserSelect):
         for staff in self.values:
             if staff is None:
                 await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name}**, this user can not be found.",
+                    f"{Emojis.no} **{interaction.user.display_name}**, this user can not be found.",
                     ephemeral=True,
                 )
                 return
@@ -934,7 +933,7 @@ class InfractionMultiple(discord.ui.UserSelect):
             )
             if not InfractionResult.inserted_id:
                 await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
+                    content=f"{Emojis.crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
                     embed=None,
                     view=None,
                 )
@@ -960,7 +959,7 @@ class InfractionMultiple(discord.ui.UserSelect):
             )
 
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I have infracted all the staff members!",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I have infracted all the staff members!",
             view=None,
         )
 
@@ -981,7 +980,7 @@ class ManageInfraction(discord.ui.View):
     @discord.ui.button(
         label="Edit",
         style=discord.ButtonStyle.blurple,
-        emoji="<:edit:1333861885778333798>",
+        emoji=f"{Emojis.edit}",
     )
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -998,7 +997,7 @@ class ManageInfraction(discord.ui.View):
     @discord.ui.button(
         label="Void",
         style=discord.ButtonStyle.danger,
-        emoji="<:Destroy:1333862072143974421>",
+        emoji=f"{Emojis.destroy}",
     )
     async def void(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -1013,7 +1012,7 @@ class ManageInfraction(discord.ui.View):
                 {"_id": infraction["_id"]}
             )
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, I've deleted the infraction permanently.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, I've deleted the infraction permanently.",
                 view=None,
                 embed=None,
             )
@@ -1024,7 +1023,7 @@ class ManageInfraction(discord.ui.View):
             upsert=False,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've voided the infraction.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, I've voided the infraction.",
             view=None,
             embed=None,
         )
@@ -1123,7 +1122,7 @@ class UpdateInfraction(discord.ui.Modal):
             expiration = self.exp.value
             if expiration and not re.match(r"^\d+[mhdws]$", expiration):
                 await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                    f"{Emojis.no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                     ephemeral=True,
                 )
                 return

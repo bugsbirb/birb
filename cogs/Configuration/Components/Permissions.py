@@ -1,5 +1,3 @@
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 
@@ -101,12 +99,12 @@ async def PermissionsEmbed(
     embed.set_author(name=f"{interaction.guild.name}", icon_url=interaction.guild.icon)
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's permissions! If you wanna know more about what these permissions read the [documentation](https://docs.astrobirb.dev)\n"
-    value = f"{replytop} `Staff Role:` {StaffRole} \n{replybottom} `Admin Role:` {AdminRole}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
+    value = f"{Emojis.replytop} `Staff Role:` {StaffRole} \n{Emojis.replybottom} `Admin Role:` {AdminRole}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
     if len(value) > 1021:
         value = value[:1018] + "..."
 
     embed.add_field(
-        name="<:Permissions:1207365901956026368> Permissions",
+        name=f"{Emojis.permissions} Permissions",
         value=value,
         inline=False,
     )

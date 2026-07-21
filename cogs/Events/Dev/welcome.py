@@ -1,8 +1,10 @@
-import discord
-from discord.ext import commands
+import logging
 import os
 
-import logging
+import discord
+from discord.ext import commands
+
+from core.bot.emojis import Emojis
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +37,7 @@ class welcome(commands.Cog):
                         label="Support",
                         url="https://canary.discord.com/channels/1092976553752789054/1328460590120702094",
                         style=discord.ButtonStyle.link,
-                        emoji="<:link:1206670134064717904>",
+                        emoji=f"{Emojis.link}",
                     )
                 )
                 try:

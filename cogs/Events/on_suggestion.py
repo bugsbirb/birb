@@ -1,6 +1,5 @@
 import logging
 
-import discord
 from bson import ObjectId
 from discord.ext import commands
 
@@ -53,7 +52,7 @@ class On_suggestions(commands.Cog):
         if not custom:
             embed = discord.Embed(
                 title="",
-                description=f"<:Member:1226674150463111299> {author.mention}",
+                description=f"{Emojis.member} {author.mention}",
                 color=discord.Color.yellow(),
             )
             embed.set_thumbnail(url=author.display_avatar)
@@ -63,13 +62,13 @@ class On_suggestions(commands.Cog):
             if back.get("image"):
                 embed.set_image(url=back.get("image"))
             embed.add_field(
-                name="<:pin:1226671966413389864> Suggestion",
+                name=f"{Emojis.pin} Suggestion",
                 value=back.get("suggestion"),
             )
             embed.set_author(icon_url=author.display_avatar, name=author.name)
             embed.add_field(
-                name="<:messageforward1:1230919023361921165> Opinions",
-                value="0 <:UpVote:1223062893096996934> | 0 <:DownVote:1223063241433939989>",
+                name=f"{Emojis.message_forward} Opinions",
+                value=f"0 {Emojis.upvote} | 0 {Emojis.downvote}",
             )
         else:
             replacements = await Variables.suggestions(back, author, guild)
@@ -103,7 +102,7 @@ class Voting(discord.ui.View):
         label="Upvote",
         style=discord.ButtonStyle.green,
         custom_id="PERSISTENTR:UPVOTE",
-        emoji="<:UpVote:1223062893096996934>",
+        emoji=f"{Emojis.upvote}",
     )
     async def upvote(self, interaction: discord.Interaction, button: discord.ui.Button):
         settings = await interaction.client.config.find_one(
@@ -142,7 +141,7 @@ class Voting(discord.ui.View):
         label="Downvote",
         style=discord.ButtonStyle.red,
         custom_id="PERSISTENTR:DOWNVOTE",
-        emoji="<:DownVote:1059585429357211760>",
+        emoji=f"{Emojis.downvote}",
     )
     async def downvote(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -219,7 +218,7 @@ class Voting(discord.ui.View):
 
     @discord.ui.button(
         label="",
-        emoji="<:Setting:1223062944187813918>",
+        emoji=f"{Emojis.settings}",
         custom_id="settingsbuttonforsuggestions",
     )
     async def settings(
@@ -238,20 +237,20 @@ class Voting(discord.ui.View):
             )
             if not suggestion_data:
                 await interaction.followup.send(
-                    f"{crisis} **Suggestion** data for this suggestion can not be found.",
+                    f"{Emojis.crisis} **Suggestion** data for this suggestion can not be found.",
                     ephemeral=True,
                 )
                 return
             if suggestion_data is None:
                 await interaction.followup.send(
-                    f"{crisis} **Suggestion** data for this suggestion can not be found.",
+                    f"{Emojis.crisis} **Suggestion** data for this suggestion can not be found.",
                     ephemeral=True,
                 )
                 return
             view = discord.ui.View()
             view.add_item(ManageSuggestion(interaction.message))
             await interaction.followup.send(
-                f"{tick} **{interaction.user.display_name}**, here are the settings for this suggestion.",
+                f"{Emojis.tick} **{interaction.user.display_name}**, here are the settings for this suggestion.",
                 view=view,
                 ephemeral=True,
             )
@@ -265,12 +264,12 @@ class ManageSuggestion(discord.ui.Select):
             discord.SelectOption(
                 label="Approve",
                 description="Approve the suggestion",
-                emoji="<:whitecheck:1223062421212631211>",
+                emoji=f"{Emojis.tick}",
             ),
             discord.SelectOption(
                 label="Reject",
                 description="Reject the suggestion",
-                emoji="<:whitex:1190819175447408681>",
+                emoji=f"{Emojis.no}",
             ),
         ]
         super().__init__(
@@ -299,7 +298,7 @@ class ManageSuggestion(discord.ui.Select):
                 "suggestion_edit", result.get("_id"), settings, "Accepted Suggestion"
             )
             await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, it has been marked as accepted.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, it has been marked as accepted.",
                 view=None,
             )
 
@@ -334,7 +333,7 @@ class DenialReason(discord.ui.Modal, title="Denial Reason"):
             "suggestion_edit", result.get("_id"), settings, "Denied Suggestion"
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** suggestion marked as denied.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** suggestion marked as denied.",
             view=None,
         )
 

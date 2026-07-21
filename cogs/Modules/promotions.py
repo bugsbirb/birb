@@ -4,11 +4,9 @@ import random
 import string
 from dataclasses import dataclass
 
-import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.bot.Checks import EnsureConfig
 from core.bot.emojis import *
 from core.bot.permissions import Permissions
 from core.format import PaginatorButtons
@@ -26,6 +24,8 @@ from core.bot.HelpEmbeds import (
     NoChannelSet,
     Support,
     NotYourPanel,
+    BotNotConfigured,
+    ModuleNotSetup,
 )
 
 
@@ -68,20 +68,29 @@ async def PromotionContext(
 ):
 
     await interaction.response.defer()
-    config = await EnsureConfig(interaction)
 
-    msg = await interaction.followup.send(
-        f"<a:Loading:1167074303905386587> Processing promotion..."
+    Config = await interaction.client.db["Config"].find_one(
+        {"_id": interaction.guild.id}
     )
+    if Config is None:
+        return await interaction.followup.send(
+            embed=BotNotConfigured(), view=Support(), ephemeral=True
+        )
+    if Config.get("Promo") is None:
+        return await interaction.followup.send(
+            embed=ModuleNotSetup(), view=Support(), ephemeral=True
+        )
+
+    msg = await interaction.followup.send(f"{Emojis.loading} Processing promotion...")
     if target.bot:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote bots."
+            content=f"{Emojis.no} **{interaction.user.display_name}**, you can't promote bots."
         )
         return None
 
     if interaction.user.id == target.id:
         await msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you can't promote yourself."
+            content=f"{Emojis.no} **{interaction.user.display_name}**, you can't promote yourself."
         )
         return None
 
@@ -125,7 +134,7 @@ async def PromotionContext(
 
         await msg.edit(
             content=(
-                f"{no} **{interaction.user.display_name}**, "
+                f"{Emojis.no} **{interaction.user.display_name}**, "
                 f"**@{target.display_name}** is on cooldown, "
                 f"you can promote them again <t:{timestamp}:R>."
             )
@@ -174,7 +183,7 @@ async def SingleHierarchy(
     )
     if not HierarchyRoles:
         return await context.msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, the hierarchy roles have not been set up yet.",
+            content=f"{Emojis.no} **{interaction.user.display_name}**, the hierarchy roles have not been set up yet.",
         )
 
     SortedRoles = [
@@ -191,7 +200,7 @@ async def SingleHierarchy(
     if SkipRole and SkipRole in SortedRoles:
         if interaction.user.top_role.position <= SkipRole.position:
             await context.msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
             )
             return
 
@@ -210,19 +219,19 @@ async def SingleHierarchy(
                     break
     if NextRole and interaction.user.top_role.position <= NextRole.position:
         await context.msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+            content=f"{Emojis.no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
         )
         return
 
     if not NextRole and not SkipRole:
         await context.msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+            content=f"{Emojis.no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
         )
         return
 
     if not NextRole:
         await context.msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** i was unable to calculate which role comes next.",
+            content=f"{Emojis.no} **{interaction.user.display_name}**, **@{user.display_name}** i was unable to calculate which role comes next.",
             view=Support(),
         )
 
@@ -247,7 +256,7 @@ async def SingleHierarchy(
 
     interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
     await context.msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
+        content=f"{Emojis.tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
     )
 
 
@@ -271,6 +280,7 @@ async def MultiHireachy(
         context = await PromotionContext(interaction=interaction, target=user)
         if not context:
             return
+        print("na")
 
         client = await interaction.guild.fetch_member(interaction.client.user.id)
         if context.channel.permissions_for(client).send_messages is False:
@@ -278,6 +288,7 @@ async def MultiHireachy(
                 embed=NoPermissionChannel(context),
                 view=Support(),
             )
+        print("ca")
         DepartmentHierarchies = [
             dept
             for sublist in context.Config.get("Promo", {})
@@ -292,9 +303,10 @@ async def MultiHireachy(
         )
         if not department_data:
             await context.msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
             )
             return
+        print("sa")
 
         NextRole = None
         PreviousRole = None
@@ -307,6 +319,8 @@ async def MultiHireachy(
         ]
         SortedRoles.sort(key=lambda r: r.position)
 
+        print("ba")
+
         HierarchyRoles = [role for role in SortedRoles if role in user.roles]
         PreviousRole = (
             max(HierarchyRoles, key=lambda r: r.position) if HierarchyRoles else None
@@ -316,9 +330,11 @@ async def MultiHireachy(
         if SkipRole and SkipRole in SortedRoles:
             if interaction.user.top_role.position <= SkipRole.position:
                 await context.msg.edit(
-                    content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
+                    content=f"{Emojis.no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{SkipRole.name}`.",
                 )
                 return
+
+        print("sa")
 
         NextRole = SkipRole
         if not NextRole:
@@ -334,15 +350,17 @@ async def MultiHireachy(
 
         if NextRole and interaction.user.top_role.position <= NextRole.position:
             await context.msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, you are not authorized to promote **{user.display_name}** to `{NextRole.name}`.",
             )
             return
 
         if not NextRole:
             await context.msg.edit(
-                content=f"{no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
             )
             return
+
+        print("ca2")
 
         Object = await interaction.client.db["promotions"].insert_one(
             {
@@ -365,10 +383,10 @@ async def MultiHireachy(
 
         interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
         await context.msg.edit(
-            content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, I've successfully promoted **@{user.display_name}**!",
         )
     except Exception as e:
-        print(e)
+        print("da")
 
 
 @app_commands.describe(
@@ -403,7 +421,7 @@ async def issue(
         )
     if interaction.user.top_role.position <= new.position:
         await context.msg.edit(
-            content=f"{no} **{interaction.user.display_name}**, you are not authorized to promote **{staff.display_name}** to `{new.name}`.",
+            content=f"{Emojis.no} **{interaction.user.display_name}**, you are not authorized to promote **{staff.display_name}** to `{new.name}`.",
         )
     Object = await interaction.client.db["promotions"].insert_one(
         {
@@ -424,7 +442,7 @@ async def issue(
 
     interaction.client.dispatch("promotion", Object.inserted_id, context.Config)
     await context.msg.edit(
-        content=f"{tick} **{interaction.user.display_name}**, I've successfully promoted **@{staff.display_name}** to `{new.name}`!",
+        content=f"{Emojis.tick} **{interaction.user.display_name}**, I've successfully promoted **@{staff.display_name}** to `{new.name}`!",
     )
 
 
@@ -642,7 +660,7 @@ class promo(commands.Cog):
 
         if not promotion:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this promotion could not be found."
+                f"{Emojis.no} **{ctx.author.display_name}**, this promotion could not be found."
             )
             return
         view = ManagePromotion(promotion, ctx.author)
@@ -663,7 +681,7 @@ class promo(commands.Cog):
 
         if not promotions:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this staff member doesn't have any promotions."
+                f"{Emojis.no} **{ctx.author.display_name}**, this staff member doesn't have any promotions."
             )
             return
 
@@ -677,7 +695,7 @@ class promo(commands.Cog):
         else:
             msg = await ctx.send(
                 embed=discord.Embed(
-                    description="<a:astroloading:1245681595546079285>",
+                    description=f"{Emojis.loading_alt}",
                     color=discord.Color.dark_embed(),
                 )
             )
@@ -703,7 +721,7 @@ class promo(commands.Cog):
                 value = value[:1021] + "..."
 
             embed.add_field(
-                name=f"<:Document:1223063264322125844> Promotion | {promotion['random_string']}",
+                name=f"{Emojis.document} Promotion | {promotion['random_string']}",
                 value=value,
                 inline=False,
             )
@@ -754,7 +772,7 @@ class ManagePromotion(discord.ui.View):
     @discord.ui.button(
         label="Edit",
         style=discord.ButtonStyle.blurple,
-        emoji="<:edit:1333861885778333798>",
+        emoji=f"{Emojis.edit}",
     )
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -771,7 +789,7 @@ class ManagePromotion(discord.ui.View):
     @discord.ui.button(
         label="Void",
         style=discord.ButtonStyle.danger,
-        emoji="<:Destroy:1333862072143974421>",
+        emoji=f"{Emojis.destroy}",
     )
     async def void(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -786,7 +804,7 @@ class ManagePromotion(discord.ui.View):
                 {"_id": promotion["_id"]}
             )
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name}**, I've deleted the promotion permanently.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, I've deleted the promotion permanently.",
                 view=None,
                 embed=None,
             )
@@ -797,7 +815,7 @@ class ManagePromotion(discord.ui.View):
             upsert=False,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I've voided the promotion.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, I've voided the promotion.",
             view=None,
             embed=None,
         )

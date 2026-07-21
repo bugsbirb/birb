@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
 
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 from core.bot.ui import BasicPaginator
@@ -15,26 +13,26 @@ class QuotaOptions(discord.ui.Select):
                 discord.SelectOption(
                     label="Quota Amount",
                     description="Set the minimum message count required.",
-                    emoji="<:uilsortamountup:1248315081154887761>",
+                    emoji=f"{Emojis.sort_amount}",
                 ),
                 discord.SelectOption(
                     label="Role Quota",
                     description="Manage role based quota requirements.",
-                    emoji="<:RoleQuota:1400797914011271231>",
+                    emoji=f"{Emojis.role_quota}",
                 ),
                 discord.SelectOption(
                     label="Ignored Channels",
                     description="Choose channels excluded from quota tracking.",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                 ),
                 discord.SelectOption(
                     label="Auto Activity",
                     description="Configure automatic activity-based quota behavior.",
-                    emoji="<:suspensions:1234998406938755122>",
+                    emoji=f"{Emojis.suspensions}",
                 ),
                 discord.SelectOption(
                     label="Audit Log",
-                    emoji="<:Log:1349431938926252115>",
+                    emoji=f"{Emojis.log}",
                     description="Logs message quota resets.",
                 ),
             ]
@@ -47,7 +45,7 @@ class QuotaOptions(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -155,7 +153,7 @@ class IgnoredChannels(discord.ui.ChannelSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -214,15 +212,13 @@ class RoleQuotaCreation(discord.ui.View):
         super().__init__(timeout=None)
         self.author = author
 
-    @discord.ui.button(
-        emoji="<:Add:1163095623600447558>", style=discord.ButtonStyle.gray, row=2
-    )
+    @discord.ui.button(emoji=f"{Emojis.add}", style=discord.ButtonStyle.gray, row=2)
     async def Add(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -243,7 +239,7 @@ class RoleQuotaCreation(discord.ui.View):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -258,13 +254,13 @@ class RoleQuotaCreation(discord.ui.View):
             or "Roles" not in config["Message Quota"]
         ):
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there aren't any roles to delete.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there aren't any roles to delete.",
                 ephemeral=True,
             )
         roles = config["Message Quota"]["Roles"]
         if not roles:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there aren't any roles to delete.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there aren't any roles to delete.",
                 ephemeral=True,
             )
         options = [
@@ -298,7 +294,7 @@ class RoleQuotaSelect(discord.ui.RoleSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -323,7 +319,7 @@ class RoleQuotaModal(discord.ui.Modal):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -333,7 +329,7 @@ class RoleQuotaModal(discord.ui.Modal):
             int(self.RoleQuota.value)
         except (ValueError, TypeError):
             return await interaction.followup.send(
-                content=f"{redx} **{interaction.user.display_name},** please enter a valid number.",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** please enter a valid number.",
                 ephemeral=True,
             )
 
@@ -361,7 +357,7 @@ class RoleQuotaModal(discord.ui.Modal):
         )
         await interaction.response.edit_message(
             view=None,
-            content=f"{tick} **{interaction.user.display_name},** successfully added the role quota.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully added the role quota.",
             embed=None,
         )
 
@@ -388,7 +384,7 @@ class RoleQuotaDelete(discord.ui.Select):
             or "Roles" not in config["Message Quota"]
         ):
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there aren't any roles to delete."
+                content=f"{Emojis.no} **{interaction.user.display_name},** there aren't any roles to delete."
             )
 
         roles = config["Message Quota"]["Roles"]
@@ -400,7 +396,7 @@ class RoleQuotaDelete(discord.ui.Select):
         )
         await interaction.edit_original_response(
             view=None,
-            content=f"{tick} **{interaction.user.display_name},** successfully deleted the role quota.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully deleted the role quota.",
             embed=None,
         )
 
@@ -426,7 +422,7 @@ class MessageQuota(discord.ui.Modal, title="Message Quota"):
             int(self.Quota.value)
         except (ValueError, TypeError):
             return await interaction.followup.send(
-                content=f"{redx} **{interaction.user.display_name},** please enter a valid number.",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** please enter a valid number.",
                 ephemeral=True,
             )
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
@@ -459,11 +455,9 @@ class AutoActivity(discord.ui.Select):
         self.author = author
 
         options = [
-            discord.SelectOption(label="Toggle", emoji="<:Button:1223063359184830494>"),
-            discord.SelectOption(label="Channel", emoji="<:tag:1234998802948034721>"),
-            discord.SelectOption(
-                label="Post Date", emoji="<:time:1158064756104630294>"
-            ),
+            discord.SelectOption(label="Toggle", emoji=f"{Emojis.button}"),
+            discord.SelectOption(label="Channel", emoji=f"{Emojis.tags}"),
+            discord.SelectOption(label="Post Date", emoji=f"{Emojis.time}"),
         ]
         super().__init__(
             placeholder="Auto Activity", min_values=1, max_values=1, options=options
@@ -568,7 +562,7 @@ class PostDate(discord.ui.Modal, title="How often?"):
 
         if specified_day not in days:
             await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** invalid day specified. Please enter a valid day of the week.",
+                f"{Emojis.no} **{interaction.user.display_name},** invalid day specified. Please enter a valid day of the week.",
                 ephemeral=True,
             )
             return
@@ -640,7 +634,9 @@ class ActivityToggle(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         if color == "Enabled":
-            await interaction.followup.send(content=f"{tick} Enabled", ephemeral=True)
+            await interaction.followup.send(
+                content=f"{Emojis.tick} Enabled", ephemeral=True
+            )
             await interaction.client.db["auto activity"].update_one(
                 {"guild_id": interaction.guild.id},
                 {"$set": {"enabled": True}},
@@ -648,7 +644,9 @@ class ActivityToggle(discord.ui.Select):
             )
 
         if color == "Disabled":
-            await interaction.followup.send(content=f"{no} Disabled", ephemeral=True)
+            await interaction.followup.send(
+                content=f"{Emojis.no} Disabled", ephemeral=True
+            )
             await interaction.client.db["auto activity"].update_one(
                 {"guild_id": interaction.guild.id},
                 {"$set": {"enabled": False}},
@@ -677,8 +675,8 @@ async def MessageQuotaEmbed(
     )
     embed.description = "> This is where you can manage your server's message quota! You can find out more at [the documentation](https://docs.astrobirb.dev).\n"
     embed.add_field(
-        name="<:settings:1207368347931516928> Message Quota",
-        value=f"{replytop} `Quota:` {Config.get('Message Quota', {}).get('quota', 'Not Configured')}\n{replybottom} `Ignored Channels:` {IgnoredChannels}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
+        name=f"{Emojis.settings_gear} Message Quota",
+        value=f"{Emojis.replytop} `Quota:` {Config.get('Message Quota', {}).get('quota', 'Not Configured')}\n{Emojis.replybottom} `Ignored Channels:` {IgnoredChannels}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
         inline=False,
     )
     return embed

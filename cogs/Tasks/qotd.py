@@ -106,7 +106,7 @@ class qotd(commands.Cog):
                     f"<@&{results.get('pingrole')}>" if results.get("pingrole") else ""
                 )
                 embed = discord.Embed(
-                    title="<:Tip:1223062864793702431> Question of the Day",
+                    title=f"{Emojis.tip} Question of the Day",
                     description=f"{question}",
                     color=discord.Color.yellow(),
                     timestamp=datetime.datetime.utcnow(),

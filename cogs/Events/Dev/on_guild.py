@@ -45,7 +45,7 @@ class GuildJoins(commands.Cog):
 
         try:
             embed = discord.Embed(
-                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{tick}' if blacklist else f'{no}'}",
+                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{Emojis.tick}' if blacklist else f'{Emojis.no}'}",
                 color=discord.Color.dark_embed(),
                 timestamp=datetime.utcnow(),
             )
@@ -75,7 +75,7 @@ class GuildJoins(commands.Cog):
             )
             try:
                 await webhook.send(
-                    f"<:join:1140670830792159373> I am now in {len(self.client.guilds)} guilds.",
+                    f"{Emojis.join} I am now in {len(self.client.guilds)} guilds.",
                     username=guild.name,
                     avatar_url=guild.icon,
                 )
@@ -92,7 +92,7 @@ class GuildJoins(commands.Cog):
                 if inviter:
                     try:
                         await inviter.send(
-                            f"🎉 Thank you for adding **Birb** to your server. To get started run </config:1140463441136586784>!\n<:ArrowDropDown:1163171628050563153> Guild `#{len(self.client.guilds)}`"
+                            f"🎉 Thank you for adding **Birb** to your server. To get started run </config:1140463441136586784>!\n{Emojis.dropdown} Guild `#{len(self.client.guilds)}`"
                         )
                     except discord.Forbidden:
                         logger.warning(
@@ -112,7 +112,7 @@ class GuildJoins(commands.Cog):
         )
         try:
             embed = discord.Embed(
-                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{tick}' if blacklist else f'{no}'}",
+                description=f"**Owner:** <@{guild.owner_id}>\n**Guild ID** {guild.id}\n**Members:** {guild.member_count}\n**Created:** <t:{guild.created_at.timestamp():.0f}:F>\n**Blacklisted:** {f'{Emojis.tick}' if blacklist else f'{Emojis.no}'}",
                 color=discord.Color.dark_embed(),
                 timestamp=datetime.utcnow(),
             )

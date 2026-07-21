@@ -1,10 +1,12 @@
-import discord
-from discord.ext import commands
-from core.bot import Paginator
+import os
+from datetime import timedelta, datetime
 from typing import NamedTuple, Optional, Union, Callable, Awaitable, Any
 
-from datetime import timedelta, datetime
-import os
+import discord
+from discord.ext import commands
+
+from core.bot import Paginator
+from core.bot.emojis import Emojis
 
 
 def DefaultTypes():
@@ -69,25 +71,25 @@ def CommandType(
 async def PaginatorButtons(extra: list = None):
     Sep = IsSeperateBot()
     emojis = {
-        "first": "<:chevronsleft:1220806428726661130>",
-        "previous": "<:chevronleft:1220806425140531321>",
-        "next": "<:chevronright:1220806430010118175>",
-        "last": "<:chevronsright:1220806426583371866>",
+        "first": f"{Emojis.chevrons_left}",
+        "previous": f"{Emojis.chevron_left}",
+        "next": f"{Emojis.chevron_right}",
+        "last": f"{Emojis.chevrons_right}",
     }
     paginator = Paginator.Simple(
-        PreviousButton=bot.ui.Button(
+        PreviousButton=discord.ui.Button(
             emoji=emojis["previous"] if not Sep else None,
             label="<<" if Sep else None,
         ),
-        NextButton=bot.ui.Button(
+        NextButton=discord.ui.Button(
             emoji=emojis["next"] if not Sep else None,
             label=">>" if Sep else None,
         ),
-        FirstEmbedButton=bot.ui.Button(
+        FirstEmbedButton=discord.ui.Button(
             emoji=emojis["first"] if not Sep else None,
             label="<<" if Sep else None,
         ),
-        LastEmbedButton=bot.ui.Button(
+        LastEmbedButton=discord.ui.Button(
             emoji=emojis["last"] if not Sep else None,
             label=">>" if Sep else None,
         ),

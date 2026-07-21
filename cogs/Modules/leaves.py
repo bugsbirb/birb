@@ -106,7 +106,7 @@ class LOAModule(commands.Cog):
 
         if len(LOA) == 0:
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, there haven't been any LOAs yet."
+                content=f"{Emojis.no} **{ctx.author.display_name}**, there haven't been any LOAs yet."
             )
 
             return
@@ -153,7 +153,7 @@ class LOAModule(commands.Cog):
 
         if len(LOA) == 0:
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, there aren't any active LOAs."
+                content=f"{Emojis.no} **{ctx.author.display_name}**, there aren't any active LOAs."
             )
 
             return
@@ -200,7 +200,7 @@ class LOAModule(commands.Cog):
 
         if len(LOA) == 0:
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, there aren't any pending LOAs."
+                content=f"{Emojis.no} **{ctx.author.display_name}**, there aren't any pending LOAs."
             )
             return
 
@@ -260,7 +260,7 @@ class LOAModule(commands.Cog):
         )
         if LOA or Also:
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name},** you already have an active LOA. Please end it before requesting a new one."
+                content=f"{Emojis.no} **{ctx.author.display_name},** you already have an active LOA. Please end it before requesting a new one."
             )
             return
 
@@ -272,7 +272,7 @@ class LOAModule(commands.Cog):
                 Start = await TimeReformat(start)
                 if Start is None:
                     await ctx.send(
-                        content=f"{no} **{ctx.author.display_name}**, invalid start time format. (example: 2023-01-01 or 2d = 2 days from now)"
+                        content=f"{Emojis.no} **{ctx.author.display_name}**, invalid start time format. (example: 2023-01-01 or 2d = 2 days from now)"
                     )
                     return
             else:
@@ -281,35 +281,35 @@ class LOAModule(commands.Cog):
             Duration = await TimeReformat(duration, DifferentNow=Start)
         except (ValueError, TypeError, AttributeError):
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, invalid duration format. (example: 2d = 2 days, 2m = 2 minutes and etc)"
+                content=f"{Emojis.no} **{ctx.author.display_name}**, invalid duration format. (example: 2d = 2 days, 2m = 2 minutes and etc)"
             )
             return
         except OverflowError:
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, the duration is too long."
+                content=f"{Emojis.no} **{ctx.author.display_name}**, the duration is too long."
             )
             return
 
         if Duration < datetime.now():
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, your LOA can't be in the past. On a real note, how did you even manage this?"
+                content=f"{Emojis.no} **{ctx.author.display_name}**, your LOA can't be in the past. On a real note, how did you even manage this?"
             )
             return
 
         if Duration > datetime.now() + timedelta(days=1000):
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name}**, your LOA is wayyy too long."
+                content=f"{Emojis.no} **{ctx.author.display_name}**, your LOA is wayyy too long."
             )
             return
         if Duration < datetime.now() + timedelta(days=1):
             await ctx.send(
-                content=f"{no} **{ctx.author.display_name},** your LOA must atleast be a day long."
+                content=f"{Emojis.no} **{ctx.author.display_name},** your LOA must atleast be a day long."
             )
             return
 
         C = await EnsureConfig(ctx, "LOA")
         MSG = await ctx.send(
-            f"<a:Loading:1167074303905386587> **{ctx.author.display_name},** requesting LOA..."
+            f"{Emojis.loading} **{ctx.author.display_name},** requesting LOA..."
         )
         if not C.get("LOA", {}).get("channel"):
             await MSG.edit(
@@ -380,14 +380,14 @@ class LOAModule(commands.Cog):
         try:
             await MSG.edit(
                 content=(
-                    f"{tick} **{ctx.author.display_name},** loa requested. Please wait for a staff member to accept it."
+                    f"{Emojis.tick} **{ctx.author.display_name},** loa requested. Please wait for a staff member to accept it."
                 ),
                 embed=None,
             )
         except (discord.HTTPException, discord.Forbidden):
             await ctx.send(
                 content=(
-                    f"{tick} **{ctx.author.display_name},** loa requested. Please wait for a staff member to accept it."
+                    f"{Emojis.tick} **{ctx.author.display_name},** loa requested. Please wait for a staff member to accept it."
                 ),
                 embed=None,
             )
@@ -550,11 +550,11 @@ class LOAManage(discord.ui.View):
         )
         if not RequestLOA:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, you have no current active request."
+                content=f"{Emojis.no} **{interaction.user.display_name}**, you have no current active request."
             )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** successfully cancelled the leave request.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully cancelled the leave request.",
             view=None,
             embed=None,
         )
@@ -651,9 +651,9 @@ class LOAManage(discord.ui.View):
 
         await interaction.edit_original_response(
             content=(
-                f"{tick} **{interaction.user.display_name}**, I've ended `@{self.target.name}'s` LOA."
+                f"{Emojis.tick} **{interaction.user.display_name}**, I've ended `@{self.target.name}'s` LOA."
                 if self.target == self.author
-                else f"{tick} **{interaction.user.display_name}**, I've ended your LOA."
+                else f"{Emojis.tick} **{interaction.user.display_name}**, I've ended your LOA."
             ),
             embed=None,
             view=None,
@@ -786,9 +786,9 @@ class RemoveTime(discord.ui.Modal):
 
         await interaction.followup.send(
             content=(
-                f"{tick} **{interaction.user.display_name}**, I've removed `{self.duration.value}` from `@{self.target.name}'s` LOA."
+                f"{Emojis.tick} **{interaction.user.display_name}**, I've removed `{self.duration.value}` from `@{self.target.name}'s` LOA."
                 if self.target == self.author
-                else f"{tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to your LOA."
+                else f"{Emojis.tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to your LOA."
             ),
             ephemeral=True,
         )
@@ -935,7 +935,7 @@ class AddTime(discord.ui.Modal):
             )
             interaction.client.dispatch("leave_ext_request", Z.inserted_id)
             await interaction.followup.send(
-                content=f"{tick} **{interaction.user.display_name}**, I've requested an extension for `{self.duration.value}` on your LOA.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, I've requested an extension for `{self.duration.value}` on your LOA.",
                 ephemeral=True,
             )
             return
@@ -1000,9 +1000,9 @@ class AddTime(discord.ui.Modal):
             )
             await interaction.followup.send(
                 content=(
-                    f"{tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to `@{self.target.name}'s` LOA."
+                    f"{Emojis.tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to `@{self.target.name}'s` LOA."
                     if self.target == self.author
-                    else f"{tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to your LOA."
+                    else f"{Emojis.tick} **{interaction.user.display_name}**, I've added `{self.duration.value}` to your LOA."
                 ),
                 ephemeral=True,
             )
@@ -1107,7 +1107,7 @@ class CreateLOA(discord.ui.Modal):
         interaction.client.dispatch("leave_create", LOA.inserted_id)
 
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name}**, the LOA has been created.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, the LOA has been created.",
             embed=None,
             view=None,
         )
@@ -1172,7 +1172,7 @@ class PendingActions(discord.ui.View):
         )
         await interaction.edit_original_response(
             content=(
-                f"{tick} **{interaction.user.display_name}**, I've accepted `@{LOA.get('ExtendedUser', {}).get('name', 'N/A')}'s` LOA."
+                f"{Emojis.tick} **{interaction.user.display_name}**, I've accepted `@{LOA.get('ExtendedUser', {}).get('name', 'N/A')}'s` LOA."
             ),
             view=None,
             embed=None,
@@ -1234,7 +1234,7 @@ class PendingActions(discord.ui.View):
         )
         await interaction.edit_original_response(
             content=(
-                f"{tick} **{interaction.user.display_name}**, I've declined `@{LOA.get('ExtendedUser', {}).get('name', 'N/A')}'s` LOA."
+                f"{Emojis.tick} **{interaction.user.display_name}**, I've declined `@{LOA.get('ExtendedUser', {}).get('name', 'N/A')}'s` LOA."
             ),
             view=None,
             embed=None,

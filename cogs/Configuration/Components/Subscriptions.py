@@ -1,5 +1,3 @@
-import discord
-
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 
@@ -11,7 +9,7 @@ class PremiumButtons(discord.ui.View):
 
     @discord.ui.button(
         label="Upgrade Server",
-        emoji="<:sparkle:1233931758089666695>",
+        emoji=f"{Emojis.sparkle}",
         style=discord.ButtonStyle.blurple,
         row=0,
     )
@@ -34,14 +32,14 @@ class PremiumButtons(discord.ui.View):
 
         if len(guilds) >= tokens:
             embed = discord.Embed(
-                description=f"{redx} **You have reached your premium server limit ({tokens}).**",
+                description=f"{Emojis.tick} **You have reached your premium server limit ({tokens}).**",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
 
         if interaction.guild.id in guilds:
             embed = discord.Embed(
-                description=f"{redx} **This server is already activated for premium.**",
+                description=f"{Emojis.tick} **This server is already activated for premium.**",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)

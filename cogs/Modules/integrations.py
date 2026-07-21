@@ -168,24 +168,24 @@ class Link(commands.Cog):
         group = c.get("groups", {}).get("id", None) if c else None
         if not (group, c):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** a group hasn't been linked.",
+                f"{Emojis.no} **{ctx.author.display_name},** a group hasn't been linked.",
                 ephemeral=True,
             )
         RobloxUser = await FetchRobloxUser(roblox)
         if not RobloxUser:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** I couldn't find this user.",
+                f"{Emojis.no} **{ctx.author.display_name},** I couldn't find this user.",
                 ephemeral=True,
             )
         Request = await GetRequest(group, RobloxUser[0].get("id"), ctx.author)
         if not Request:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** this user doesn't have a request.",
+                f"{Emojis.no} **{ctx.author.display_name},** this user doesn't have a request.",
                 ephemeral=True,
             )
         if Request == 403:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** please relink your account. There is a missing scope.",
+                f"{Emojis.no} **{ctx.author.display_name},** please relink your account. There is a missing scope.",
                 ephemeral=True,
             )
 
@@ -194,11 +194,11 @@ class Link(commands.Cog):
         request = await AcceptRequest(group, join_request_id, user=ctx.author)
         if not request:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** you couldn't accept this request. Make sure you have permission to do this.",
+                f"{Emojis.no} **{ctx.author.display_name},** you couldn't accept this request. Make sure you have permission to do this.",
                 ephemeral=True,
             )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** sucessfully accepted the request."
+            f"{Emojis.tick} **{ctx.author.display_name},** sucessfully accepted the request."
         )
 
     @requests.command(description="Reject a group join request.")
@@ -232,24 +232,24 @@ class Link(commands.Cog):
         group = c.get("groups", {}).get("id", None) if c else None
         if not (group, c):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** a group hasn't been linked.",
+                f"{Emojis.no} **{ctx.author.display_name},** a group hasn't been linked.",
                 ephemeral=True,
             )
         RobloxUser = await FetchRobloxUser(roblox)
         if not RobloxUser:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** I couldn't find this user.",
+                f"{Emojis.no} **{ctx.author.display_name},** I couldn't find this user.",
                 ephemeral=True,
             )
         Request = await GetRequest(group, RobloxUser[0].get("id"), ctx.author)
         if not Request:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** this user doesn't have a request.",
+                f"{Emojis.no} **{ctx.author.display_name},** this user doesn't have a request.",
                 ephemeral=True,
             )
         if Request == 403:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** please relink your account. There is a missing scope.",
+                f"{Emojis.no} **{ctx.author.display_name},** please relink your account. There is a missing scope.",
                 ephemeral=True,
             )
 
@@ -258,11 +258,11 @@ class Link(commands.Cog):
         request = await RejectRequest(group, join_request_id, user=ctx.author)
         if not request:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** you couldn't accept this request. Make sure you have permission to do this.",
+                f"{Emojis.no} **{ctx.author.display_name},** you couldn't accept this request. Make sure you have permission to do this.",
                 ephemeral=True,
             )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** sucessfully denied the request."
+            f"{Emojis.tick} **{ctx.author.display_name},** sucessfully denied the request."
         )
 
     @membership.command(description="Update a users group roles.")
@@ -286,18 +286,18 @@ class Link(commands.Cog):
         if Roles == 1:
 
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** you don't have access to the groups roles.",
+                f"{Emojis.no} **{ctx.author.display_name},** you don't have access to the groups roles.",
                 ephemeral=True,
             )
         if Roles == 2:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** a group hasn't been linked.",
+                f"{Emojis.no} **{ctx.author.display_name},** a group hasn't been linked.",
                 ephemeral=True,
             )
         RobloxUser = await FetchRobloxUser(roblox)
         if not RobloxUser:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** I couldn't find this user.",
+                f"{Emojis.no} **{ctx.author.display_name},** I couldn't find this user.",
                 ephemeral=True,
             )
         update = await UpdateMembership(
@@ -305,15 +305,15 @@ class Link(commands.Cog):
         )
         if update == 401:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** you don't have permission to update this user to that role. Make sure you actually have permission to do this.",
+                f"{Emojis.no} **{ctx.author.display_name},** you don't have permission to update this user to that role. Make sure you actually have permission to do this.",
                 ephemeral=True,
             )
         elif update != 200:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name},** internal error. HTTP CODE: {update}",
+                f"{Emojis.no} **{ctx.author.display_name},** internal error. HTTP CODE: {update}",
             )
         await ctx.send(
-            f"{tick} **{ctx.author.name},** successfully updated members role."
+            f"{Emojis.tick} **{ctx.author.name},** successfully updated members role."
         )
 
     @integrations.command(
@@ -348,7 +348,7 @@ class Link(commands.Cog):
                 return
             if not view.value:
                 return await interaction.followup.send(
-                    f"{tick} cancelled.", ephemeral=True
+                    f"{Emojis.tick} cancelled.", ephemeral=True
                 )
 
         await self.client.db["Pending"].update_one(

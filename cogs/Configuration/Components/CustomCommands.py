@@ -1,7 +1,5 @@
 import logging
 
-import discord
-
 from cogs.Modules.commands import SyncCommand, Unsync
 from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
 from core.bot.emojis import *
@@ -15,7 +13,7 @@ class CustomCommands(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Manage Commands", emoji="<:command1:1223062616872583289>"
+                    label="Manage Commands", emoji=f"{Emojis.command}"
                 ),
             ]
         )
@@ -52,8 +50,8 @@ class CustomCommands(discord.ui.Select):
                 else:
                     Required = "None"
                 embed.add_field(
-                    name=f"<:command1:1223062616872583289> {commands.get('name')}",
-                    value=f">>> {replytop} **Required:** {Required}\n{replybottom} **Created:** <@{commands.get('creator')}> (`{commands.get('creator')}`)",
+                    name=f"{Emojis.command} {commands.get('name')}",
+                    value=f">>> {Emojis.replytop} **Required:** {Required}\n{Emojis.replybottom} **Created:** <@{commands.get('creator')}> (`{commands.get('creator')}`)",
                     inline=False,
                 )
                 if 20 <= len(embed.fields):
@@ -77,7 +75,7 @@ class ManageCommands(discord.ui.View):
         super().__init__(timeout=360)
         self.author = author
 
-    @discord.ui.button(label="Create", emoji="<:Add:1163095623600447558>")
+    @discord.ui.button(label="Create", emoji=f"{Emojis.add}")
     async def CreateCommand(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -99,7 +97,7 @@ class ManageCommands(discord.ui.View):
 
         await interaction.response.send_modal(CreateCommand(interaction.user))
 
-    @discord.ui.button(label="Edit", emoji="<:Pen:1235001839036923996>")
+    @discord.ui.button(label="Edit", emoji=f"{Emojis.pen}")
     async def EditCommand(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -132,7 +130,7 @@ class ManageCommands(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no custom commands.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no custom commands.",
                 ephemeral=True,
             )
         view = discord.ui.View()
@@ -171,7 +169,7 @@ class ManageCommands(discord.ui.View):
                 continue
         if len(Options) == 0:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no custom commands.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no custom commands.",
                 ephemeral=True,
             )
         view = discord.ui.View()
@@ -246,7 +244,7 @@ class CommandSelection(discord.ui.Select):
             )
             await Unsync(interaction.client, self.values[0], interaction.guild.id)
             await interaction.response.edit_message(
-                content=f"{no} **{interaction.user.display_name},** I've deleted the command.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** I've deleted the command.",
                 view=None,
                 embed=None,
             )
@@ -267,7 +265,7 @@ class CreateCommand(discord.ui.Modal, title="Create Command"):
         )
         if command:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** theres already a command named that.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** theres already a command named that.",
                 ephemeral=True,
             )
         from cogs.Configuration.Components.EmbedBuilder import NoEmbed
@@ -340,7 +338,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
     await SyncCommand(interaction.client, datad.get("name"), interaction.guild.id)
 
     await interaction.response.edit_message(
-        content=f"{tick} **{interaction.user.display_name},** success.",
+        content=f"{Emojis.tick} **{interaction.user.display_name},** success.",
         view=None,
         embed=None,
     )

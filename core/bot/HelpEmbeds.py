@@ -1,6 +1,8 @@
 import discord
 from sentry_sdk import metrics
 
+from core.bot.emojis import Emojis
+
 
 class Support(discord.ui.View):
     def __init__(self):
@@ -11,7 +13,7 @@ class Support(discord.ui.View):
                 label="Support Server",
                 url=url1,
                 style=discord.ButtonStyle.blurple,
-                emoji="<:link:1206670134064717904>",
+                emoji=f"{Emojis.link}",
             )
         )
         self.add_item(
@@ -29,7 +31,7 @@ def NotRobloxLinked():
         description="```\nYour Roblox account is not linked.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Use the `/integrations link` command to link your Roblox account.",
     )
 
@@ -39,7 +41,7 @@ def NoPermission(permission: str):
         description=f"```\nThis command requires {permission.lower()} permissions.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value=f"> 1. Make sure you have permissions configured in </config:1140463441136586784> `>` Permissions.\n> 2. Make sure you have the role that fits in the category `{permission.lower()}.`",
     )
 
@@ -49,7 +51,7 @@ def NoSetupPermissions():
         description=f"```\nPermissiosn are not setup.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value=f"> 1. Make sure you have permissions configured in </config:1140463441136586784> `>` Permissions.\n> 2. Make sure you have the role that this command requires.`",
     )
 
@@ -59,7 +61,7 @@ def NoAdvancedPermission():
         description=f"```\nThis command requires advanced permissions.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value=f"> 1. Make sure you have permissions configured in </config:1140463441136586784> `>` Permissions.\n> 2. Make sure you have the role that this command requires..`",
     )
 
@@ -69,7 +71,7 @@ def ChannelNotFound():
         description="```\nI couldn't find the channel for this.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Head to </config:1140463441136586784> and make sure to go to the module and set the channel.\n> 2. Ensure I have permission to access that channel (`View Channel, Read Messages, Send Messages`).",
     )
 
@@ -85,7 +87,7 @@ def NoPermissionChannel(channel: discord.TextChannel):
         description=f"```\nI don't have permission to send messages in <#{channel.id}>.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Ensure I have permission to send messages in that channel.\n> 2. Check that I have the required permissions (`View Channel, Read Messages, Send Messages`).",
     )
 
@@ -96,7 +98,7 @@ def NoPremium():
         description="```\nThis feature is only available for premium servers.\n```",
         color=discord.Color.blurple(),
     ).add_field(
-        name="<:Premium:1250160559203287080> Premium",
+        name=f"{Emojis.premium} Premium",
         value="> If you already have premium go to /config → Subscriptions and activate your server.\n-# If you have premium and your subscription isn't showing up run /patreon.",
     )
 
@@ -120,7 +122,7 @@ def NoChannelSet():
         description="```\nNo channel has been set for this module.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Head to </config:1140463441136586784> and make sure to go to the module and set the channel.",
     )
 
@@ -130,7 +132,7 @@ def ModuleNotEnabled():
         description="```\nThis module hasn't been enabled yet.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Head to </config:1140463441136586784> and go to the Modules section to find the module.\n> 2. Select the module, and then go back to the config menu.\n> 3. You should be able to see it, and now you can configure it to suit your needs.",
     )
 
@@ -140,7 +142,7 @@ def BotNotConfigured():
         description="```\nI haven't been configured yet.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Run the `/config` command to configure me.",
     )
 
@@ -150,6 +152,6 @@ def ModuleNotSetup():
         description="```\nThis module hasn't been set up yet.\n```",
         color=discord.Color.brand_red(),
     ).add_field(
-        name="<:Help:1184535847513624586> How To Fix",
+        name=f"{Emojis.help} How To Fix",
         value="> 1. Run the `/config` command to set up the module.",
     )

@@ -34,7 +34,7 @@ class Tree(app_commands.CommandTree):
                         color=discord.Color.brand_red(),
                         description="```\nApplication command 'promote' not found\n```",
                     ).add_field(
-                        name="<:Help:1184535847513624586> How To Fix",
+                        name=f"{Emojis.help} How To Fix",
                         value=(
                             f"> 1. Wait a bit; the bot may be loading commands. "
                             f"(Started: <t:{int(self.client.launch_time.timestamp())}:R>)\n"
@@ -155,7 +155,7 @@ class On_error(commands.Cog):
                 return
             if isinstance(error, commands.NoPrivateMessage):
                 await interaction.send(
-                    f"{no} **{interaction.author.display_name},** I can't execute commands in DMs. Please use me in a server.",
+                    f"{Emojis.no} **{interaction.author.display_name},** I can't execute commands in DMs. Please use me in a server.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -169,7 +169,7 @@ class On_error(commands.Cog):
                 return
             if isinstance(error, commands.BadLiteralArgument):
                 await interaction.send(
-                    f"{no} **{interaction.author.display_name}**, you have used an invalid argument.",
+                    f"{Emojis.no} **{interaction.author.display_name}**, you have used an invalid argument.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -179,7 +179,7 @@ class On_error(commands.Cog):
                 return
             if isinstance(error, commands.MemberNotFound):
                 await interaction.send(
-                    f"{no} **{interaction.author.display_name}**, that member isn't in the server.",
+                    f"{Emojis.no} **{interaction.author.display_name}**, that member isn't in the server.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -191,7 +191,7 @@ class On_error(commands.Cog):
                 return
             if isinstance(error, commands.MissingRequiredArgument):
                 await interaction.send(
-                    f"{no} **{interaction.author.display_name}**, you are missing a requirement.",
+                    f"{Emojis.no} **{interaction.author.display_name}**, you are missing a requirement.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -244,7 +244,7 @@ class On_error(commands.Cog):
                 )
             )
             embed = discord.Embed(
-                title="<:x21:1214614676772626522> Command Error",
+                title=f"{Emojis.x21} Command Error",
                 description=f"Error ID: `{error_id}`\n-# We can't fix bugs without you, please report this to our support services.",
                 color=discord.Color.brand_red(),
             )

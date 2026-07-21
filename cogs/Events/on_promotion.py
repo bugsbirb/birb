@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from core.bot.CustomEmbed import DisplayEmbed
 from core.bot.Variables import Variables
+from core.bot.emojis import Emojis
 from core.bot.permissions import premium
 from datamodels.Promotions import PromotionItem
 
@@ -136,7 +137,7 @@ class on_promotion(commands.Cog):
             self.client, PromotionData, guild, staff, manager
         )
         if PromotionData:
-            promotion = Promotion(PromotionData)
+            promotion = PromotionItem(**PromotionData)
         if custom:
             replacements = await Variables.promotion(
                 staff=staff, promotion=promotion, manager=manager, guild=guild
@@ -243,7 +244,7 @@ class on_promotion(commands.Cog):
         self.client.dispatch("promotion_log", objectid, "create", manager)
         try:
             await staff.send(
-                content=f"<:SmallArrow:1140288951861649418>From **@{guild.name}**",
+                content=f"{Emojis.small_arrow}From **@{guild.name}**",
                 embed=embed,
             )
         except:
@@ -258,7 +259,7 @@ class PromotionIssuer(discord.ui.View):
         label=f"",
         style=discord.ButtonStyle.grey,
         disabled=True,
-        emoji="<:flag:1223062579346145402>",
+        emoji=f"{Emojis.flag}",
     )
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass

@@ -1,6 +1,5 @@
 import logging
 
-import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -36,7 +35,7 @@ class ConnectionRoles(commands.Cog):
         )
         if len(Roles) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no connection roles.",
+                f"{Emojis.no} **{ctx.author.display_name}**, there are no connection roles.",
             )
             return
         if not ctx.guild.chunked:
@@ -44,9 +43,7 @@ class ConnectionRoles(commands.Cog):
 
         Total = len(ctx.guild.members)
         Updated = 0
-        msg = await ctx.send(
-            "<a:astroloading:1245681595546079285> Syncing connection roles..."
-        )
+        msg = await ctx.send(f"{Emojis.loading_alt} Syncing connection roles...")
 
         for role in Roles:
             Child = ctx.guild.get_role(role["child"])
@@ -66,17 +63,17 @@ class ConnectionRoles(commands.Cog):
                                 )
                             except discord.Forbidden:
                                 await ctx.send(
-                                    f"{no} **{ctx.author.display_name}**, I don't have permission to add the role to {member.mention}.",
+                                    f"{Emojis.no} **{ctx.author.display_name}**, I don't have permission to add the role to {member.mention}.",
                                 )
                                 return
                             except discord.HTTPException:
                                 await ctx.send(
-                                    f"{no} **{ctx.author.display_name}**, An error occurred while adding the role to {member.mention}.",
+                                    f"{Emojis.no} **{ctx.author.display_name}**, An error occurred while adding the role to {member.mention}.",
                                 )
                                 return
 
                 await msg.edit(
-                    content=f"<a:astroloading:1245681595546079285> Syncing connection roles... {len(ctx.guild.members)}/{Total} members processed."
+                    content=f"{Emojis.loading_alt} Syncing connection roles... {len(ctx.guild.members)}/{Total} members processed."
                 )
 
     @connectionrole.command(
@@ -93,7 +90,7 @@ class ConnectionRoles(commands.Cog):
     ):
         if parent == child:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the parent and child roles cannot be the same.",
+                f"{Emojis.no} **{ctx.author.display_name}**, the parent and child roles cannot be the same.",
             )
             return
 
@@ -106,7 +103,7 @@ class ConnectionRoles(commands.Cog):
             }
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, the connection role has been added."
+            f"{Emojis.tick} **{ctx.author.display_name}**, the connection role has been added."
         )
 
     @connectionrole.command(
@@ -122,7 +119,7 @@ class ConnectionRoles(commands.Cog):
         )
         if result is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the connection role does not exist.",
+                f"{Emojis.no} **{ctx.author.display_name}**, the connection role does not exist.",
             )
             return
 
@@ -130,7 +127,7 @@ class ConnectionRoles(commands.Cog):
             {"guild": ctx.guild.id, "name": name}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, the connection role has been removed.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, the connection role has been removed.",
         )
 
     @connectionrole.command(
@@ -146,13 +143,13 @@ class ConnectionRoles(commands.Cog):
         )
         if len(result) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no connection roles.",
+                f"{Emojis.no} **{ctx.author.display_name}**, there are no connection roles.",
             )
             return
 
         msg = await ctx.send(
             embed=discord.Embed(
-                description="<a:astroloading:1245681595546079285>",
+                description=f"{Emojis.loading_alt}",
                 color=discord.Color.dark_embed(),
             )
         )
@@ -203,12 +200,12 @@ class ConnectionRoles(commands.Cog):
     async def SyncError(self, ctx: commands.Context, error):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can only use this command once every hour.",
+                f"{Emojis.no} **{ctx.author.display_name}**, you can only use this command once every hour.",
             )
             return
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n<:Arrow:1115743130461933599>**Required:** ``Manage Roles``",
+                f"{Emojis.no} **{ctx.author.display_name}**, you don't have permission to configure connection roles.\n{Emojis.arrow_alt}**Required:** ``Manage Roles``",
             )
 
 

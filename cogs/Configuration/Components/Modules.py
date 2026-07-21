@@ -1,6 +1,7 @@
 import discord
 
 from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import Emojis
 
 
 async def ModuleOptions(Config, data=None):
@@ -10,7 +11,7 @@ async def ModuleOptions(Config, data=None):
         discord.SelectOption(
             label="Infractions",
             description="",
-            emoji="<:Infraction:1223063128275943544>",
+            emoji=f"{Emojis.infractions}",
             value="infractions",
             default=(
                 Config.get("Modules", {}).get("infractions", False) or False
@@ -21,7 +22,7 @@ async def ModuleOptions(Config, data=None):
         discord.SelectOption(
             label="Promotions",
             description="",
-            emoji="<:Promotion:1234997026677198938>",
+            emoji=f"{Emojis.promotions}",
             value="promotions",
             default=(
                 Config.get("Modules", {}).get("promotions", False) or False
@@ -33,7 +34,7 @@ async def ModuleOptions(Config, data=None):
             label="Message Quota",
             description="",
             value="Quota",
-            emoji="<:messageQuota:1224722310687359106>",
+            emoji=f"{Emojis.message_quota}",
             default=(
                 Config.get("Modules", {}).get("Quota", False) or False
                 if not data
@@ -44,7 +45,7 @@ async def ModuleOptions(Config, data=None):
             label="Forums",
             description="",
             value="Forums",
-            emoji="<:forum:1223062562782838815>",
+            emoji=f"{Emojis.forum}",
             default=(
                 Config.get("Modules", {}).get("Forums", False) or False
                 if not data
@@ -53,7 +54,7 @@ async def ModuleOptions(Config, data=None):
         ),
         discord.SelectOption(
             label="Daily Questions",
-            emoji="<:qotd:1234994772796772432>",
+            emoji=f"{Emojis.qotd}",
             description="",
             value="QOTD",
             default=(
@@ -66,7 +67,7 @@ async def ModuleOptions(Config, data=None):
             label="Leave Of Absence",
             description="",
             value="LOA",
-            emoji="<:LOA:1223063170856390806>",
+            emoji=f"{Emojis.loa}",
             default=(
                 Config.get("Modules", {}).get("LOA", False) or False
                 if not data
@@ -77,7 +78,7 @@ async def ModuleOptions(Config, data=None):
             label="Suspensions",
             description="",
             value="suspensions",
-            emoji="<:suspensions:1234998406938755122>",
+            emoji=f"{Emojis.suspensions}",
             default=(
                 Config.get("Modules", {}).get("suspensions", False) or False
                 if not data
@@ -88,7 +89,7 @@ async def ModuleOptions(Config, data=None):
             label="Suggestions",
             description="",
             value="suggestions",
-            emoji="<:suggestion:1207370004379607090>",
+            emoji=f"{Emojis.suggestion}",
             default=(
                 Config.get("Modules", {}).get("suggestions", False) or False
                 if not data
@@ -99,7 +100,7 @@ async def ModuleOptions(Config, data=None):
             label="Tickets",
             description="",
             value="Tickets",
-            emoji="<:messagereceived:1201999712593383444>",
+            emoji=f"{Emojis.message_received}",
             default=(
                 Config.get("Modules", {}).get("Tickets", False) or False
                 if not data
@@ -110,7 +111,7 @@ async def ModuleOptions(Config, data=None):
             label="Modmail",
             description="",
             value="Modmail",
-            emoji="<:messagereceived:1201999712593383444>",
+            emoji=f"{Emojis.message_received}",
             default=(
                 Config.get("Modules", {}).get("Modmail", False) or False
                 if not data
@@ -121,7 +122,7 @@ async def ModuleOptions(Config, data=None):
             label="Custom Commands",
             description="",
             value="customcommands",
-            emoji="<:command1:1223062616872583289>",
+            emoji=f"{Emojis.command}",
             default=(
                 Config.get("Modules", {}).get("customcommands", False) or False
                 if not data
@@ -132,7 +133,7 @@ async def ModuleOptions(Config, data=None):
             label="Staff List",
             description="",
             value="Staff List",
-            emoji="<:StaffList:1264584889727193159>",
+            emoji=f"{Emojis.staff_list}",
             default=(
                 Config.get("Modules", {}).get("Staff List", False) or False
                 if not data
@@ -143,7 +144,7 @@ async def ModuleOptions(Config, data=None):
             label="Staff Feedback",
             description="",
             value="Feedback",
-            emoji="<:stafffeedback:1235000485208002610>",
+            emoji=f"{Emojis.staff_feedback}",
             default=(
                 Config.get("Modules", {}).get("Feedback", False) or False
                 if not data
@@ -154,7 +155,7 @@ async def ModuleOptions(Config, data=None):
             label="Staff Panel",
             description="",
             value="Staff Database",
-            emoji="<:staffdb:1206253848298127370>",
+            emoji=f"{Emojis.staff_db}",
             default=(
                 Config.get("Modules", {}).get("Staff Database", False) or False
                 if not data
@@ -164,7 +165,7 @@ async def ModuleOptions(Config, data=None):
         discord.SelectOption(
             label="Auto Response",
             value="Auto Responder",
-            emoji="<:autoresponse:1250481563615887391>",
+            emoji=f"{Emojis.auto_response}",
             default=(
                 Config.get("Modules", {}).get("Auto Responder", False) or False
                 if not data
@@ -174,7 +175,7 @@ async def ModuleOptions(Config, data=None):
         discord.SelectOption(
             label="Connection Roles",
             value="connectionroles",
-            emoji="<:link:1206670134064717904>",
+            emoji=f"{Emojis.link}",
             default=(
                 Config.get("Modules", {}).get("connectionroles", False) or False
                 if not data

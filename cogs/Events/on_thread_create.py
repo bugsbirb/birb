@@ -78,47 +78,47 @@ class CloseLock(discord.ui.View):
     @discord.ui.button(
         label="Lock",
         style=discord.ButtonStyle.blurple,
-        emoji="<:close:1280576608125849731>",
+        emoji=f"{Emojis.close}",
     )
     async def lock(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await has_staff_role(interaction):
             return
         if not isinstance(interaction.channel, discord.Thread):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** This can only be used in a thread.",
+                f"{Emojis.no} **{interaction.user.display_name},** This can only be used in a thread.",
                 ephemeral=True,
             )
             return
         thread = interaction.channel
         if self.lock.label == "Lock":
             self.lock.label = "Unlock"
-            self.lock.emoji = "<:unlock:1280576824065396848>"
+            self.lock.emoji = f"{Emojis.unlock}"
             self.lock.style = discord.ButtonStyle.green
             await thread.edit(locked=True)
             await interaction.channel.send(
-                content=f"<:close:1280576608125849731> **@{interaction.user.display_name}**, has locked the thread."
+                content=f"{Emojis.close} **@{interaction.user.display_name}**, has locked the thread."
             )
         else:
             self.lock.label = "Lock"
-            self.lock.emoji = "<:close:1280576608125849731>"
+            self.lock.emoji = f"{Emojis.close}"
             self.lock.style = discord.ButtonStyle.blurple
             await interaction.channel.edit(locked=False)
             await interaction.channel.send(
-                content=f"<:unlock:1280576824065396848> **@{interaction.user.display_name}**, has unlocked the thread."
+                content=f"{Emojis.unlock} **@{interaction.user.display_name}**, has unlocked the thread."
             )
         await interaction.response.edit_message(view=self)
 
     @discord.ui.button(
         label="Close",
         style=discord.ButtonStyle.red,
-        emoji="<:close:1280577170233753650>",
+        emoji=f"{Emojis.close}",
     )
     async def Close(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await has_staff_role(interaction):
             return
         if not isinstance(interaction.channel, discord.Thread):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** This can only be used in a thread.",
+                f"{Emojis.no} **{interaction.user.display_name},** This can only be used in a thread.",
                 ephemeral=True,
             )
             return
@@ -127,20 +127,20 @@ class CloseLock(discord.ui.View):
         if self.Close.label == "Close":
             await thread.edit(archived=True)
             self.Close.label = "Reopen"
-            self.Close.emoji = "<:Add:1163095623600447558>"
+            self.Close.emoji = f"{Emojis.add}"
 
             await interaction.channel.send(
-                content=f"<:close:1280577170233753650> **@{interaction.user.display_name}**, has closed the thread.",
+                content=f"{Emojis.close} **@{interaction.user.display_name}**, has closed the thread.",
             )
 
             self.Close.style = discord.ButtonStyle.green
         else:
             await interaction.channel.edit(archived=False)
             self.Close.label = "Close"
-            self.Close.emoji = "<:close:1280577170233753650>"
+            self.Close.emoji = f"{Emojis.close}"
 
             await interaction.channel.send(
-                content=f"<:Add:1163095623600447558> **@{interaction.user.display_name}**, has reopened the thread.",
+                content=f"{Emojis.add} **@{interaction.user.display_name}**, has reopened the thread.",
             )
             self.Close.style = discord.ButtonStyle.red
 

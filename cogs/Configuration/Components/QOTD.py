@@ -2,8 +2,6 @@ import io
 import re
 from datetime import datetime, timedelta
 
-import discord
-
 from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
 from core.bot.emojis import *
 from core.bot.permissions import premium
@@ -42,7 +40,7 @@ class QOTDOptions(discord.ui.Select):
             nextdate = datetime.now() + timedelta(days=1)
             timestamp = f"<t:{int(nextdate.timestamp())}>"
             embed = discord.Embed(
-                title=f"{greencheck} Enabled",
+                title=f"{Emojis.green_tick} Enabled",
                 description=f"> **Next Post Date:** {timestamp}",
                 color=discord.Color.brand_green(),
             )
@@ -50,21 +48,17 @@ class QOTDOptions(discord.ui.Select):
             options = [
                 discord.SelectOption(
                     label="Stop QOTD",
-                    emoji="<:stop:1330484991414501418>",
+                    emoji=f"{Emojis.stop}",
                     description="End the daily questions.",
                 ),
-                discord.SelectOption(
-                    label="Channel", emoji="<:tag:1234998802948034721>"
-                ),
+                discord.SelectOption(label="Channel", emoji=f"{Emojis.tags}"),
                 discord.SelectOption(
                     label="Webhook",
                     description="Send it as a webhook.",
-                    emoji="<:Webhook:1400197752339824821>",
+                    emoji=f"{Emojis.webhook}",
                 ),
-                discord.SelectOption(label="Ping", emoji="<:Ping:1298301862906298378>"),
-                discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
-                ),
+                discord.SelectOption(label="Ping", emoji=f"{Emojis.ping}"),
+                discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
             ]
             view = discord.ui.View()
             view.add_item(QOTDOptions(self.author, options))
@@ -128,7 +122,7 @@ class QOTDOptions(discord.ui.Select):
                 upsert=True,
             )
             embed = discord.Embed(
-                title=f"{redx} Disabled",
+                title=f"{Emojis.tick} Disabled",
                 description="> **QOTD has been disabled.**",
                 color=discord.Color.brand_red(),
             )
@@ -136,21 +130,17 @@ class QOTDOptions(discord.ui.Select):
             options = [
                 discord.SelectOption(
                     label="Start QOTD",
-                    emoji="<:start:1299717567660687371>",
+                    emoji=f"{Emojis.start}",
                     description="Start the daily questions. (Pressing this while its already started will restart it.)",
                 ),
-                discord.SelectOption(
-                    label="Channel", emoji="<:tag:1234998802948034721>"
-                ),
+                discord.SelectOption(label="Channel", emoji=f"{Emojis.tags}"),
                 discord.SelectOption(
                     label="Webhook",
                     description="Send it as a webhook.",
-                    emoji="<:Webhook:1400197752339824821>",
+                    emoji=f"{Emojis.webhook}",
                 ),
-                discord.SelectOption(label="Ping", emoji="<:Ping:1298301862906298378>"),
-                discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
-                ),
+                discord.SelectOption(label="Ping", emoji=f"{Emojis.ping}"),
+                discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
             ]
 
             view = discord.ui.View()
@@ -278,7 +268,7 @@ class DeleteQuestion(discord.ui.Modal):
         )
         if result.deleted_count == 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name}**, no question matched that exact text.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, no question matched that exact text.",
                 ephemeral=True,
             )
 
@@ -426,7 +416,7 @@ class QOTDChannel(discord.ui.ChannelSelect):
             )
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** channel has been updated.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** channel has been updated.",
             view=None,
             embed=None,
         )
@@ -509,7 +499,7 @@ class WebhookDesign(discord.ui.Modal):
         pattern = r"^https?://.*\.(png|jpg|jpeg|gif|webp)(\?.*)?$"
         if not re.match(pattern, AV, re.IGNORECASE):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -608,8 +598,8 @@ async def WebhookEmbed(interaction: discord.Interaction, Config: dict):
     username = WebhookSettings.get("Username", None) or "Not Set"
     avatar = WebhookSettings.get("Avatar", None) or "Not Set"
     embed.add_field(
-        name="<:Webhook:1400197752339824821> Webhook Settings",
-        value=f"> {replytop} **Enabled:** {'True' if enabled else 'False'}\n> {replymiddle} **Username:** {username}\n> {replybottom} **Avatar:** {avatar}",
+        name=f"{Emojis.webhook} Webhook Settings",
+        value=f"> {Emojis.replytop} **Enabled:** {'True' if enabled else 'False'}\n> {Emojis.replymiddle} **Username:** {username}\n> {Emojis.replybottom} **Avatar:** {avatar}",
     )
     return embed
 
@@ -640,8 +630,8 @@ async def QOTDEMbed(interaction: discord.Interaction, embed: discord.Embed):
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's QOTD settings! QOTD is a way for members to answer a question of the day. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Daily Questions",
-        value=f"{replytop} `Channel:` {channel}\n{replymiddle} `Ping`: {ping}\n{replybottom} `Next Date:` {NextDate}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
+        name=f"{Emojis.settings_gear} Daily Questions",
+        value=f"{Emojis.replytop} `Channel:` {channel}\n{Emojis.replymiddle} `Ping`: {ping}\n{Emojis.replybottom} `Next Date:` {NextDate}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
         inline=False,
     )
     return embed

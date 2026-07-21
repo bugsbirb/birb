@@ -9,6 +9,7 @@ from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 from core.bot.CustomEmbed import DisplayEmbed
 from core.bot.Variables import Variables
+from core.bot.emojis import Emojis
 from core.bot.permissions import premium
 from datamodels.Infractions import InfractionItem
 
@@ -306,7 +307,7 @@ class on_infractions(commands.Cog):
         if Settings.get("Module Options", {}).get("Direct Message", True):
             try:
                 await staff.send(
-                    content=f"<:SmallArrow:1140288951861649418>From  **{guild.name}**",
+                    content=f"{Emojis.small_arrow}From  **{guild.name}**",
                     embed=embed,
                 )
             except:
@@ -767,7 +768,7 @@ class InfractionIssuer(discord.ui.View):
         label=f"",
         style=discord.ButtonStyle.grey,
         disabled=True,
-        emoji="<:flag:1223062579346145402>",
+        emoji=f"{Emojis.flag}",
     )
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass
