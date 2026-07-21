@@ -7,16 +7,16 @@ from discord import app_commands
 from discord.ext import commands
 
 from cogs.Events.modmail import Close
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
-from core.discord.autocompletes import Snippets
-from core.discord.emojis import *
+from core.bot.Module import ModuleCheck, ModuleIsEnabled
+from core.bot.autocompletes import Snippets
+from core.bot.emojis import *
 from core.format import IsSeperateBot, PaginatorButtons
 
 MONGO_URL = os.getenv("MONGO_URL")
 environment = os.getenv("ENVIRONMENT")
 
-from core.discord.permissions import Permissions
-from core.discord.HelpEmbeds import (
+from core.bot.permissions import Permissions
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     ModuleNotEnabled,
     Support,

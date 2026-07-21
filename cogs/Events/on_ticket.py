@@ -6,8 +6,8 @@ import discord
 from bson import ObjectId
 from discord.ext import commands, tasks
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.emojis import *
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.emojis import *
 from core.format import ReplaceVariables
 from core.integrations.r2 import upload_file_to_r2
 

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from core.discord import Paginator
+from core.bot import Paginator
+from typing import NamedTuple, Optional, Union, Callable, Awaitable, Any
 
 from datetime import timedelta, datetime
 import os
@@ -27,20 +28,42 @@ def IsSeperateBot():
     )
 
 
-def CommandType(I: discord.Interaction):
-    if isinstance(I, commands.Context):
-        author = I.author
-        guild = I.guild
-        send = I.send
-    else:
-        author = I.user
-        guild = I.guild
-        if I.response.is_done():
-            send = I.followup.send
-        else:
-            send = I.response.send_message
-    command = I.command
-    return (author, guild, send, command)
+class ContextClass(NamedTuple):
+    author: Optional[Union[discord.Member, discord.User]]
+    guild: Optional[discord.Guild]
+    send: Optional[Callable[..., Awaitable[Any]]]
+    command: Optional[Union[commands.Command, discord.app_commands.Command]]
+    client: Optional[discord.Client]
+    channel: Optional[discord.TextChannel]
+
+
+def CommandType(
+    ctx: Union[commands.Context, discord.Interaction],
+) -> ContextClass:
+    if isinstance(ctx, commands.Context):
+        return ContextClass(
+            author=ctx.author,
+            guild=ctx.guild,
+            send=ctx.send,
+            command=ctx.command,
+            client=ctx.bot,
+            channel=ctx.channel,
+        )
+
+    if isinstance(ctx, discord.Interaction):
+        send = (
+            ctx.followup.send if ctx.response.is_done() else ctx.response.send_message
+        )
+        return ContextClass(
+            author=ctx.user,
+            guild=ctx.guild,
+            send=send,
+            command=ctx.command,
+            client=ctx.client,
+            channel=ctx.channel,
+        )
+
+    raise TypeError(f"Unsupported type")
 
 
 async def PaginatorButtons(extra: list = None):
@@ -52,19 +75,19 @@ async def PaginatorButtons(extra: list = None):
         "last": "<:chevronsright:1220806426583371866>",
     }
     paginator = Paginator.Simple(
-        PreviousButton=discord.ui.Button(
+        PreviousButton=bot.ui.Button(
             emoji=emojis["previous"] if not Sep else None,
             label="<<" if Sep else None,
         ),
-        NextButton=discord.ui.Button(
+        NextButton=bot.ui.Button(
             emoji=emojis["next"] if not Sep else None,
             label=">>" if Sep else None,
         ),
-        FirstEmbedButton=discord.ui.Button(
+        FirstEmbedButton=bot.ui.Button(
             emoji=emojis["first"] if not Sep else None,
             label="<<" if Sep else None,
         ),
-        LastEmbedButton=discord.ui.Button(
+        LastEmbedButton=bot.ui.Button(
             emoji=emojis["last"] if not Sep else None,
             label=">>" if Sep else None,
         ),

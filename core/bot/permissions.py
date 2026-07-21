@@ -1,11 +1,11 @@
 import discord
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from core.discord.HelpEmbeds import (
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     Support,
 )
-from core.discord.emojis import *
+from core.bot.emojis import *
 from core.errors.Permissions import *
 from core.format import CommandType
 
@@ -25,22 +25,22 @@ Configuration = db["Config"]
 
 def Permissions(permissions: Literal["Admin", "Staff"]):
     async def predicate(interaction: discord.Interaction) -> bool:
-        author, guild, _, command = CommandType(interaction)
-        Config = await Configuration.find_one({"_id": guild.id})
+        I = CommandType(interaction)
+        Config = await Configuration.find_one({"_id": I.guild.id})
         if not Config:
             raise MissingSetup()
         if Config.get("Advanced Permissions", None):
-            if command:
+            if I.command:
                 if (
-                    command.qualified_name
+                    I.command.qualified_name
                     in Config.get("Advanced Permissions", {}).keys()
                 ):
                     Permissions = Config.get("Advanced Permissions", {}).get(
-                        command.qualified_name, []
+                        I.command.qualified_name, []
                     )
                     if not isinstance(Permissions, list):
                         Permissions = [Permissions]
-                    if any(role.id in Permissions for role in author.roles):
+                    if any(role.id in Permissions for role in I.author.roles):
                         return True
                     else:
                         raise MissingAdvancedPermissions()
@@ -51,11 +51,11 @@ def Permissions(permissions: Literal["Admin", "Staff"]):
             raise MissingPermissionSetup("Admin")
 
         if permissions == "Admin":
-            if RequireAdmin(Config, author):
+            if RequireAdmin(Config, I.author):
                 return True
 
         if permissions == "Staff":
-            if RequireStaff(Config, author):
+            if RequireStaff(Config, I.author):
                 return True
 
         raise MissingPermission(permissions)

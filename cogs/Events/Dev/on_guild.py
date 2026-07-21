@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.emojis import *
 from cogs.Modules.promotions import SyncServer
 from datetime import datetime
 from sentry_sdk import metrics

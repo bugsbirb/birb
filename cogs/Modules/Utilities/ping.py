@@ -6,7 +6,7 @@ import matplotlib
 import aiohttp
 from discord import app_commands
 from datetime import datetime
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 matplotlib.use("Agg")
 import numpy as np

@@ -4,9 +4,9 @@ import traceback
 import discord
 import discord.http
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 logger = logging.getLogger(__name__)
 

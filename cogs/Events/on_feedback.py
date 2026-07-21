@@ -4,8 +4,8 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.Variables import Variables
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.Variables import Variables
 
 logger = logging.getLogger(__name__)
 

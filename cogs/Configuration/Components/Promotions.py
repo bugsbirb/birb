@@ -3,9 +3,9 @@ import traceback
 
 import discord
 
-from core.discord.HelpEmbeds import NoPremium, Support, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 
 class PSelect(discord.ui.Select):
@@ -176,7 +176,7 @@ class PSelect(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 view = Embed(
                     interaction.user,

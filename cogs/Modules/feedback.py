@@ -3,15 +3,16 @@ from datetime import datetime
 
 from discord import app_commands
 
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
-from core.discord.emojis import *
-from core.discord.permissions import *
+from core.bot.Checks import EnsureConfig
+from core.bot.Module import ModuleCheck, ModuleIsEnabled
+from core.bot.emojis import *
+from core.bot.permissions import *
 from core.format import PaginatorButtons
 
 MONGO_URL = os.getenv("MONGO_URL")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-from core.discord.HelpEmbeds import (
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     NoPermissionChannel,
     ChannelNotFound,
@@ -57,6 +58,7 @@ class Feedback(commands.Cog):
         rating="The rating you want to give (1-10).",
         feedback="The feedback you want to give.",
     )
+    @ModuleIsEnabled("Feedback")
     async def feedback(
         self,
         ctx: commands.Context,
@@ -84,24 +86,10 @@ class Feedback(commands.Cog):
         existing_feedback = await self.client.db["feedback"].find_one(
             {"guild_id": ctx.guild.id, "staff": staff.id, "author": ctx.author.id}
         )
-        Config = await Configuration.find_one({"_id": ctx.guild.id})
-        if not Config:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Feedback"):
-            return await ctx.send(
-                embed=ModuleNotSetup(),
-                view=Support(),
-            )
-
+        Config = await EnsureConfig(ctx, "Feedback")
         if staff is None:
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, please provide a staff member.",
-            )
-            return
-        if not await ModuleCheck(ctx.guild.id, "Feedback"):
-            await ctx.send(
-                embed=ModuleNotEnabled(),
-                view=Support(),
             )
             return
         if staff == ctx.author:

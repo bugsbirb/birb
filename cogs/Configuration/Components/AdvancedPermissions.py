@@ -1,8 +1,8 @@
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.ui import BasicPaginator
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.ui import BasicPaginator
 from core.format import IsSeperateBot
 
 

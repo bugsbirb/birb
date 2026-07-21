@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from discord.ext import commands
 
-from core.discord.permissions import *
+from core.bot.permissions import *
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +14,8 @@ from datetime import datetime
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
-from core.discord.Module import ModuleIsEnabled
-from core.discord.HelpEmbeds import (
+from core.bot.Module import ModuleIsEnabled
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     NoPermissionChannel,
     ChannelNotFound,

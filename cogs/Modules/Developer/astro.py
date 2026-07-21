@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import psutil
-from core.discord.emojis import *
+from core.bot.emojis import *
 from typing import Optional, Literal
 
 

@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 import discord
 
-from core.discord.HelpEmbeds import NoPremium, Support, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 
 class QOTDOptions(discord.ui.Select):

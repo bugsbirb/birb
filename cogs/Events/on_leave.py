@@ -5,8 +5,8 @@ from bson import ObjectId
 from discord.ext import commands
 
 from cogs.Modules.leaves import Duration
-from core.discord import HelpEmbeds
-from core.discord.permissions import has_admin_role
+from core.bot import HelpEmbeds
+from core.bot.permissions import has_admin_role
 
 
 class on_leave(commands.Cog):

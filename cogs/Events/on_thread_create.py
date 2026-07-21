@@ -4,10 +4,10 @@ import logging
 import discord
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 logger = logging.getLogger(__name__)
-from core.discord.permissions import has_staff_role
+from core.bot.permissions import has_staff_role
 
 
 class ForumCreaton(commands.Cog):
@@ -29,7 +29,7 @@ class ForumCreaton(commands.Cog):
             return
         await asyncio.sleep(2)
         if config:
-            from core.discord.CustomEmbed import DisplayEmbed
+            from core.bot.CustomEmbed import DisplayEmbed
 
             embed = await DisplayEmbed(
                 config,

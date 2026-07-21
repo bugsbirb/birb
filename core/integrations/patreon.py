@@ -122,7 +122,7 @@ async def SubscriptionUser(UserID: int, Sub: str = "22855340", Tiers: list = Non
                     SocialConnections = User.get("attributes", {}).get(
                         "social_connections", {}
                     )
-                    DiscordInfo = SocialConnections.get("discord")
+                    DiscordInfo = SocialConnections.get("bot")
                     if not DiscordInfo:
                         continue
                     if str(DiscordInfo.get("user_id")) != str(UserID):
@@ -227,7 +227,7 @@ async def PremiumMembers():
                     DiscordInfo = (
                         User.get("attributes", {})
                         .get("social_connections", {})
-                        .get("discord")
+                        .get("bot")
                     )
                     if not DiscordInfo or not DiscordInfo.get("user_id"):
                         continue

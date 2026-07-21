@@ -2,8 +2,8 @@ import traceback
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Suggestions(discord.ui.Select):
@@ -193,7 +193,7 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
         from cogs.Configuration.Components.EmbedBuilder import (
             Embed,
         )
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
 
         if not custom:
             view = Embed(

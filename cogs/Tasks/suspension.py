@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from core.discord.emojis import *
+from core.bot.emojis import *
 from datetime import datetime
 import logging
 import sentry_sdk

@@ -2,8 +2,8 @@ import typing
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class HSELECT(discord.ui.Select):

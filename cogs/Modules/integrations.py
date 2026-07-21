@@ -6,9 +6,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.emojis import *
-from core.discord.permissions import has_admin_role
-from core.discord.ui import YesOrNo
+from core.bot.emojis import *
+from core.bot.permissions import has_admin_role
+from core.bot.ui import YesOrNo
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class Link(commands.Cog):
             GetValidToken,
             FetchRobloxUser,
         )
-        from core.discord.HelpEmbeds import NotRobloxLinked
+        from core.bot.HelpEmbeds import NotRobloxLinked
 
         await ctx.defer()
 
@@ -217,7 +217,7 @@ class Link(commands.Cog):
             GetValidToken,
             FetchRobloxUser,
         )
-        from core.discord.HelpEmbeds import NotRobloxLinked
+        from core.bot.HelpEmbeds import NotRobloxLinked
 
         await ctx.defer()
 
@@ -280,7 +280,7 @@ class Link(commands.Cog):
 
         Roles = await GroupRoles(ctx.interaction)
         if Roles == 0:
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             return await ctx.send(embed=NotRobloxLinked(), ephemeral=True)
         if Roles == 1:
@@ -317,7 +317,7 @@ class Link(commands.Cog):
         )
 
     @integrations.command(
-        description="Link an integration to your discord account (e.g., Roblox)"
+        description="Link an integration to your bot account (e.g., Roblox)"
     )
     async def link(
         self,
@@ -361,7 +361,7 @@ class Link(commands.Cog):
             name="Verify With Roblox",
             icon_url="https://cdn.discordapp.com/emojis/1206670134064717904.webp?size=96",
         )
-        embed.description = "You are authorising to manage the roblox group from the discord.\n\n-# Press the button link below."
+        embed.description = "You are authorising to manage the roblox group from the bot.\n\n-# Press the button link below."
 
         view = discord.ui.View()
         if service == "Roblox Groups":

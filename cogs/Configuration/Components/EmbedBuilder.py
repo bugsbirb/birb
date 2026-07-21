@@ -2,9 +2,9 @@ import logging
 
 import discord
 
-from core.discord.HelpEmbeds import NoPremium, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 from core.format import ReplaceVariables, IsSeperateBot
 
 logger = logging.getLogger(__name__)

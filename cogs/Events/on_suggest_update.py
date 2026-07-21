@@ -4,9 +4,9 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
+from core.bot.CustomEmbed import DisplayEmbed
 from cogs.Events.on_suggestion import Voting
-from core.discord.emojis import *
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)

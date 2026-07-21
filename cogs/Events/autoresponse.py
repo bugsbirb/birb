@@ -7,8 +7,8 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
-from core.discord.Variables import Variables
-from core.discord.permissions import premium
+from core.bot.Variables import Variables
+from core.bot.permissions import premium
 from core.format import ReplaceVariables
 
 logger = logging.getLogger(__name__)

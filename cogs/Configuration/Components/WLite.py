@@ -1,9 +1,9 @@
 import discord
 
-from core.discord.HelpEmbeds import NoPremium
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 
 class WLiteOption(discord.ui.Select):

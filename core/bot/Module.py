@@ -1,6 +1,6 @@
 from discord import app_commands
 
-from core.discord.emojis import *
+from core.bot.emojis import *
 from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
 from core.errors.Modules import ModuleDisabled

@@ -1,7 +1,7 @@
 import discord
 import traceback
-from core.discord.emojis import *
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
 
 
 class StaffPanelOptions(discord.ui.Select):
@@ -41,7 +41,7 @@ class StaffPanelOptions(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 view = Embed(interaction.user, FinalFunction, "Staff Panel")
 

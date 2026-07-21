@@ -4,9 +4,9 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.Variables import Variables
-from core.discord.emojis import *
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.Variables import Variables
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)
@@ -226,7 +226,7 @@ class Voting(discord.ui.View):
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         try:
-            from core.discord.permissions import has_admin_role
+            from core.bot.permissions import has_admin_role
 
             if not await has_admin_role(interaction, ephemeral=True):
                 logger.debug("check")

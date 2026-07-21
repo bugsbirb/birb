@@ -7,9 +7,10 @@ from bson import ObjectId
 from discord.ext import commands
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.Variables import Variables
-from core.discord.permissions import premium
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.Variables import Variables
+from core.bot.permissions import premium
+from datamodels.Infractions import InfractionItem
 
 logger = logging.getLogger(__name__)
 MONGO_URL = os.getenv("MONGO_URL")
@@ -50,96 +51,6 @@ def DefaultEmbed(data, staff, manager):
     return embed
 
 
-def InfractItem(data):
-    return InfractionItem(
-        staff=data.get("staff"),
-        management=data.get("management"),
-        action=data.get("action"),
-        reason=data.get("reason"),
-        notes=data.get("notes"),
-        expiration=data.get("expiration"),
-        voided=data.get("voided"),
-        expired=data.get("expired"),
-        random_string=data.get("random_string"),
-        guild_id=data.get("guild_id"),
-        annonymous=data.get("annonymous"),
-        msg_id=data.get("msg_id"),
-        webhook_id=data.get("WebhookID"),
-        escalated_from=data.get("EscalatedFrom"),
-        skipExec=data.get("skipExec"),
-        jumpUrl=data.get("jump_url"),
-        previous=data.get("previous"),
-        new=data.get("new"),
-    )
-
-
-def CustomItem(data):
-    return Embed(
-        author=data.get("author"),
-        author_icon=data.get("author_icon"),
-        color=data.get("color"),
-        description=data.get("description"),
-        image=data.get("image"),
-        thumbnail=data.get("thumbnail"),
-        title=data.get("title"),
-    )
-
-
-class InfractionItem:
-    def __init__(
-        self,
-        staff,
-        management,
-        action,
-        reason,
-        notes,
-        expiration,
-        voided,
-        expired,
-        random_string,
-        guild_id,
-        annonymous,
-        msg_id,
-        webhook_id,
-        escalated_from,
-        skipExec,
-        jumpUrl,
-        previous,
-        new,
-    ):
-        self.staff = staff
-        self.management = management
-        self.action = action
-        self.reason = reason
-        self.notes = notes
-        self.expiration = expiration
-        self.voided = voided
-        self.expired = expired
-        self.random_string = random_string
-        self.guild_id = guild_id
-        self.annonymous = annonymous
-        self.msg_id = msg_id
-        self.webhook_id = webhook_id
-        self.escalated_from = escalated_from
-        self.skipExec = skipExec
-        self.jumpUrl = jumpUrl
-        self.previous = (previous,)
-        self.new = new
-
-
-class Embed:
-    def __init__(
-        self, author, author_icon, color, description, image, thumbnail, title
-    ):
-        self.author = author
-        self.author_icon = author_icon
-        self.color = color
-        self.description = description
-        self.image = image
-        self.thumbnail = thumbnail
-        self.title = title
-
-
 class on_infractions(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
@@ -157,7 +68,7 @@ class on_infractions(commands.Cog):
             InfractionData = await self.client.db["Suspensions"].find_one(
                 {"_id": objectid}
             )
-        Infraction = InfractItem(InfractionData)
+        Infraction = InfractionItem(**InfractionData)
         guild = await self.client.fetch_guild(Infraction.guild_id)
         if guild is None:
             logging.warning(
@@ -277,9 +188,9 @@ class on_infractions(commands.Cog):
 
         embeds = [embed]
 
-        if Infraction.escalated_from and not Infraction.skipExec:
+        if Infraction.EscalatedFrom and not Infraction.SkipExec:
             CheckedActions = InfractionData.get("EscalationChain", [])
-            Org = Infraction.escalated_from
+            Org = Infraction.EscalatedFrom
             action = Infraction.action
 
             parts = []
@@ -409,12 +320,9 @@ class on_infractions(commands.Cog):
         config: dict,
         Infraction: dict,
     ):
-        print("1")
         if not data:
             return {}
         Actions = {}
-        print("2")
-        print(data)
         try:
             channel = False
             if data.get("givenroles"):

@@ -1,7 +1,7 @@
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 
@@ -137,7 +137,7 @@ class ForumSelection(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         await interaction.response.defer()
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
         from cogs.Configuration.Components.EmbedBuilder import Embed
 
         Forum = await interaction.client.db["Forum Configuration"].find_one(

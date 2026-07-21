@@ -8,11 +8,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-import core.discord.HelpEmbeds as HelpEmbeds
-from core.discord.Module import ModuleIsEnabled
-from core.discord.emojis import *
-from core.discord.permissions import Permissions
-from core.discord.ui import BasicPaginator
+import core.bot.HelpEmbeds as HelpEmbeds
+from core.bot.Checks import EnsureConfig
+from core.bot.Module import ModuleIsEnabled
+from core.bot.emojis import *
+from core.bot.permissions import Permissions
+from core.bot.ui import BasicPaginator
 from core.format import TimeReformat
 
 environment = os.getenv("ENVIRONMENT")
@@ -306,28 +307,10 @@ class LOAModule(commands.Cog):
             )
             return
 
+        C = await EnsureConfig(ctx, "LOA")
         MSG = await ctx.send(
             f"<a:Loading:1167074303905386587> **{ctx.author.display_name},** requesting LOA..."
         )
-        C = await self.client.db["Config"].find_one(
-            {
-                "_id": ctx.guild.id,
-            }
-        )
-        if not C:
-            await MSG.edit(
-                embed=HelpEmbeds.BotNotConfigured(),
-                view=HelpEmbeds.Support(),
-                content=None,
-            )
-            return
-        if not C.get("LOA", {}):
-            await MSG.edit(
-                embed=HelpEmbeds.ModuleNotEnabled(),
-                view=HelpEmbeds.Support(),
-                content=None,
-            )
-            return
         if not C.get("LOA", {}).get("channel"):
             await MSG.edit(
                 embed=HelpEmbeds.NoChannelSet(), view=HelpEmbeds.Support(), content=None

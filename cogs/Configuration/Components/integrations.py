@@ -1,7 +1,7 @@
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Integrations(discord.ui.Select):
@@ -21,7 +21,7 @@ class Integrations(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
         if self.values[0] == "Roblox Groups":
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             token = await GetValidToken(user=interaction.user)
             if not token:
@@ -75,7 +75,7 @@ class EnterGroup(discord.ui.Modal):
             config["groups"] = {}
 
         from core.integrations.roblox import GetGroup2, GetUser
-        from core.discord.HelpEmbeds import NotRobloxLinked
+        from core.bot.HelpEmbeds import NotRobloxLinked
 
         group = await GetGroup2(self.group_id.value, interaction.user)
         if not group or not group.get("owner"):

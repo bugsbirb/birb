@@ -3,8 +3,8 @@ from typing import Literal
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 
@@ -799,7 +799,7 @@ async def CustomiseEmbed(interaction: discord.Interaction, option, name):
             Embed,
             NoEmbed,
         )
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
 
         Default = {
             "thumb": "",

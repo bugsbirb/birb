@@ -8,19 +8,19 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.emojis import *
-from core.discord.permissions import Permissions
+from core.bot.Checks import EnsureConfig
+from core.bot.emojis import *
+from core.bot.permissions import Permissions
 from core.format import PaginatorButtons
 
 logger = logging.getLogger(__name__)
-from core.discord.Module import ModuleIsEnabled
-from core.discord.autocompletes import DepartmentAutocomplete, RoleAutocomplete
+from core.bot.Module import ModuleIsEnabled
+from core.bot.autocompletes import DepartmentAutocomplete, RoleAutocomplete
 from core.format import IsSeperateBot
 
 environment = os.getenv("ENVIRONMENT")
 
-from core.discord.HelpEmbeds import (
-    BotNotConfigured,
+from core.bot.HelpEmbeds import (
     NoPermissionChannel,
     ChannelNotFound,
     NoChannelSet,
@@ -68,6 +68,7 @@ async def PromotionContext(
 ):
 
     await interaction.response.defer()
+    config = await EnsureConfig(interaction)
 
     msg = await interaction.followup.send(
         f"<a:Loading:1167074303905386587> Processing promotion..."
@@ -81,15 +82,6 @@ async def PromotionContext(
     if interaction.user.id == target.id:
         await msg.edit(
             content=f"{no} **{interaction.user.display_name}**, you can't promote yourself."
-        )
-        return None
-
-    config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-
-    if not config:
-        await msg.edit(
-            embed=BotNotConfigured(),
-            view=Support(),
         )
         return None
 
@@ -162,10 +154,8 @@ async def SingleHierarchy(
     reason: str,
     rank: str = None,
 ):
-    try:
-        context = await PromotionContext(interaction=interaction, target=user)
-    except Exception as e:
-        print(f"[S Context] {e}")
+
+    context = await PromotionContext(interaction=interaction, target=user)
     if not context:
         return
 

@@ -1,6 +1,6 @@
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.HelpEmbeds import NotYourPanel
 
 
 async def ModuleOptions(Config, data=None):

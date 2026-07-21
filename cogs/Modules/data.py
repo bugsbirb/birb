@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Data(commands.Cog):

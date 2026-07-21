@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 logger = logging.getLogger(__name__)
 

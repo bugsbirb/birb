@@ -8,7 +8,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.HelpEmbeds import (
+from core.bot.Checks import EnsureConfig
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     NoPermissionChannel,
     ChannelNotFound,
@@ -18,11 +19,11 @@ from core.discord.HelpEmbeds import (
     NoPremium,
     NotYourPanel,
 )
-from core.discord.Module import ModuleIsEnabled
-from core.discord.Variables import Variables
-from core.discord.autocompletes import infractiontypes, infractionreasons
-from core.discord.emojis import *
-from core.discord.permissions import Permissions, premium
+from core.bot.Module import ModuleIsEnabled
+from core.bot.Variables import Variables
+from core.bot.autocompletes import infractiontypes, infractionreasons
+from core.bot.emojis import *
+from core.bot.permissions import Permissions, premium
 from core.format import PaginatorButtons, IsSeperateBot, TimeReformat, DefaultTypes
 
 environment = os.getenv("ENVIRONMENT")
@@ -365,11 +366,8 @@ class Infractions(commands.Cog):
                 f"{no} **{ctx.author.display_name},** you don't have permission to use this shift type."
             )
 
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if Config.get("Infraction", None) is None:
-            return await ctx.send(embed=ModuleNotSetup(), view=Support())
+        Config = await EnsureConfig(ctx, "Infraction")
+
         if staff is None:
             await ctx.send(
                 f"{no} **{ctx.author.display_name}**, this user can not be found.",
@@ -403,6 +401,7 @@ class Infractions(commands.Cog):
             return await msg.edit(content=f"", embed=ChannelNotFound(), view=Support())
         if not channel:
             return await msg.edit(content=f"", embed=ChannelNotFound(), view=Support())
+
         client = await ctx.guild.fetch_member(self.client.user.id)
         if (
             channel.permissions_for(client).send_messages is False
@@ -425,7 +424,7 @@ class Infractions(commands.Cog):
         )
         if Config.get("group", {}).get("id", None):
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             Roblox = await GetValidToken(user=ctx.author)
             if not Roblox:
@@ -542,10 +541,10 @@ class Infractions(commands.Cog):
                 {"guild_id": ctx.guild.id, "type": "Infractions"}
             )
             from cogs.Events.on_infraction import DefaultEmbed
-            from core.discord.ui import YesOrNo
+            from core.bot.ui import YesOrNo
 
             if custom:
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 replaces = await Variables.infraction(
                     staff=staff,
@@ -840,7 +839,7 @@ class InfractionMultiple(discord.ui.UserSelect):
 
         if Config.get("group", {}).get("id", None):
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             Roblox = await GetValidToken(user=interaction.user)
             if not Roblox:

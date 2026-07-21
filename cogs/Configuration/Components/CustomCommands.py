@@ -3,9 +3,9 @@ import logging
 import discord
 
 from cogs.Modules.commands import SyncCommand, Unsync
-from core.discord.HelpEmbeds import NoPremium, Support, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,7 @@ class CommandSelection(discord.ui.Select):
                 NoEmbed,
                 Embed,
             )
-            from core.discord.CustomEmbed import DisplayEmbed
+            from core.bot.CustomEmbed import DisplayEmbed
 
             command = await interaction.client.db["Custom Commands"].find_one(
                 {"name": self.values[0], "guild_id": interaction.guild.id}

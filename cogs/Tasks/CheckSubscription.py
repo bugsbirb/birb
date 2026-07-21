@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from core.discord.emojis import *
+from core.bot.emojis import *
 from motor.motor_asyncio import AsyncIOMotorClient
 import aiohttp
 import re
@@ -10,7 +10,7 @@ from core.integrations.dokploy import premium, GetProjects, StopApplication
 from core.integrations.patreon import SubscriptionUser
 from core.format import IsSeperateBot
 from datetime import datetime
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.HelpEmbeds import NotYourPanel
 
 logger = logging.getLogger(__name__)
 

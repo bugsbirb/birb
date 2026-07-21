@@ -2,7 +2,7 @@ import traceback
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.HelpEmbeds import NotYourPanel
 
 
 class StaffFeedback(discord.ui.Select):
@@ -85,7 +85,7 @@ class StaffFeedback(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(

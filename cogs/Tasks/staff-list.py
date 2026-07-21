@@ -2,9 +2,9 @@ import discord
 from discord.ext import commands
 
 from discord.ext import tasks
-from core.discord.emojis import *
+from core.bot.emojis import *
 from datetime import datetime
-from core.discord.Module import ModuleCheck
+from core.bot.Module import ModuleCheck
 import asyncio
 import logging
 import sentry_sdk

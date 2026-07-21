@@ -2,7 +2,7 @@ import traceback
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.HelpEmbeds import NotYourPanel
 
 
 class SuspensionOptions(discord.ui.Select):
@@ -51,7 +51,7 @@ class SuspensionOptions(discord.ui.Select):
                     NoEmbed,
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 view = Embed(
                     interaction.user,

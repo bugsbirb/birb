@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 import re
 import string
@@ -11,22 +10,23 @@ import pymongo
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.Checks import EnsureConfig
+from core.bot.emojis import *
 from core.format import IsSeperateBot, PaginatorButtons
 
 logger = logging.getLogger(__name__)
 
 
-from core.discord.permissions import Permissions
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
+from core.bot.permissions import Permissions
+from core.bot.Module import ModuleCheck, ModuleIsEnabled
 from core.format import LeaderboardPlace
-from core.discord.permissions import check_admin_and_staff
+from core.bot.permissions import check_admin_and_staff
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
 
-from core.discord.HelpEmbeds import (
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     ModuleNotEnabled,
     Support,
@@ -721,11 +721,7 @@ class quota(commands.Cog):
             return await ctx.send(
                 f"{no} **{ctx.author.display_name}**, they haven't sent any messages."
             )
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Message Quota"):
-            return await ctx.send(embed=ModuleNotEnabled(), view=Support())
+        Config = await EnsureConfig(ctx, "Message Quota")
         Quota, Name = self.GetQuota(staff, Config)
         YourEmoji = None
         YouPlace = None
@@ -785,12 +781,7 @@ class quota(commands.Cog):
             .sort("message_count", pymongo.DESCENDING)
             .to_list(length=None)
         )
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Message Quota"):
-            return await ctx.send(embed=ModuleNotEnabled(), view=Support())
-
+        Config = await EnsureConfig(ctx, "Message Quota")
         if not users:
             return await ctx.send(
                 f"{no} **{ctx.author.display_name}**, there are no users in the leaderboard."
@@ -829,14 +820,9 @@ class quota(commands.Cog):
     @Permissions("Staff")
     @ModuleIsEnabled("Quota")
     async def leaderboard(self, ctx: commands.Context):
-        if not await ModuleCheck(ctx.guild.id, "Quota"):
-            await ctx.send(
-                embed=ModuleNotEnabled(),
-                view=Support(),
-            )
-            return
 
         await ctx.defer()
+        Config = await EnsureConfig(ctx, "Message Quota")
         if IsSeperateBot():
             msg = await ctx.send(
                 embed=discord.Embed(
@@ -852,9 +838,6 @@ class quota(commands.Cog):
                 )
             )
 
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await msg.edit(embed=BotNotConfigured(), view=Support())
         message_users = (
             await self.client.db["messages"]
             .find({"guild_id": ctx.guild.id})
@@ -1196,7 +1179,7 @@ class quota(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if custom and custom.get("embed"):
-            from core.discord.CustomEmbed import DisplayEmbed
+            from core.bot.CustomEmbed import DisplayEmbed
 
             embed = await DisplayEmbed(custom, ctx.author)
         People = (

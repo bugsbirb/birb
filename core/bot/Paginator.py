@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import discord
 from discord.ext import commands
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 
 class Simple(discord.ui.View):

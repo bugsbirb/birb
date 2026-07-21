@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 import aiohttp
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 
 class Utility(commands.Cog):

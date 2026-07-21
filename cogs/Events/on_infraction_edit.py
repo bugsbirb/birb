@@ -3,9 +3,10 @@ import logging
 import discord
 from discord.ext import commands
 
-from cogs.Events.on_infraction import InfractItem, DefaultEmbed
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.Variables import Variables
+from cogs.Events.on_infraction import DefaultEmbed
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.Variables import Variables
+from datamodels.Infractions import InfractionItem
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class on_infraction_edit(commands.Cog):
         InfractionData = await self.client.db["infractions"].find_one(
             {"_id": after.get("_id")}
         )
-        Infraction = InfractItem(InfractionData)
+        Infraction = InfractionItem(**InfractionData)
         guild = await self.client.fetch_guild(Infraction.guild_id)
         if guild is None:
             logging.warning(

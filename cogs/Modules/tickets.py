@@ -10,20 +10,20 @@ import pymongo
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
+from core.bot.CustomEmbed import DisplayEmbed
 from cogs.Events.on_ticket import TicketPermissions
-from core.discord.emojis import *
-from core.discord.permissions import (
+from core.bot.emojis import *
+from core.bot.permissions import (
     check_admin_and_staff,
     RequireStaff,
     RequireAdmin,
 )
 
 logger = logging.getLogger(__name__)
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
-from core.discord.HelpEmbeds import ModuleNotEnabled, Support, BotNotConfigured
-from core.discord.autocompletes import CloseReason
-from core.discord.permissions import Permissions
+from core.bot.Module import ModuleCheck, ModuleIsEnabled
+from core.bot.HelpEmbeds import ModuleNotEnabled, Support, BotNotConfigured
+from core.bot.autocompletes import CloseReason
+from core.bot.permissions import Permissions
 from core.format import LeaderboardPlace, PaginatorButtons
 
 

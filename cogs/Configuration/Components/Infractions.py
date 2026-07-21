@@ -5,13 +5,13 @@ import traceback
 import discord
 import discord.http
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)
-from core.discord.permissions import premium
-from core.discord.HelpEmbeds import NoPremium, Support
+from core.bot.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, Support
 
 
 class InfractionOption(discord.ui.Select):
@@ -204,7 +204,7 @@ class InfractionOption(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(color=discord.Color.dark_embed())
@@ -1219,7 +1219,7 @@ class InfractionTypesAction(discord.ui.Select):
             await interaction.response.defer()
             Roles = await GroupRoles(interaction)
             if Roles == 0:
-                from core.discord.HelpEmbeds import NotRobloxLinked
+                from core.bot.HelpEmbeds import NotRobloxLinked
 
                 return await interaction.followup.send(
                     embed=NotRobloxLinked(), ephemeral=True

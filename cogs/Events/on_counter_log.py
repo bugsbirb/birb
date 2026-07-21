@@ -25,7 +25,6 @@ class on_counter_log(commands.Cog):
         if not config:
             return
         if type in ("Messages", "Both") and not config.get("Message Quota"):
-            print("2")
             return
 
         if type in ("Tickets", "Both") and not config.get("Tickets"):

@@ -2,13 +2,13 @@ import random
 import string
 import re
 import asyncio
-from core.discord.HelpEmbeds import *
+from core.bot.HelpEmbeds import *
 from discord.ext import tasks
 from cogs.Modules.staff import quota as QUOTA
 
 from core.format import TimeReformat
-from core.discord.Module import ModuleCheck
-from core.discord.permissions import *
+from core.bot.Module import ModuleCheck
+from core.bot.permissions import *
 from datetime import timedelta, datetime
 import logging
 import sentry_sdk
@@ -312,7 +312,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
 
         if Config.get("group", {}).get("id", None):
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             Roblox = await GetValidToken(user=interaction.user)
             if not Roblox:

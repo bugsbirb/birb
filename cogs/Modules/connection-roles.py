@@ -4,9 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.Module import ModuleIsEnabled
-from core.discord.autocompletes import ConnectionRoles
-from core.discord.emojis import *
+from core.bot.Module import ModuleIsEnabled
+from core.bot.autocompletes import ConnectionRoles
+from core.bot.emojis import *
 from core.format import PaginatorButtons
 
 logger = logging.getLogger(__name__)
