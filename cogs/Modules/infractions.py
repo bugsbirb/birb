@@ -93,7 +93,7 @@ class Infractions(commands.Cog):
         manager: discord.Member,
     ):
         if not C:
-            return None, None, None
+            return None, None, None, None
 
         PromoSystemType = C.get("Promo", {}).get("System", {}).get("type", "")
         if not PromoSystemType:

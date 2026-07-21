@@ -433,8 +433,7 @@ class on_infractions(commands.Cog):
                         pass
                     Actions["AddedRoles"] = [role.id for role in roles]
 
-            if data.get("DemotionRole"):
-
+            if data.get("DemotionRole") or data.get("DemoteRole"):
                 await DemotionSystem(
                     self=self.client,
                     DemotionData=Infraction,
@@ -624,7 +623,7 @@ async def DemotionSystem(
                     f"[Demotion] Demoting from {CurrentRole.name} to {PrevRole.name}"
                 )
 
-                if PrevRole.position <= manager.top_role.position:
+                if manager.top_role.position <= PrevRole.position:
                     return await self.db["infractions"].find_one(
                         {"_id": DemotionData.get("_id")}
                     )
@@ -657,7 +656,7 @@ async def DemotionSystem(
                 logger.info(
                     f"[Demotion] At bottom of hierarchy, removing {CurrentRole.name}"
                 )
-                if PrevRole.position <= manager.top_role.position:
+                if manager.top_role.position <= PrevRole.position:
                     return await self.db["infractions"].find_one(
                         {"_id": DemotionData.get("_id")}
                     )
@@ -745,7 +744,7 @@ async def DemotionSystem(
                     {"_id": DemotionData.get("_id")}
                 )
 
-            if manager.top_role.position <= SkipRole.position:
+            if manager.top_role.position <= PrevRole.position:
                 return await self.db["infractions"].find_one(
                     {"_id": DemotionData.get("_id")}
                 )
