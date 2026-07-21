@@ -79,7 +79,7 @@ class On_suggestions_edit(commands.Cog):
             embed.set_author(icon_url=author.display_avatar, name=author.name)
             embed.add_field(
                 name=f"{Emojis.message_forward} Opinions",
-                value=f"{len(back.get('upvoters')) if back.get('upvotersf') else 0} {Emojis.upvote} | {len(back.get('downvoters')) if back.get('downvotersf') else 0} {Emojis.downvote}",
+                value=f"{len(back.get('upvoters')) if back.get('upvoters') else 0} {Emojis.upvote} | {len(back.get('downvoters')) if back.get('downvoters') else 0} {Emojis.downvote}",
             )
             if action == "Accepted Suggestion":
                 embed.title = f"{Emojis.green_tick} Suggestion Accepted"

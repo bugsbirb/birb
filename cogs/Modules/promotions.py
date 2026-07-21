@@ -69,14 +69,14 @@ async def PromotionContext(
 
     await interaction.response.defer()
 
-    Config = await interaction.client.db["Config"].find_one(
+    config = await interaction.client.db["Config"].find_one(
         {"_id": interaction.guild.id}
     )
-    if Config is None:
+    if config is None:
         return await interaction.followup.send(
             embed=BotNotConfigured(), view=Support(), ephemeral=True
         )
-    if Config.get("Promo") is None:
+    if config.get("Promo") is None:
         return await interaction.followup.send(
             embed=ModuleNotSetup(), view=Support(), ephemeral=True
         )
