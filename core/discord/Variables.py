@@ -160,8 +160,10 @@ class Variables:
 
     @staticmethod
     async def infraction(staff, Infraction, manager, guild) -> dict:
-        newRole = guild.get_role(Infraction.new) if guild else None
-        previousRole = guild.get_role(Infraction.previous) if guild else None
+        newRole = guild.get_role(get_attr(Infraction, "new")) if guild else None
+        previousRole = (
+            guild.get_role(get_attr(Infraction, "previous")) if guild else None
+        )
 
         expiration = get_attr(Infraction, "expiration", None)
         extra = {

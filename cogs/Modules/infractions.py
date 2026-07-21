@@ -19,6 +19,7 @@ from core.discord.HelpEmbeds import (
     NotYourPanel,
 )
 from core.discord.Module import ModuleIsEnabled
+from core.discord.Variables import Variables
 from core.discord.autocompletes import infractiontypes, infractionreasons
 from core.discord.emojis import *
 from core.discord.permissions import Permissions, premium
@@ -540,13 +541,18 @@ class Infractions(commands.Cog):
             custom = await self.client.db["Customisation"].find_one(
                 {"guild_id": ctx.guild.id, "type": "Infractions"}
             )
-            from cogs.Events.on_infraction import Replacements, DefaultEmbed
+            from cogs.Events.on_infraction import DefaultEmbed
             from core.discord.ui import YesOrNo
 
             if custom:
                 from core.discord.CustomEmbed import DisplayEmbed
 
-                replaces = Replacements(staff, FormeData, ctx.author)
+                replaces = await Variables.infraction(
+                    staff=staff,
+                    Infraction=FormeData,
+                    guild=ctx.guild,
+                    manager=ctx.author,
+                )
                 embed = await DisplayEmbed(custom, ctx.author, replaces)
             else:
                 embed = DefaultEmbed(FormeData, staff, ctx.author)

@@ -128,23 +128,23 @@ class on_promotion(commands.Cog):
         self, objectid: ObjectId, Settings: dict, edit: bool = False
     ):
         PromotionData = await self.client.db["promotions"].find_one({"_id": objectid})
-        Promotion = PromotionItem(PromotionData)
-        guild = await self.client.fetch_guild(Promotion.guild_id)
+        promotion = Promotion(PromotionData)
+        guild = await self.client.fetch_guild(promotion.guild_id)
 
         if guild is None:
             logging.warning(
-                f"[🏠 on_promotion] {Promotion.guild_id} is None and can't be found..?",
+                f"[🏠 on_promotion] {promotion.guild_id} is None and can't be found..?",
                 extra={"objectId": str(objectid)},
             )
             return
 
         try:
-            staff = await guild.fetch_member(int(Promotion.staff))
+            staff = await guild.fetch_member(int(promotion.staff))
         except:
             staff = None
         if staff is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} staff member {Promotion.staff} can't be found.",
+                f"[🏠 on_promotion] @{guild.name} staff member {promotion.staff} can't be found.",
                 extra={"objectId": str(objectid)},
             )
             return
@@ -155,12 +155,12 @@ class on_promotion(commands.Cog):
         )
 
         try:
-            manager = await guild.fetch_member(int(Promotion.management))
+            manager = await guild.fetch_member(int(promotion.management))
         except:
             manager = None
         if manager is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} manager {Promotion.management} can't be found.",
+                f"[🏠 on_promotion] @{guild.name} manager {promotion.management} can't be found.",
                 extra={"objectId": str(objectid)},
             )
             return
@@ -192,16 +192,16 @@ class on_promotion(commands.Cog):
             view = PromotionIssuer()
             view.issuer.label = f"Issued By {manager.display_name}"
         custom = await self.client.db["Customisation"].find_one(
-            {"guild_id": Promotion.guild_id, "type": "Promotions"}
+            {"guild_id": promotion.guild_id, "type": "Promotions"}
         )
         PromotionData = await PromotionSystem(
             self.client, PromotionData, guild, staff, manager
         )
         if PromotionData:
-            Promotion = Promotion(PromotionData)
+            promotion = Promotion(PromotionData)
         if custom:
             replacements = await Variables.promotion(
-                staff=staff, promotion=Promotion, manager=manager, guild=guild
+                staff=staff, promotion=promotion, manager=manager, guild=guild
             )
             embed = await DisplayEmbed(
                 data=custom, user=staff, replacements=replacements
