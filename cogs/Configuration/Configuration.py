@@ -45,7 +45,7 @@ class ConfigMenu(discord.ui.Select):
 
         selection = self.values[0]
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
         embed = discord.Embed(color=discord.Colour.dark_embed())
 
         await Reset(interaction, lambda: ConfigMenu(Options(Config), interaction.user))

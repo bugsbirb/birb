@@ -67,9 +67,7 @@ class InfractionOption(discord.ui.Select):
 
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send(
-                embed=NotYourPanel(), ephemeral=selection
-            )
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Config:

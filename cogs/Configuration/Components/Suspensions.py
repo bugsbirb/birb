@@ -48,10 +48,10 @@ class SuspensionOptions(discord.ui.Select):
                 embed = None
 
                 from cogs.Configuration.Components.EmbedBuilder import (
-                    DisplayEmbed,
                     NoEmbed,
                     Embed,
                 )
+                from core.discord.CustomEmbed import DisplayEmbed
 
                 view = Embed(
                     interaction.user,

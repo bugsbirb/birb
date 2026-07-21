@@ -19,7 +19,7 @@ class AutoResponderOptions(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         if self.values[0] == "Manage Responses":
             embed = discord.Embed(color=discord.Color.dark_embed())

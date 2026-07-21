@@ -796,10 +796,10 @@ async def CustomiseEmbed(interaction: discord.Interaction, option, name):
         embed = None
 
         from cogs.Configuration.Components.EmbedBuilder import (
-            DisplayEmbed,
             Embed,
             NoEmbed,
         )
+        from core.discord.CustomEmbed import DisplayEmbed
 
         Default = {
             "thumb": "",

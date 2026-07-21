@@ -48,9 +48,9 @@ class Variables:
             return {}
         return {
             f"{{{prefix}.mention}}": member.mention,
-            f"{{{prefix}.name}}": member.display_name,
+            f"{{{prefix}.display_name}}": member.display_name,
             f"{{{prefix}.id}}": str(member.id),
-            f"{{{prefix}.global_name}}": member.global_name,
+            f"{{{prefix}.name}}": member.global_name,
             f"{{{prefix}.tag}}": (
                 member.primary_guild.tag if member.primary_guild else "N/A"
             ),
@@ -117,6 +117,12 @@ class Variables:
     async def guild(guild: discord.Guild) -> dict:
         if not guild:
             return {}
+        owner = guild.get_member(guild.owner_id or 0)
+        if not owner and guild.owner_id:
+            try:
+                owner = await guild.fetch_member(guild.owner_id)
+            except (discord.Forbidden, discord.NotFound):
+                owner = None
         return {
             "{guild.name}": guild.name,
             "{guild.id}": str(guild.id),
@@ -134,17 +140,18 @@ class Variables:
             "{guild.emoji_count}": str(len(guild.emojis)),
             "{guild.verification_level}": str(guild.verification_level).title(),
             "{guild.vanity_url}": guild.vanity_url or "N/A",
+            **Variables.member("guild.owner", owner),
         }
 
     @staticmethod
-    def build(
+    async def build(
         staff: discord.Member = None,
         author: discord.Member = None,
         guild: discord.Guild = None,
         extra: dict = None,
     ) -> dict:
         return {
-            **Variables.guild(guild),
+            **await Variables.guild(guild),
             **Variables.tools(),
             **Variables.member("staff", staff),
             **Variables.member("author", author),
@@ -152,7 +159,10 @@ class Variables:
         }
 
     @staticmethod
-    def infraction(staff, Infraction, manager, guild) -> dict:
+    async def infraction(staff, Infraction, manager, guild) -> dict:
+        newRole = guild.get_role(Infraction.new) if guild else None
+        previousRole = guild.get_role(Infraction.previous) if guild else None
+
         expiration = get_attr(Infraction, "expiration", None)
         extra = {
             "{action}": get_attr(Infraction, "action"),
@@ -161,11 +171,45 @@ class Variables:
             "{expiration}": (
                 f"<t:{int(expiration.timestamp())}:R>" if expiration else "N/A"
             ),
+            **Variables.role("new", newRole),
+            **Variables.role("previous", previousRole),
         }
-        return Variables.build(staff=staff, author=manager, extra=extra, guild=guild)
+        return await Variables.build(
+            staff=staff, author=manager, extra=extra, guild=guild
+        )
 
     @staticmethod
-    def promotion(staff, promotion, manager, guild) -> dict:
+    async def suggestions(suggestion, author, guild):
+        extra = {
+            "{suggestion}": suggestion.get("suggestion"),
+            "{image}": suggestion.get("image"),
+            "{upvotes}": (
+                len(suggestion.get("upvoters")) if suggestion.get("upvoters") else 0
+            ),
+            "{downvoters}": (
+                len(suggestion.get("downvoters")) if suggestion.get("downvoters") else 0
+            ),
+            "{reason}": suggestion.get("reason"),
+            "{downvote}": (
+                len(suggestion.get("downvoters")) if suggestion.get("downvoters") else 0
+            ),
+        }
+        return await Variables.build(
+            staff=author, author=author, extra=extra, guild=guild
+        )
+
+    @staticmethod
+    async def feedback(feedback, author, staff, guild) -> dict:
+        extra = {
+            "{feedback}": feedback.get("feedback"),
+            "{rating}": feedback.get("rating"),
+        }
+        return await Variables.build(
+            staff=staff, author=author, extra=extra, guild=guild
+        )
+
+    @staticmethod
+    async def promotion(staff, promotion, manager, guild) -> dict:
         newRole = guild.get_role(promotion.new) if guild else None
         previousRole = guild.get_role(promotion.previous) if guild else None
 
@@ -178,4 +222,6 @@ class Variables:
             **Variables.role("new", newRole),
             **Variables.role("previous", previousRole),
         }
-        return Variables.build(staff=staff, author=manager, extra=extra, guild=guild)
+        return await Variables.build(
+            staff=staff, author=manager, extra=extra, guild=guild
+        )

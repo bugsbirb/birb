@@ -24,7 +24,7 @@ class CustomCommands(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         IsPremium = await premium(interaction.guild.id)
         if self.values[0] == "Manage Commands":
@@ -190,8 +190,8 @@ class CommandSelection(discord.ui.Select):
             from cogs.Configuration.Components.EmbedBuilder import (
                 NoEmbed,
                 Embed,
-                DisplayEmbed,
             )
+            from core.discord.CustomEmbed import DisplayEmbed
 
             command = await interaction.client.db["Custom Commands"].find_one(
                 {"name": self.values[0], "guild_id": interaction.guild.id}

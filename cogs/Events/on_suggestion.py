@@ -5,6 +5,7 @@ from bson import ObjectId
 from discord.ext import commands
 
 from core.discord.CustomEmbed import DisplayEmbed
+from core.discord.Variables import Variables
 from core.discord.emojis import *
 from core.format import IsSeperateBot
 
@@ -71,23 +72,7 @@ class On_suggestions(commands.Cog):
                 value="0 <:UpVote:1223062893096996934> | 0 <:DownVote:1223063241433939989>",
             )
         else:
-            replacements = {
-                "{author.mention}": author.mention,
-                "{author.name}": author.display_name,
-                "{author.avatar}": (
-                    author.display_avatar.url if author.display_avatar else None,
-                ),
-                "{suggestion}": back.get("suggestion"),
-                "{image}": back.get("image"),
-                "{upvotes}": len(back.get("upvoters")) if back.get("upvoters") else 0,
-                "{downvoters}": (
-                    len(back.get("downvoters")) if back.get("downvoters") else 0
-                ),
-                "{reason}": back.get("reason"),
-                "{downvote}": (
-                    len(back.get("downvoters")) if back.get("downvoters") else 0
-                ),
-            }
+            replacements = await Variables.suggestions(back, author, guild)
             embed = await DisplayEmbed(custom, author, replacements=replacements)
         view = Voting()
         if IsSeperateBot():

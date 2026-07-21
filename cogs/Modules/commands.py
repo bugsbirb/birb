@@ -1,8 +1,6 @@
 import asyncio
 import logging
-import random
 import re
-from datetime import datetime
 
 import discord
 from discord import app_commands
@@ -11,6 +9,7 @@ from discord.ext import commands
 from cogs.Configuration.Components.EmbedBuilder import HandleButton
 from core.discord.CustomEmbed import DisplayEmbed
 from core.discord.Module import ModuleCheck
+from core.discord.Variables import Variables
 from core.discord.emojis import *
 from core.discord.permissions import has_admin_role
 from core.format import ReplaceVariables
@@ -19,74 +18,63 @@ logger = logging.getLogger(__name__)
 
 
 async def run(
-    ctx: discord.Interaction,
+    interaction: discord.Interaction,
     cmd: str = None,
     data: dict = None,
     channel: discord.TextChannel = None,
 ):
-    await ctx.response.defer(ephemeral=True)
-    client = ctx.client
+    await interaction.response.defer(ephemeral=True)
+    client = interaction.client
 
-    if not await ModuleCheck(ctx.guild.id, "customcommands"):
-        await ctx.followup.send(
-            f"{no} **{ctx.user.display_name}**, the custom commands module isn't enabled.",
+    if not await ModuleCheck(interaction.guild.id, "customcommands"):
+        await interaction.followup.send(
+            f"{no} **{interaction.user.display_name}**, the custom commands module isn't enabled.",
             ephemeral=True,
         )
         return
     if not data:
-        command_data = await client.db["Custom Commands"].find_one(
+        result = await client.db["Custom Commands"].find_one(
             {
                 "Command" if not cmd else "name": (
-                    cmd if not ctx.command else ctx.command.name
+                    cmd if not interaction.command else interaction.command.name
                 ),
-                "guild_id": ctx.guild.id,
+                "guild_id": interaction.guild.id,
             }
         )
 
-        if command_data is None:
-            await ctx.followup.send(
-                f"{no} **{ctx.user.display_name},** That command does not exist.",
+        if result is None:
+            await interaction.followup.send(
+                f"{no} **{interaction.user.display_name},** That command does not exist.",
                 ephemeral=True,
             )
             return
-        command = cmd if not ctx.command else ctx.command.name
+        command = cmd if not interaction.command else interaction.command.name
     else:
-        command_data = data
+        result = data
         command = data.get("Command")
 
-    if not await has_customcommandrole(ctx, command):
+    if not await RequiresPermission(interaction, command):
         return
 
     view = None
-    if command_data.get("components"):
-        view = await HandleButton(command_data)
+    if result.get("components"):
+        view = await HandleButton(result)
 
-    timestamp = datetime.utcnow().timestamp()
-    replacements = {
-        "{author.mention}": ctx.user.mention,
-        "{author.name}": ctx.user.display_name,
-        "{author.id}": str(ctx.user.id),
-        "{timestamp}": f"<t:{int(timestamp)}:F>",
-        "{guild.name}": ctx.guild.name,
-        "{guild.id}": str(ctx.guild.id),
-        "{guild.owner.mention}": ctx.guild.owner.mention if ctx.guild.owner else "",
-        "{guild.owner.name}": (ctx.guild.owner.display_name if ctx.guild.owner else ""),
-        "{guild.owner.id}": str(ctx.guild.owner.id) if ctx.guild.owner else "",
-        "{random}": str(random.randint(1, 1000000)),
-        "{guild.members}": str(ctx.guild.member_count),
-        "{channel.name}": channel.name if channel else ctx.channel.name,
-        "{channel.id}": str(channel.id) if channel else str(ctx.channel.id),
-        "{channel.mention}": channel.mention if channel else ctx.channel.mention,
-    }
+    replacements = await Variables.build(
+        staff=interaction.user,
+        author=interaction.user,
+        guild=interaction.guild,
+        extra=Variables.channel(channel),
+    )
 
-    content = ReplaceVariables(command_data.get("content", ""), replacements)
+    content = ReplaceVariables(result.get("content", ""), replacements)
     embed = None
-    if command_data.get("embed"):
-        embed = await DisplayEmbed(command_data, None, replacements)
-    target_channel = channel or ctx.channel
+    if result.get("embed"):
+        embed = await DisplayEmbed(result, None, replacements)
+    target_channel = channel or interaction.channel
     try:
         if not cmd:
-            msg = await target_channel.send(
+            await target_channel.send(
                 content,
                 embed=embed,
                 view=view,
@@ -94,12 +82,12 @@ async def run(
                     everyone=True, users=True, roles=True
                 ),
             )
-            await ctx.followup.send(
-                f"{tick} **{ctx.user.display_name},** The command has been sent",
+            await interaction.followup.send(
+                f"{tick} **{interaction.user.display_name},** The command has been sent",
                 ephemeral=True,
             )
         else:
-            await ctx.followup.send(
+            await interaction.followup.send(
                 content,
                 embed=embed,
                 allowed_mentions=discord.AllowedMentions(
@@ -109,31 +97,32 @@ async def run(
             )
 
     except discord.Forbidden:
-        await ctx.followup.send(
-            f"{no} **{ctx.user.display_name},** I do not have permission to send messages in that channel.",
+        await interaction.followup.send(
+            f"{no} **{interaction.user.display_name},** I do not have permission to send messages in that channel.",
             ephemeral=True,
         )
         return
 
     loggingdata = await client.db["Commands Logging"].find_one(
-        {"guild_id": ctx.guild.id}
+        {"guild_id": interaction.guild.id}
     )
     if loggingdata:
         loggingchannel = client.get_channel(loggingdata["channel_id"])
         if loggingchannel:
             log_embed = discord.Embed(
                 title="Custom Command Usage",
-                description=f"Command **{command}** was used by {ctx.user.mention} in {ctx.channel.mention}",
+                description=f"Command **{command}** was used by {interaction.user.mention} in {interaction.channel.mention}",
                 color=discord.Color.dark_embed(),
             )
             log_embed.set_author(
-                name=ctx.user.display_name, icon_url=ctx.user.display_avatar
+                name=interaction.user.display_name,
+                icon_url=interaction.user.display_avatar,
             )
             try:
                 await loggingchannel.send(embed=log_embed)
             except (discord.Forbidden, discord.HTTPException):
                 logger.warning(
-                    f"I could not send the log message in the specified channel (guild: {ctx.guild.name})"
+                    f"I could not send the log message in the specified channel (guild: {interaction.guild.name})"
                 )
 
 
@@ -360,7 +349,7 @@ class Voting(discord.ui.View):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-async def has_customcommandrole(ctx, command):
+async def RequiresPermission(ctx, command):
     if isinstance(ctx, discord.Interaction):
         author = ctx.user
         send = ctx.followup.send
@@ -371,10 +360,10 @@ async def has_customcommandrole(ctx, command):
         client = ctx.client
 
     filter = {"guild_id": ctx.guild.id, "name": command}
-    role_data = await client.db["Custom Commands"].find_one(filter)
+    data = await client.db["Custom Commands"].find_one(filter)
 
-    if role_data and "permissionroles" in role_data:
-        role_ids = role_data["permissionroles"]
+    if data and "permissionroles" in data:
+        role_ids = data["permissionroles"]
         if not isinstance(role_ids, list):
             role_ids = [role_ids]
 

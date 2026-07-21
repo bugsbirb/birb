@@ -5,11 +5,12 @@ from bson import ObjectId
 from discord.ext import commands
 
 from core.discord.CustomEmbed import DisplayEmbed
+from core.discord.Variables import Variables
 
 logger = logging.getLogger(__name__)
 
 
-class OnFEEDABCKS(commands.Cog):
+class OnFeedback(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client
 
@@ -63,28 +64,13 @@ class OnFEEDABCKS(commands.Cog):
             )
             embed.set_footer(text=f"Feedback ID: {back.get('feedbackid')}")
         else:
-            replacements = {
-                "{staff.mention}": staff.mention,
-                "{staff.name}": staff.display_name,
-                "{staff.display_name}": staff.display_name,
-                "{staff.avatar}": (
-                    staff.display_avatar.url if staff.display_avatar else None
-                ),
-                "{author.mention}": author.mention,
-                "{author.name}": author.display_name,
-                "{author.avatar}": (
-                    author.display_avatar.url if author.display_avatar else None,
-                ),
-                "{author.display_name}": (
-                    author.display_name if author.display_name else None
-                ),
-                "{feedback}": back.get("feedback"),
-                "{rating}": back.get("rating"),
-            }
+            replacements = await Variables.feedback(
+                staff=staff, feedback=back, author=author, guild=guild
+            )
             embed = await DisplayEmbed(custom, author, replacements=replacements)
             embed.set_footer(text=f"Feedback ID: {back.get('feedbackid')}")
         await channel.send(embed=embed, content=staff.mention)
 
 
 async def setup(client: commands.Bot) -> None:
-    await client.add_cog(OnFEEDABCKS(client))
+    await client.add_cog(OnFeedback(client))

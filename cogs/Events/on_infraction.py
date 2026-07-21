@@ -7,8 +7,8 @@ from bson import ObjectId
 from discord.ext import commands
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
-from core.discord.Variables import Variables
 from core.discord.CustomEmbed import DisplayEmbed
+from core.discord.Variables import Variables
 from core.discord.permissions import premium
 
 logger = logging.getLogger(__name__)
@@ -68,6 +68,8 @@ def InfractItem(data):
         escalated_from=data.get("EscalatedFrom"),
         skipExec=data.get("skipExec"),
         jumpUrl=data.get("jump_url"),
+        previous=data.get("previous"),
+        new=data.get("new"),
     )
 
 
@@ -102,6 +104,8 @@ class InfractionItem:
         escalated_from,
         skipExec,
         jumpUrl,
+        previous,
+        new,
     ):
         self.staff = staff
         self.management = management
@@ -119,6 +123,8 @@ class InfractionItem:
         self.escalated_from = escalated_from
         self.skipExec = skipExec
         self.jumpUrl = jumpUrl
+        self.previous = (previous,)
+        self.new = new
 
 
 class Embed:
@@ -239,7 +245,7 @@ class on_infractions(commands.Cog):
             view.issuer.label = f"Issued By {manager.display_name}"
 
         if custom:
-            replacements = Variables.infraction(
+            replacements = await Variables.infraction(
                 staff=staff, Infraction=Infraction, manager=manager, guild=guild
             )
             if Type == "Suspension":
@@ -503,12 +509,12 @@ async def DemotionSystem(
     logger.info(f"[Demotion] Started for member {member.id} in guild {guild.id}")
 
     if not settings.get("Promo"):
-        logger.warning(f"[Demotion] No Promo settings found for guild {guild.id}")
         return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
 
     DemoSystemType = settings.get("Promo", {}).get("System", {}).get("type", None)
     PrevRole = None
     SkipRole = None
+    OldRole = None
 
     if not DemoSystemType:
         return await self.db["infractions"].find_one({"_id": DemotionData.get("_id")})
@@ -556,6 +562,13 @@ async def DemotionSystem(
         ]
         SortedRoles.sort(key=lambda Role: Role.position)
 
+        MemberRolesInHierarchy = [Role for Role in SortedRoles if Role in MemberRoles]
+        OldRole = (
+            max(MemberRolesInHierarchy, key=lambda Role: Role.position)
+            if MemberRolesInHierarchy
+            else None
+        )
+
         if SkipTo:
             SkipRole = guild.get_role(int(SkipTo))
             logger.info(
@@ -591,7 +604,13 @@ async def DemotionSystem(
                             pass
 
                 await self.db["infractions"].update_one(
-                    {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
+                    {"_id": DemotionData.get("_id")},
+                    {
+                        "$set": {
+                            "new": SkipRole.id,
+                            "previous": OldRole.id if OldRole else None,
+                        }
+                    },
                 )
                 logger.info(f"[Demotion] Updated infraction with skip role ID")
                 return await self.db["infractions"].find_one(
@@ -660,7 +679,13 @@ async def DemotionSystem(
         RoleID = SkipRole.id if SkipTo else PrevRole.id if PrevRole else None
         if RoleID:
             await self.db["infractions"].update_one(
-                {"_id": DemotionData.get("_id")}, {"$set": {"new": RoleID}}
+                {"_id": DemotionData.get("_id")},
+                {
+                    "$set": {
+                        "new": RoleID,
+                        "previous": OldRole.id if OldRole else None,
+                    }
+                },
             )
 
     if DemoSystemType == "single":
@@ -688,6 +713,13 @@ async def DemotionSystem(
             if guild.get_role(int(RoleID))
         ]
         SortedRoles.sort(key=lambda Role: Role.position)
+
+        MemberRolesInHierarchy = [Role for Role in SortedRoles if Role in MemberRoles]
+        OldRole = (
+            max(MemberRolesInHierarchy, key=lambda Role: Role.position)
+            if MemberRolesInHierarchy
+            else None
+        )
 
         if SkipTo:
             SkipRole = guild.get_role(int(SkipTo))
@@ -721,7 +753,7 @@ async def DemotionSystem(
             try:
                 await member.add_roles(
                     SkipRole,
-                    reason=f"Staff Demotion (Skipped) in {Department} initiated by {manager.name}",
+                    reason=f"Staff Demotion (Skipped) initiated by {manager.name}",
                 )
             except (discord.Forbidden, discord.HTTPException) as e:
                 logger.error(f"[Demotion] Failed to add skip role: {e}")
@@ -739,7 +771,17 @@ async def DemotionSystem(
                         )
 
             await self.db["infractions"].update_one(
-                {"_id": DemotionData.get("_id")}, {"$set": {"new": SkipRole.id}}
+                {"_id": DemotionData.get("_id")},
+                {
+                    "$set": {
+                        "new": SkipRole.id,
+                        "previous": OldRole.id if OldRole else None,
+                    }
+                },
+            )
+            logger.info(f"[Demotion] Completed for member {member.id}")
+            return await self.db["infractions"].find_one(
+                {"_id": DemotionData.get("_id")}
             )
 
         for Index, CurrentRole in enumerate(SortedRoles):
@@ -797,7 +839,13 @@ async def DemotionSystem(
         RoleID = SkipRole.id if SkipTo else PrevRole.id if PrevRole else None
         if RoleID:
             await self.db["infractions"].update_one(
-                {"_id": DemotionData.get("_id")}, {"$set": {"new": RoleID}}
+                {"_id": DemotionData.get("_id")},
+                {
+                    "$set": {
+                        "new": RoleID,
+                        "previous": OldRole.id if OldRole else None,
+                    }
+                },
             )
 
     logger.info(f"[Demotion] Completed for member {member.id}")

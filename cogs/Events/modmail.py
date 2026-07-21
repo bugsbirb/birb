@@ -22,7 +22,7 @@ async def Reply(
     try:
         Channel = await Guild.fetch_channel(int(ModmailData.get("channel_id", 0)))
     except (discord.NotFound, discord.HTTPException):
-        traceback.format_exc(e)
+        traceback.format_exc()
         return await self.db["modmail"].delete_one({"user_id": message.author.id})
     if not Channel:
         return await message.add_reaction("⚠️")

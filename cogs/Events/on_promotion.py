@@ -7,8 +7,8 @@ from bson import ObjectId
 from discord.ext import commands
 
 from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.permissions import premium
 from core.discord.Variables import Variables
+from core.discord.permissions import premium
 
 logger = logging.getLogger(__name__)
 
@@ -200,7 +200,7 @@ class on_promotion(commands.Cog):
         if PromotionData:
             Promotion = Promotion(PromotionData)
         if custom:
-            replacements = Variables.promotion(
+            replacements = await Variables.promotion(
                 staff=staff, promotion=Promotion, manager=manager, guild=guild
             )
             embed = await DisplayEmbed(

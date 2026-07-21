@@ -191,9 +191,9 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
         embed = None
 
         from cogs.Configuration.Components.EmbedBuilder import (
-            DisplayEmbed,
             Embed,
         )
+        from core.discord.CustomEmbed import DisplayEmbed
 
         if not custom:
             view = Embed(

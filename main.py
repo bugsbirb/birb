@@ -9,8 +9,6 @@ import time
 import logging
 
 from motor.motor_asyncio import AsyncIOMotorClient
-
-# import pymongo
 from cogs.Modules.promotions import SyncCommands
 from cogs.Events.on_suggestion import Voting as Voti
 

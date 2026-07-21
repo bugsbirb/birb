@@ -544,7 +544,7 @@ class Infractions(commands.Cog):
             from core.discord.ui import YesOrNo
 
             if custom:
-                from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+                from core.discord.CustomEmbed import DisplayEmbed
 
                 replaces = Replacements(staff, FormeData, ctx.author)
                 embed = await DisplayEmbed(custom, ctx.author, replaces)

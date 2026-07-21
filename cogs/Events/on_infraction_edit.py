@@ -3,8 +3,8 @@ import logging
 import discord
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
 from cogs.Events.on_infraction import InfractItem, DefaultEmbed
+from core.discord.CustomEmbed import DisplayEmbed
 from core.discord.Variables import Variables
 
 logger = logging.getLogger(__name__)
@@ -73,9 +73,8 @@ class on_infraction_edit(commands.Cog):
                 "type": "Infractions",
             }
         )
-        embed = discord.Embed()
         if custom:
-            replacements = Variables.infraction(
+            replacements = await Variables.infraction(
                 staff=staff, Infraction=Infraction, manager=manager, guild=guild
             )
             embed = await DisplayEmbed(

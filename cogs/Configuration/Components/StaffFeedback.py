@@ -83,9 +83,9 @@ class StaffFeedback(discord.ui.Select):
                 embed = None
 
                 from cogs.Configuration.Components.EmbedBuilder import (
-                    DisplayEmbed,
                     Embed,
                 )
+                from core.discord.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(
@@ -167,7 +167,7 @@ class StaffFeedback(discord.ui.Select):
 
                 return await interaction.edit_original_response(embed=embed, view=view)
             except Exception as e:
-                traceback.print_exc(e)
+                traceback.print_exc()
 
 
 async def FinalFunction(interaction: discord.Interaction, d={}):

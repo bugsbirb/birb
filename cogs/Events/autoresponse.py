@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from fuzzywuzzy import fuzz
 
+from core.discord.Variables import Variables
 from core.discord.permissions import premium
 from core.format import ReplaceVariables
 
@@ -37,42 +38,13 @@ class autoresponse(commands.Cog):
 
         if not autoresponses:
             return
-        try:
-            guild = message.guild
-            owner = await guild.fetch_member(guild.owner_id)
-            ownermention = owner.mention
-            ownername = owner.name
-            ownerid = owner.id
-        except discord.NotFound:
-            ownermention = None
-            ownername = None
-            ownerid = None
-        timestamp = datetime.utcnow().timestamp()
-        timestampformat = f"<t:{int(timestamp)}:F>"
-        replacements = {
-            "{author.mention}": message.author.mention,
-            "{author.name}": message.author.display_name,
-            "{author.id}": str(message.author.id),
-            "{timestamp}": timestampformat,
-            "{guild.name}": message.guild.name if message.guild else "",
-            "{guild.id}": str(message.guild.id) if message.guild else "",
-            "{guild.owner.mention}": (
-                ownermention if message.guild and ownermention else ""
-            ),
-            "{guild.owner.name}": ownername if message.guild and owner else "",
-            "{guild.owner.id}": str(ownerid) if message.guild and owner else "",
-            "{random}": int(random.randint(1, 1000000)),
-            "{guild.members}": int(message.guild.member_count),
-            "{channel.name}": (
-                message.channel.name if message.channel else message.channel.name
-            ),
-            "{channel.id}": (
-                str(message.channel.id) if message.channel else str(message.channel.id)
-            ),
-            "{channel.mention}": (
-                message.channel.mention if message.channel else message.channel.mention
-            ),
-        }
+
+        replacements = await Variables.build(
+            staff=message.author,
+            author=message.author,
+            guild=message.guild,
+            extra=Variables.channel(message.channel),
+        )
 
         for response in autoresponses:
             trigger = response.get("trigger")
