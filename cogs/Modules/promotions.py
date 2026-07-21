@@ -280,7 +280,6 @@ async def MultiHireachy(
         context = await PromotionContext(interaction=interaction, target=user)
         if not context:
             return
-        print("na")
 
         client = await interaction.guild.fetch_member(interaction.client.user.id)
         if context.channel.permissions_for(client).send_messages is False:
@@ -288,7 +287,6 @@ async def MultiHireachy(
                 embed=NoPermissionChannel(context),
                 view=Support(),
             )
-        print("ca")
         DepartmentHierarchies = [
             dept
             for sublist in context.Config.get("Promo", {})
@@ -306,7 +304,6 @@ async def MultiHireachy(
                 content=f"{Emojis.no} **{interaction.user.display_name}**, the department `{department}` does not exist.",
             )
             return
-        print("sa")
 
         NextRole = None
         PreviousRole = None
@@ -318,8 +315,6 @@ async def MultiHireachy(
             if interaction.guild.get_role(int(roleId))
         ]
         SortedRoles.sort(key=lambda r: r.position)
-
-        print("ba")
 
         HierarchyRoles = [role for role in SortedRoles if role in user.roles]
         PreviousRole = (
@@ -334,7 +329,6 @@ async def MultiHireachy(
                 )
                 return
 
-        print("sa")
 
         NextRole = SkipRole
         if not NextRole:
@@ -360,7 +354,6 @@ async def MultiHireachy(
             )
             return
 
-        print("ca2")
 
         Object = await interaction.client.db["promotions"].insert_one(
             {
