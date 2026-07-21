@@ -111,6 +111,16 @@ class On_error(commands.Cog):
                     view=Support(),
                 )
                 return
+            if isinstance(error, MissingAdvancedPermissions):
+                await send(
+                    embed=NoAdvancedPermission(),
+                    view=Support(),
+                    ephemeral=(
+                        True
+                        if isinstance(interactionType, discord.Interaction)
+                        else False
+                    ),
+                )
             if isinstance(error, MissingSetup):
                 await send(
                     embed=BotNotConfigured(),
