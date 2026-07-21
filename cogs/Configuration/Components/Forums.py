@@ -137,7 +137,8 @@ class ForumSelection(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         await interaction.response.defer()
-        from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed, Embed
+        from core.discord.CustomEmbed import DisplayEmbed
+        from cogs.Configuration.Components.EmbedBuilder import Embed
 
         Forum = await interaction.client.db["Forum Configuration"].find_one(
             {"guild_id": interaction.guild.id, "name": self.values[0]}

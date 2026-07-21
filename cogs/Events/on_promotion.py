@@ -6,8 +6,9 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from core.discord.CustomEmbed import DisplayEmbed
 from core.discord.permissions import premium
+from core.discord.Variables import Variables
 
 logger = logging.getLogger(__name__)
 
@@ -127,23 +128,23 @@ class on_promotion(commands.Cog):
         self, objectid: ObjectId, Settings: dict, edit: bool = False
     ):
         PromotionData = await self.client.db["promotions"].find_one({"_id": objectid})
-        Infraction = Promotion(PromotionData)
-        guild = await self.client.fetch_guild(Infraction.guild_id)
+        Promotion = Promotion(PromotionData)
+        guild = await self.client.fetch_guild(Promotion.guild_id)
 
         if guild is None:
             logging.warning(
-                f"[🏠 on_promotion] {Infraction.guild_id} is None and can't be found..?",
+                f"[🏠 on_promotion] {Promotion.guild_id} is None and can't be found..?",
                 extra={"objectId": str(objectid)},
             )
             return
 
         try:
-            staff = await guild.fetch_member(int(Infraction.staff))
+            staff = await guild.fetch_member(int(Promotion.staff))
         except:
             staff = None
         if staff is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} staff member {Infraction.staff} can't be found.",
+                f"[🏠 on_promotion] @{guild.name} staff member {Promotion.staff} can't be found.",
                 extra={"objectId": str(objectid)},
             )
             return
@@ -154,12 +155,12 @@ class on_promotion(commands.Cog):
         )
 
         try:
-            manager = await guild.fetch_member(int(Infraction.management))
+            manager = await guild.fetch_member(int(Promotion.management))
         except:
             manager = None
         if manager is None:
             logging.warning(
-                f"[🏠 on_promotion] @{guild.name} manager {Infraction.management} can't be found.",
+                f"[🏠 on_promotion] @{guild.name} manager {Promotion.management} can't be found.",
                 extra={"objectId": str(objectid)},
             )
             return
@@ -191,38 +192,17 @@ class on_promotion(commands.Cog):
             view = PromotionIssuer()
             view.issuer.label = f"Issued By {manager.display_name}"
         custom = await self.client.db["Customisation"].find_one(
-            {"guild_id": Infraction.guild_id, "type": "Promotions"}
+            {"guild_id": Promotion.guild_id, "type": "Promotions"}
         )
-        embed = discord.Embed()
         PromotionData = await PromotionSystem(
             self.client, PromotionData, guild, staff, manager
         )
         if PromotionData:
-            Infraction = Promotion(PromotionData)
+            Promotion = Promotion(PromotionData)
         if custom:
-            replacements = {
-                "{staff.mention}": staff.mention,
-                "{staff.name}": staff.display_name,
-                "{staff.avatar}": (
-                    staff.display_avatar.url if staff.display_avatar else None
-                ),
-                "{author.mention}": manager.mention,
-                "{author.name}": manager.display_name,
-                "{newrank}": f"<@&{Infraction.new}>",
-                "{previous_rank}": f"<@&{Infraction.previous}>",
-                "{reason}": Infraction.reason,
-                "{author.avatar}": (
-                    manager.display_avatar.url if manager.display_avatar else None
-                ),
-                "{notes}": Infraction.notes if Infraction.notes else "",
-                "{promotion.id}": (
-                    Infraction.random_string
-                    if hasattr(Infraction, "random_string")
-                    else ""
-                ),
-                "{guild.name}": guild.name,
-                "{guild.id}": str(guild.id),
-            }
+            replacements = Variables.promotion(
+                staff=staff, promotion=Promotion, manager=manager, guild=guild
+            )
             embed = await DisplayEmbed(
                 data=custom, user=staff, replacements=replacements
             )

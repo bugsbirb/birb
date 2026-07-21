@@ -1196,7 +1196,7 @@ class quota(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if custom and custom.get("embed"):
-            from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+            from core.discord.CustomEmbed import DisplayEmbed
 
             embed = await DisplayEmbed(custom, ctx.author)
         People = (

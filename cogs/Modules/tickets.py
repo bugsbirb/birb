@@ -10,7 +10,7 @@ import pymongo
 from discord import app_commands
 from discord.ext import commands
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from core.discord.CustomEmbed import DisplayEmbed
 from cogs.Events.on_ticket import TicketPermissions
 from core.discord.emojis import *
 from core.discord.permissions import (

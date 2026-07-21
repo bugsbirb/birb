@@ -4,7 +4,7 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from core.discord.CustomEmbed import DisplayEmbed
 
 logger = logging.getLogger(__name__)
 

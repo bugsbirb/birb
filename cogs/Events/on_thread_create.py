@@ -17,26 +17,26 @@ class ForumCreaton(commands.Cog):
     @commands.Cog.listener()
     async def on_thread_create(self, thread: discord.Thread):
         guild_id = thread.guild.id
-        config_data = await self.client.db["Forum Configuration"].find_one(
+        config = await self.client.db["Forum Configuration"].find_one(
             {"guild_id": guild_id, "channel_id": thread.parent_id}
         )
-        if not config_data or "channel_id" not in config_data:
+        if not config or "channel_id" not in config:
             return
 
         if thread.guild.id != guild_id:
             return
-        if thread.parent_id != config_data["channel_id"]:
+        if thread.parent_id != config["channel_id"]:
             return
         await asyncio.sleep(2)
-        if config_data:
-            from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+        if config:
+            from core.discord.CustomEmbed import DisplayEmbed
 
             embed = await DisplayEmbed(
-                config_data,
+                config,
             )
             Roles = ""
             view = None
-            Roled = config_data.get("role")
+            Roled = config.get("role")
             if Roled:
                 if not isinstance(Roled, list):
                     Roled = [Roled]
@@ -48,13 +48,13 @@ class ForumCreaton(commands.Cog):
                         Roles.append(role)
                 Roles = ", ".join([role.mention for role in Roles])
 
-            if config_data.get("Close") or config_data.get("Lock"):
+            if config.get("Close") or config.get("Lock"):
                 view = CloseLock()
                 view.remove_item(view.Close)
                 view.remove_item(view.lock)
-                if config_data.get("Close"):
+                if config.get("Close"):
                     view.add_item(view.Close)
-                if config_data.get("Lock"):
+                if config.get("Lock"):
                     view.add_item(view.lock)
 
             msg = await thread.send(

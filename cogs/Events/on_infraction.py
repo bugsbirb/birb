@@ -7,7 +7,8 @@ from bson import ObjectId
 from discord.ext import commands
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from core.discord.Variables import Variables
+from core.discord.CustomEmbed import DisplayEmbed
 from core.discord.permissions import premium
 
 logger = logging.getLogger(__name__)
@@ -30,31 +31,6 @@ def HubConnection(serverId: str):
 
 def normalize(value):
     return str(value) if isinstance(value, int) else value
-
-
-def Replacements(staff: discord.Member, Infraction: dict, manager: discord.Member):
-    def get_attr_or_key(obj, key):
-        return getattr(obj, key, None) if hasattr(obj, key) else obj.get(key, "N/A")
-
-    replacements = {
-        "{staff.mention}": staff.mention,
-        "{staff.name}": staff.display_name,
-        "{staff.avatar}": staff.display_avatar.url if staff.display_avatar else None,
-        "{author.mention}": manager.mention,
-        "{author.name}": manager.display_name,
-        "{action}": get_attr_or_key(Infraction, "action"),
-        "{reason}": get_attr_or_key(Infraction, "reason"),
-        "{notes}": get_attr_or_key(Infraction, "notes"),
-        "{author.avatar}": (
-            manager.display_avatar.url if manager.display_avatar else None
-        ),
-        "{expiration}": (
-            f"<t:{int(get_attr_or_key(Infraction, 'expiration').timestamp())}:R>"
-            if get_attr_or_key(Infraction, "expiration")
-            else "N/A"
-        ),
-    }
-    return replacements
 
 
 def DefaultEmbed(data, staff, manager):
@@ -263,8 +239,8 @@ class on_infractions(commands.Cog):
             view.issuer.label = f"Issued By {manager.display_name}"
 
         if custom:
-            replacements = Replacements(
-                staff=staff, Infraction=Infraction, manager=manager
+            replacements = Variables.infraction(
+                staff=staff, Infraction=Infraction, manager=manager, guild=guild
             )
             if Type == "Suspension":
                 replacements.update(

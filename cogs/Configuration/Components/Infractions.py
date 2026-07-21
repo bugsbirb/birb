@@ -204,9 +204,9 @@ class InfractionOption(discord.ui.Select):
                 embed = None
 
                 from cogs.Configuration.Components.EmbedBuilder import (
-                    DisplayEmbed,
                     Embed,
                 )
+                from core.discord.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(color=discord.Color.dark_embed())

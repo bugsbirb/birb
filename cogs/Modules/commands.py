@@ -8,7 +8,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed, HandleButton
+from cogs.Configuration.Components.EmbedBuilder import HandleButton
+from core.discord.CustomEmbed import DisplayEmbed
 from core.discord.Module import ModuleCheck
 from core.discord.emojis import *
 from core.discord.permissions import has_admin_role

@@ -3,8 +3,9 @@ import logging
 import discord
 from discord.ext import commands
 
-from cogs.Configuration.Components.EmbedBuilder import DisplayEmbed
+from core.discord.CustomEmbed import DisplayEmbed
 from cogs.Events.on_infraction import InfractItem, DefaultEmbed
+from core.discord.Variables import Variables
 
 logger = logging.getLogger(__name__)
 
@@ -74,26 +75,9 @@ class on_infraction_edit(commands.Cog):
         )
         embed = discord.Embed()
         if custom:
-            replacements = {
-                "{staff.mention}": staff.mention,
-                "{staff.name}": staff.display_name,
-                "{staff.avatar}": (
-                    staff.display_avatar.url if staff.display_avatar else None
-                ),
-                "{author.mention}": manager.mention,
-                "{author.name}": manager.display_name,
-                "{action}": Infraction.action,
-                "{reason}": Infraction.reason,
-                "{notes}": Infraction.notes,
-                "{author.avatar}": (
-                    manager.display_avatar.url if manager.display_avatar else None,
-                ),
-                "{expiration}": (
-                    f"<t:{int(Infraction.expiration.timestamp())}:R>"
-                    if Infraction.expiration
-                    else "N/A"
-                ),
-            }
+            replacements = Variables.infraction(
+                staff=staff, Infraction=Infraction, manager=manager, guild=guild
+            )
             embed = await DisplayEmbed(
                 data=custom, user=staff, replacements=replacements
             )
