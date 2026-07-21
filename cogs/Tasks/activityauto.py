@@ -1,17 +1,18 @@
-import random
-import string
-import re
 import asyncio
-from core.discord.HelpEmbeds import *
-from discord.ext import tasks
-from cogs.Modules.staff import quota as QUOTA
-
-from core.format import TimeReformat
-from core.discord.Module import ModuleCheck
-from core.discord.permissions import *
-from datetime import timedelta, datetime
 import logging
+import random
+import re
+import string
+from datetime import timedelta, datetime
+
 import sentry_sdk
+from discord.ext import tasks
+
+from cogs.Modules.staff import quota as QUOTA
+from core.bot.HelpEmbeds import *
+from core.bot.Module import ModuleCheck
+from core.bot.permissions import *
+from core.format import TimeReformat
 
 logger = logging.getLogger(__name__)
 
@@ -229,7 +230,7 @@ class ResetLeaderboard(discord.ui.View):
         label="Reset Leaderboard",
         style=discord.ButtonStyle.danger,
         custom_id="persistent:resetleaderboard",
-        emoji="<:staticload:1206248311280111616>",
+        emoji=f"{Emojis.static_load}",
     )
     async def reset_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -254,7 +255,7 @@ class ResetLeaderboard(discord.ui.View):
         label="Punish Failures",
         style=discord.ButtonStyle.danger,
         custom_id="persistent:punishfailures",
-        emoji="<:hammer:1280559940788031663>",
+        emoji=f"{Emojis.hammer}",
     )
     async def punishfailures(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -268,7 +269,7 @@ class ResetLeaderboard(discord.ui.View):
             self.failures = result.get("failed", [])
             if not result or self.failures is None or len(self.failures) == 0:
                 await interaction.response.send_message(
-                    f"{no} **{interaction.user.display_name}**, there are no failures to punish.",
+                    f"{Emojis.no} **{interaction.user.display_name}**, there are no failures to punish.",
                     ephemeral=True,
                 )
                 return
@@ -301,18 +302,18 @@ class ActionModal(discord.ui.Modal, title="Action"):
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
+                f"{Emojis.no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
                 ephemeral=True,
             )
         if not Config.get("Infraction", None):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
+                f"{Emojis.no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
                 ephemeral=True,
             )
 
         if Config.get("group", {}).get("id", None):
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             Roblox = await GetValidToken(user=interaction.user)
             if not Roblox:
@@ -326,12 +327,12 @@ class ActionModal(discord.ui.Modal, title="Action"):
             )
         except (discord.NotFound, discord.HTTPException, discord.Forbidden):
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find your infraction channel.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't find your infraction channel.",
                 ephemeral=True,
             )
         if not channel:
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find your infraction channel.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't find your infraction channel.",
                 ephemeral=True,
             )
         client = await interaction.guild.fetch_member(interaction.client.user.id)
@@ -340,12 +341,12 @@ class ActionModal(discord.ui.Modal, title="Action"):
             or channel.permissions_for(client).view_channel is False
         ):
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name},** I don't have permissions to send messages in the infraction channel.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I don't have permissions to send messages in the infraction channel.",
                 ephemeral=True,
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Use e.g. '1d', '2h'.",
+                f"{Emojis.no} **{interaction.user.display_name}**, invalid duration format. Use e.g. '1d', '2h'.",
                 ephemeral=True,
             )
         if expiration:
@@ -355,7 +356,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
             user = await interaction.guild.fetch_member(Ids)
             if user is None:
                 await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name}**, user {Ids} not found.",
+                    f"{Emojis.no} **{interaction.user.display_name}**, user {Ids} not found.",
                     ephemeral=True,
                 )
                 continue
@@ -407,7 +408,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
             )
             if not InfractionResult.inserted_id:
                 await interaction.followup.send(
-                    f"{crisis} **{interaction.user.display_name},** error submitting infraction.",
+                    f"{Emojis.crisis} **{interaction.user.display_name},** error submitting infraction.",
                     ephemeral=True,
                 )
                 continue
@@ -439,7 +440,7 @@ class ActionModal(discord.ui.Modal, title="Action"):
                     "infraction_approval", InfractionResult.inserted_id, Config
                 )
                 await interaction.followup.send(
-                    f"{tick} **{interaction.user.display_name},** sent infraction to approval.",
+                    f"{Emojis.tick} **{interaction.user.display_name},** sent infraction to approval.",
                     ephemeral=True,
                 )
                 continue

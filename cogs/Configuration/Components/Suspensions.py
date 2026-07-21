@@ -1,8 +1,8 @@
 import traceback
 
 import discord
-
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.emojis import Emojis
+from core.bot.HelpEmbeds import NotYourPanel
 
 
 class SuspensionOptions(discord.ui.Select):
@@ -10,11 +10,11 @@ class SuspensionOptions(discord.ui.Select):
         super().__init__(
             options=[
                 discord.SelectOption(
-                    label="Suspension Channel", emoji="<:tag:1234998802948034721>"
+                    label="Suspension Channel", emoji=f"{Emojis.tags}"
                 ),
                 discord.SelectOption(
                     label="Customise Embed",
-                    emoji="<:Customisation:1223063306131210322>",
+                    emoji=f"{Emojis.customisation}",
                 ),
             ]
         )
@@ -51,7 +51,7 @@ class SuspensionOptions(discord.ui.Select):
                     NoEmbed,
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 view = Embed(
                     interaction.user,
@@ -268,7 +268,7 @@ async def SuspensionEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's suspensions settings! Suspension are a way to punish staff members for a period of time. You can find out more at [the documentation](https://docs.astrobirb.dev/)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Suspension",
+        name=f"{Emojis.settings_gear} Suspension",
         value=f"> `Suspension Channel:` {Channel}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)",
         inline=False,
     )

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from core.format import IsSeperateBot
+
+from core.bot.emojis import Emojis
 
 
 class botinfo(commands.Cog):
@@ -60,7 +61,7 @@ class Buttons(discord.ui.View):
     @discord.ui.button(
         label="Attributions",
         style=discord.ButtonStyle.blurple,
-        emoji="<:info:1245364500874399864>",
+        emoji=f"{Emojis.info}",
     )
     async def attributions(
         self, interaction: discord.Interaction, button: discord.ui.Button

@@ -1,12 +1,11 @@
 import logging
 
-import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
 from cogs.Events.on_suggestion import Voting
-from core.discord.emojis import *
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)
@@ -64,7 +63,7 @@ class On_suggestions_edit(commands.Cog):
 
             embed = discord.Embed(
                 title="",
-                description=f"<:Member:1226674150463111299> {author.mention}",
+                description=f"{Emojis.member} {author.mention}",
                 color=discord.Color.yellow(),
             )
             embed.set_thumbnail(url=author.display_avatar)
@@ -74,22 +73,22 @@ class On_suggestions_edit(commands.Cog):
             if back.get("image"):
                 embed.set_image(url=back.get("image"))
             embed.add_field(
-                name="<:pin:1226671966413389864> Suggestion",
+                name=f"{Emojis.pin} Suggestion",
                 value=back.get("suggestion"),
             )
             embed.set_author(icon_url=author.display_avatar, name=author.name)
             embed.add_field(
-                name="<:messageforward1:1230919023361921165> Opinions",
-                value=f"{len(back.get('upvoters')) if back.get('upvoters') else 0} <:UpVote:1223062893096996934> | {len(back.get('downvoters')) if back.get('downvoters') else 0} <:DownVote:1223063241433939989>",
+                name=f"{Emojis.message_forward} Opinions",
+                value=f"{len(back.get('upvoters')) if back.get('upvotersf') else 0} {Emojis.upvote} | {len(back.get('downvoters')) if back.get('downvotersf') else 0} {Emojis.downvote}",
             )
             if action == "Accepted Suggestion":
-                embed.title = f"{greencheck} Suggestion Accepted"
+                embed.title = f"{Emojis.green_tick} Suggestion Accepted"
                 embed.color = discord.Color.brand_green()
                 view.upvote.disabled = True
                 view.downvote.disabled = True
                 view.settings.disabled = True
             if action == "Denied Suggestion":
-                embed.title = f"{redx} Suggestion Denied"
+                embed.title = f"{Emojis.red_cross} Suggestion Denied"
                 embed.color = discord.Color.brand_red()
                 embed.add_field(
                     name="Denied Reason", value=f"{back.get('reason')}", inline=False

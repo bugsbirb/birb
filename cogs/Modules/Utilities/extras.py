@@ -1,12 +1,10 @@
-import discord
-from discord.ext import commands
-from discord import app_commands
-
 from datetime import datetime
 
-
 import aiohttp
-from core.discord.emojis import *
+from discord import app_commands
+from discord.ext import commands
+
+from core.bot.emojis import *
 
 
 class Utility(commands.Cog):
@@ -32,7 +30,7 @@ class Utility(commands.Cog):
 
         except aiohttp.ClientError as e:
             await interaction.response.send_message(
-                f"{crisis} {interaction.user.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`",
+                f"{Emojis.crisis} {interaction.user.mention}, I couldn't get a birb image for you :c\n**Error:** `{e}`",
             )
 
     @app_commands.command(description="Get support from the support server")
@@ -45,7 +43,7 @@ class Utility(commands.Cog):
                 label="Join",
                 url="https://discord.gg/DhWdgfh3hN",
                 style=discord.ButtonStyle.blurple,
-                emoji="<:link:1206670134064717904>",
+                emoji=f"{Emojis.link}",
             )
         )
         view.add_item(
@@ -74,7 +72,7 @@ class Utility(commands.Cog):
                 label="Invite",
                 url="https://discord.com/api/oauth2/authorize?client_id=1113245569490616400&permissions=1632557853697&scope=bot%20applications.commands",
                 style=discord.ButtonStyle.blurple,
-                emoji="<:link:1206670134064717904>",
+                emoji=f"{Emojis.link}",
             )
         )
         await interaction.response.send_message(view=view)

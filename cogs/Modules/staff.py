@@ -1,32 +1,31 @@
 import logging
-import os
 import random
 import re
 import string
 from datetime import datetime
 from typing import Literal
 
-import discord
 import pymongo
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.Checks import EnsureConfig
+from core.bot.emojis import *
 from core.format import IsSeperateBot, PaginatorButtons
 
 logger = logging.getLogger(__name__)
 
 
-from core.discord.permissions import Permissions
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
+from core.bot.permissions import Permissions
+from core.bot.Module import ModuleCheck, ModuleIsEnabled
 from core.format import LeaderboardPlace
-from core.discord.permissions import check_admin_and_staff
+from core.bot.permissions import check_admin_and_staff
 
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
 
-from core.discord.HelpEmbeds import (
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     ModuleNotEnabled,
     Support,
@@ -55,7 +54,7 @@ class SetMessages(discord.ui.Modal, title="Set Message Count"):
                 raise ValueError("Message count cannot be negative.")
         except ValueError as e:
             await interaction.response.send_message(
-                f"{no} Invalid input: {str(e)}. Please enter a valid non-negative integer.",
+                f"{Emojis.no} Invalid input: {str(e)}. Please enter a valid non-negative integer.",
                 ephemeral=True,
             )
             return
@@ -67,7 +66,7 @@ class SetMessages(discord.ui.Modal, title="Set Message Count"):
         )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, the user's message count has been updated to `{message_count_value}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, the user's message count has been updated to `{message_count_value}`.",
             embed=None,
             view=None,
         )
@@ -91,7 +90,7 @@ class AddMessage(discord.ui.Modal, title="Add Messages"):
                 raise ValueError("Message count must be a positive integer.")
         except ValueError:
             await interaction.response.send_message(
-                f"{no} Invalid input. Please enter a valid positive number for the message count.",
+                f"{Emojis.no} Invalid input. Please enter a valid positive number for the message count.",
                 ephemeral=True,
             )
             return
@@ -106,7 +105,7 @@ class AddMessage(discord.ui.Modal, title="Add Messages"):
             action_message = "added to the existing record"
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, `{message_count_value}` messages have been successfully {action_message}.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, `{message_count_value}` messages have been successfully {action_message}.",
             embed=None,
             view=None,
         )
@@ -131,7 +130,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
                 raise ValueError("Message count must be a positive integer.")
         except ValueError as e:
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** Please enter a valid positive integer.",
+                f"{Emojis.no} **{interaction.user.display_name},** Please enter a valid positive integer.",
                 ephemeral=True,
             )
             return
@@ -142,7 +141,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
         )
         if not result:
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**,  No existing record found for this user. Unable to remove messages.",
+                f"{Emojis.no} **{interaction.user.display_name}**,  No existing record found for this user. Unable to remove messages.",
                 ephemeral=True,
             )
             return
@@ -153,7 +152,7 @@ class RemovedMessage(discord.ui.Modal, title="Remove Messages"):
             {"$set": {"message_count": NewMessageCount}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, `{MSGCount}` messages have been removed. The new message count is `{NewMessageCount}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, `{MSGCount}` messages have been removed. The new message count is `{NewMessageCount}`.",
             embed=None,
             view=None,
         )
@@ -169,7 +168,7 @@ class StaffManage(discord.ui.View):
     @discord.ui.button(
         label="Add Messages",
         style=discord.ButtonStyle.green,
-        emoji="<:Add:1163095623600447558>",
+        emoji=f"{Emojis.add}",
         row=1,
     )
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -200,7 +199,7 @@ class StaffManage(discord.ui.View):
         label="Set Messages",
         style=discord.ButtonStyle.blurple,
         row=2,
-        emoji="<:Pen:1235001839036923996>",
+        emoji=f"{Emojis.pen}",
     )
     async def set(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -214,7 +213,7 @@ class StaffManage(discord.ui.View):
         label="Reset Messages",
         style=discord.ButtonStyle.red,
         row=2,
-        emoji="<:bin:1235001855721865347>",
+        emoji=f"{Emojis.bin}",
     )
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
         staff_id = self.staff_id
@@ -228,7 +227,7 @@ class StaffManage(discord.ui.View):
         await interaction.client.db["messages"].update_one(filter, update)
 
         await interaction.response.edit_message(
-            content=f"**{tick} {interaction.user.display_name}**, I have reset the staff member's ",
+            content=f"**{Emojis.tick} {interaction.user.display_name}**, I have reset the staff member's ",
             embed=None,
             view=None,
         )
@@ -260,7 +259,7 @@ class quota(commands.Cog):
             upsert=True,
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have added `@{rank.name}` to the staff list.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, I have added `@{rank.name}` to the staff list.",
         )
 
     @list.command(description="Remove a rank from the staff list")
@@ -269,7 +268,7 @@ class quota(commands.Cog):
     async def remove(self, ctx: commands.Context, rank: discord.Role):
         await self.client.db["Staff List"].delete_one({"rank": rank.id})
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have removed `@{rank.name}` from the staff list.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, I have removed `@{rank.name}` from the staff list.",
         )
 
     @list.command(description="Send the staff list")
@@ -283,7 +282,7 @@ class quota(commands.Cog):
         )
         if len(results) == 0 or not results:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no ranks in the staff list.\n{replybottom} You can add a rank using `/staff list add <rank> <position>`."
+                f"{Emojis.no} **{ctx.author.display_name}**, there are no ranks in the staff list.\n{Emojis.replybottom} You can add a rank using `/staff list add <rank> <position>`."
             )
         results = sorted(results, key=lambda x: int(x.get("position", 0)))
         member_roles = {}
@@ -341,7 +340,9 @@ class quota(commands.Cog):
                     view=Support(),
                 )
                 return
-            await ctx.send(f"{tick} successfully sent the staff list.", ephemeral=True)
+            await ctx.send(
+                f"{Emojis.tick} successfully sent the staff list.", ephemeral=True
+            )
         else:
             try:
 
@@ -415,7 +416,7 @@ class quota(commands.Cog):
         else:
             msg = await ctx.send(
                 embed=discord.Embed(
-                    description="<a:astroloading:1245681595546079285>",
+                    description=f"{Emojis.loading_alt}",
                     color=discord.Color.dark_embed(),
                 )
             )
@@ -531,7 +532,7 @@ class quota(commands.Cog):
         else:
             msg = await ctx.send(
                 embed=discord.Embed(
-                    description="<a:astroloading:1245681595546079285>",
+                    description=f"{Emojis.loading_alt}",
                     color=discord.Color.dark_embed(),
                 )
             )
@@ -673,17 +674,9 @@ class quota(commands.Cog):
                 "`LOA`"
                 if OnLOA
                 else (
-                    (
-                        "Met"
-                        if IsSeperateBot()
-                        else "<:status_green:1227365520857104405>"
-                    )
+                    ("Met" if IsSeperateBot() else f"{Emojis.status_green}")
                     if MessageData.get("message_count") >= Quota
-                    else (
-                        "Not Met"
-                        if IsSeperateBot()
-                        else "<:status_red:1227365495376711700>"
-                    )
+                    else ("Not Met" if IsSeperateBot() else f"{Emojis.status_red}")
                 )
             )
             users = (
@@ -699,7 +692,7 @@ class quota(commands.Cog):
             color=discord.Color.dark_embed(),
         )
         embed.add_field(
-            name="<:tablerprogressbolt:1330500442551091210> Manage Messages",
+            name=f"{Emojis.progress_bolt} Manage Messages",
             value=f"> **Messages:** {MessageData.get('message_count', 0) if MessageData else 0} messages\n> **Passed:** {YourEmoji if YourEmoji else 'N/A'}{Name}\n> **Place:** {LeaderboardPlace(YouPlace) if MessageData else 'N/A' if YouPlace else 'N/A'}",
         )
         embed.set_author(name=f"@{staff.name}", icon_url=staff.display_avatar)
@@ -719,13 +712,9 @@ class quota(commands.Cog):
         )
         if not MessageData:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, they haven't sent any messages."
+                f"{Emojis.no} **{ctx.author.display_name}**, they haven't sent any messages."
             )
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Message Quota"):
-            return await ctx.send(embed=ModuleNotEnabled(), view=Support())
+        Config = await EnsureConfig(ctx, "Message Quota")
         Quota, Name = self.GetQuota(staff, Config)
         YourEmoji = None
         YouPlace = None
@@ -739,16 +728,10 @@ class quota(commands.Cog):
                 "`LOA`"
                 if OnLOA
                 else (
-                    (
-                        "Met"
-                        if environment == "custom"
-                        else "<:status_green:1227365520857104405>"
-                    )
+                    ("Met" if environment == "custom" else f"{Emojis.status_green}")
                     if MessageData.get("message_count") >= Quota
                     else (
-                        "Not Met"
-                        if environment == "custom"
-                        else "<:status_red:1227365495376711700>"
+                        "Not Met" if environment == "custom" else f"{Emojis.status_red}"
                     )
                 )
             )
@@ -768,7 +751,7 @@ class quota(commands.Cog):
             icon_url=staff.display_avatar,
         )
         embed.add_field(
-            name="<:tablerprogressbolt:1330500442551091210> Progress",
+            name=f"{Emojis.progress_bolt} Progress",
             value=f"> **Messages:** {MessageData.get('message_count')} messages\n> **Passed:** {YourEmoji if YourEmoji else 'N/A'}{Name}\n> **Place:** {LeaderboardPlace(YouPlace) if YouPlace else 'N/A'}",
         )
         await ctx.send(embed=embed)
@@ -778,22 +761,17 @@ class quota(commands.Cog):
     @ModuleIsEnabled("Quota")
     async def export(self, ctx: commands.Context):
         await ctx.defer(ephemeral=True)
-        msg = await ctx.send("<a:Loading:1167074303905386587> Exporting to CSV...")
+        msg = await ctx.send(f"{Emojis.loading} Exporting to CSV...")
         users = (
             await self.client.db["messages"]
             .find({"guild_id": ctx.guild.id})
             .sort("message_count", pymongo.DESCENDING)
             .to_list(length=None)
         )
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Message Quota"):
-            return await ctx.send(embed=ModuleNotEnabled(), view=Support())
-
+        Config = await EnsureConfig(ctx, "Message Quota")
         if not users:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there are no users in the leaderboard."
+                f"{Emojis.no} **{ctx.author.display_name}**, there are no users in the leaderboard."
             )
 
         CSV = "User,Messages,Passed"
@@ -819,7 +797,7 @@ class quota(commands.Cog):
             f.write(CSV)
         await msg.edit(
             attachments=[discord.File(filename)],
-            content=f"{tick} **{ctx.author.display_name}**, here's your CSV file.",
+            content=f"{Emojis.tick} **{ctx.author.display_name}**, here's your CSV file.",
         )
         os.remove(filename)
 
@@ -829,14 +807,9 @@ class quota(commands.Cog):
     @Permissions("Staff")
     @ModuleIsEnabled("Quota")
     async def leaderboard(self, ctx: commands.Context):
-        if not await ModuleCheck(ctx.guild.id, "Quota"):
-            await ctx.send(
-                embed=ModuleNotEnabled(),
-                view=Support(),
-            )
-            return
 
         await ctx.defer()
+        Config = await EnsureConfig(ctx, "Message Quota")
         if IsSeperateBot():
             msg = await ctx.send(
                 embed=discord.Embed(
@@ -847,14 +820,11 @@ class quota(commands.Cog):
         else:
             msg = await ctx.send(
                 embed=discord.Embed(
-                    description="<a:astroloading:1245681595546079285>",
+                    description=f"{Emojis.loading_alt}",
                     color=discord.Color.dark_embed(),
                 )
             )
 
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
-        if Config is None:
-            return await msg.edit(embed=BotNotConfigured(), view=Support())
         message_users = (
             await self.client.db["messages"]
             .find({"guild_id": ctx.guild.id})
@@ -864,7 +834,7 @@ class quota(commands.Cog):
 
         if len(message_users) == 0:
             return await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there hasn't been any messages sent yet.",
+                content=f"{Emojis.no} **{ctx.author.display_name},** there hasn't been any messages sent yet.",
                 embed=None,
             )
         YouProgress = next(
@@ -880,23 +850,15 @@ class quota(commands.Cog):
             "`LOA`"
             if YourLOA
             else (
-                (
-                    "Met"
-                    if environment == "custom"
-                    else "<:status_green:1227365520857104405>"
-                )
+                ("Met" if environment == "custom" else f"{Emojis.status_green}")
                 if YourMessages >= int(Config.get("Message Quota", {}).get("quota", 0))
-                else (
-                    "Not Met"
-                    if environment == "custom"
-                    else "<:status_red:1227365495376711700>"
-                )
+                else ("Not Met" if environment == "custom" else f"{Emojis.status_red}")
             )
         )
 
         if message_users is None:
             return await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there has been no messages sent yet."
+                content=f"{Emojis.no} **{ctx.author.display_name},** there has been no messages sent yet."
             )
         Description = ""
         i = 1
@@ -924,22 +886,16 @@ class quota(commands.Cog):
                 "`LOA`"
                 if OnLOA
                 else (
-                    (
-                        "Met"
-                        if environment == "custom"
-                        else "<:status_green:1227365520857104405>"
-                    )
+                    ("Met" if environment == "custom" else f"{Emojis.status_green}")
                     if int(staff.get("message_count", 0)) >= int(Quota)
                     else (
-                        "Not Met"
-                        if environment == "custom"
-                        else "<:status_red:1227365495376711700>"
+                        "Not Met" if environment == "custom" else f"{Emojis.status_red}"
                     )
                 )
             )
             Description += f"* `{i}` {member.display_name} • {staff.get('message_count', 0)} messages\n"
             if Quota != 0:
-                Description += f"{replybottom} **Status:** {emoji}{Name}\n"
+                Description += f"{Emojis.replybottom} **Status:** {emoji}{Name}\n"
 
             if i % 9 == 0:
                 embed = discord.Embed(
@@ -966,7 +922,7 @@ class quota(commands.Cog):
         if YouProgress:
             for embed in pages:
                 embed.add_field(
-                    name="<:tablerprogressbolt:1330500442551091210> Your Progress",
+                    name=f"{Emojis.progress_bolt} Your Progress",
                     value=(
                         f"> **Messages:** {YouProgress.get('message_count')} messages\n"
                     )
@@ -980,7 +936,7 @@ class quota(commands.Cog):
             await paginator.start(ctx, pages=pages[:45], msg=msg)
         else:
             await msg.edit(
-                content=f"{no} **{ctx.author.display_name},** there are no pages to display.",
+                content=f"{Emojis.no} **{ctx.author.display_name},** there are no pages to display.",
                 embed=None,
             )
 
@@ -1036,7 +992,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user is already a staff member.\n-#{arrow} You can always edit them using </staff edit:1165258229102682124>!"
+                f"{Emojis.no} **{ctx.author.display_name}**, this user is already a staff member.\n-#{Emojis.arrow} You can always edit them using </staff edit:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].insert_one(
@@ -1054,7 +1010,7 @@ class quota(commands.Cog):
             logger.error(str(e))
 
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member added successfully.\n-# You should now be able to see them on </staff panel:1165258229102682124>!"
+            f"{Emojis.tick} **{ctx.author.display_name},** staff member added successfully.\n-# You should now be able to see them on </staff panel:1165258229102682124>!"
         )
 
     @staff.command(description="Remove a staff member from the staff database.")
@@ -1066,7 +1022,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
+                f"{Emojis.no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n{Emojis.arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].delete_one(
@@ -1075,7 +1031,7 @@ class quota(commands.Cog):
         except Exception as e:
             logger.error(str(e))
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member removed successfully."
+            f"{Emojis.tick} **{ctx.author.display_name},** staff member removed successfully."
         )
 
     @staff.command(description="Edit a staff member's rank. (Staff Database)")
@@ -1100,7 +1056,7 @@ class quota(commands.Cog):
             {"guild_id": ctx.guild.id, "staff_id": staff.id}
         ):
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n-#{arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
+                f"{Emojis.no} **{ctx.author.display_name}**, this user has not been added to the staff team.\n-#{Emojis.arrow} To add someone to the staff database use </staff add:1165258229102682124>!"
             )
         try:
             await self.client.db["staff database"].update_one(
@@ -1116,7 +1072,7 @@ class quota(commands.Cog):
         except Exception as e:
             logger.error(str(e))
         await ctx.send(
-            f"{tick} **{ctx.author.display_name},** staff member edited successfully."
+            f"{Emojis.tick} **{ctx.author.display_name},** staff member edited successfully."
         )
 
     @staff.command(description="View a staff member's information. (Staff Database)")
@@ -1129,7 +1085,7 @@ class quota(commands.Cog):
         )
         if result is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, this user is not in the staff database."
+                f"{Emojis.no} **{ctx.author.display_name}**, this user is not in the staff database."
             )
             return
         timezone = ""
@@ -1166,7 +1122,7 @@ class quota(commands.Cog):
         )
         if not result:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you are not in the staff database."
+                f"{Emojis.no} **{ctx.author.display_name}**, you are not in the staff database."
             )
 
         await self.client.db["staff database"].update_one(
@@ -1174,7 +1130,7 @@ class quota(commands.Cog):
             {"$set": {"introduction": introduction}},
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, your introduction has been updated."
+            f"{Emojis.tick} **{ctx.author.display_name}**, your introduction has been updated."
         )
 
     @staff.command(
@@ -1196,7 +1152,7 @@ class quota(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon)
         embed.set_author(name=ctx.guild.name, icon_url=ctx.guild.icon)
         if custom and custom.get("embed"):
-            from core.discord.CustomEmbed import DisplayEmbed
+            from core.bot.CustomEmbed import DisplayEmbed
 
             embed = await DisplayEmbed(custom, ctx.author)
         People = (
@@ -1220,7 +1176,7 @@ class quota(commands.Cog):
                     label=member.display_name,
                     value=str(member.id),
                     description=person.get("rolename"),
-                    emoji="<:staff:1206248655359840326>",
+                    emoji=f"{Emojis.staff}",
                 )
             )
             Added.add(member.id)
@@ -1230,7 +1186,7 @@ class quota(commands.Cog):
                     discord.SelectOption(
                         label="View More",
                         value="more",
-                        emoji="<:List:1223063187063308328>",
+                        emoji=f"{Emojis.list}",
                         description="View more staff members.",
                     )
                 )
@@ -1240,17 +1196,17 @@ class quota(commands.Cog):
         try:
             msg = await ctx.channel.send(embed=embed, view=view)
             await ctx.send(
-                f"{tick} **{ctx.author.display_name},** staff panel sent successfully.",
+                f"{Emojis.tick} **{ctx.author.display_name},** staff panel sent successfully.",
                 ephemeral=True,
             )
         except discord.errors.Forbidden:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.",
+                f"{Emojis.no} **{ctx.author.display_name}**, I don't have permission to send messages in that channel.",
             )
             return
         except discord.errors.HTTPException:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there is an error with the message. Make sure the embed/message is formed correctly.",
+                f"{Emojis.no} **{ctx.author.display_name}**, there is an error with the message. Make sure the embed/message is formed correctly.",
             )
             return
         await self.client.db["Views"].insert_one(
@@ -1270,7 +1226,7 @@ class InfractionTypeSelection(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this is not your panel!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your panel!",
                     color=discord.Colour.brand_red(),
                 ),
                 ephemeral=True,
@@ -1287,12 +1243,12 @@ class InfractionTypeSelection(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
+                f"{Emojis.no} **{interaction.user.display_name}**, the bot isn't setup you can do that in /config.",
                 ephemeral=True,
             )
         if not Config.get("Infraction", None):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
+                f"{Emojis.no} **{interaction.user.display_name}**, the infraction module is not setup you can do that in /config.",
                 ephemeral=True,
             )
         try:
@@ -1301,23 +1257,23 @@ class InfractionTypeSelection(discord.ui.Select):
             )
         except (discord.NotFound, discord.HTTPException):
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         if not channel:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** hey I can't find your infraction channel it is configured but I can't find it?",
                 ephemeral=True,
             )
         client = await interaction.guild.fetch_member(interaction.client.user.id)
         if channel.permissions_for(client).send_messages is False:
             return await interaction.response.send_message(
-                content=f"{crisis} **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** oi I can't send messages in the infraction channel!!",
                 ephemeral=True,
             )
         if expiration and not re.match(r"^\d+[mhdws]$", expiration):
             await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"{Emojis.no} **{interaction.user.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
                 ephemeral=True,
             )
             return
@@ -1347,7 +1303,7 @@ class InfractionTypeSelection(discord.ui.Select):
             )
             if not InfractionResult.inserted_id:
                 await interaction.response.send_message(
-                    content=f"{crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
+                    content=f"{Emojis.crisis} **{interaction.user.display_name},** hi I had a issue submitting this infraction please head to support!",
                     ephemeral=True,
                 )
                 return
@@ -1357,7 +1313,7 @@ class InfractionTypeSelection(discord.ui.Select):
 
         await interaction.edit_original_response(
             embed=None,
-            content=f"{tick} **{interaction.user.display_name},** successfully punished all the failures.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully punished all the failures.",
             view=None,
         )
 
@@ -1405,7 +1361,7 @@ class StaffPanel(discord.ui.Select):
                         label=member.display_name,
                         value=str(member.id),
                         description=person.get("rolename"),
-                        emoji="<:staff:1206248655359840326>",
+                        emoji=f"{Emojis.staff}",
                     )
                 )
                 Existing.add(member.id)
@@ -1416,7 +1372,7 @@ class StaffPanel(discord.ui.Select):
             await interaction.response.send_message(
                 view=self.view,
                 ephemeral=True,
-                content=f"<:List:1223063187063308328> **{interaction.user.display_name},** heres more people to view.",
+                content=f"{Emojis.list} **{interaction.user.display_name},** heres more people to view.",
             )
             return
         member = interaction.guild.get_member(int(self.values[0]))
@@ -1425,7 +1381,7 @@ class StaffPanel(discord.ui.Select):
                 member = await interaction.guild.fetch_member(int(self.values[0]))
             except (discord.NotFound, discord.HTTPException):
                 return await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name},** I couldn't find that user.",
+                    content=f"{Emojis.no} **{interaction.user.display_name},** I couldn't find that user.",
                     ephemeral=True,
                 )
         result = await interaction.client.db["staff database"].find_one(
@@ -1433,7 +1389,7 @@ class StaffPanel(discord.ui.Select):
         )
         if not result:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this user is not in the staff database.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this user is not in the staff database.",
                 ephemeral=True,
             )
         timezone = ""
@@ -1505,7 +1461,7 @@ class ArmFire(discord.ui.View):
                 {"$set": {"ClaimedTickets": 0}},
             )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, I have reset the staff leaderboard.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, I have reset the staff leaderboard.",
             embed=None,
             view=None,
         )
@@ -1527,7 +1483,7 @@ class InfractionIssuer(discord.ui.View):
         label=f"",
         style=discord.ButtonStyle.grey,
         disabled=True,
-        emoji="<:flag:1223062579346145402>",
+        emoji=f"{Emojis.flag}",
     )
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass

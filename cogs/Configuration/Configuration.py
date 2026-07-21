@@ -1,12 +1,11 @@
 import logging
 
-import discord
 from discord.ext import commands
 
-from core.discord.HelpEmbeds import NoPremium, Support, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
-from core.discord.ui import PMButton
+from core.bot.HelpEmbeds import NoPremium, Support, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
+from core.bot.ui import PMButton
 
 logger = logging.getLogger(__name__)
 
@@ -269,55 +268,43 @@ class ConfigMenu(discord.ui.Select):
                 options = [
                     discord.SelectOption(
                         label="Stop QOTD",
-                        emoji="<:stop:1330484991414501418>",
+                        emoji=f"{Emojis.stop}",
                         description="End the daily questions.",
                     ),
-                    discord.SelectOption(
-                        label="Channel", emoji="<:tag:1234998802948034721>"
-                    ),
+                    discord.SelectOption(label="Channel", emoji=f"{Emojis.tags}"),
                     discord.SelectOption(
                         label="Webhook",
                         description="Premium Required. Send it as a webhook.",
-                        emoji="<:Webhook:1400197752339824821>",
+                        emoji=f"{Emojis.webhook}",
                     ),
-                    discord.SelectOption(
-                        label="Ping", emoji="<:Ping:1298301862906298378>"
-                    ),
+                    discord.SelectOption(label="Ping", emoji=f"{Emojis.ping}"),
                     discord.SelectOption(
                         label="Custom Questions",
-                        emoji="<:MEssage:1297957000440844382>",
+                        emoji=f"{Emojis.message_icon}",
                         description="Premium Required.",
                     ),
-                    discord.SelectOption(
-                        label="Preferences", emoji="<:leaf:1160541147320553562>"
-                    ),
+                    discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
                 ]
             else:
                 options = [
                     discord.SelectOption(
                         label="Start QOTD",
-                        emoji="<:start:1299717567660687371>",
+                        emoji=f"{Emojis.start}",
                         description="Start the daily questions. (Pressing this while its already started will restart it.)",
                     ),
-                    discord.SelectOption(
-                        label="Channel", emoji="<:tag:1234998802948034721>"
-                    ),
+                    discord.SelectOption(label="Channel", emoji=f"{Emojis.tags}"),
                     discord.SelectOption(
                         label="Webhook",
                         description="Premium Required. Send it as a webhook. ",
-                        emoji="<:Webhook:1400197752339824821>",
+                        emoji=f"{Emojis.webhook}",
                     ),
-                    discord.SelectOption(
-                        label="Ping", emoji="<:Ping:1298301862906298378>"
-                    ),
+                    discord.SelectOption(label="Ping", emoji=f"{Emojis.ping}"),
                     discord.SelectOption(
                         label="Custom Questions",
-                        emoji="<:MEssage:1297957000440844382>",
+                        emoji=f"{Emojis.message_icon}",
                         description="Premium Required.",
                     ),
-                    discord.SelectOption(
-                        label="Preferences", emoji="<:leaf:1160541147320553562>"
-                    ),
+                    discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
                 ]
 
             embed = await QOTDEMbed(interaction, embed)
@@ -391,16 +378,16 @@ class ConfigMenu(discord.ui.Select):
 def DefaultEmbed(guild: discord.Guild):
     embed = discord.Embed(
         title="Configuration",
-        description="<:Options:1223062969043124306> Select **an option** to manage your server's configuration.",
+        description=f"{Emojis.options} Select **an option** to manage your server's configuration.",
         color=discord.Color.dark_embed(),
     )
     embed.add_field(
-        name="<:partnerships:1224724406144733224> Support Server",
+        name=f"{Emojis.partnerships} Support Server",
         value="> If you ever have issues with the bot or require assistance come and talk to someone in [#get-support](https://discord.gg/23TD4vQXJA).",
         inline=False,
     )
     embed.add_field(
-        name="<:Help:1184535847513624586> Documentation",
+        name=f"{Emojis.help} Documentation",
         value="> The best way to learn how to use **Birb** is through the [**documentation**](https://astrobirb.dev)!",
         inline=False,
     )
@@ -417,32 +404,32 @@ def Options(Config: dict = None):
         discord.SelectOption(
             label="Permissions",
             description="Manage your server's permissions.",
-            emoji="<:Settings:1207365901956026368>",
+            emoji=f"{Emojis.settings_page}",
         ),
         discord.SelectOption(
             label="Modules",
             description="Manage your server's modules",
-            emoji="<:Modules:1296530049381568522>",
+            emoji=f"{Emojis.modules}",
         ),
         discord.SelectOption(
             label="Edit Profile",
             description="Edit the bots avatar & nickname.",
-            emoji="<:Pen:1235001839036923996>",
+            emoji=f"{Emojis.pen}",
         ),
         discord.SelectOption(
             label="Subscriptions",
             description="Manage your server's subscriptions",
-            emoji="<:subscription:1334962057073655858>",
+            emoji=f"{Emojis.subscription}",
         ),
         discord.SelectOption(
             label="Integrations",
             description="Use External APIs.",
-            emoji="<:link:1206670134064717904>",
+            emoji=f"{Emojis.link}",
         ),
         discord.SelectOption(
             label="Hierarchy",
             description="Hierarchies for both promotions & infractions.",
-            emoji="<:hierarchy:1341493421503676517>",
+            emoji=f"{Emojis.hierarchy}",
         ),
     ]
 
@@ -450,66 +437,66 @@ def Options(Config: dict = None):
         discord.SelectOption(
             label="Infractions",
             description="",
-            emoji="<:Infraction:1223063128275943544>",
+            emoji=f"{Emojis.infractions}",
             value="infractions",
         ),
         discord.SelectOption(
             label="Promotions",
             description="",
-            emoji="<:Promotion:1234997026677198938>",
+            emoji=f"{Emojis.promotions}",
             value="promotions",
         ),
         discord.SelectOption(
             label="Message Quota",
             description="",
             value="Quota",
-            emoji="<:messageQuota:1224722310687359106>",
+            emoji=f"{Emojis.message_quota}",
         ),
         discord.SelectOption(
             label="Leave Of Absence",
             description="",
             value="LOA",
-            emoji="<:LOA:1223063170856390806>",
+            emoji=f"{Emojis.loa}",
         ),
         discord.SelectOption(
             label="Tickets",
             value="Tickets",
-            emoji="<:Tickets:1340740494623375424>",
+            emoji=f"{Emojis.tickets}",
             description="",
         ),
         discord.SelectOption(
             label="Modmail",
             description="",
             value="Modmail",
-            emoji="<:messagereceived:1201999712593383444>",
+            emoji=f"{Emojis.message_received}",
         ),
         discord.SelectOption(
             label="Custom Commands",
             description="",
             value="customcommands",
-            emoji="<:command1:1223062616872583289>",
+            emoji=f"{Emojis.command}",
         ),
         discord.SelectOption(
             label="Staff List",
             description="",
             value="Staff List",
-            emoji="<:StaffList:1264584889727193159>",
+            emoji=f"{Emojis.staff_list}",
         ),
         discord.SelectOption(
             label="Forums",
             description="",
             value="Forums",
-            emoji="<:forum:1223062562782838815>",
+            emoji=f"{Emojis.forum}",
         ),
         discord.SelectOption(
             label="Suspensions",
             description="",
             value="suspensions",
-            emoji="<:suspensions:1234998406938755122>",
+            emoji=f"{Emojis.suspensions}",
         ),
         discord.SelectOption(
             label="Daily Questions",
-            emoji="<:qotd:1234994772796772432>",
+            emoji=f"{Emojis.qotd}",
             description="",
             value="QOTD",
         ),
@@ -517,24 +504,24 @@ def Options(Config: dict = None):
             label="Suggestions",
             description="",
             value="suggestions",
-            emoji="<:suggestion:1207370004379607090>",
+            emoji=f"{Emojis.suggestion}",
         ),
         discord.SelectOption(
             label="Staff Feedback",
             description="",
             value="Feedback",
-            emoji="<:stafffeedback:1235000485208002610>",
+            emoji=f"{Emojis.staff_feedback}",
         ),
         discord.SelectOption(
             label="Staff Panel",
             description="",
             value="Staff Database",
-            emoji="<:staffdb:1206253848298127370>",
+            emoji=f"{Emojis.staff_db}",
         ),
         discord.SelectOption(
             label="Auto Response",
             value="Auto Responder",
-            emoji="<:autoresponse:1250481563615887391>",
+            emoji=f"{Emojis.auto_response}",
         ),
     ]
 
@@ -552,7 +539,7 @@ class ConfigCog(commands.Cog):
     @commands.hybrid_command(description="Configure the bot for your servers needs")
     @commands.has_guild_permissions(manage_guild=True)
     async def config(self, ctx: commands.Context):
-        Config = await self.client.config.find_one({"_id": ctx.guild.id})
+        Config = await self.client.db["Config"].find_one({"_id": ctx.guild.id})
         if (
             not Config
             or "Infraction" not in Config
@@ -589,7 +576,7 @@ class ConfigCog(commands.Cog):
     async def PermsHandler(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name},** you are missing the `Manage Server` permission."
+                f"{Emojis.no} **{ctx.author.display_name},** you are missing the `Manage Server` permission."
             )
 
 

@@ -1,7 +1,5 @@
-import discord
-
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 
@@ -9,9 +7,7 @@ class ForumsOptions(discord.ui.Select):
     def __init__(self, author: discord.User):
         super().__init__(
             options=[
-                discord.SelectOption(
-                    label="Manage Forums", emoji="<:category:1248312604733210735>"
-                ),
+                discord.SelectOption(label="Manage Forums", emoji=f"{Emojis.category}"),
             ],
         )
         self.author = author
@@ -36,8 +32,8 @@ class ForumsOptions(discord.ui.Select):
             )
             for form in Forums:
                 embed.add_field(
-                    name=f"<:forum:1223062562782838815> {form.get('name')}",
-                    value=f"{replytop} **Created:** <@{form.get('creator') if form.get('creator') else 'Unknown'}> (`{form.get('creator') if form.get('creator') else 'Unknown'}`)\n{replybottom} **Channel:** <#{form.get('channel_id') if form.get('channel_id') else 'Unknown'}>",
+                    name=f"{Emojis.forum} {form.get('name')}",
+                    value=f"{Emojis.replytop} **Created:** <@{form.get('creator') if form.get('creator') else 'Unknown'}> (`{form.get('creator') if form.get('creator') else 'Unknown'}`)\n{Emojis.replybottom} **Channel:** <#{form.get('channel_id') if form.get('channel_id') else 'Unknown'}>",
                     inline=False,
                 )
                 if 20 <= len(embed.fields):
@@ -58,14 +54,14 @@ class ForumManagent(discord.ui.View):
         super().__init__()
         self.author = author
 
-    @discord.ui.button(emoji="<:Add:1163095623600447558>")
+    @discord.ui.button(emoji=f"{Emojis.add}")
     async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
 
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
         await interaction.response.send_modal(CreateForum(interaction.user))
 
-    @discord.ui.button(emoji="<:Pen:1235001839036923996>")
+    @discord.ui.button(emoji=f"{Emojis.pen}")
     async def edit(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
@@ -88,7 +84,7 @@ class ForumManagent(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** there are no forums.",
+                f"{Emojis.no} **{interaction.user.display_name},** there are no forums.",
                 ephemeral=True,
             )
         view.add_item(ForumSelection(interaction.user, "Edit", Options))
@@ -118,7 +114,7 @@ class ForumManagent(discord.ui.View):
                 break
         if len(Options) == 0:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** there are no forums.",
+                f"{Emojis.no} **{interaction.user.display_name},** there are no forums.",
                 ephemeral=True,
             )
         view.add_item(ForumSelection(interaction.user, "Remove", Options))
@@ -137,7 +133,7 @@ class ForumSelection(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         await interaction.response.defer()
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
         from cogs.Configuration.Components.EmbedBuilder import Embed
 
         Forum = await interaction.client.db["Forum Configuration"].find_one(
@@ -145,7 +141,7 @@ class ForumSelection(discord.ui.Select):
         )
         if not Forum:
             return await interaction.followup.send(
-                f"{redx} **{interaction.user.display_name},** theres no forum named that.",
+                f"{Emojis.tick} **{interaction.user.display_name},** theres no forum named that.",
                 ephemeral=True,
             )
         if self.typed == "Remove":
@@ -153,7 +149,7 @@ class ForumSelection(discord.ui.Select):
                 {"guild_id": interaction.guild.id, "name": self.values[0]}
             )
             return await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name},** successfully deleted the forum.",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** successfully deleted the forum.",
                 embed=None,
                 view=None,
             )
@@ -192,7 +188,7 @@ class CreateForum(discord.ui.Modal, title="Create Forum"):
         )
         if Forum:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** theres already a forum named that.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** theres already a forum named that.",
                 ephemeral=True,
             )
         from cogs.Configuration.Components.EmbedBuilder import Embed
@@ -218,7 +214,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
     if embed:
         if not datad.get("channel_id"):
             await interaction.response.send_message(
-                f"{tick} **{interaction.user.display_name},** you need to select a forum channel before finishing.",
+                f"{Emojis.tick} **{interaction.user.display_name},** you need to select a forum channel before finishing.",
                 ephemeral=True,
             )
             return
@@ -266,7 +262,7 @@ async def FinalFunc(interaction: discord.Interaction, datad: dict):
         upsert=True,
     )
     await interaction.response.edit_message(
-        content=f"{tick} **{interaction.user.display_name},** success.",
+        content=f"{Emojis.tick} **{interaction.user.display_name},** success.",
         view=None,
         embed=None,
     )

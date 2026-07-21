@@ -6,9 +6,11 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.Variables import Variables
-from core.discord.permissions import premium
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.Variables import Variables
+from core.bot.emojis import Emojis
+from core.bot.permissions import premium
+from datamodels.Promotions import PromotionItem
 
 logger = logging.getLogger(__name__)
 
@@ -28,69 +30,6 @@ def DefaultEmbed(data, staff, manager):
     embed.set_thumbnail(url=staff.display_avatar)
     embed.set_footer(text=f"Promotion ID | {data.get('random_string')}")
     return embed
-
-
-def Promotion(data):
-    return PromotionItem(
-        staff=data.get("staff"),
-        management=data.get("management"),
-        new=data.get("new"),
-        reason=data.get("reason"),
-        random_string=data.get("random_string"),
-        guild_id=data.get("guild_id"),
-        notes=data.get("notes"),
-        annonymous=data.get("annonymous"),
-        previous=data.get("previous", None),
-    )
-
-
-def CustomItem(data):
-    return Embed(
-        author=data.get("author"),
-        author_icon=data.get("author_icon"),
-        color=data.get("color"),
-        description=data.get("description"),
-        image=data.get("image"),
-        thumbnail=data.get("thumbnail"),
-        title=data.get("title"),
-    )
-
-
-class PromotionItem:
-    def __init__(
-        self,
-        staff,
-        management,
-        new,
-        reason,
-        random_string,
-        guild_id,
-        previous,
-        notes="N/A",
-        annonymous=False,
-    ):
-        self.staff = staff
-        self.management = management
-        self.new = new
-        self.reason = reason
-        self.notes = notes
-        self.random_string = random_string
-        self.guild_id = guild_id
-        self.annonymous = annonymous
-        self.previous = previous
-
-
-class Embed:
-    def __init__(
-        self, author, author_icon, color, description, image, thumbnail, title
-    ):
-        self.author = author
-        self.author_icon = author_icon
-        self.color = color
-        self.description = description
-        self.image = image
-        self.thumbnail = thumbnail
-        self.title = title
 
 
 async def PromotionSystem(self, PromotionData, guild, member, manager):
@@ -128,7 +67,7 @@ class on_promotion(commands.Cog):
         self, objectid: ObjectId, Settings: dict, edit: bool = False
     ):
         PromotionData = await self.client.db["promotions"].find_one({"_id": objectid})
-        promotion = Promotion(PromotionData)
+        promotion = PromotionItem(**PromotionData)
         guild = await self.client.fetch_guild(promotion.guild_id)
 
         if guild is None:
@@ -198,7 +137,7 @@ class on_promotion(commands.Cog):
             self.client, PromotionData, guild, staff, manager
         )
         if PromotionData:
-            promotion = Promotion(PromotionData)
+            promotion = PromotionItem(**PromotionData)
         if custom:
             replacements = await Variables.promotion(
                 staff=staff, promotion=promotion, manager=manager, guild=guild
@@ -305,7 +244,7 @@ class on_promotion(commands.Cog):
         self.client.dispatch("promotion_log", objectid, "create", manager)
         try:
             await staff.send(
-                content=f"<:SmallArrow:1140288951861649418>From **@{guild.name}**",
+                content=f"{Emojis.small_arrow}From **@{guild.name}**",
                 embed=embed,
             )
         except:
@@ -320,7 +259,7 @@ class PromotionIssuer(discord.ui.View):
         label=f"",
         style=discord.ButtonStyle.grey,
         disabled=True,
-        emoji="<:flag:1223062579346145402>",
+        emoji=f"{Emojis.flag}",
     )
     async def issuer(self, interaction: discord.Interaction, button: discord.ui.Button):
         pass

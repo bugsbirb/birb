@@ -2,22 +2,19 @@ import traceback
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import Emojis
 
 
 class StaffFeedback(discord.ui.Select):
     def __init__(self, author: discord.User):
         super().__init__(
             options=[
-                discord.SelectOption(
-                    label="Feedback Channel", emoji="<:tag:1234998802948034721>"
-                ),
-                discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
-                ),
+                discord.SelectOption(label="Feedback Channel", emoji=f"{Emojis.tags}"),
+                discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
                 discord.SelectOption(
                     label="Customise Embed",
-                    emoji="<:Customisation:1223063306131210322>",
+                    emoji=f"{Emojis.customisation}",
                 ),
             ]
         )
@@ -85,7 +82,7 @@ class StaffFeedback(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(
@@ -325,7 +322,7 @@ async def StaffFeedbackEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's staff feedback settings! Staff feedback is a way for members to give feedback to staff. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Staff Feedback",
+        name=f"{Emojis.settings_gear} Staff Feedback",
         value=f"> `Feedback Channel:` {Channel}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
         inline=False,
     )

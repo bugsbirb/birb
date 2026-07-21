@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.discord.HelpEmbeds import (
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     NoPermissionChannel,
     ChannelNotFound,
@@ -10,8 +10,8 @@ from core.discord.HelpEmbeds import (
     Support,
     ModuleNotSetup,
 )
-from core.discord.Module import ModuleIsEnabled
-from core.discord.emojis import *
+from core.bot.Module import ModuleIsEnabled
+from core.bot.emojis import *
 
 
 class suggestions(commands.Cog):
@@ -65,7 +65,7 @@ class suggestions(commands.Cog):
                 embed=NoPermissionChannel(channel),
             )
         msg = await ctx.send(
-            f"<a:Loading:1167074303905386587>  **{ctx.author.display_name}**, submitting suggestion..."
+            f"{Emojis.loading}  **{ctx.author.display_name}**, submitting suggestion..."
         )
         result = await self.client.db["suggestions"].insert_one(
             {
@@ -81,7 +81,7 @@ class suggestions(commands.Cog):
         )
         self.client.dispatch("suggestion", result.inserted_id, Config)
         await msg.edit(
-            content=f"{tick} **{ctx.author.display_name},** successfully submitted suggestion."
+            content=f"{Emojis.tick} **{ctx.author.display_name},** successfully submitted suggestion."
         )
 
 

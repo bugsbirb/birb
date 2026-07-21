@@ -2,12 +2,11 @@ import asyncio
 import datetime
 import logging
 
-import discord
 from bson import ObjectId
 from discord.ext import commands, tasks
 
-from core.discord.CustomEmbed import DisplayEmbed
-from core.discord.emojis import *
+from core.bot.CustomEmbed import DisplayEmbed
+from core.bot.emojis import *
 from core.format import ReplaceVariables
 from core.integrations.r2 import upload_file_to_r2
 
@@ -38,7 +37,7 @@ async def DefaultEmbed(Member: discord.Member, Ticket: dict) -> discord.Embed:
         )
         .add_field(
             name="` 👤 ` User Info",
-            value=f"{replytop} `User:` {Member.mention} (`{Member.id}`)\n {replymiddle} `Created:` <t:{int(Member.created_at.timestamp())}:R>\n {replybottom} `Joined:` <t:{int(Member.joined_at.timestamp())}:R>",
+            value=f"{Emojis.replytop} `User:` {Member.mention} (`{Member.id}`)\n {Emojis.replymiddle} `Created:` <t:{int(Member.created_at.timestamp())}:R>\n {Emojis.replybottom} `Joined:` <t:{int(Member.joined_at.timestamp())}:R>",
         )
         .set_author(name="Support", icon_url=Member.guild.icon)
     )
@@ -60,7 +59,7 @@ class PTicketControl(discord.ui.View):
 
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
+                f"{Emojis.no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
                 ephemeral=True,
             )
 
@@ -85,7 +84,7 @@ class PTicketControl(discord.ui.View):
         await interaction.response.defer()
         if not await TicketPermissions(interaction):
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
+                f"{Emojis.no} **{interaction.user.display_name}** you don't have permission to close this ticket.",
                 ephemeral=True,
             )
         Result = await interaction.client.db["Tickets"].find_one(
@@ -559,13 +558,12 @@ class TicketsPublic(commands.Cog):
                 "{user.name}": author.name,
                 "{user.id}": str(author.id),
             }
-            try:
-                name = ReplaceVariables(
-                    P.get("TicketNames").get("Open"),
-                    replacements=replacements,
-                )
-            except Exception as e:
-                name = f"claimed-{channel.name.split('-')[1]}"
+
+            name = ReplaceVariables(
+                P.get("TicketNames").get("Open"),
+                replacements=replacements,
+            )
+
         try:
             channel = await category.create_text_channel(
                 name=name, overwrites=Overwrites
@@ -669,7 +667,7 @@ class TicketsPublic(commands.Cog):
             user = None
         try:
             msg = await Channel.send(
-                "<a:Loading:1167074303905386587> Ticket closing...",
+                f"{Emojis.loading} Ticket closing...",
             )
         except (discord.NotFound, discord.Forbidden):
             logging.warning(
@@ -702,7 +700,7 @@ class TicketsPublic(commands.Cog):
 
         if P.get("TranscriptChannel"):
             await msg.edit(
-                content=f"<a:Loading:1167074303905386587> Ticket closing... (Saving transcript this may take a second.)"
+                content=f"{Emojis.loading} Ticket closing... (Saving transcript this may take a second.)"
             )
             async for message in Channel.history(limit=None):
                 if not message:
@@ -781,7 +779,7 @@ class TicketsPublic(commands.Cog):
                     discord.ui.Button(
                         label="View Transcript",
                         url=f"https://astrobirb.dev/transcript/{Result.get('_id')}",
-                        emoji="<:Website:1132252914082127882>",
+                        emoji=f"{Emojis.website}",
                         style=discord.ButtonStyle.blurple,
                     )
                 )
@@ -864,7 +862,7 @@ class Review(discord.ui.Select):
             )
         if Ticket.get("review"):
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** you've already reviewed this.",
+                f"{Emojis.no} **{interaction.user.display_name},** you've already reviewed this.",
                 ephemeral=True,
             )
 
@@ -895,7 +893,7 @@ class FormalReview(discord.ui.Modal):
             )
         if self.ticket.get("review"):
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name},** you've already reviewed this.",
+                f"{Emojis.no} **{interaction.user.display_name},** you've already reviewed this.",
                 ephemeral=True,
             )
 
@@ -919,7 +917,7 @@ class FormalReview(discord.ui.Modal):
                 label="Reviewed",
                 style=discord.ButtonStyle.success,
                 disabled=True,
-                emoji="<:whitecheck:1190819388941668362>",
+                emoji=f"{Emojis.tick}",
             )
         )
         await interaction.response.edit_message(view=view)

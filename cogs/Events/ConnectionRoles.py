@@ -3,7 +3,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from core.discord.Module import ModuleCheck
+from core.bot.Module import ModuleCheck
 
 logger = logging.getLogger(__name__)
 

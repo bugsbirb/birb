@@ -5,10 +5,12 @@ from datetime import datetime
 
 import sentry_sdk
 
-from core.discord.HelpEmbeds import *
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import *
+from core.bot.emojis import *
+from core.errors.Config import ModuleMissingConfig
 from core.errors.Modules import ModuleDisabled
 from core.errors.Permissions import *
+from core.format import CommandType
 
 
 class Tree(app_commands.CommandTree):
@@ -32,7 +34,7 @@ class Tree(app_commands.CommandTree):
                         color=discord.Color.brand_red(),
                         description="```\nApplication command 'promote' not found\n```",
                     ).add_field(
-                        name="<:Help:1184535847513624586> How To Fix",
+                        name=f"{Emojis.help} How To Fix",
                         value=(
                             f"> 1. Wait a bit; the bot may be loading commands. "
                             f"(Started: <t:{int(self.client.launch_time.timestamp())}:R>)\n"
@@ -82,26 +84,10 @@ class On_error(commands.Cog):
             return
         error = getattr(error, "original", error)
         try:
-            if isinstance(interactionType, commands.Context):
-                author = interactionType.author
-                channel = interactionType.channel
-                guild = interactionType.guild
-                send = interactionType.send
-                command = interactionType.command
-            elif isinstance(interactionType, discord.Interaction):
-                author = interactionType.user
-                guild = interactionType.guild
-                channel = interactionType.channel
-
-                if not interactionType.response.is_done():
-                    await interactionType.response.defer(ephemeral=True)
-                send = interactionType.followup.send
-                command = interactionType.command
-            else:
-                return
+            interaction = CommandType(interactionType)
 
             if isinstance(error, MissingPermission):
-                await send(
+                await interaction.send(
                     embed=NoPermission(error.permission),
                     ephemeral=(
                         True
@@ -112,7 +98,7 @@ class On_error(commands.Cog):
                 )
                 return
             if isinstance(error, MissingAdvancedPermissions):
-                await send(
+                await interaction.send(
                     embed=NoAdvancedPermission(),
                     view=Support(),
                     ephemeral=(
@@ -122,7 +108,7 @@ class On_error(commands.Cog):
                     ),
                 )
             if isinstance(error, MissingSetup):
-                await send(
+                await interaction.send(
                     embed=BotNotConfigured(),
                     view=Support(),
                     ephemeral=(
@@ -132,11 +118,22 @@ class On_error(commands.Cog):
                     ),
                 )
                 return
+            if isinstance(error, ModuleMissingConfig):
+                await interaction.send(
+                    embed=ModuleNotSetup(),
+                    view=Support(),
+                    ephemeral=(
+                        True
+                        if isinstance(interactionType, discord.Interaction)
+                        else False
+                    ),
+                )
+                return
             if isinstance(error, ModuleDisabled):
-                await send(embed=ModuleNotEnabled(), view=Support())
+                await interaction.send(embed=ModuleNotEnabled(), view=Support())
                 return
             if isinstance(error, MissingAdvancedPermissions):
-                await send(
+                await interaction.send(
                     embed=NoAdvancedPermission(),
                     ephemeral=(
                         True
@@ -146,7 +143,7 @@ class On_error(commands.Cog):
                     view=Support(),
                 )
             if isinstance(error, MissingPermissionSetup):
-                await send(
+                await interaction.send(
                     embed=NoSetupPermissions(),
                     ephemeral=(
                         True
@@ -157,8 +154,8 @@ class On_error(commands.Cog):
                 )
                 return
             if isinstance(error, commands.NoPrivateMessage):
-                await send(
-                    f"{no} **{author.display_name},** I can't execute commands in DMs. Please use me in a server.",
+                await interaction.send(
+                    f"{Emojis.no} **{interaction.author.display_name},** I can't execute commands in DMs. Please use me in a server.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -171,8 +168,8 @@ class On_error(commands.Cog):
             if isinstance(error, commands.NotOwner):
                 return
             if isinstance(error, commands.BadLiteralArgument):
-                await send(
-                    f"{no} **{author.display_name}**, you have used an invalid argument.",
+                await interaction.send(
+                    f"{Emojis.no} **{interaction.author.display_name}**, you have used an invalid argument.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -181,8 +178,8 @@ class On_error(commands.Cog):
                 )
                 return
             if isinstance(error, commands.MemberNotFound):
-                await send(
-                    f"{no} **{author.display_name}**, that member isn't in the server.",
+                await interaction.send(
+                    f"{Emojis.no} **{interaction.author.display_name}**, that member isn't in the server.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -193,8 +190,8 @@ class On_error(commands.Cog):
             if isinstance(error, commands.MissingPermissions):
                 return
             if isinstance(error, commands.MissingRequiredArgument):
-                await send(
-                    f"{no} **{author.display_name}**, you are missing a requirement.",
+                await interaction.send(
+                    f"{Emojis.no} **{interaction.author.display_name}**, you are missing a requirement.",
                     ephemeral=(
                         True
                         if isinstance(interactionType, discord.Interaction)
@@ -205,15 +202,19 @@ class On_error(commands.Cog):
             if isinstance(error, commands.BadArgument):
                 return
 
-            if guild is None:
+            if interaction.guild is None:
                 return
             errorId = self.captureSentry(
                 error,
                 {
-                    "guildId": guild.id,
-                    "authorId": author.id,
-                    "channelId": channel.id,
-                    "command": (command.qualified_name if command else "unknown"),
+                    "guildId": interaction.guild.id,
+                    "authorId": interaction.author.id,
+                    "channelId": interaction.channel.id,
+                    "command": (
+                        interaction.command.qualified_name
+                        if interaction.command
+                        else "unknown"
+                    ),
                 },
             )
             sentry = True if errorId != None else False
@@ -230,7 +231,7 @@ class On_error(commands.Cog):
                     "error": ERROR,
                     "traceback": TRACEBACK,
                     "timestamp": datetime.now(),
-                    "guild_id": guild.id,
+                    "guild_id": interaction.guild.id,
                     "sentry": sentry,
                 }
             )
@@ -243,12 +244,12 @@ class On_error(commands.Cog):
                 )
             )
             embed = discord.Embed(
-                title="<:x21:1214614676772626522> Command Error",
+                title=f"{Emojis.x21} Command Error",
                 description=f"Error ID: `{error_id}`\n-# We can't fix bugs without you, please report this to our support services.",
                 color=discord.Color.brand_red(),
             )
 
-            await send(
+            await interaction.send(
                 embed=embed,
                 view=view,
                 ephemeral=(
@@ -263,7 +264,7 @@ class On_error(commands.Cog):
             )
             embed.add_field(
                 name="Extra Information",
-                value=f">>> **Guild:** {guild.name} (`{guild.id}`)\n**Command:** {command.qualified_name if command else 'Unknown'}\n**Timestamp:** <t:{int(datetime.now().timestamp())}>",
+                value=f">>> **Guild:** {interaction.guild.name} (`{interaction.guild.id}`)\n**Command:** {interaction.command.qualified_name if interaction.command else 'Unknown'}\n**Timestamp:** <t:{int(datetime.now().timestamp())}>",
                 inline=False,
             )
             embed.set_footer(text=f"Error ID: {error_id}")

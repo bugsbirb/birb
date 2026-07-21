@@ -1,15 +1,17 @@
-import discord
-from fastapi import FastAPI, APIRouter, HTTPException, Request, status
-from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
-import uvicorn
 import random
 import string
-from core.discord.emojis import *
 import time
-from bson import ObjectId
 from datetime import datetime
+
+import discord
+import uvicorn
+from bson import ObjectId
 from discord.ext import commands
+from fastapi import FastAPI, APIRouter, HTTPException, Request, status
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from core.bot.emojis import *
 
 MONGO_URL = os.getenv("MONGO_URL")
 KEY = os.getenv("KEY")
@@ -156,8 +158,6 @@ class APIRoutes:
 
         guilds = body.get("guilds")
         user = body.get("user")
-        print(user)
-        print(guilds)
 
         if not guilds or not user:
             raise HTTPException(
@@ -169,7 +169,6 @@ class APIRoutes:
             if not guild:
                 return None
             if not guild.chunked:
-                print("betco")
                 await guild.chunk()
             member = guild.get_member(int(user))
             if not member:
@@ -353,7 +352,6 @@ class APIRoutes:
 
         if not guild:
             raise HTTPException(status_code=404, detail="Guild not found")
-        print(guild.chunked)
 
         config = await self.client.db["Config"].find_one({"_id": guild.id})
         if not config:
@@ -366,7 +364,6 @@ class APIRoutes:
         for roleId in staffRoles:
             role = guild.get_role(roleId)
             if role:
-                print(role.members)
                 staff.update(role.members)
 
         serialized = []
@@ -446,7 +443,7 @@ class APICog(commands.Cog):
             )
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I've sent your API key to your/their DMs.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, I've sent your API key to your/their DMs.",
             ephemeral=True,
         )
 

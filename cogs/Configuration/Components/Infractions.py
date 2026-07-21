@@ -2,16 +2,15 @@ import logging
 import re
 import traceback
 
-import discord
 import discord.http
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)
-from core.discord.permissions import premium
-from core.discord.HelpEmbeds import NoPremium, Support
+from core.bot.permissions import premium
+from core.bot.HelpEmbeds import NoPremium, Support
 
 
 class InfractionOption(discord.ui.Select):
@@ -20,42 +19,42 @@ class InfractionOption(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Infraction Channel",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                     description="Channel where infractions are sent.",
                 ),
                 discord.SelectOption(
                     label="Infraction Audit Log",
-                    emoji="<:Log:1349431938926252115>",
+                    emoji=f"{Emojis.log}",
                     description="Logs infraction creation, voiding, and edits.",
                 ),
                 discord.SelectOption(
                     label="Infraction Types",
-                    emoji="<:gridiconstypes:1248299279513161829>",
+                    emoji=f"{Emojis.grid_icon}",
                     description="Configure custom actions for each punishment type.",
                 ),
                 discord.SelectOption(
                     label="Infraction Approval",
                     description="Require approval before an infraction is applied.",
-                    emoji="<:Approval:1340271794694914058>",
+                    emoji=f"{Emojis.approval}",
                 ),
                 discord.SelectOption(
                     label="Webhook",
                     description="Premium Required. Send infraction messages through a webhook.",
-                    emoji="<:Webhook:1400197752339824821>",
+                    emoji=f"{Emojis.webhook}",
                 ),
                 discord.SelectOption(
                     label="Preferences",
-                    emoji="<:leaf:1160541147320553562>",
+                    emoji=f"{Emojis.leaf}",
                     description="General settings for notifications and defaults.",
                 ),
                 discord.SelectOption(
                     label="Customise Embed",
-                    emoji="<:Customisation:1223063306131210322>",
+                    emoji=f"{Emojis.customisation}",
                     description="Customise infraction embeds and messages sent to the channel.",
                 ),
                 discord.SelectOption(
                     label="Preset Reasons",
-                    emoji="<:auto:1280563201662255137>",
+                    emoji=f"{Emojis.auto}",
                     description="Premium required. Manage preset reasons for infractions.",
                 ),
             ]
@@ -204,7 +203,7 @@ class InfractionOption(discord.ui.Select):
                 from cogs.Configuration.Components.EmbedBuilder import (
                     Embed,
                 )
-                from core.discord.CustomEmbed import DisplayEmbed
+                from core.bot.CustomEmbed import DisplayEmbed
 
                 if not custom:
                     embed = discord.Embed(color=discord.Color.dark_embed())
@@ -469,7 +468,7 @@ class ManageReasons(discord.ui.View):
         self.author = author
         self.message = message
 
-    @discord.ui.button(label="", emoji="<:Add:1163095623600447558>")
+    @discord.ui.button(label="", emoji=f"{Emojis.add}")
     async def AddReason(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -503,7 +502,7 @@ class ManageReasons(discord.ui.View):
             )
         else:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no preset reasons to remove!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** there are no preset reasons to remove!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -539,7 +538,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
                 Config["Infraction"]["reasons"] = []
             if self.reason.value in Config["Infraction"]["reasons"]:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this preset reason already exists!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this preset reason already exists!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -547,7 +546,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
         elif self.type == "remove":
             if self.reason.value not in Config["Infraction"]["reasons"]:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this preset reason doesn't exist!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this preset reason doesn't exist!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -556,7 +555,7 @@ class AddAndRemove(discord.ui.Modal, title="Preset Reasons"):
             {"_id": interaction.guild.id}, {"$set": Config}
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name}**, {self.reason.value} has been {'added' if self.type == 'add' else 'removed'} to the preset reasons!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, {self.reason.value} has been {'added' if self.type == 'add' else 'removed'} to the preset reasons!",
             view=None,
         )
         try:
@@ -691,7 +690,7 @@ class ManageTypes(discord.ui.Select):  # Infraction Types
 
             else:
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** there are no infraction types to remove!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** there are no infraction types to remove!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -764,7 +763,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         if self.type == "add":
             if self.name in config.get("Infraction").get("types"):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** this infraction type already exists!",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** this infraction type already exists!",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -778,7 +777,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
             if config.get("Infraction").get("types") is not None:
                 if not Value in config.get("Infraction").get("types"):
                     embed = discord.Embed(
-                        description=f"{redx} **{interaction.user.display_name},** this infraction type doesn't exist.",
+                        description=f"{Emojis.tick} **{interaction.user.display_name},** this infraction type doesn't exist.",
                         color=discord.Colour.brand_red(),
                     )
                     return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -794,20 +793,20 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
             view = NoThanks()
             view.add_item(InfractionTypesAction(self.author, Value))
             return await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?",
                 view=view,
             )
         elif self.type == "edit":
             if Value not in config["Infraction"].get("types", []):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** there isn't an infraction type named this.",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** there isn't an infraction type named this.",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
             view = Done()
             view.add_item(InfractionTypesAction(self.author, Value))
             return await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name}**, you are now editing the infraction type.",
+                content=f"{Emojis.tick} **{interaction.user.display_name}**, you are now editing the infraction type.",
                 view=view,
             )
 
@@ -836,7 +835,7 @@ class NoThanks(discord.ui.View):
     ):
         await interaction.response.defer()
         await interaction.followup.send(
-            content=f"{tick} **{interaction.user.display_name},** No problem! I've created the infraction type for you!",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** No problem! I've created the infraction type for you!",
         )
 
 
@@ -921,7 +920,7 @@ class RequiredRoles(discord.ui.RoleSelect):
             upsert=True,
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1024,7 +1023,7 @@ class WebhookDesign(discord.ui.Modal):
         pattern = r"^https?://.*\.(png|jpg|jpeg|gif|webp)(\?.*)?$"
         if not re.match(pattern, AV, re.IGNORECASE):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** the avatar link provided is not a valid image URL!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.followup.send(embed=embed, ephemeral=True)
@@ -1131,32 +1130,22 @@ class InfractionTypesAction(discord.ui.Select):
         self.author = author
         self.name = name
         options = [
+            discord.SelectOption(label="Send to channel", emoji=f"{Emojis.tags}"),
             discord.SelectOption(
-                label="Send to channel", emoji="<:tag:1234998802948034721>"
-            ),
-            discord.SelectOption(
-                label="Required Permissions", emoji="<:Permissions:1207365901956026368>"
+                label="Required Permissions", emoji=f"{Emojis.permissions}"
             ),
             discord.SelectOption(
                 label="Use Hierarchy",
                 description="This will use a demotion system with the Hierarchy system.",
-                emoji="<:hierarchy:1341493421503676517>",
+                emoji=f"{Emojis.hierarchy}",
             ),
+            discord.SelectOption(label="Give Roles", emoji=f"{Emojis.promotions}"),
+            discord.SelectOption(label="Remove Roles", emoji=f"{Emojis.infractions}"),
             discord.SelectOption(
-                label="Give Roles", emoji="<:Promotion:1234997026677198938>"
+                label="Staff Database Removal", emoji=f"{Emojis.staff_db}"
             ),
-            discord.SelectOption(
-                label="Remove Roles", emoji="<:Infraction:1223063128275943544>"
-            ),
-            discord.SelectOption(
-                label="Staff Database Removal", emoji="<:staffdb:1206253848298127370>"
-            ),
-            discord.SelectOption(
-                label="Escalate", emoji="<:escalate:1340246894013841440>"
-            ),
-            discord.SelectOption(
-                label="Change Group Role", emoji="<:robloxWhite:1200584000390053899>"
-            ),
+            discord.SelectOption(label="Escalate", emoji=f"{Emojis.escalate}"),
+            discord.SelectOption(label="Change Group Role", emoji=f"{Emojis.roblox}"),
         ]
         super().__init__(
             placeholder="Select Infraction Actions",
@@ -1170,7 +1159,7 @@ class InfractionTypesAction(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.response.send_message(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"{Emojis.tick} This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1219,19 +1208,19 @@ class InfractionTypesAction(discord.ui.Select):
             await interaction.response.defer()
             Roles = await GroupRoles(interaction)
             if Roles == 0:
-                from core.discord.HelpEmbeds import NotRobloxLinked
+                from core.bot.HelpEmbeds import NotRobloxLinked
 
                 return await interaction.followup.send(
                     embed=NotRobloxLinked(), ephemeral=True
                 )
             if Roles == 1:
                 return await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name},** you don't have access to the group's roles.",
+                    f"{Emojis.no} **{interaction.user.display_name},** you don't have access to the group's roles.",
                     ephemeral=True,
                 )
             if Roles == 2:
                 return await interaction.followup.send(
-                    f"{no} **{interaction.user.display_name},** a group hasn't been linked.",
+                    f"{Emojis.no} **{interaction.user.display_name},** a group hasn't been linked.",
                     ephemeral=True,
                 )
 
@@ -1259,7 +1248,7 @@ class InfractionTypesAction(discord.ui.Select):
                 upsert=True,
             )
             await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
                 view=None,
             )
 
@@ -1277,13 +1266,13 @@ class Done(discord.ui.View):
             if interaction.user.id != self.author.id:
                 return await interaction.followup.send(
                     embed=discord.Embed(
-                        description=f"{redx} This is not your panel!",
+                        description=f"{Emojis.tick} This is not your panel!",
                         color=discord.Color.red(),
                     ),
                     ephemeral=True,
                 )
             await interaction.edit_original_response(
-                content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
                 view=None,
             )
 
@@ -1335,7 +1324,7 @@ class Escalate(discord.ui.Modal, title="Escalate"):
             upsert=True,
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1353,7 +1342,7 @@ class TypeChannel(discord.ui.ChannelSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"{Emojis.tick} This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1366,7 +1355,7 @@ class TypeChannel(discord.ui.ChannelSelect):
             upsert=True,
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1381,7 +1370,7 @@ class RemoveRoles(discord.ui.RoleSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"{Emojis.tick} This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1394,7 +1383,7 @@ class RemoveRoles(discord.ui.RoleSelect):
             upsert=True,
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1409,7 +1398,7 @@ class GiveRoles(discord.ui.RoleSelect):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"{Emojis.tick} This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1422,7 +1411,7 @@ class GiveRoles(discord.ui.RoleSelect):
             upsert=True,
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1439,7 +1428,7 @@ class ChangeGroupRole(discord.ui.Select):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(
                 embed=discord.Embed(
-                    description=f"{redx} This is not your panel!",
+                    description=f"{Emojis.tick} This is not your panel!",
                     color=discord.Color.red(),
                 ),
                 ephemeral=True,
@@ -1452,7 +1441,7 @@ class ChangeGroupRole(discord.ui.Select):
             upsert=True,
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** successfully updated infraction type.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
 
@@ -1472,8 +1461,8 @@ async def WebhookEmbed(interaction: discord.Interaction, Config: dict):
     username = WebhookSettings.get("Username", None) or "Not Set"
     avatar = WebhookSettings.get("Avatar", None) or "Not Set"
     embed.add_field(
-        name="<:Webhook:1400197752339824821> Webhook Settings",
-        value=f"> {replytop} **Enabled:** {'True' if enabled else 'False'}\n> {replymiddle} **Username:** {username}\n> {replybottom} **Avatar:** {avatar}",
+        name=f"{Emojis.webhook} Webhook Settings",
+        value=f"> {Emojis.replytop} **Enabled:** {'True' if enabled else 'False'}\n> {Emojis.replymiddle} **Username:** {username}\n> {Emojis.replybottom} **Avatar:** {avatar}",
     )
     return embed
 
@@ -1514,12 +1503,12 @@ async def InfractionEmbed(
         ],
     )
     Reasons = Config.get("Infraction", {}).get("reasons", [])
-    value = f"{replytop} `Infraction Channel:` {Channel}\n{replymiddle} `Audit Log Channel`:  {Audit}\n{replymiddle} `Types:` {', '.join(Types)}\n{replybottom} `Reasons:` {', '.join(Reasons) if Reasons else 'Not Configured'}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev/infractions-bot)"[
+    value = f"{Emojis.replytop} `Infraction Channel:` {Channel}\n{Emojis.replymiddle} `Audit Log Channel`:  {Audit}\n{Emojis.replymiddle} `Types:` {', '.join(Types)}\n{Emojis.replybottom} `Reasons:` {', '.join(Reasons) if Reasons else 'Not Configured'}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev/infractions-bot)"[
         :1024
     ]
 
     embed.add_field(
-        name="<:settings:1207368347931516928> Infractions",
+        name=f"{Emojis.settings_gear} Infractions",
         value=value[:1021] + "..." if len(value) > 1024 else value,
         inline=False,
     )

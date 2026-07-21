@@ -1,24 +1,18 @@
-import os
 from datetime import datetime
 
-from discord import app_commands
-
-from core.discord.Module import ModuleCheck, ModuleIsEnabled
-from core.discord.emojis import *
-from core.discord.permissions import *
+from core.bot.Checks import EnsureConfig
+from core.bot.Module import ModuleIsEnabled
+from core.bot.permissions import *
 from core.format import PaginatorButtons
 
 MONGO_URL = os.getenv("MONGO_URL")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-from core.discord.HelpEmbeds import (
-    BotNotConfigured,
+from core.bot.HelpEmbeds import (
     NoPermissionChannel,
     ChannelNotFound,
-    ModuleNotEnabled,
     NoChannelSet,
     Support,
-    ModuleNotSetup,
 )
 
 
@@ -40,7 +34,7 @@ class Feedback(commands.Cog):
         )
         if result is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any feedback with that ID."
+                f"{Emojis.no} **{ctx.author.display_name}**, I couldn't find any feedback with that ID."
             )
             return
 
@@ -48,7 +42,7 @@ class Feedback(commands.Cog):
             {"feedbackid": id, "guild_id": ctx.guild.id}
         )
         await ctx.send(
-            f"{tick} **{ctx.author.display_name}**, I have removed the feedback.",
+            f"{Emojis.tick} **{ctx.author.display_name}**, I have removed the feedback.",
         )
 
     @FeedbackGroup.command(description="Rate a staff member", name="give")
@@ -57,6 +51,7 @@ class Feedback(commands.Cog):
         rating="The rating you want to give (1-10).",
         feedback="The feedback you want to give.",
     )
+    @ModuleIsEnabled("Feedback")
     async def feedback(
         self,
         ctx: commands.Context,
@@ -74,45 +69,31 @@ class Feedback(commands.Cog):
             "10/10",
         ],
         *,
-        feedback: discord.ext.commands.Range[str, 1, 2000],
+        feedback: commands.Range[str, 1, 2000],
     ):
         await ctx.defer(ephemeral=True)
         if not await ctx.guild.fetch_member(ctx.author.id):
             return await ctx.send(
-                f"{no} {ctx.author.display_name}, that user isn't in the server."
+                f"{Emojis.no} {ctx.author.display_name}, that user isn't in the server."
             )
         existing_feedback = await self.client.db["feedback"].find_one(
             {"guild_id": ctx.guild.id, "staff": staff.id, "author": ctx.author.id}
         )
-        Config = await Configuration.find_one({"_id": ctx.guild.id})
-        if not Config:
-            return await ctx.send(embed=BotNotConfigured(), view=Support())
-        if not Config.get("Feedback"):
-            return await ctx.send(
-                embed=ModuleNotSetup(),
-                view=Support(),
-            )
-
+        Config = await EnsureConfig(ctx, "Feedback")
         if staff is None:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, please provide a staff member.",
-            )
-            return
-        if not await ModuleCheck(ctx.guild.id, "Feedback"):
-            await ctx.send(
-                embed=ModuleNotEnabled(),
-                view=Support(),
+                f"{Emojis.no} **{ctx.author.display_name}**, please provide a staff member.",
             )
             return
         if staff == ctx.author:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you cannot rate yourself.",
+                f"{Emojis.no} **{ctx.author.display_name}**, you cannot rate yourself.",
             )
             return
 
         if not RequireStaff(Config, staff):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can only rate staff members.",
+                f"{Emojis.no} **{ctx.author.display_name}**, you can only rate staff members.",
             )
             return
 
@@ -122,18 +103,18 @@ class Feedback(commands.Cog):
                 and existing_feedback
             ):
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** you have already rated this staff member.",
+                    f"{Emojis.no} **{ctx.author.display_name},** you have already rated this staff member.",
                 )
                 return
         else:
             if existing_feedback:
                 await ctx.send(
-                    f"{no} **{ctx.author.display_name},** you have already rated this staff member.",
+                    f"{Emojis.no} **{ctx.author.display_name},** you have already rated this staff member.",
                 )
                 return
         feedbackid = await self.client.db["feedback"].count_documents({}) + 1
         msg = await ctx.send(
-            f"<a:Loading:1167074303905386587>  **{ctx.author.display_name}**, submitting feedback..."
+            f"{Emojis.loading}  **{ctx.author.display_name}**, submitting feedback..."
         )
 
         try:
@@ -167,7 +148,7 @@ class Feedback(commands.Cog):
             insert = await self.client.db["feedback"].insert_one(feedbackdata)
             self.client.dispatch("feedback", insert.inserted_id, Config)
             await msg.edit(
-                content=f"{tick} You've rated **@{staff.display_name}** {rating}!",
+                content=f"{Emojis.tick} You've rated **@{staff.display_name}** {rating}!",
             )
         except discord.Forbidden:
             await ctx.send(
@@ -207,12 +188,14 @@ class Feedback(commands.Cog):
                 {"guild_id": ctx.guild.id, "staff": staff.id}
             )
         else:
-            await ctx.send(f"{no} Invalid scope. Please use 'global' or 'server'.")
+            await ctx.send(
+                f"{Emojis.no} Invalid scope. Please use 'global' or 'server'."
+            )
             return
 
         if total_ratings == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, I couldn't find any rating for this user.\n{arrow} To rate someone use </feedback give:1194418154617700382>!",
+                f"{Emojis.no} **{ctx.author.display_name}**, I couldn't find any rating for this user.\n{Emojis.arrow} To rate someone use </feedback give:1194418154617700382>!",
             )
             return
         sum_ratings = sum(
@@ -259,7 +242,7 @@ class ViewRatings(discord.ui.View):
     @discord.ui.button(
         label="View Ratings",
         style=discord.ButtonStyle.grey,
-        emoji="<:stafffeedback:1235000485208002610>",
+        emoji=f"{Emojis.staff_feedback}",
     )
     async def Ratings(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -272,7 +255,7 @@ class ViewRatings(discord.ui.View):
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         msg = await self.ctx.send(
             embed=discord.Embed(
-                description="<a:astroloading:1245681595546079285>",
+                description=f"{Emojis.loading_alt}",
                 color=discord.Color.dark_embed(),
             )
         )

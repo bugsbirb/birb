@@ -4,8 +4,8 @@ import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from cogs.Events.on_infraction import InfractItem
-from core.discord.emojis import *
+from datamodels.Infractions import InfractionItem
+from core.bot.emojis import *
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class on_infraction_approval(commands.Cog):
         InfractionData = await self.client.db["infractions"].find_one({"_id": objectid})
         if not InfractionData:
             return
-        Infraction = InfractItem(InfractionData)
+        Infraction = InfractionItem(**InfractionData)
 
         guild = await self.client.fetch_guild(Infraction.guild_id)
         if guild is None:
@@ -146,9 +146,9 @@ class CaseApproval(discord.ui.View):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"{Emojis.no} **{interaction.user.display_name}**, I couldn't find the data for this."
             )
-        Infraction = InfractItem(Result)
+        Infraction = InfractionItem(**Result)
 
         guild = await interaction.client.fetch_guild(Infraction.guild_id)
         if guild is None:
@@ -212,9 +212,9 @@ class CaseApproval(discord.ui.View):
         )
         if not Result:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, I couldn't find the data for this."
+                content=f"{Emojis.no} **{interaction.user.display_name}**, I couldn't find the data for this."
             )
-        Infraction = InfractItem(Result)
+        Infraction = InfractionItem(Result)
 
         guild = await interaction.client.fetch_guild(Infraction.guild_id)
         if guild is None:

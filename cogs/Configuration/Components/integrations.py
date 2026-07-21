@@ -1,16 +1,12 @@
-import discord
-
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Integrations(discord.ui.Select):
     def __init__(self, author: discord.Member):
         super().__init__(
             options=[
-                discord.SelectOption(
-                    label="Roblox Groups", emoji="<:robloxWhite:1200584000390053899>"
-                )
+                discord.SelectOption(label="Roblox Groups", emoji=f"{Emojis.roblox}")
             ]
         )
         self.author = author
@@ -21,7 +17,7 @@ class Integrations(discord.ui.Select):
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
         if self.values[0] == "Roblox Groups":
             from core.integrations.roblox import GetValidToken
-            from core.discord.HelpEmbeds import NotRobloxLinked
+            from core.bot.HelpEmbeds import NotRobloxLinked
 
             token = await GetValidToken(user=interaction.user)
             if not token:
@@ -75,12 +71,12 @@ class EnterGroup(discord.ui.Modal):
             config["groups"] = {}
 
         from core.integrations.roblox import GetGroup2, GetUser
-        from core.discord.HelpEmbeds import NotRobloxLinked
+        from core.bot.HelpEmbeds import NotRobloxLinked
 
         group = await GetGroup2(self.group_id.value, interaction.user)
         if not group or not group.get("owner"):
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I couldn't find the roblox group from your account.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I couldn't find the roblox group from your account.",
                 view=None,
                 embed=None,
             )
@@ -98,7 +94,7 @@ class EnterGroup(discord.ui.Modal):
         OwnerID = int(group.get("owner").split("/")[1])
         if not OwnerID == RobloxID:
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** you aren't the owner of this group. Please get the owner of it to link it.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** you aren't the owner of this group. Please get the owner of it to link it.",
                 view=None,
                 embed=None,
             )
@@ -108,7 +104,7 @@ class EnterGroup(discord.ui.Modal):
             {"_id": interaction.guild.id}, {"$set": config}, upsert=True
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name}**, group successfullyy linked.",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, group successfullyy linked.",
             view=None,
         )
 
@@ -127,12 +123,12 @@ async def integrationsEmbed(interaction: discord.Interaction, embed: discord.Emb
     )
     Groups = config.get("groups", {}).get("id", None) if config else None
     embed.add_field(
-        name="<:link:1206670134064717904> Integrations",
+        name=f"{Emojis.link} Integrations",
         value=f"> **Groups**: {'Linked' if Groups else 'Unlinked'}",
         inline=False,
     )
     embed.add_field(
-        name="<:Modules:1296530049381568522> Functions",
+        name=f"{Emojis.modules} Functions",
         value="> * Infraction Types\n> -# We are still looking to add more purposes to integrations",
     )
 

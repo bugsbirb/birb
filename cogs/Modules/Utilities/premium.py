@@ -35,7 +35,7 @@ class Premium(commands.Cog):
             return
 
         if not user or not user.get("attributes", {}).get("social_connections", {}).get(
-            "discord"
+            "bot"
         ):
             await msg.edit(
                 embed=discord.Embed(

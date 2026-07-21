@@ -1,9 +1,12 @@
+import os
+from datetime import timedelta, datetime
+from typing import NamedTuple, Optional, Union, Callable, Awaitable, Any
+
 import discord
 from discord.ext import commands
-from core.discord import Paginator
 
-from datetime import timedelta, datetime
-import os
+from core.bot import Paginator
+from core.bot.emojis import Emojis
 
 
 def DefaultTypes():
@@ -27,29 +30,51 @@ def IsSeperateBot():
     )
 
 
-def CommandType(I: discord.Interaction):
-    if isinstance(I, commands.Context):
-        author = I.author
-        guild = I.guild
-        send = I.send
-    else:
-        author = I.user
-        guild = I.guild
-        if I.response.is_done():
-            send = I.followup.send
-        else:
-            send = I.response.send_message
-    command = I.command
-    return (author, guild, send, command)
+class ContextClass(NamedTuple):
+    author: Optional[Union[discord.Member, discord.User]]
+    guild: Optional[discord.Guild]
+    send: Optional[Callable[..., Awaitable[Any]]]
+    command: Optional[Union[commands.Command, discord.app_commands.Command]]
+    client: Optional[discord.Client]
+    channel: Optional[discord.TextChannel]
+
+
+def CommandType(
+    ctx: Union[commands.Context, discord.Interaction],
+) -> ContextClass:
+    if isinstance(ctx, commands.Context):
+        return ContextClass(
+            author=ctx.author,
+            guild=ctx.guild,
+            send=ctx.send,
+            command=ctx.command,
+            client=ctx.bot,
+            channel=ctx.channel,
+        )
+
+    if isinstance(ctx, discord.Interaction):
+        send = (
+            ctx.followup.send if ctx.response.is_done() else ctx.response.send_message
+        )
+        return ContextClass(
+            author=ctx.user,
+            guild=ctx.guild,
+            send=send,
+            command=ctx.command,
+            client=ctx.client,
+            channel=ctx.channel,
+        )
+
+    raise TypeError(f"Unsupported type")
 
 
 async def PaginatorButtons(extra: list = None):
     Sep = IsSeperateBot()
     emojis = {
-        "first": "<:chevronsleft:1220806428726661130>",
-        "previous": "<:chevronleft:1220806425140531321>",
-        "next": "<:chevronright:1220806430010118175>",
-        "last": "<:chevronsright:1220806426583371866>",
+        "first": f"{Emojis.chevrons_left}",
+        "previous": f"{Emojis.chevron_left}",
+        "next": f"{Emojis.chevron_right}",
+        "last": f"{Emojis.chevrons_right}",
     }
     paginator = Paginator.Simple(
         PreviousButton=discord.ui.Button(

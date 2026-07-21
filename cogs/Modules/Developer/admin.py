@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import os
-from core.discord.ui import YesOrNo, BasicPaginator
+from core.bot.ui import YesOrNo, BasicPaginator
 
 AdminRoles = (
     [int(x) for x in os.getenv("STAFF").split(",")] if os.getenv("STAFF") else []

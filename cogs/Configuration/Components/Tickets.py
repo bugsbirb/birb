@@ -3,8 +3,8 @@ from typing import Literal
 
 import discord
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 from core.format import IsSeperateBot
 
 
@@ -14,27 +14,27 @@ class Tickets(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Panels",
-                    emoji="<:Panel:1340741181965078642>",
+                    emoji=f"{Emojis.panel}",
                     description="Singular ticket panels that include one button.",
                 ),
                 discord.SelectOption(
                     label="Multi Panels",
-                    emoji="<:MultiPanel:1340741183579885690>",
+                    emoji=f"{Emojis.multi_panel}",
                     description="Merge multiple singular panels together: Adds multiple buttons to one panel.",
                 ),
                 discord.SelectOption(
                     label="Quota",
-                    emoji="<:counting:1343598685749252227>",
+                    emoji=f"{Emojis.counting}",
                     description="Track the amount of claimed tickets staff members claim.",
                 ),
                 discord.SelectOption(
                     label="Blacklist",
-                    emoji="<:staff:1206248655359840326>",
+                    emoji=f"{Emojis.staff}",
                     description="Blacklists roles from opening tickets.",
                 ),
                 discord.SelectOption(
                     label="Audit Log",
-                    emoji="<:Log:1349431938926252115>",
+                    emoji=f"{Emojis.log}",
                     description="Logs ticket quota resets.",
                 ),
             ]
@@ -130,7 +130,7 @@ class BlacklistRoles(discord.ui.RoleSelect):
         )
 
         await interaction.response.send_message(
-            f"{tick} **{interaction.user.display_name}**, successfully updated blacklist roles..",
+            f"{Emojis.tick} **{interaction.user.display_name}**, successfully updated blacklist roles..",
             ephemeral=True,
         )
         try:
@@ -163,7 +163,7 @@ class TicketQuota(discord.ui.Modal):
             upsert=True,
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** ticket quota updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** ticket quota updated successfully.",
             ephemeral=True,
         )
 
@@ -171,11 +171,11 @@ class TicketQuota(discord.ui.Modal):
 class CreateDeletePanel(discord.ui.Select):
     def __init__(self, author: discord.Member, PanelType: Literal["single", "multi"]):
         Options = [
-            discord.SelectOption(label="Create", emoji="<:Add:1163095623600447558>"),
+            discord.SelectOption(label="Create", emoji=f"{Emojis.add}"),
             discord.SelectOption(
                 label="Delete", emoji="<:Subtract:1229040262161109003>"
             ),
-            discord.SelectOption(label="Modify", emoji="<:Pen:1235001839036923996>"),
+            discord.SelectOption(label="Modify", emoji=f"{Emojis.pen}"),
         ]
         self.PanelType = PanelType
         self.author = author
@@ -279,7 +279,7 @@ class PanelCreationModal(discord.ui.Modal):
             }
         ):
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** a panel with that name already exists.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** a panel with that name already exists.",
                 ephemeral=True,
             )
         PanelName = self.name_input.value
@@ -327,7 +327,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Customise Embeds",
         style=discord.ButtonStyle.gray,
-        emoji="<:Customisation:1223063306131210322>",
+        emoji=f"{Emojis.customisation}",
     )
     async def CustomiseEmbed(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -341,7 +341,7 @@ class SingelPanelCustomisation(discord.ui.View):
         view.add_item(EmbedSelection(interaction.user, "Panel", self.name))
         await interaction.response.send_message(view=view)
 
-    @discord.ui.button(label="Customise Button", emoji="<:Button:1223063359184830494>")
+    @discord.ui.button(label="Customise Button", emoji=f"{Emojis.button}")
     async def CustomiseButton(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -361,7 +361,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Category",
         style=discord.ButtonStyle.blurple,
-        emoji="<:category:1248312604733210735>",
+        emoji=f"{Emojis.category}",
     )
     async def Category(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -387,7 +387,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Transcript Channel",
         style=discord.ButtonStyle.blurple,
-        emoji="<:tag:1234998802948034721>",
+        emoji=f"{Emojis.tags}",
     )
     async def Transcript(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -414,7 +414,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Permissions",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Permissions:1207365901956026368>",
+        emoji=f"{Emojis.permissions}",
     )
     async def Permissions(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -450,7 +450,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Mentions On Open",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Ping:1298301862906298378>",
+        emoji=f"{Emojis.ping}",
     )
     async def Mentions(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -480,7 +480,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Access Control",
         style=discord.ButtonStyle.blurple,
-        emoji="<:AccessControl:1340741536492814458>",
+        emoji=f"{Emojis.access_control}",
     )
     async def AccessControl(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -515,7 +515,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Automations",
         style=discord.ButtonStyle.blurple,
-        emoji="<:reports:1224723845726998651>",
+        emoji=f"{Emojis.reports}",
     )
     async def Automations(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -557,7 +557,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Forms",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Application:1224722901328986183>",
+        emoji=f"{Emojis.application}",
     )
     async def Forms(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.author.id:
@@ -585,7 +585,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Allow Ratings (Disabled)",
         style=discord.ButtonStyle.red,
-        emoji="<:Reviews:1340741536492814458>",
+        emoji=f"{Emojis.reviews}",
     )
     async def Reviews(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -600,7 +600,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         if not custom:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -623,7 +623,7 @@ class SingelPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Finish",
         style=discord.ButtonStyle.green,
-        emoji="<:Save:1223293419678470245>",
+        emoji=f"{Emojis.save}",
     )
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         custom = await interaction.client.db["Panels"].find_one(
@@ -631,7 +631,7 @@ class SingelPanelCustomisation(discord.ui.View):
         )
         if not custom:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
             return
@@ -644,12 +644,12 @@ class SingelPanelCustomisation(discord.ui.View):
 
         if len(MissingFields) > 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
+                content=f"{Emojis.no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
                 ephemeral=True,
             )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** configuration finished.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** configuration finished.",
             view=None,
         )
 
@@ -681,7 +681,7 @@ class Automations(discord.ui.Modal):
                 Inactivity = int(Inactivity)
             except:
                 return await interaction.response.send_message(
-                    content=f"{no} **{interaction.user.display_name},** inactivity must be an integer.",
+                    content=f"{Emojis.no} **{interaction.user.display_name},** inactivity must be an integer.",
                     ephemeral=True,
                 )
 
@@ -692,7 +692,7 @@ class Automations(discord.ui.Modal):
             upsert=True,
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** inactivity reminder updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** inactivity reminder updated successfully.",
             ephemeral=True,
         )
 
@@ -706,7 +706,7 @@ class MultiPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Customise Embeds",
         style=discord.ButtonStyle.gray,
-        emoji="<:Customisation:1223063306131210322>",
+        emoji=f"{Emojis.customisation}",
     )
     async def CustomiseEmbed(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -720,7 +720,7 @@ class MultiPanelCustomisation(discord.ui.View):
         view.add_item(EmbedSelection(interaction.user, "Multi", self.name))
         await interaction.response.send_message(view=view)
 
-    @discord.ui.button(label="Manage Panels", emoji="<:MultiPanel:1340741183579885690>")
+    @discord.ui.button(label="Manage Panels", emoji=f"{Emojis.multi_panel}")
     async def ManagePanels(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -756,7 +756,7 @@ class MultiPanelCustomisation(discord.ui.View):
     @discord.ui.button(
         label="Finish",
         style=discord.ButtonStyle.green,
-        emoji="<:Save:1223293419678470245>",
+        emoji=f"{Emojis.save}",
     )
     async def Finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         custom = await interaction.client.db["Panels"].find_one(
@@ -764,7 +764,7 @@ class MultiPanelCustomisation(discord.ui.View):
         )
         if not custom:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
             return
@@ -777,12 +777,12 @@ class MultiPanelCustomisation(discord.ui.View):
 
         if len(MissingFields) > 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
+                content=f"{Emojis.no} **{interaction.user.display_name},** missing required fields: {', '.join(MissingFields)}",
                 ephemeral=True,
             )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** configuration finished.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** configuration finished.",
             view=None,
         )
 
@@ -799,7 +799,7 @@ async def CustomiseEmbed(interaction: discord.Interaction, option, name):
             Embed,
             NoEmbed,
         )
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
 
         Default = {
             "thumb": "",
@@ -860,7 +860,7 @@ async def FinalFunction(interaction: discord.Interaction, d={}):
     embed = interaction.message.embeds
     if embed and interaction.message is None:
         return await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** you can't have an empty message.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** you can't have an empty message.",
         )
     RemoveEmbed = False
     if embed:
@@ -909,7 +909,7 @@ async def FinalFunction(interaction: discord.Interaction, d={}):
     )
 
     await interaction.response.send_message(
-        content=f"{tick} **{interaction.user.display_name}**, successfully updated `{d.get('option')}` embed.",
+        content=f"{Emojis.tick} **{interaction.user.display_name}**, successfully updated `{d.get('option')}` embed.",
         embed=None,
         ephemeral=True,
     )
@@ -966,7 +966,7 @@ class MultiToSingle(discord.ui.Select):
             {"$set": {"Panels": self.values}},
         )
         return await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully updated the connected panels.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've successfully updated the connected panels.",
             embed=None,
             view=None,
         )
@@ -1007,7 +1007,7 @@ class Permissions(discord.ui.RoleSelect):
             {"$set": {"permissions": selected_roles}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** permissions updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** permissions updated successfully.",
             view=None,
             embed=None,
         )
@@ -1035,7 +1035,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
             {"$set": {"TranscriptChannel": self.values[0].id if self.values else None}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** transcript channel updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** transcript channel updated successfully.",
             view=None,
         )
 
@@ -1050,7 +1050,7 @@ class TicketForms(discord.ui.View):
     @discord.ui.button(
         label="(0/5)",
         style=discord.ButtonStyle.gray,
-        emoji="<:Add:1163095623600447558>",
+        emoji=f"{Emojis.add}",
     )
     async def AddQuestion(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1071,13 +1071,13 @@ class TicketForms(discord.ui.View):
         )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
         if len(Config.get("Questions", [])) == 0:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no questions to delete.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no questions to delete.",
                 ephemeral=True,
             )
 
@@ -1111,7 +1111,7 @@ class DeleteQuestionSelect(discord.ui.Select):
         )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -1121,7 +1121,7 @@ class DeleteQuestionSelect(discord.ui.Select):
         )
         if not question:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this question does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this question does not exist.",
                 ephemeral=True,
             )
 
@@ -1197,12 +1197,12 @@ class Question(discord.ui.Modal):
         )
         if any(q.get("label") == question for q in Config.get("Questions", [])):
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this question already exists.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this question already exists.",
                 ephemeral=True,
             )
         if not Config:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** this panel does not exist.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** this panel does not exist.",
                 ephemeral=True,
             )
 
@@ -1211,7 +1211,7 @@ class Question(discord.ui.Modal):
 
         if len(Config.get("Questions", [])) == 5:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** you can only have 5 questions.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** you can only have 5 questions.",
                 ephemeral=True,
             )
 
@@ -1265,7 +1265,7 @@ class Category(discord.ui.ChannelSelect):
             {"$set": {"Category": self.values[0].id if self.values else None}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** category updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** category updated successfully.",
             view=None,
         )
 
@@ -1294,7 +1294,7 @@ class MentionsOnOpen(discord.ui.RoleSelect):
             {"$set": {"MentionsOnOpen": Roles}},
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** mentions on open updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** mentions on open updated successfully.",
             view=None,
         )
 
@@ -1327,7 +1327,7 @@ class AccessControl(discord.ui.RoleSelect):
             },
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** access control updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** access control updated successfully.",
             view=None,
             embed=None,
         )
@@ -1367,7 +1367,7 @@ class CustomiseButton(discord.ui.Modal):
             color = "Grey"
         if not color in ["Blurple", "Green", "Red", "Grey"]:
             return await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** invalid button color.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** invalid button color.",
                 ephemeral=True,
             )
         if not emoji:
@@ -1391,7 +1391,7 @@ class CustomiseButton(discord.ui.Modal):
             },
         )
         await interaction.response.send_message(
-            content=f"{tick} **{interaction.user.display_name},** button updated successfully.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** button updated successfully.",
             ephemeral=True,
         )
 

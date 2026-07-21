@@ -1,9 +1,7 @@
 import traceback
 
-import discord
-
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Suggestions(discord.ui.Select):
@@ -12,15 +10,13 @@ class Suggestions(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Suggestions Channel",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                 ),
                 discord.SelectOption(
                     label="Customise Embeds",
-                    emoji="<:Customisation:1223063306131210322>",
+                    emoji=f"{Emojis.customisation}",
                 ),
-                discord.SelectOption(
-                    label="Preferences", emoji="<:leaf:1160541147320553562>"
-                ),
+                discord.SelectOption(label="Preferences", emoji=f"{Emojis.leaf}"),
             ]
         )
         self.author = author
@@ -60,7 +56,7 @@ class Suggestions(discord.ui.Select):
             await interaction.edit_original_response(
                 embed=None,
                 view=view,
-                content="<:List:1223063187063308328> Select which embed you want to edit.",
+                content=f"{Emojis.list} Select which embed you want to edit.",
             )
             return
         if option == "Preferences":
@@ -193,7 +189,7 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
         from cogs.Configuration.Components.EmbedBuilder import (
             Embed,
         )
-        from core.discord.CustomEmbed import DisplayEmbed
+        from core.bot.CustomEmbed import DisplayEmbed
 
         if not custom:
             view = Embed(
@@ -209,7 +205,7 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
             )
             embed = discord.Embed(
                 title="",
-                description="<:Member:1226674150463111299> {author.mention}",
+                description=f"{Emojis.member}" + "{author.mention}",
                 color=discord.Color.yellow(),
             )
             embed.set_thumbnail(url=interaction.user.display_avatar)
@@ -217,22 +213,22 @@ async def CustomiseEmbed(interaction: discord.Interaction, option):
                 url="https://cdn.discordapp.com/attachments/1143363161609736192/1152281646414958672/invisible.png"
             )
 
-            embed.add_field(
-                name="<:pin:1226671966413389864> Suggestion", value="{suggestion}"
-            )
+            embed.add_field(name=f"{Emojis.pin} Suggestion", value="{suggestion}")
             embed.set_author(
                 icon_url=interaction.user.display_avatar, name="{author.name}"
             )
             embed.add_field(
-                name="<:messageforward1:1230919023361921165> Opinions",
-                value="{upvotes} <:UpVote:1223062893096996934> | {downvote} <:DownVote:1223063241433939989>",
+                name=f"{Emojis.message_forward} Opinions",
+                value="{upvotes} " + f"{Emojis.upvote} "
+                "| {downvote} "
+                f"{Emojis.downvote}",
             )
             if option == "Accepted Suggestion":
-                embed.title = f"{greencheck} Suggestion Accepted"
+                embed.title = f"{Emojis.green_tick} Suggestion Accepted"
                 embed.color = discord.Color.brand_green()
 
             if option == "Denied Suggestion":
-                embed.title = f"{redx} Suggestion Denied"
+                embed.title = f"{Emojis.tick} Suggestion Denied"
                 embed.color = discord.Color.brand_red()
                 embed.add_field(name="Denied Reason", value="{reason}", inline=False)
 
@@ -379,7 +375,7 @@ async def SuggestionsEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's suggestions settings! Suggestions is a way for members to give suggestions to the server. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     embed.add_field(
-        name="<:settings:1207368347931516928> Suggestions",
+        name=f"{Emojis.settings_gear} Suggestions",
         value=f"> `Suggestions Channel:` {Channel}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev).",
         inline=False,
     )

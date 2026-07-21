@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from discord.ext import commands
 
-from core.discord.permissions import *
+from core.bot.permissions import *
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +14,8 @@ from datetime import datetime
 environment = os.getenv("ENVIRONMENT")
 guildid = os.getenv("CUSTOM_GUILD")
 
-from core.discord.Module import ModuleIsEnabled
-from core.discord.HelpEmbeds import (
+from core.bot.Module import ModuleIsEnabled
+from core.bot.HelpEmbeds import (
     BotNotConfigured,
     NoPermissionChannel,
     ChannelNotFound,
@@ -50,25 +50,25 @@ class Suspensions(commands.Cog):
         await ctx.defer(ephemeral=True)
         if staff.bot:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you can't suspend a bot.",
+                f"{Emojis.no} **{ctx.author.display_name}**, you can't suspend a bot.",
             )
             return
 
         if not re.match(r"^\d+[mhdw]$", length):
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
+                f"{Emojis.no} **{ctx.author.display_name}**, invalid duration format. Please use a valid format like '1d' (1 day), '2h' (2 hours), etc.",
             )
             return
 
         if ctx.author == staff:
             await ctx.send(
-                f"{no} You can't suspend yourself.",
+                f"{Emojis.no} You can't suspend yourself.",
             )
             return
 
         if ctx.author.top_role <= staff.top_role:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.",
+                f"{Emojis.no} **{ctx.author.display_name}**, you don't have authority to suspend this user they are higher then you in the hierarchy.",
                 ephemeral=True,
             )
             return
@@ -78,7 +78,7 @@ class Suspensions(commands.Cog):
 
         if existing_suspensions:
             await ctx.send(
-                f"{no} **{staff.display_name}** is already suspended.",
+                f"{Emojis.no} **{staff.display_name}** is already suspended.",
                 ephemeral=True,
             )
             return
@@ -100,14 +100,14 @@ class Suspensions(commands.Cog):
         end_time = start_time + timedelta(seconds=duration_seconds)
         embed = discord.Embed(
             title="",
-            description="<:Tip:1223062864793702431> **TIP:** Make sure the bot has permissions to send messages to the channel & to removes roles.",
+            description=f"{Emojis.tip} **TIP:** Make sure the bot has permissions to send messages to the channel & to removes roles.",
             color=discord.Color.light_embed(),
         )
         view = RoleTakeAwayYesOrNo(
             staff, ctx.author, reason, end_time, start_time, notes
         )
         await ctx.send(
-            "<:Role:1223077527984144474> Would you like to **remove roles** from this person? Don't worry the roles will be **returned** after suspension.",
+            f"{Emojis.role} Would you like to **remove roles** from this person? Don't worry the roles will be **returned** after suspension.",
             view=view,
             embed=embed,
         )
@@ -128,7 +128,7 @@ class Suspensions(commands.Cog):
 
         if len(loa_requests) == 0:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.",
+                f"{Emojis.no} **{ctx.author.display_name}**, there aren't any active suspensions on this server.",
             )
         else:
             embed = discord.Embed(
@@ -147,8 +147,8 @@ class Suspensions(commands.Cog):
                 notes = request.get("notes", "N/A")
 
                 embed.add_field(
-                    name=f"<:Infraction:1223063128275943544>{user.name.capitalize()}",
-                    value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}\n{arrow}**Notes:** {notes}",
+                    name=f"{Emojis.infractions}{user.name.capitalize()}",
+                    value=f"{Emojis.arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{Emojis.arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{Emojis.arrow}**Reason:** {reason}\n{Emojis.arrow}**Notes:** {notes}",
                     inline=False,
                 )
 
@@ -192,8 +192,8 @@ class Suspensions(commands.Cog):
                 reason = record["reason"]
 
                 embed.add_field(
-                    name=f"<:Infraction:1223063128275943544>{user.name.capitalize()}",
-                    value=f"{arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{arrow}**Reason:** {reason}",
+                    name=f"{Emojis.infractions}{user.name.capitalize()}",
+                    value=f"{Emojis.arrow}**Start Date:** <t:{int(start_time.timestamp())}:f>\n{Emojis.arrow}**End Date:** <t:{int(end_time.timestamp())}:f>\n{Emojis.arrow}**Reason:** {reason}",
                     inline=False,
                 )
 
@@ -204,7 +204,7 @@ class Suspensions(commands.Cog):
             await ctx.send(embed=embed, view=view)
         else:
             await ctx.send(
-                f"{no} **{ctx.author.display_name}**, No suspensions found for this user.",
+                f"{Emojis.no} **{ctx.author.display_name}**, No suspensions found for this user.",
             )
 
 
@@ -232,7 +232,7 @@ class Suspension(discord.ui.RoleSelect):
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if not config:
             return await interaction.response.send_message(
-                f"{no} **{interaction.user.display_name}**, you need to select at least one role.",
+                f"{Emojis.no} **{interaction.user.display_name}**, you need to select at least one role.",
                 ephemeral=True,
             )
         ChannelID = config.get("Suspension", {}).get("channel") or config.get(
@@ -277,7 +277,7 @@ class Suspension(discord.ui.RoleSelect):
             "infraction", RESULT.inserted_id, config, None, "Suspension"
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
             view=None,
             embed=None,
         )
@@ -317,7 +317,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             self.notes,
         )
         await interaction.response.edit_message(
-            content="<:Role:1223077527984144474> Select the **roles** that will be removed & then given back after the suspension is over.",
+            content=f"{Emojis.role} Select the **roles** that will be removed & then given back after the suspension is over.",
             embed=None,
             view=view,
         )
@@ -379,7 +379,7 @@ class RoleTakeAwayYesOrNo(discord.ui.View):
             "infraction", RESULT.inserted_id, config, None, "Suspension"
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've successfully suspended **{self.user.display_name}** for <t:{int(self.start_time.timestamp())}:f> - <t:{int(self.end_time.timestamp())}:f>",
             view=None,
             embed=None,
         )
@@ -414,7 +414,7 @@ class SuspensionPanel(discord.ui.View):
     @discord.ui.button(
         label="Suspension Void",
         style=discord.ButtonStyle.grey,
-        emoji="<:Exterminate:1223063042246443078>",
+        emoji=f"{Emojis.exterminate}",
     )
     async def SuspensionVoid(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -447,7 +447,7 @@ class SuspensionPanel(discord.ui.View):
                 if roles_to_return and member:
                     await interaction.response.defer()
                     await interaction.edit_original_response(
-                        content="<a:Loading:1167074303905386587> Loading...",
+                        content=f"{Emojis.loading} Loading...",
                         embed=None,
                         view=None,
                     )
@@ -457,7 +457,7 @@ class SuspensionPanel(discord.ui.View):
                             reason=f"Suspension voided by {interaction.user.display_name}",
                         )
                         await interaction.edit_original_response(
-                            content=f"{tick} Suspension has been voided. Roles have been restored.",
+                            content=f"{Emojis.tick} Suspension has been voided. Roles have been restored.",
                             view=None,
                             embed=None,
                         )
@@ -467,14 +467,14 @@ class SuspensionPanel(discord.ui.View):
 
                     except discord.Forbidden:
                         await interaction.edit_original_response(
-                            content=f"{no} Failed to restore roles due to insufficient permissions.",
+                            content=f"{Emojis.no} Failed to restore roles due to insufficient permissions.",
                             view=None,
                             embed=None,
                         )
                         return
                     try:
                         await member.send(
-                            f"<:bin:1235001855721865347> Your suspension has been voided **@{interaction.guild.name}**"
+                            f"{Emojis.bin} Your suspension has been voided **@{interaction.guild.name}**"
                         )
                     except discord.Forbidden:
                         logger.warning("Failed to send suspension message to user")
@@ -485,11 +485,13 @@ class SuspensionPanel(discord.ui.View):
                     {"guild_id": interaction.guild.id, "staff": self.user.id}
                 )
                 await interaction.response.edit_message(
-                    content=f"{tick} Suspension has been voided.", embed=None, view=None
+                    content=f"{Emojis.tick} Suspension has been voided.",
+                    embed=None,
+                    view=None,
                 )
                 try:
                     await member.send(
-                        f"<:bin:1235001855721865347> Your suspension has been voided **@{interaction.guild.name}**"
+                        f"{Emojis.bin} Your suspension has been voided **@{interaction.guild.name}**"
                     )
 
                 except discord.Forbidden:
@@ -497,7 +499,7 @@ class SuspensionPanel(discord.ui.View):
 
         else:
             await interaction.response.send_message(
-                f"{no} No suspension found.", ephemeral=True
+                f"{Emojis.no} No suspension found.", ephemeral=True
             )
 
 

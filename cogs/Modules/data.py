@@ -1,8 +1,7 @@
-import discord
 from discord.ext import commands
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
 
 
 class Data(commands.Cog):
@@ -22,7 +21,7 @@ class Data(commands.Cog):
         Configuration = await self.client.config.find_one({"_id": ctx.guild.id})
         if not Configuration:
             return await ctx.send(
-                f"{no} **{ctx.author.display_name}**, the config is not setup please run `/config`."
+                f"{Emojis.no} **{ctx.author.display_name}**, the config is not setup please run `/config`."
             )
 
         options = await ModuleOptions(Config=Configuration, data=True)
@@ -31,7 +30,7 @@ class Data(commands.Cog):
                 discord.SelectOption(
                     label="Permissions",
                     description="Manage your server's permissions.",
-                    emoji="<:Settings:1207365901956026368>",
+                    emoji=f"{Emojis.settings_page}",
                 )
             ]
         )
@@ -44,14 +43,16 @@ class Data(commands.Cog):
         view.add_item(DataManage(ctx.author, options))
         embed = DefaultEmbed(ctx.guild)
         embed.title = "Data Management"
-        embed.description = "<:Options:1223062969043124306> Select **an option** to manage your server's data."
+        embed.description = (
+            f"{Emojis.options} Select **an option** to manage your server's data."
+        )
         await ctx.send(view=view, embed=embed)
 
     @manage.error
     async def PermsHandler(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                f"{no} **{ctx.author.display_name},** you are missing the `Administrator` permission."
+                f"{Emojis.no} **{ctx.author.display_name},** you are missing the `Administrator` permission."
             )
 
 
@@ -301,7 +302,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all infractions.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all infractions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Promotions", style=discord.ButtonStyle.danger)
@@ -317,7 +318,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all promotions.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all promotions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Suggestions", style=discord.ButtonStyle.danger)
@@ -333,7 +334,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all suggestions.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all suggestions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Custom Commands", style=discord.ButtonStyle.danger)
@@ -349,7 +350,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all custom commands.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all custom commands.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase LOA", style=discord.ButtonStyle.danger)
@@ -365,7 +366,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all LOA.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all LOA.", ephemeral=True
         )
 
     @discord.ui.button(
@@ -383,7 +384,8 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all forum configurations.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all forum configurations.",
+            ephemeral=True,
         )
 
     @discord.ui.button(label="Erase Staff Database", style=discord.ButtonStyle.danger)
@@ -399,7 +401,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all staff database.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all staff database.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Feedback", style=discord.ButtonStyle.danger)
@@ -415,7 +417,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all feedback.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all feedback.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Responders", style=discord.ButtonStyle.danger)
@@ -431,7 +433,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all responders.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all responders.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Suspensions", style=discord.ButtonStyle.danger)
@@ -447,7 +449,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all suspensions.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all suspensions.", ephemeral=True
         )
 
     @discord.ui.button(label="Erase Connection Roles", style=discord.ButtonStyle.danger)
@@ -463,7 +465,7 @@ class ClearData(discord.ui.View):
             {"guild_id": interaction.guild.id}
         )
         await interaction.response.send_message(
-            f"{tick} Successfully cleared all connection roles.", ephemeral=True
+            f"{Emojis.tick} Successfully cleared all connection roles.", ephemeral=True
         )
 
 

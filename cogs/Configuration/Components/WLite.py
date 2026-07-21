@@ -1,9 +1,7 @@
-import discord
-
-from core.discord.HelpEmbeds import NoPremium
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NoPremium
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 
 class WLiteOption(discord.ui.Select):
@@ -12,7 +10,7 @@ class WLiteOption(discord.ui.Select):
             options=[
                 discord.SelectOption(
                     label="Edit Profile",
-                    emoji="<:Pen:1235001839036923996>",
+                    emoji=f"{Emojis.pen}",
                     description="Premium Required.",
                 ),
             ]
@@ -67,11 +65,11 @@ class EditProfile(discord.ui.Modal):
             )
         except (discord.Forbidden, discord.HTTPException):
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name},** an error occured while trying to edit the bot in this server.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** an error occured while trying to edit the bot in this server.",
                 ephemeral=True,
             )
         return await interaction.followup.send(
-            f"{tick} **{interaction.user.display_name},** successfully updated the bots profile in this server.",
+            f"{Emojis.tick} **{interaction.user.display_name},** successfully updated the bots profile in this server.",
             ephemeral=True,
         )
 
@@ -85,7 +83,7 @@ async def WLiteEmbed(interaction: discord.Interaction) -> discord.Embed:
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> Customize your bots's profile in this server."
     embed.add_field(
-        name="<:settings:1207368347931516928> Bot Profile",
+        name=f"{Emojis.settings_gear} Bot Profile",
         value=f"> **Nickname:** {interaction.guild.me.nick or 'Not Set'}",
         inline=False,
     )

@@ -1,11 +1,9 @@
 import logging
 
-import discord
-
-from core.discord.HelpEmbeds import NoPremium, NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
-from core.format import ReplaceVariables, IsSeperateBot
+from core.bot.HelpEmbeds import NoPremium, NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
+from core.format import IsSeperateBot
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +100,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Add Embed",
         style=discord.ButtonStyle.green,
-        emoji="<:Add:1163095623600447558>",
+        emoji=f"{Emojis.add}",
     )
     async def AddEmbed(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -141,7 +139,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Button",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Button:1223063359184830494>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.button}" if not IsSeperateBot() else None,
     )
     async def Buttons(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -190,7 +188,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Content",
         style=discord.ButtonStyle.gray,
-        emoji="<:MEssage:1297957000440844382>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.message_icon}" if not IsSeperateBot() else None,
     )
     async def Content(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -204,7 +202,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Permissions",
         style=discord.ButtonStyle.grey,
-        emoji="<:Permissions:1207365901956026368>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.permissions}" if not IsSeperateBot() else None,
     )
     async def Permissions(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -219,7 +217,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Reset",
         style=discord.ButtonStyle.red,
-        emoji="<:Reset:1297957894624510093>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.reset}" if not IsSeperateBot() else None,
     )
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
@@ -290,7 +288,7 @@ class NoEmbed(discord.ui.View):
     @discord.ui.button(
         label="Finish",
         style=discord.ButtonStyle.green,
-        emoji="<:Save:1223293419678470245>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.save}" if not IsSeperateBot() else None,
     )
     async def Finished(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -364,7 +362,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Content",
         style=discord.ButtonStyle.gray,
-        emoji="<:MEssage:1297957000440844382>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.message_icon}" if not IsSeperateBot() else None,
         row=0,
     )
     async def Content(
@@ -380,7 +378,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Button",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Button:1223063359184830494>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.button}" if not IsSeperateBot() else None,
     )
     async def Buttons(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -438,7 +436,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Title",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Application:1224722901328986183>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.application}" if not IsSeperateBot() else None,
         row=0,
     )
     async def Title(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -458,7 +456,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Description",
         style=discord.ButtonStyle.blurple,
-        emoji="<:description:1223062677572812920>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.description}" if not IsSeperateBot() else None,
         row=0,
     )
     async def Desc(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -477,7 +475,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Thumbnail",
         style=discord.ButtonStyle.blurple,
-        emoji="<:image:1223062544135094363>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.image}" if not IsSeperateBot() else None,
         row=1,
     )
     async def Thu(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -500,7 +498,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Image",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Image:1223063095417765938>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.image_alt}" if not IsSeperateBot() else None,
         row=1,
     )
     async def Im(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -522,7 +520,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Author",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Author:1297956338738925722>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.author}" if not IsSeperateBot() else None,
         row=1,
     )
     async def Au(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -550,7 +548,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Color",
         style=discord.ButtonStyle.blurple,
-        emoji="<:tag:1234998802948034721>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.tags}" if not IsSeperateBot() else None,
         row=1,
     )
     async def Colo(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -578,7 +576,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Ping",
         style=discord.ButtonStyle.blurple,
-        emoji="<:Ping:1298301862906298378>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.ping}" if not IsSeperateBot() else None,
         row=2,
     )
     async def Ping(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -592,7 +590,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Forums Channel",
         style=discord.ButtonStyle.blurple,
-        emoji="<:tag:1234998802948034721>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.tags}" if not IsSeperateBot() else None,
         row=2,
     )
     async def ForumsChannel(
@@ -609,7 +607,7 @@ class Embed(discord.ui.View):
         label="Permissions",
         style=discord.ButtonStyle.grey,
         row=2,
-        emoji="<:Permissions:1207365901956026368>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.permissions}" if not IsSeperateBot() else None,
     )
     async def Permissions(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -624,7 +622,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Reset",
         style=discord.ButtonStyle.red,
-        emoji="<:Reset:1297957894624510093>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.reset}" if not IsSeperateBot() else None,
         row=2,
     )
     async def reset(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -771,7 +769,7 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Finish",
         style=discord.ButtonStyle.green,
-        emoji="<:Save:1223293419678470245>" if not IsSeperateBot() else None,
+        emoji=f"{Emojis.save}" if not IsSeperateBot() else None,
         row=3,
     )
     async def Finished(
@@ -800,7 +798,7 @@ class Ping(discord.ui.RoleSelect):
         else:
             self.data.pop("ping")
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the ping has been updated.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** the ping has been updated.",
             view=None,
             embed=None,
         )
@@ -825,7 +823,7 @@ class ForumsChannel(discord.ui.ChannelSelect):
 
         self.data["channel_id"] = self.values[0].id if self.values else None
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the channel has been updated.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** the channel has been updated.",
             view=None,
             embed=None,
         )
@@ -851,7 +849,7 @@ class PermissionRoles(discord.ui.RoleSelect):
             self.data.pop("permissionroles")
 
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** the command has been updated.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** the command has been updated.",
             view=None,
             embed=None,
         )
@@ -879,7 +877,7 @@ class Title(discord.ui.Modal, title="Title"):
             await interaction.edit_original_response(embed=embed)
         except discord.HTTPException():
             return await interaction.followup.send(
-                f"{no} {interaction.user.display_name}, had an error adding the title please try again.",
+                f"{Emojis.no} {interaction.user.display_name}, had an error adding the title please try again.",
                 ephemeral=True,
             )
 
@@ -908,7 +906,7 @@ class Buttons(discord.ui.Select):
                     }
                 )
                 await interaction.edit_original_response(
-                    content=f"{tick} **@{interaction.user.name}** I've successfully added voting buttons. (This doesn't support other button types)",
+                    content=f"{Emojis.tick} **@{interaction.user.name}** I've successfully added voting buttons. (This doesn't support other button types)",
                     view=None,
                     embed=None,
                 )
@@ -930,7 +928,7 @@ class Buttons(discord.ui.Select):
                 self.data["Close"] = False
                 self.data["Lock"] = False
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -955,7 +953,7 @@ class CustomButton(discord.ui.Modal, title="Custom Button"):
         )
         self.emoji = discord.ui.TextInput(
             label="Emoji",
-            placeholder="What emoji should be on the button? (Example: <:Alert:1208972002803712000>)",
+            placeholder=f"What emoji should be on the button? (Example: {Emojis.alert})",
             required=False,
             max_length=256,
         )
@@ -979,7 +977,7 @@ class CustomButton(discord.ui.Modal, title="Custom Button"):
             color = "Grey"
         if self.color.value not in ["Red", "Blue", "Grey", "Green"]:
             return await interaction.response.edit_message(
-                content=f"{tick} **{interaction.user.display_name},** you can only select from the following colors: Red, Blue, Grey, Green",
+                content=f"{Emojis.tick} **{interaction.user.display_name},** you can only select from the following colors: Red, Blue, Grey, Green",
                 embed=None,
                 view=None,
             )
@@ -1000,7 +998,7 @@ class CustomButton(discord.ui.Modal, title="Custom Button"):
         )
 
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -1030,7 +1028,7 @@ class LinkButton(discord.ui.Modal, title="Link Button"):
         )
         self.emoji = discord.ui.TextInput(
             label="Emoji",
-            placeholder="What emoji should be on the button? (Example: <:Alert:1208972002803712000>)",
+            placeholder=f"What emoji should be on the button? (Example: {Emojis.alert})",
             required=False,
             max_length=256,
         )
@@ -1058,7 +1056,7 @@ class LinkButton(discord.ui.Modal, title="Link Button"):
         )
 
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've updated the buttons.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've updated the buttons.",
             embed=None,
             view=None,
         )
@@ -1105,7 +1103,7 @@ class Colour(discord.ui.Modal, title="Colour"):
         color_value = self.color.value
         if len(color_value) != 6:
             await interaction.response.send_message(
-                f" {no} Please provide a valid hex color. (A hex is 6 characters long without the hashtag.)",
+                f" {Emojis.no} Please provide a valid hex color. (A hex is 6 characters long without the hashtag.)",
                 ephemeral=True,
             )
             return
@@ -1114,7 +1112,7 @@ class Colour(discord.ui.Modal, title="Colour"):
             color = discord.Color(int(color_value, 16))
         except ValueError:
             await interaction.response.send_message(
-                f" {no} Please provide a valid hex color without the hashtag.",
+                f" {Emojis.no} Please provide a valid hex color without the hashtag.",
                 ephemeral=True,
             )
             return
@@ -1175,7 +1173,7 @@ class Thumbnail(discord.ui.Modal, title="Thumbnail"):
 
         except discord.HTTPException:
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"{Emojis.crisis} **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1209,7 +1207,7 @@ class Image(discord.ui.Modal, title="Image"):
             self.data["image"] = org
         except discord.HTTPException:
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"{Emojis.crisis} **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1258,7 +1256,7 @@ class Author(discord.ui.Modal, title="Author"):
             self.data["author_url"] = Org
         except discord.HTTPException:
             return await interaction.followup.send(
-                content=f"{crisis} **{interaction.user.display_name}**, this isn't a proper link."
+                content=f"{Emojis.crisis} **{interaction.user.display_name}**, this isn't a proper link."
             )
 
 
@@ -1268,9 +1266,7 @@ class componentmanager(discord.ui.View):
         self.author = author
         self.data = data
 
-    @discord.ui.button(
-        label="", style=discord.ButtonStyle.gray, emoji="<:Add:1163095623600447558>"
-    )
+    @discord.ui.button(label="", style=discord.ButtonStyle.gray, emoji=f"{Emojis.add}")
     async def AddButton(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -1298,7 +1294,7 @@ class componentmanager(discord.ui.View):
         await interaction.response.defer()
         if not self.data.get("components") or len(self.data.get("components")) == 0:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no buttons to remove.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no buttons to remove.",
                 ephemeral=True,
             )
         options = [
@@ -1313,7 +1309,7 @@ class componentmanager(discord.ui.View):
         await interaction.edit_original_response(
             view=view,
             embed=None,
-            content="<:List:1223063187063308328> Select which components you want to remove.",
+            content=f"{Emojis.list} Select which components you want to remove.",
         )
 
 
@@ -1328,7 +1324,9 @@ class EraseButtons(discord.ui.Select):
             c for c in self.data["components"] if c.get("ix") != Selected
         ]
         await interaction.response.edit_message(
-            content=f"{tick} successfully removed component.", view=None, embed=None
+            content=f"{Emojis.tick} successfully removed component.",
+            view=None,
+            embed=None,
         )
 
 
@@ -1387,7 +1385,7 @@ class EmbedFieldEditor(discord.ui.Modal, title="Edit Embed Field"):
             await msg.edit(embed=embed)
         except discord.NotFound:
             await interaction.response.send_message(
-                content=f"{crisis} **@{interaction.user.display_name},** to be able to edit fields you must be in a channel I can access so I can add the fields.",
+                content=f"{Emojis.crisis} **@{interaction.user.display_name},** to be able to edit fields you must be in a channel I can access so I can add the fields.",
                 ephemeral=True,
             )
         await interaction.response.edit_message(content="")
@@ -1400,16 +1398,14 @@ class EmbedFieldManager(discord.ui.View):
         self.data = data
         self.msg = msg
 
-    @discord.ui.button(
-        label="", style=discord.ButtonStyle.gray, emoji="<:Add:1163095623600447558>"
-    )
+    @discord.ui.button(label="", style=discord.ButtonStyle.gray, emoji=f"{Emojis.add}")
     async def add_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         await interaction.response.send_modal(EmbedFieldEditor(msg=self.msg))
 
     @discord.ui.button(
-        label="", style=discord.ButtonStyle.blurple, emoji="<:Pen:1235001839036923996>"
+        label="", style=discord.ButtonStyle.blurple, emoji=f"{Emojis.pen}"
     )
     async def edit_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -1417,7 +1413,7 @@ class EmbedFieldManager(discord.ui.View):
         embed = self.msg.embeds[0]
         if not embed.fields or len(embed.fields) == 0:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no fields to edit.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no fields to edit.",
                 ephemeral=True,
             )
             return
@@ -1440,7 +1436,7 @@ class EmbedFieldManager(discord.ui.View):
         embed = self.msg.embeds[0]
         if not embed.fields or len(embed.fields) == 0:
             await interaction.response.send_message(
-                content=f"{no} **{interaction.user.display_name},** there are no fields to edit.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no fields to edit.",
                 ephemeral=True,
             )
             return

@@ -1,8 +1,6 @@
-import discord
-
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.ui import BasicPaginator
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.ui import BasicPaginator
 from core.format import IsSeperateBot
 
 
@@ -14,7 +12,7 @@ class PermissionsDropdown(discord.ui.Select):
                 discord.SelectOption(
                     label="Manage Permissions",
                     value="Manage Permissions",
-                    emoji="<:Permissions:1207365901956026368>",
+                    emoji=f"{Emojis.permissions}",
                 )
             ],
         )
@@ -80,14 +78,12 @@ class ManagePermissions(discord.ui.View):
         super().__init__(timeout=360)
         self.author = author
 
-    @discord.ui.button(
-        emoji="<:Add:1163095623600447558>", style=discord.ButtonStyle.gray
-    )
+    @discord.ui.button(emoji=f"{Emojis.add}", style=discord.ButtonStyle.gray)
     async def Add(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
 
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         InvalidCommands = [
             "botinfo",
@@ -152,7 +148,7 @@ class ManagePermissions(discord.ui.View):
                 discord.SelectOption(
                     label=command,
                     value=command,
-                    emoji="<:command1:1223062616872583289>",
+                    emoji=f"{Emojis.command}",
                 )
             )
         view = PaginateViews(Commands, self.author, commands)
@@ -175,13 +171,13 @@ class ManagePermissions(discord.ui.View):
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if config is None or "Advanced Permissions" not in config:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no advanced permissions set.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no advanced permissions set.",
                 ephemeral=True,
             )
         commands = list(config["Advanced Permissions"].keys())
         if not commands:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there are no advanced permissions set.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there are no advanced permissions set.",
                 ephemeral=True,
             )
         view = PaginateViews(RemoveCommands, self.author, commands)
@@ -198,7 +194,7 @@ class RemoveCommands(discord.ui.Select):
                 discord.SelectOption(
                     label=command,
                     value=command,
-                    emoji="<:command1:1223062616872583289>",
+                    emoji=f"{Emojis.command}",
                 )
                 for command in commands
             ][:25],
@@ -214,7 +210,7 @@ class RemoveCommands(discord.ui.Select):
 
         if config is None or "Advanced Permissions" not in config:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name}**, there are no advanced permissions set.",
+                content=f"{Emojis.no} **{interaction.user.display_name}**, there are no advanced permissions set.",
                 ephemeral=True,
             )
         for command in self.values:
@@ -224,7 +220,7 @@ class RemoveCommands(discord.ui.Select):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully reset advanced permissions.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've successfully reset advanced permissions.",
             view=None,
             embed=None,
         )
@@ -244,7 +240,7 @@ class Commands(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-            return await interaction.followup.send(embed=embed, ephemeral=True)
+            return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if config is None:
@@ -353,7 +349,7 @@ class RoleSelect(discord.ui.RoleSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.edit_original_response(
-            content=f"{tick} **{interaction.user.display_name},** I've successfully updated advanced permissions.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've successfully updated advanced permissions.",
             view=None,
             embed=None,
         )

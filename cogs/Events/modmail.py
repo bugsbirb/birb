@@ -4,10 +4,9 @@ import random
 import traceback
 from datetime import datetime, timedelta
 
-import discord
 from discord.ext import commands
 
-from core.discord.emojis import *
+from core.bot.emojis import *
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ async def Reply(
         if Config.get("Module Options").get("MessageFormatting") == "Messages":
             try:
                 await Channel.send(
-                    f"<:messagereceived:1201999712593383444> {message.author.name}: {message.content}",
+                    f"{Emojis.message_received} {message.author.name}: {message.content}",
                     files=files,
                 )
             except Exception as e:
@@ -60,9 +59,7 @@ async def Reply(
 async def Close(interaction: discord.Interaction, reason=None):
     Text = None
     TranscriptMSG = None
-    msg = await interaction.followup.send(
-        content="<a:Loading:1167074303905386587> Closing..."
-    )
+    msg = await interaction.followup.send(content=f"{Emojis.loading} Closing...")
     if isinstance(interaction.channel, discord.DMChannel):
         Modmail = await interaction.client.db["modmail"].find_one(
             {"user_id": interaction.user.id}
@@ -73,21 +70,21 @@ async def Close(interaction: discord.Interaction, reason=None):
         )
     if not Modmail:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** you have no active modmail."
+            content=f"{Emojis.no} **{interaction.user.display_name},** you have no active modmail."
         )
     Server = await interaction.client.fetch_guild(Modmail.get("guild_id"))
     if not Server:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** no idea how but the guild can't be found from the modmail."
+            content=f"{Emojis.no} **{interaction.user.display_name},** no idea how but the guild can't be found from the modmail."
         )
     Config = await interaction.client.config.find_one({"_id": Server.id})
     if not Config:
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** the bot isn't set up. Run `/config`."
+            content=f"{Emojis.no} **{interaction.user.display_name},** the bot isn't set up. Run `/config`."
         )
     if not Config.get("Modmail"):
         return await msg.edit(
-            content=f"{no} **{interaction.user.display_name},** you haven't set up the modmail module."
+            content=f"{Emojis.no} **{interaction.user.display_name},** you haven't set up the modmail module."
         )
     ModmailType = Config.get("Module Options", {}).get("ModmailType", "channel")
     channel = interaction.client.get_channel(int(Modmail.get("channel_id")))
@@ -118,7 +115,7 @@ async def Close(interaction: discord.Interaction, reason=None):
 
             except discord.Forbidden:
                 await msg.edit(
-                    content=f"{no} **{interaction.user.display_name},** I can't delete this channel please contact the server admins.",
+                    content=f"{Emojis.no} **{interaction.user.display_name},** I can't delete this channel please contact the server admins.",
                 )
                 return
     user = await interaction.client.fetch_user(Modmail.get("user_id"))
@@ -134,27 +131,27 @@ async def Close(interaction: discord.Interaction, reason=None):
         icon_url=Server.icon,
     )
     embed.add_field(
-        name="<:Document:1191926049857097748> ID",
+        name=f"{Emojis.document} ID",
         value=TranscriptID,
         inline=True,
     )
     embed.add_field(
-        name="<:Add:1163095623600447558> Opened",
+        name=f"{Emojis.add} Opened",
         value=user.mention,
         inline=True,
     )
     embed.add_field(
-        name="<:Exterminate:1223063042246443078> Closed",
+        name=f"{Emojis.exterminate} Closed",
         value=interaction.user.mention,
         inline=True,
     )
     embed.add_field(
-        name="<:casewarningwhite:1191903691750514708> Time Created",
+        name=f"{Emojis.case_warning} Time Created",
         value=channelcreated,
         inline=True,
     )
     embed.add_field(
-        name="<:reason:1235000513477738576> Reason",
+        name=f"{Emojis.reason} Reason",
         value=reason,
         inline=True,
     )
@@ -189,7 +186,7 @@ async def Close(interaction: discord.Interaction, reason=None):
                     )
                 except (discord.NotFound, discord.HTTPException):
                     return await msg.edit(
-                        content=f"{no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
+                        content=f"{Emojis.no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
                     )
                 view = Links()
                 try:
@@ -203,7 +200,7 @@ async def Close(interaction: discord.Interaction, reason=None):
                     )
                 except (discord.NotFound, discord.HTTPException):
                     return await msg.edit(
-                        content=f"{no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
+                        content=f"{Emojis.no} **{interaction.user.display_name},** you have setup the transcript channel but it can't be found.",
                     )
                 view = Links()
                 try:
@@ -228,7 +225,7 @@ async def Close(interaction: discord.Interaction, reason=None):
     else:
         try:
             await channel.send(
-                content=f"<:close:1280576608125849731> The modmail has been closed. This thread will be archived and locked.\n-# Locked by @{user.name}"
+                content=f"{Emojis.close} The modmail has been closed. This thread will be archived and locked.\n-# Locked by @{user.name}"
             )
             await msg.delete()
             await channel.edit(archived=True, locked=True)
@@ -250,7 +247,7 @@ class Links(discord.ui.View):
     @discord.ui.button(
         label="Generate Transcript",
         style=discord.ButtonStyle.success,
-        emoji="<:utility:1234994834763419769>",
+        emoji=f"{Emojis.utility}",
         custom_id="Generate Transcript",
     )
     async def generate_transcript(
@@ -262,19 +259,19 @@ class Links(discord.ui.View):
         )
         if not Modmail:
             return await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** you have no active modmail."
+                content=f"{Emojis.no} **{interaction.user.display_name},** you have no active modmail."
             )
         if Modmail.get("text"):
             Text = Modmail.get("text")
             if not isinstance(Text, str):
                 return await interaction.followup.send(
-                    content=f"{no} **{interaction.user.display_name},** this isn't a valid transcript."
+                    content=f"{Emojis.no} **{interaction.user.display_name},** this isn't a valid transcript."
                 )
             file = discord.File(io.BytesIO(Text.encode()), filename="transcript.txt")
             await interaction.followup.send(file=file, ephemeral=True)
         else:
             await interaction.followup.send(
-                content=f"{no} **{interaction.user.display_name},** there is no transcript to generate.",
+                content=f"{Emojis.no} **{interaction.user.display_name},** there is no transcript to generate.",
                 ephemeral=True,
             )
 
@@ -294,13 +291,13 @@ class Select(discord.ui.Select):
             Guild = await interaction.client.fetch_guild(self.values[0])
         except (discord.NotFound, discord.HTTPException):
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** I can't find the server anymore.",
+                f"{Emojis.crisis} **{interaction.user.display_name},** I can't find the server anymore.",
                 ephemeral=True,
             )
 
         if not Guild:
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** I can't find the server anymore.",
+                f"{Emojis.crisis} **{interaction.user.display_name},** I can't find the server anymore.",
                 ephemeral=True,
             )
 
@@ -309,7 +306,7 @@ class Select(discord.ui.Select):
         )
         if Blacklists and interaction.user.id in Blacklists.get("blacklist", []):
             return interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** you are blacklisted from using modmail in this server.",
+                f"{Emojis.no} **{interaction.user.display_name},** you are blacklisted from using modmail in this server.",
                 ephemeral=True,
             )
 
@@ -318,7 +315,7 @@ class Select(discord.ui.Select):
         )
         if Modmail:
             return await interaction.edit_original_response(
-                content=f"{no} {interaction.user.display_name}, you've already started a Modmail, calm down.",
+                content=f"{Emojis.no} {interaction.user.display_name}, you've already started a Modmail, calm down.",
                 embed=None,
                 view=None,
             )
@@ -326,7 +323,7 @@ class Select(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": Guild.id})
         if not Config or not Config.get("Modmail"):
             return await interaction.followup.send(
-                f"{crisis} **{interaction.user.display_name},** this server doesn't even have the bot setup how did you even get this?",
+                f"{Emojis.crisis} **{interaction.user.display_name},** this server doesn't even have the bot setup how did you even get this?",
                 ephemeral=True,
             )
 
@@ -341,7 +338,7 @@ class Select(discord.ui.Select):
             for name, data in Categories.items():
                 CategoryOptions.append(
                     discord.SelectOption(
-                        label=name, value=name, emoji="<:category:1248312604733210735>"
+                        label=name, value=name, emoji=f"{Emojis.category}"
                     )
                 )
                 if len(CategoryOptions) < 25:
@@ -367,13 +364,13 @@ class Select(discord.ui.Select):
                 )
             except (discord.NotFound, discord.HTTPException):
                 return await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                    content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                     embed=None,
                     view=None,
                 )
             if not Category:
                 return await interaction.edit_original_response(
-                    content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                    content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                     embed=None,
                     view=None,
                 )
@@ -395,7 +392,7 @@ class CategorySelection(discord.ui.Select):
         Config = await interaction.client.config.find_one({"_id": self.guild.id})
         if not Config:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** this server doesn't have modmail setup."
+                f"{Emojis.no} **{interaction.user.display_name},** this server doesn't have modmail setup."
             )
 
         CategoryConfig = (
@@ -405,7 +402,7 @@ class CategorySelection(discord.ui.Select):
         )
         if not CategoryConfig:
             return await interaction.followup.send(
-                f"{no} **{interaction.user.display_name},** this category doesn't have anything setup."
+                f"{Emojis.no} **{interaction.user.display_name},** this category doesn't have anything setup."
             )
 
         Config["Modmail"] = {
@@ -450,7 +447,7 @@ async def OpenModmail(
     embed.set_author(
         name=f"@{interaction.user.name}", icon_url=interaction.user.display_avatar
     )
-    embed.description = f"{replytop} **User:** {interaction.user.mention} (`{interaction.user.id}`)\n{replybottom} **Created/Joined**: <t:{int(Member.created_at.timestamp())}:R> • <t:{int(Member.joined_at.timestamp())}:R>"
+    embed.description = f"{Emojis.replytop} **User:** {interaction.user.mention} (`{interaction.user.id}`)\n{Emojis.replybottom} **Created/Joined**: <t:{int(Member.created_at.timestamp())}:R> • <t:{int(Member.joined_at.timestamp())}:R>"
     Roles = " ".join(
         [role.mention for role in Member.roles if role != Guild.default_role][:20]
     )
@@ -484,7 +481,7 @@ async def OpenModmail(
 
         except (discord.Forbidden, discord.HTTPException):
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't create a channel in this category. Please check my permissions.",
                 embed=None,
                 view=None,
             )
@@ -495,14 +492,14 @@ async def OpenModmail(
             )
         except:
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find their threads channel.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't find their threads channel.",
                 embed=None,
                 view=None,
             )
 
         if not Channel:
             return await interaction.edit_original_response(
-                content=f"{crisis} **{interaction.user.display_name},** I can't find their threads channel.",
+                content=f"{Emojis.crisis} **{interaction.user.display_name},** I can't find their threads channel.",
                 embed=None,
                 view=None,
             )
@@ -553,7 +550,7 @@ class ModmailClosure(discord.ui.View):
     @discord.ui.button(
         label="Close",
         style=discord.ButtonStyle.danger,
-        emoji="<:close:1280576608125849731>",
+        emoji=f"{Emojis.close}",
         custom_id="ADosajdopsajdop",
     )
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -587,9 +584,7 @@ class ModmailEvent(commands.Cog):
         )
         if isinstance(message.channel, discord.DMChannel):
             if not Modmail:
-                Message = await message.reply(
-                    content="<a:Loading:1167074303905386587> Wait..."
-                )
+                Message = await message.reply(content=f"{Emojis.loading} Wait...")
                 try:
                     LastSelect = self.LastSelection.get(message.author.id, None)
                     if LastSelect is None:
@@ -602,7 +597,7 @@ class ModmailEvent(commands.Cog):
                         )
                     if Remaining.total_seconds() > 0:
                         await Message.edit(
-                            content=f"{no} **{message.author.display_name},** Please wait {int(Remaining.total_seconds())} seconds before opening another modmail panel."
+                            content=f"{Emojis.no} **{message.author.display_name},** Please wait {int(Remaining.total_seconds())} seconds before opening another modmail panel."
                         )
                         return
                     Mutual = []
@@ -619,7 +614,7 @@ class ModmailEvent(commands.Cog):
                             Mutual.append(guilds)
                     if len(Mutual) == 0:
                         return await Message.edit(
-                            content=f"{crisis} **{message.author.display_name},** you aren't in any mutual servers with modmail enabled."
+                            content=f"{Emojis.crisis} **{message.author.display_name},** you aren't in any mutual servers with modmail enabled."
                         )
                     Options = []
                     for Guild in Mutual:
@@ -632,7 +627,7 @@ class ModmailEvent(commands.Cog):
                         )
                     if len(Options) == 0:
                         return await Message.edit(
-                            content=f"{crisis} big fuck up happened."
+                            content=f"{Emojis.crisis} big fuck up happened."
                         )
                     view = discord.ui.View()
                     view.add_item(Select(message.author, message, Options))
@@ -685,12 +680,12 @@ class ModmailEvent(commands.Cog):
                 User = await message.guild.fetch_member(int(Modmail.get("user_id")))
             except (discord.Forbidden, discord.NotFound):
                 return await message.reply(
-                    content=f"{crisis} I can't find the user they must of left. Probably should delete this."
+                    content=f"{Emojis.crisis} I can't find the user they must of left. Probably should delete this."
                 )
 
             if not User:
                 return await message.reply(
-                    content=f"{crisis} I can't find the user they must of left. Probably should delete this."
+                    content=f"{Emojis.crisis} I can't find the user they must of left. Probably should delete this."
                 )
             embed = discord.Embed(
                 color=discord.Color.dark_embed(),
@@ -706,10 +701,10 @@ class ModmailEvent(commands.Cog):
             if Config.get("Module Options", {}):
                 if Config.get("Module Options").get("MessageFormatting") == "Messages":
                     await message.channel.send(
-                        f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}"
+                        f"{Emojis.message_received} **(Staff)** {message.author.name}: {message.content}"
                     )
                     await User.send(
-                        f"<:messagereceived:1201999712593383444> **(Staff)** {message.author.name}: {message.content}"
+                        f"{Emojis.message_received} **(Staff)** {message.author.name}: {message.content}"
                     )
                     return await message.delete()
 

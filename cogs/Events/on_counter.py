@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from core.discord.Module import ModuleCheck
-from core.discord.permissions import RequireStaff
+from core.bot.Module import ModuleCheck
+from core.bot.permissions import RequireStaff
 
 
 class MessageCounter(commands.Cog):

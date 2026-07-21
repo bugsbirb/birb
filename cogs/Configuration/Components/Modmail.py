@@ -1,12 +1,11 @@
 import logging
 import traceback
 
-import discord
 import discord.http
 
-from core.discord.HelpEmbeds import NotYourPanel
-from core.discord.emojis import *
-from core.discord.permissions import premium
+from core.bot.HelpEmbeds import NotYourPanel
+from core.bot.emojis import *
+from core.bot.permissions import premium
 
 logger = logging.getLogger(__name__)
 
@@ -18,22 +17,22 @@ class ModmailOptions(discord.ui.Select):
                 discord.SelectOption(
                     label="Threads Channel",
                     description="Channel where modmail threads are created",
-                    emoji="<:category:1248312604733210735>",
+                    emoji=f"{Emojis.category}",
                 ),
                 discord.SelectOption(
                     label="Modmail Pings",
                     description="Roles or users to ping for new modmail messages",
-                    emoji="<:Ping:1298301862906298378>",
+                    emoji=f"{Emojis.ping}",
                 ),
                 discord.SelectOption(
                     label="Preferences",
                     description="Configure general modmail behavior and settings",
-                    emoji="<:leaf:1160541147320553562>",
+                    emoji=f"{Emojis.leaf}",
                 ),
                 discord.SelectOption(
                     label="Modmail Categories",
                     description="Manage different categories for organizing modmail threads",
-                    emoji="<:integrations:1272191311234990131>",
+                    emoji=f"{Emojis.integrations}",
                 ),
             ]
 
@@ -42,27 +41,27 @@ class ModmailOptions(discord.ui.Select):
                 discord.SelectOption(
                     label="Category",
                     description="Main category channel for modmail threads",
-                    emoji="<:category:1248312604733210735>",
+                    emoji=f"{Emojis.category}",
                 ),
                 discord.SelectOption(
                     label="Transcripts Channel",
                     description="Channel where modmail transcripts are saved",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                 ),
                 discord.SelectOption(
                     label="Modmail Pings",
                     description="Roles or users to ping for new modmail messages",
-                    emoji="<:Ping:1298301862906298378>",
+                    emoji=f"{Emojis.ping}",
                 ),
                 discord.SelectOption(
                     label="Preferences",
                     description="Configure general modmail behavior and settings",
-                    emoji="<:leaf:1160541147320553562>",
+                    emoji=f"{Emojis.leaf}",
                 ),
                 discord.SelectOption(
                     label="Modmail Categories",
                     description="Manage different categories for organizing modmail threads",
-                    emoji="<:integrations:1272191311234990131>",
+                    emoji=f"{Emojis.integrations}",
                 ),
             ]
 
@@ -329,7 +328,7 @@ class Preferences(discord.ui.View):
     @discord.ui.button(
         label="Modmail Type",
         style=discord.ButtonStyle.grey,
-        emoji="<:List:1223063187063308328>",
+        emoji=f"{Emojis.list}",
     )
     async def ModmailType(
         self, interaction: discord.Interaction, button: discord.ui.Button
@@ -378,7 +377,7 @@ class SelectModmailType(discord.ui.Select):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} {interaction.user.display_name}, the modmail type has been updated to {self.values[0]}.",
+            content=f"{Emojis.tick} {interaction.user.display_name}, the modmail type has been updated to {self.values[0]}.",
             view=None,
         )
 
@@ -413,11 +412,11 @@ class ModmailCategories(discord.ui.View):
         super().__init__(timeout=360)
         self.user = user
 
-    @discord.ui.button(emoji="<:Add:1163095623600447558>")
+    @discord.ui.button(emoji=f"{Emojis.add}")
     async def create(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -429,7 +428,7 @@ class ModmailCategories(discord.ui.View):
         if 3 <= len(config.get("Modmail", {}).get("Categories", [])):
             if not await premium(interaction.guild.id):
                 embed = discord.Embed(
-                    description=f"{redx} **{interaction.user.display_name},** you've reached the maximum amount of categories!\n-# Upgrade to premium for unlimited.",
+                    description=f"{Emojis.tick} **{interaction.user.display_name},** you've reached the maximum amount of categories!\n-# Upgrade to premium for unlimited.",
                     color=discord.Colour.brand_red(),
                 )
                 return await interaction.response.send_message(
@@ -442,7 +441,7 @@ class ModmailCategories(discord.ui.View):
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -453,7 +452,7 @@ class ModmailCategories(discord.ui.View):
             config["Modmail"] = {}
         if not config.get("Modmail").get("Categories"):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no categories to delete!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** there are no categories to delete!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -476,7 +475,7 @@ class DeleteCategory(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -488,13 +487,13 @@ class DeleteCategory(discord.ui.Modal):
             config["Modmail"] = {}
         if not config.get("Modmail").get("Categories"):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** there are no categories to delete!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** there are no categories to delete!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if name not in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category doesn't exist!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this category doesn't exist!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -503,7 +502,7 @@ class DeleteCategory(discord.ui.Modal):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** the category `{name}` has been deleted.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** the category `{name}` has been deleted.",
             view=None,
             embed=None,
         )
@@ -525,7 +524,7 @@ class CreateCategory(discord.ui.Modal):
     async def on_submit(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -542,42 +541,42 @@ class CreateCategory(discord.ui.Modal):
             config["Modmail"]["Categories"] = []
         if name in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category already exists!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this category already exists!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         if config.get("Module Options", {}).get("ModmailType") == "threads":
             options = [
                 discord.SelectOption(
-                    label="Ping", value="Ping", emoji="<:Ping:1298301862906298378>"
+                    label="Ping", value="Ping", emoji=f"{Emojis.ping}"
                 ),
                 discord.SelectOption(
                     label="Threads Channel",
                     value="Threads Channel",
-                    emoji="<:threads:1248312604733210735>",
+                    emoji=f"{Emojis.threads}",
                 ),
             ]
 
         else:
             options = [
                 discord.SelectOption(
-                    label="Ping", value="Ping", emoji="<:Ping:1298301862906298378>"
+                    label="Ping", value="Ping", emoji=f"{Emojis.ping}"
                 ),
                 discord.SelectOption(
                     label="Category",
                     value="Category",
-                    emoji="<:category:1248312604733210735>",
+                    emoji=f"{Emojis.category}",
                 ),
                 discord.SelectOption(
                     label="Transcript Channel",
                     value="Transcript Channel",
-                    emoji="<:tag:1234998802948034721>",
+                    emoji=f"{Emojis.tags}",
                 ),
             ]
         view = NoThanks(self.user, name)
         view.add_item(CategoryType(interaction.user, name, options))
         await interaction.edit_original_response(
-            content=f"{Settings} **{interaction.user.display_name},** do you want to add extra stuff to this modmail category?",
+            content=f"{Emojis.settings} **{interaction.user.display_name},** do you want to add extra stuff to this modmail category?",
             view=view,
             embed=None,
         )
@@ -595,12 +594,12 @@ class NoThanks(discord.ui.View):
     ):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** I've created the modmail category for you.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** I've created the modmail category for you.",
             view=None,
         )
 
@@ -610,7 +609,7 @@ class NoThanks(discord.ui.View):
     ):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -624,7 +623,7 @@ class NoThanks(discord.ui.View):
             config["Modmail"]["Categories"] = {}
         if self.name in config.get("Modmail", {}).get("Categories", []):
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this category already exists!",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this category already exists!",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -635,7 +634,7 @@ class NoThanks(discord.ui.View):
         )
 
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name}**, No problem! I've created the modmail category for you!",
+            content=f"{Emojis.tick} **{interaction.user.display_name}**, No problem! I've created the modmail category for you!",
             view=None,
         )
 
@@ -649,7 +648,7 @@ class CategoryType(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -684,7 +683,7 @@ class Threads(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -704,7 +703,7 @@ class Threads(discord.ui.ChannelSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set threads channel for `{self.name}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** Successfully set threads channel for `{self.name}`.",
             view=None,
         )
 
@@ -721,7 +720,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -741,7 +740,7 @@ class TranscriptChannel(discord.ui.ChannelSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set transcript channel for `{self.name}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** Successfully set transcript channel for `{self.name}`.",
             view=None,
         )
 
@@ -758,7 +757,7 @@ class CategoryChannel(discord.ui.ChannelSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -778,7 +777,7 @@ class CategoryChannel(discord.ui.ChannelSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set category for `{self.name}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** Successfully set category for `{self.name}`.",
             view=None,
         )
 
@@ -792,7 +791,7 @@ class PingRoles(discord.ui.RoleSelect):
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id != self.user.id:
             embed = discord.Embed(
-                description=f"{redx} **{interaction.user.display_name},** this is not your view",
+                description=f"{Emojis.tick} **{interaction.user.display_name},** this is not your view",
                 color=discord.Colour.brand_red(),
             )
             return await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -812,7 +811,7 @@ class PingRoles(discord.ui.RoleSelect):
             {"_id": interaction.guild.id}, {"$set": config}
         )
         await interaction.response.edit_message(
-            content=f"{tick} **{interaction.user.display_name},** Successfully set ping roles for `{self.name}`.",
+            content=f"{Emojis.tick} **{interaction.user.display_name},** Successfully set ping roles for `{self.name}`.",
             view=None,
         )
 
@@ -992,13 +991,13 @@ async def ModmailEmbed(
     embed.set_thumbnail(url=interaction.guild.icon)
     embed.description = "> This is where you can manage your server's modmail settings! Modmail is a way for users to contact staff. You can find out more at [the documentation](https://docs.astrobirb.dev)."
     if config.get("Module Options", {}).get("ModmailType", "channel") == "channel":
-        value = f"{replytop} `Category:` {Category}\n{replymiddle} `Transcripts:` {Transcripts}\n{replybottom} `Roles:` {ModmailRoles}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
+        value = f"{Emojis.replytop} `Category:` {Category}\n{Emojis.replymiddle} `Transcripts:` {Transcripts}\n{Emojis.replybottom} `Roles:` {ModmailRoles}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
 
     else:
-        value = f"{replytop} `Threads Channel:` <#{config.get('Modmail', {}).get('threads', 'Not Configured')}>\n{replybottom} `Roles:` {ModmailRoles}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
+        value = f"{Emojis.replytop} `Threads Channel:` <#{config.get('Modmail', {}).get('threads', 'Not Configured')}>\n{Emojis.replybottom} `Roles:` {ModmailRoles}\n\nIf you need help either go to the [support server](https://discord.gg/36xwMFWKeC) or read the [documentation](https://docs.astrobirb.dev)."
 
     embed.add_field(
-        name="<:settings:1207368347931516928> Modmail",
+        name=f"{Emojis.settings_gear} Modmail",
         value=value,
         inline=False,
     )

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from core.discord.emojis import *
+from core.bot.emojis import *
 from datetime import datetime
 import logging
 import sentry_sdk
@@ -98,7 +98,7 @@ class EmptyCog(commands.Cog):
                 if user:
                     try:
                         await user.send(
-                            f"{tick} Your suspension in **@{guild.name}** has ended."
+                            f"{Emojis.tick} Your suspension in **@{guild.name}** has ended."
                         )
                     except discord.Forbidden:
                         logger.warning(
@@ -126,7 +126,7 @@ class EmptyCog(commands.Cog):
                         try:
                             message = await channel.fetch_message(request.get("msg_id"))
                             await message.reply(
-                                f"<:suspensions:1234998406938755122> The suspension has concluded. Any taken roles have been replenished."
+                                f"{Emojis.suspensions} The suspension has concluded. Any taken roles have been replenished."
                             )
                         except (discord.NotFound, discord.HTTPException):
                             continue
