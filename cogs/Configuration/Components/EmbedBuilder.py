@@ -107,7 +107,6 @@ class NoEmbed(discord.ui.View):
     ):
         await interaction.response.defer()
         if interaction.user.id != self.author.id:
-
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
         view = Embed(interaction.user, self.finalfunc, self.typed, self.data)
         if self.typed in ("Promotions", "Infractions"):
@@ -313,7 +312,6 @@ class Embed(discord.ui.View):
     @discord.ui.button(
         label="Remove Embed",
         style=discord.ButtonStyle.red,
-        emoji=f"{Emojis.bin}",
         row=0,
     )
     async def RemoveEmbed(
