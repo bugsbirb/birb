@@ -23,3 +23,6 @@
 - Complete rework of core/discord/emojis.py, existed since the start of the bot, using the application emoji directory would be better.
 - Staff Panel rewrite
 - Giving Birb up.
+
+### Discovered Bugs
+- Embed fields do not update in embed builder.
