@@ -576,7 +576,7 @@ class CreateCategory(discord.ui.Modal):
         view = NoThanks(self.user, name)
         view.add_item(CategoryType(interaction.user, name, options))
         await interaction.edit_original_response(
-            content=f"{Emojis.settings} **{interaction.user.display_name},** do you want to add extra stuff to this modmail category?",
+            content=f"{Emojis.settings_page} **{interaction.user.display_name},** do you want to add extra stuff to this modmail category?",
             view=view,
             embed=None,
         )

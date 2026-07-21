@@ -1,11 +1,10 @@
 import logging
 
-import discord
 from bson import ObjectId
 from discord.ext import commands
 
-from datamodels.Infractions import InfractionItem
 from core.bot.emojis import *
+from datamodels.Infractions import InfractionItem
 
 logger = logging.getLogger(__name__)
 
@@ -214,7 +213,7 @@ class CaseApproval(discord.ui.View):
             return await interaction.followup.send(
                 content=f"{Emojis.no} **{interaction.user.display_name}**, I couldn't find the data for this."
             )
-        Infraction = InfractionItem(Result)
+        Infraction = InfractionItem(**Result)
 
         guild = await interaction.client.fetch_guild(Infraction.guild_id)
         if guild is None:

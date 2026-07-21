@@ -218,7 +218,7 @@ class Voting(discord.ui.View):
 
     @discord.ui.button(
         label="",
-        emoji=f"{Emojis.settings}",
+        emoji=f"{Emojis.settings_gear}",
         custom_id="settingsbuttonforsuggestions",
     )
     async def settings(
