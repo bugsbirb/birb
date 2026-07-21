@@ -60,13 +60,6 @@ if not (TOKEN and MONGO_URL and PREFIX):
     logger.error("[❌] Missing .env variables. [TOKEN, MONGO_URL, PREFIX]")
     sys.exit(1)
 
-if os.getenv("REMOVE_EMOJIS", "False") == "True" or (
-    ENVIRONMENT and ENVIRONMENT.lower() == "custom"
-):
-    from core.branding import ClearEmojis
-
-    ClearEmojis(True, os.getenv("FOLDER_PATH", "/app"))
-
 
 def beforeSend(
     event, hint
