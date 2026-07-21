@@ -128,7 +128,7 @@ class on_promotion(commands.Cog):
         self, objectid: ObjectId, Settings: dict, edit: bool = False
     ):
         PromotionData = await self.client.db["promotions"].find_one({"_id": objectid})
-        Promotion = Promotion(PromotionData)
+        Promotion = PromotionItem(PromotionData)
         guild = await self.client.fetch_guild(Promotion.guild_id)
 
         if guild is None:
