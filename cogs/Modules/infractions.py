@@ -352,7 +352,7 @@ class Infractions(commands.Cog):
         staff: discord.User,
         action: discord.ext.commands.Range[str, 1, 200],
         *,
-        reason: discord.ext.commands.Range[str, 1, 2000],
+        reason: discord.ext.commands.Range[str, 1, 1024],
         notes="",
         expiration: Optional[str] = None,
         anonymous: Optional[Literal["True"]] = None,
