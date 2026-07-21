@@ -1,7 +1,5 @@
 ## Todos - Maybe in my lifetime.
 
-- Make feedback, suggestions, custom commands and suspension use the new Variable constructor class.
-
 - Either get rid of suspensions, or improve it.
 - Either get rid of connection roles, or improve it.
 - Fully get rid of on_admin_role & on_staff_role.
