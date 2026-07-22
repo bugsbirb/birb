@@ -1231,7 +1231,7 @@ class componentmanager(discord.ui.View):
         self.author = author
         self.data = data
 
-    @discord.ui.button(label="", style=discord.ButtonStyle.gray, emoji=f"{Emojis.add}")
+    @discord.ui.button(label="", style=discord.ButtonStyle.gray)
     async def AddButton(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -1249,7 +1249,6 @@ class componentmanager(discord.ui.View):
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.gray,
-        emoji="<:Subtract:1229040262161109003>",
     )
     async def RemoveButton(
         self,
