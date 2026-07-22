@@ -1,8 +1,6 @@
-import aiohttp
-
+import logging
 import os
-import logging
-import logging
+
 from motor.motor_asyncio import AsyncIOMotorClient
 
 logger = logging.getLogger(__name__)
@@ -34,6 +32,7 @@ async def RefreshToken(ClientID: str, ClientSecret: str, RefreshTokenValue: str)
     async with aiohttp.ClientSession() as Session:
         async with Session.post(url, data=data, headers=headers) as Resp:
             if Resp.status != 200:
+                logger.error("Failed to refresh Patreon token: %s", Resp.status)
                 return None
             return await Resp.json()
 
@@ -41,6 +40,7 @@ async def RefreshToken(ClientID: str, ClientSecret: str, RefreshTokenValue: str)
 async def GetAccessToken():
     Doc = await Patreon.find_one({"_id": 0})
     if not Doc:
+        logger.error("Patreon token document not found")
         return None
 
     AccessToken = Doc.get("access_token")
@@ -52,13 +52,17 @@ async def GetAccessToken():
     async with aiohttp.ClientSession() as Session:
         async with Session.get(url, headers=headers) as Resp:
             if Resp.status == 401:
+                logger.warning("Patreon access token expired, refreshing")
                 TokenData = await RefreshToken(
                     ClientID, ClientSecret, RefreshTokenValue
                 )
                 if not TokenData or "access_token" not in TokenData:
+                    logger.error("Failed to refresh Patreon access token")
                     return None
+
                 AccessToken = TokenData["access_token"]
                 NewRefresh = TokenData.get("refresh_token", RefreshTokenValue)
+
                 await Patreon.update_one(
                     {"_id": 0},
                     {
@@ -69,26 +73,31 @@ async def GetAccessToken():
                     },
                     upsert=True,
                 )
+
             elif Resp.status != 200:
+                logger.error("Failed Patreon identity request: %s", Resp.status)
                 return None
+
     return AccessToken
 
 
 async def SubscriptionUser(UserID: int, Sub: str = "22855340", Tiers: list = None):
     AccessToken = await GetAccessToken()
     if not AccessToken:
-        return
+        logger.error("No Patreon access token available")
+        return None
 
     CampaignID = await GetCampaignID(AccessToken)
     if not CampaignID:
-        return
+        logger.error("Failed to get Patreon campaign ID")
+        return None
 
     URL = f"https://www.patreon.com/api/oauth2/v2/campaigns/{CampaignID}/members"
     Params = {
         "include": "currently_entitled_tiers,user",
         "fields[member]": "patron_status",
         "fields[user]": "social_connections",
-        "page[count]": 100,
+        "page[count]": 1000,
     }
 
     Headers = {
@@ -100,11 +109,18 @@ async def SubscriptionUser(UserID: int, Sub: str = "22855340", Tiers: list = Non
         while URL:
             async with Session.get(URL, headers=Headers, params=Params) as Resp:
                 if Resp.status != 200:
-                    return
+                    logger.error("Failed Patreon members request: %s", Resp.status)
+                    return None
 
                 Data = await Resp.json()
                 Included = Data.get("included", [])
                 Users = {U["id"]: U for U in Included if U.get("type") == "user"}
+
+                logger.info(
+                    "Processing Patreon members page: members=%s users=%s",
+                    len(Data.get("data", [])),
+                    len(Users),
+                )
 
                 for Member in Data.get("data", []):
                     PatronStatus = Member.get("attributes", {}).get("patron_status")
@@ -116,15 +132,26 @@ async def SubscriptionUser(UserID: int, Sub: str = "22855340", Tiers: list = Non
                     )
                     UserID_ = UserRef.get("id")
                     User = Users.get(UserID_)
+
                     if not User:
+                        logger.warning(
+                            "Missing user data for Patreon user: %s", UserID_
+                        )
                         continue
 
                     SocialConnections = User.get("attributes", {}).get(
                         "social_connections", {}
                     )
-                    DiscordInfo = SocialConnections.get("bot")
+
+                    DiscordInfo = SocialConnections.get("discord")
+
                     if not DiscordInfo:
+                        logger.warning(
+                            "No Discord connection for Patreon user: %s",
+                            UserID_,
+                        )
                         continue
+
                     if str(DiscordInfo.get("user_id")) != str(UserID):
                         continue
 
@@ -133,10 +160,18 @@ async def SubscriptionUser(UserID: int, Sub: str = "22855340", Tiers: list = Non
                         .get("currently_entitled_tiers", {})
                         .get("data", [])
                     )
+
                     TierIDs = [Tier.get("id") for Tier in EntitledTiers]
+
+                    logger.info(
+                        "Found Patreon user: discord=%s tiers=%s",
+                        UserID,
+                        TierIDs,
+                    )
 
                     HasPremium = Sub in TierIDs
                     InTiers = False
+
                     if Tiers:
                         InTiers = any(tier in TierIDs for tier in Tiers)
 
@@ -158,37 +193,39 @@ async def GetCampaignID(AccessToken: str):
     async with aiohttp.ClientSession() as Session:
         async with Session.get(url, headers=headers) as Resp:
             if Resp.status != 200:
+                logger.error("Failed Patreon campaign request: %s", Resp.status)
                 return None
+
             Data = await Resp.json()
+
             for Item in Data.get("included", []):
                 if Item.get("type") == "campaign":
+                    logger.info("Found Patreon campaign: %s", Item.get("id"))
                     return Item.get("id")
-    return None
 
-
-def FindUserByID(included, user_id):
-    for item in included:
-        if item.get("type") == "user" and item.get("id") == user_id:
-            return item
+    logger.error("No Patreon campaign found")
     return None
 
 
 async def PremiumMembers():
     AccessToken = await GetAccessToken()
     if not AccessToken:
+        logger.error("No Patreon access token available")
         return []
 
     CampaignID = await GetCampaignID(AccessToken)
     if not CampaignID:
+        logger.error("Failed to get Patreon campaign ID")
         return []
 
     Members = []
+
     BaseURL = f"https://www.patreon.com/api/oauth2/v2/campaigns/{CampaignID}/members"
     Params = {
         "include": "currently_entitled_tiers,user",
         "fields[member]": "patron_status",
         "fields[user]": "social_connections",
-        "page[count]": 100,
+        "page[count]": 1000,
     }
 
     headers = {
@@ -202,34 +239,53 @@ async def PremiumMembers():
         while NextURL:
             async with Session.get(NextURL, headers=headers, params=Params) as Resp:
                 if Resp.status != 200:
-                    logger.error("Failed to get members: " + str(Resp.status))
+                    logger.error("Failed to get Patreon members: %s", Resp.status)
                     break
 
                 Data = await Resp.json()
+
                 Included = Data.get("included", [])
                 Users = {
                     item["id"]: item for item in Included if item.get("type") == "user"
                 }
 
+                logger.info(
+                    "Processing Patreon page: members=%s users=%s",
+                    len(Data.get("data", [])),
+                    len(Users),
+                )
+
                 for Member in Data.get("data", []):
                     PatronStatus = Member.get("attributes", {}).get("patron_status")
+
                     if PatronStatus != "active_patron":
                         continue
 
                     UserRef = (
                         Member.get("relationships", {}).get("user", {}).get("data", {})
                     )
+
                     UserID = UserRef.get("id")
                     User = Users.get(UserID)
+
                     if not User:
+                        logger.warning(
+                            "Missing Patreon user: %s",
+                            UserID,
+                        )
                         continue
 
                     DiscordInfo = (
                         User.get("attributes", {})
                         .get("social_connections", {})
-                        .get("bot")
+                        .get("discord")
                     )
+
                     if not DiscordInfo or not DiscordInfo.get("user_id"):
+                        logger.warning(
+                            "Missing Discord connection: %s",
+                            UserID,
+                        )
                         continue
 
                     TierIDs = [
@@ -239,7 +295,7 @@ async def PremiumMembers():
                         .get("data", [])
                     ]
 
-                    if 22855340 in TierIDs:
+                    if "22855340" in TierIDs:
                         Members.append(
                             {
                                 "discord_id": DiscordInfo["user_id"],
@@ -250,4 +306,5 @@ async def PremiumMembers():
 
                 NextURL = Data.get("links", {}).get("next")
 
+    logger.info("Premium Patreon members found: %s", len(Members))
     return Members
