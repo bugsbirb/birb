@@ -1362,13 +1362,13 @@ class EmbedFieldManager(discord.ui.View):
         self.data = data
         self.msg = msg
 
-    @discord.ui.button(label="", style=discord.ButtonStyle.gray)
+    @discord.ui.button(label="Add", style=discord.ButtonStyle.gray)
     async def add_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
         await interaction.response.send_modal(EmbedFieldEditor(msg=self.msg))
 
-    @discord.ui.button(label="", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Edit", style=discord.ButtonStyle.blurple)
     async def edit_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -1388,7 +1388,7 @@ class EmbedFieldManager(discord.ui.View):
         await interaction.response.send_message(view=view, ephemeral=True)
 
     @discord.ui.button(
-        label="",
+        label="Remove",
         style=discord.ButtonStyle.gray,
     )
     async def delete_field(
