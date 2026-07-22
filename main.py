@@ -108,6 +108,7 @@ class Client(commands.AutoShardedBot):
                 [
                     "core.api",
                     "core.integrations.dokploy",
+                    "cogs.Tasks.CheckSubscription",
                 ]
             )
         if os.getenv("STAFF"):
