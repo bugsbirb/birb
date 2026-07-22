@@ -1,16 +1,12 @@
-import discord
-from discord.ext import commands, tasks
-from core.bot.emojis import *
-from motor.motor_asyncio import AsyncIOMotorClient
-import aiohttp
-import re
 import logging
+import re
 
+from discord.ext import commands, tasks
+
+from core.bot.emojis import *
+from core.format import IsSeperateBot
 from core.integrations.dokploy import premium, GetProjects, StopApplication
 from core.integrations.patreon import SubscriptionUser
-from core.format import IsSeperateBot
-from datetime import datetime
-from core.bot.HelpEmbeds import NotYourPanel
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +28,13 @@ class CheckSubscription(commands.Cog):
         if os.getenv("ENVIRONMENT") in ["custom", "development"]:
             return
         Guild = self.client.get_guild(1092976553752789054)
-        PremiumRole = Guild.get_role(1233945875680596010)
-        BrandingRole = Guild.get_role(1182022232407543981)
+        if not Guild:
+            return
+        try:
+            PremiumRole = await Guild.fetch_role(1233945875680596010)
+            BrandingRole = await Guild.fetch_role(1182022232407543981)
+        except (discord.Forbidden, discord.NotFound):
+            return
         if not PremiumRole or not BrandingRole:
             return
         PremiumMembers = set()
