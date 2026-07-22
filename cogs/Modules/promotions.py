@@ -329,7 +329,6 @@ async def MultiHireachy(
                 )
                 return
 
-
         NextRole = SkipRole
         if not NextRole:
             if not UserRolesInHierarchy:
@@ -353,7 +352,6 @@ async def MultiHireachy(
                 content=f"{Emojis.no} **{interaction.user.display_name}**, **@{user.display_name}** is already at the top of the hierarchy and cannot be promoted further.",
             )
             return
-
 
         Object = await interaction.client.db["promotions"].insert_one(
             {

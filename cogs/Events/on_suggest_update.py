@@ -24,7 +24,10 @@ class On_suggestions_edit(commands.Cog):
         guild = await self.client.fetch_guild(back.get("guild_id"))
         if not guild:
             return logging.critical("[on_suggestion] I can't find the server.")
-        author = await guild.fetch_member(back.get("author_id"))
+        try:
+            author = await self.client.fetch_user(back.get("author_id"))
+        except (discord.HTTPException, discord.NotFound):
+            return logger.critical("[on_suggestion] can't find the author")
         if not author:
             return logger.critical("[on_suggestion] can't find the author")
 
