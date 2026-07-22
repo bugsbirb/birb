@@ -1362,7 +1362,7 @@ class EmbedFieldManager(discord.ui.View):
         self.data = data
         self.msg = msg
 
-    @discord.ui.button(label="", style=discord.ButtonStyle.gray, emoji=f"{Emojis.add}")
+    @discord.ui.button(label="", style=discord.ButtonStyle.gray)
     async def add_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -1392,7 +1392,6 @@ class EmbedFieldManager(discord.ui.View):
     @discord.ui.button(
         label="",
         style=discord.ButtonStyle.gray,
-        emoji="<:Subtract:1229040262161109003>",
     )
     async def delete_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
