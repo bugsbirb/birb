@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from core.integrations.patreon import SubscriptionUser
 
 
@@ -35,7 +36,7 @@ class Premium(commands.Cog):
             return
 
         if not user or not user.get("attributes", {}).get("social_connections", {}).get(
-            "bot"
+            "discord"
         ):
             await msg.edit(
                 embed=discord.Embed(
