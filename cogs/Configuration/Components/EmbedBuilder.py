@@ -1368,9 +1368,7 @@ class EmbedFieldManager(discord.ui.View):
     ):
         await interaction.response.send_modal(EmbedFieldEditor(msg=self.msg))
 
-    @discord.ui.button(
-        label="", style=discord.ButtonStyle.blurple, emoji=f"{Emojis.pen}"
-    )
+    @discord.ui.button(label="", style=discord.ButtonStyle.blurple)
     async def edit_field(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
