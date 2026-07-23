@@ -31,7 +31,7 @@ Birb is designed to simplify tasks related to managing staff, staff punishment, 
 
 ## License
 
-Birb © 2023 Bugsbirb  
+Birb © 2026 Bugsbirb  
 Licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
 
 - **Attribution (BY):** Credit must be given to the original creator.  
