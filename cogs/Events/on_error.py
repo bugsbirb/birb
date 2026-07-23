@@ -85,7 +85,6 @@ class On_error(commands.Cog):
         error = getattr(error, "original", error)
         try:
             interaction = CommandType(interactionType)
-
             if isinstance(error, MissingPermission):
                 await interaction.send(
                     embed=NoPermission(error.permission),
@@ -142,6 +141,7 @@ class On_error(commands.Cog):
                     ),
                     view=Support(),
                 )
+                return
             if isinstance(error, MissingPermissionSetup):
                 await interaction.send(
                     embed=NoSetupPermissions(),

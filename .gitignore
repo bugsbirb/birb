@@ -10,3 +10,4 @@ migrate.py
 .idea/misc.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/birb.iml
+/.idea
