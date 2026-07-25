@@ -86,8 +86,8 @@ class on_infraction_edit(commands.Cog):
         embed.set_footer(text=f"Infraction ID | {Infraction.random_string}")
 
         try:
-            if Infraction.webhook_id:
-                webhook = await self.client.fetch_webhook(Infraction.webhook_id)
+            if Infraction.WebhookID:
+                webhook = await self.client.fetch_webhook(Infraction.WebhookID)
                 msg = await webhook.fetch_message(Infraction.msg_id)
             else:
                 msg = await channel.fetch_message(Infraction.msg_id)
