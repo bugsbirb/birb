@@ -72,6 +72,9 @@ def RequireStaff(Config: dict, author: discord.Member):
     if not isinstance(StaffIDs, list):
         StaffIDs = [StaffIDs]
 
+    if not author.roles or 0 >= len(author.roles):
+        return False
+
     if StaffIDs:
         if any(role.id in StaffIDs for role in author.roles):
             return True
@@ -92,6 +95,9 @@ def RequireAdmin(Config: dict, author: discord.Member):
     Ids = Config.get("Permissions", {}).get("adminrole")
     if not isinstance(Ids, list):
         Ids = [Ids]
+
+    if not author.roles or 0 >= len(author.roles):
+        return False
 
     if any(role.id in Ids for role in author.roles):
         return True
