@@ -147,14 +147,30 @@ def LeaderboardPlace(n):
     return f"{n}{suffix}"
 
 
-def ReplaceVariables(text, replacements):
-    if text is None:
-        return text
-    for placeholder, replacement in replacements.items():
-        if isinstance(replacement, (str, int, float)):
-            text = text.replace(placeholder, str(replacement))
-        elif isinstance(replacement, tuple) and len(replacement) > 0:
-            text = text.replace(placeholder, str(replacement[0]))
-        else:
-            text = text.replace(placeholder, "")
-    return text
+def ReplaceVariables(data, replacements: dict):
+    if data is None:
+        return data
+    if isinstance(data, str):
+        for placeholder, replacement in replacements.items():
+            if isinstance(replacement, (str, int, float, bool)):
+                value = str(replacement)
+            elif isinstance(replacement, (tuple, list)) and len(replacement) > 0:
+                value = str(replacement[0])
+            else:
+                value = ""
+            data = data.replace(placeholder, value)
+        return data
+
+    if isinstance(data, dict):
+        return {
+            ReplaceVariables(key, replacements): ReplaceVariables(value, replacements)
+            for key, value in data.items()
+        }
+
+    if isinstance(data, list):
+        return [ReplaceVariables(item, replacements) for item in data]
+
+    if isinstance(data, tuple):
+        return tuple(ReplaceVariables(item, replacements) for item in data)
+
+    return data

@@ -3,6 +3,7 @@ import re
 
 import discord.http
 
+from cogs.Configuration.Components.integrations import IntegrationsView
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 from core.format import IsSeperateBot
@@ -1430,30 +1431,6 @@ class ChangeGroupRole(discord.ui.Select):
         )
 
 
-class IntegrationsView(discord.ui.LayoutView):
-    def __init__(self, author, name):
-        super().__init__()
-        self.add_item(
-            discord.ui.Container(
-                discord.ui.Section(
-                    discord.ui.TextDisplay(f"### {Emojis.roblox} Roblox Communities"),
-                    discord.ui.TextDisplay(
-                        content="Using Roblox's communities api you can modify a users roblox rank."
-                        "\n-# This uses the old communities roles, not the system where you can have multiple roles."
-                    ),
-                    accessory=ConfigureGroupRoles(author, name).Configure,
-                ),
-                discord.ui.Separator(),
-                discord.ui.Section(
-                    discord.ui.TextDisplay("### Melonly - Workflows & Webhooks"),
-                    discord.ui.TextDisplay(
-                        "Using [Melonly workflows](<https://melonly.xyz/product/workflows>), you can create a trigger to "
-                    ),
-                ),
-            )
-        )
-
-
 class ConfigureIntegrations(discord.ui.View):
     def __init__(self, author, name: str):
         super().__init__()
@@ -1466,7 +1443,10 @@ class ConfigureIntegrations(discord.ui.View):
     ):
         await interaction.response.defer(ephemeral=True)
         await interaction.followup.send(
-            view=IntegrationsView(self.author, self.name), ephemeral=True
+            view=IntegrationsView(
+                self.author, "infractions", extra={"name": self.name}
+            ),
+            ephemeral=True,
         )
 
 
