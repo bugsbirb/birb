@@ -1,4 +1,3 @@
-import discord
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from core.bot.HelpEmbeds import (
@@ -47,7 +46,7 @@ def Permissions(permissions: Literal["Admin", "Staff"]):
         if not Config.get("Permissions"):
             raise MissingPermissionSetup("All")
 
-        if not Config.get("Permissions").get("adminrole"):
+        if not Config.get("Permissions", {}).get("adminrole"):
             raise MissingPermissionSetup("Admin")
 
         if permissions == "Admin":
@@ -69,7 +68,7 @@ def Permissions(permissions: Literal["Admin", "Staff"]):
 
 
 def RequireStaff(Config: dict, author: discord.Member):
-    StaffIDs = Config.get("Permissions").get("staffrole")
+    StaffIDs = Config.get("Permissions", {}).get("staffrole")
     if not isinstance(StaffIDs, list):
         StaffIDs = [StaffIDs]
 
@@ -77,7 +76,7 @@ def RequireStaff(Config: dict, author: discord.Member):
         if any(role.id in StaffIDs for role in author.roles):
             return True
 
-    AdminIDs = Config.get("Permissions").get("adminrole")
+    AdminIDs = Config.get("Permissions", {}).get("adminrole")
     if not isinstance(AdminIDs, list):
         AdminIDs = [AdminIDs]
 
@@ -90,7 +89,7 @@ def RequireStaff(Config: dict, author: discord.Member):
 
 
 def RequireAdmin(Config: dict, author: discord.Member):
-    Ids = Config.get("Permissions").get("adminrole")
+    Ids = Config.get("Permissions", {}).get("adminrole")
     if not isinstance(Ids, list):
         Ids = [Ids]
 
