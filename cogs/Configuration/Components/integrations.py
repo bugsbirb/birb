@@ -117,19 +117,10 @@ async def integrationsEmbed(interaction: discord.Interaction, embed: discord.Emb
         "You can find out more at [the documentation](https://docs.astrobirb.dev/)."
     )
     config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-
-    ERM = await interaction.client.db["integrations"].find_one(
-        {"server": int(interaction.guild.id), "erm": {"$exists": True}}
-    )
     Groups = config.get("groups", {}).get("id", None) if config else None
     embed.add_field(
         name=f"{Emojis.link} Integrations",
         value=f"> **Groups**: {'Linked' if Groups else 'Unlinked'}",
         inline=False,
     )
-    embed.add_field(
-        name=f"{Emojis.modules} Functions",
-        value="> * Infraction Types\n> -# We are still looking to add more purposes to integrations",
-    )
-
     return embed
