@@ -181,7 +181,7 @@ class NoEmbed(discord.ui.View):
                     discord.SelectOption(label="Lock", value="Lock"),
                 ],
             )
-            await interaction.followup.send(view=view, ephemeral=True)
+        await interaction.followup.send(view=view, ephemeral=True)
 
     @discord.ui.button(label="Content", style=discord.ButtonStyle.gray)
     async def Content(
