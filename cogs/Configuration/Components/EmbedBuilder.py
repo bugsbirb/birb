@@ -172,7 +172,9 @@ class NoEmbed(discord.ui.View):
                 embed.description = "There are no buttons yet. You can create one below by pressing the **plus button.**"
 
             view = componentmanager(interaction.user, self.data)
-            await interaction.followup.send(view=view, embed=embed, ephemeral=True)
+            return await interaction.followup.send(
+                view=view, embed=embed, ephemeral=True
+            )
         else:
             view = Buttons(
                 self.data,
@@ -1231,7 +1233,7 @@ class componentmanager(discord.ui.View):
         self.author = author
         self.data = data
 
-    @discord.ui.button(label="", style=discord.ButtonStyle.gray)
+    @discord.ui.button(label="Add", style=discord.ButtonStyle.gray)
     async def AddButton(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
@@ -1247,7 +1249,7 @@ class componentmanager(discord.ui.View):
         await interaction.response.edit_message(view=view, embed=None)
 
     @discord.ui.button(
-        label="",
+        label="Remove",
         style=discord.ButtonStyle.gray,
     )
     async def RemoveButton(
