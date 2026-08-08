@@ -1,5 +1,48 @@
+from typing import Literal
+
+from cogs.Configuration.Components.Infractions import ConfigureGroupRoles
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
+
+
+class IntegrationsView(discord.ui.LayoutView):
+    def __init__(
+        self, author, features: Literal["infractions", "promotions"], extra: dict
+    ):
+        super().__init__()
+        children = []
+        if features.lower() != "infractions":
+            children.append(
+                discord.ui.Section(
+                    discord.ui.TextDisplay(
+                        f"### {Emojis.roblox} [Roblox](<https://roblox.com>) Communities"
+                    ),
+                    discord.ui.TextDisplay(
+                        content="Using Roblox's communities api you can modify a users roblox rank."
+                        "\n-# This uses the old communities roles, not the system where you can have multiple roles."
+                    ),
+                    accessory=ConfigureGroupRoles(author, extra.get("name")).Configure,
+                )
+            )
+            children.append(discord.ui.Separator())
+
+        children.extend(
+            [
+                discord.ui.Section(
+                    discord.ui.TextDisplay(
+                        "### [Melonly](<https://melonly.xyz>) - Workflows & Webhooks"
+                    ),
+                    discord.ui.TextDisplay(
+                        "Using [Melonly workflows](<https://melonly.xyz/product/workflows>), you can trigger actions using their webhook trigger type."
+                    ),
+                ),
+                discord.ui.Separator(),
+                discord.ui.Section(
+                    discord.ui.TextDisplay("### Custom Webhooks"),
+                    discord.ui.TextDisplay("Send requests to a custom webhook"),
+                ),
+            ]
+        )
 
 
 class Integrations(discord.ui.Select):
@@ -117,19 +160,10 @@ async def integrationsEmbed(interaction: discord.Interaction, embed: discord.Emb
         "You can find out more at [the documentation](https://docs.astrobirb.dev/)."
     )
     config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-
-    ERM = await interaction.client.db["integrations"].find_one(
-        {"server": int(interaction.guild.id), "erm": {"$exists": True}}
-    )
     Groups = config.get("groups", {}).get("id", None) if config else None
     embed.add_field(
         name=f"{Emojis.link} Integrations",
         value=f"> **Groups**: {'Linked' if Groups else 'Unlinked'}",
         inline=False,
     )
-    embed.add_field(
-        name=f"{Emojis.modules} Functions",
-        value="> * Infraction Types\n> -# We are still looking to add more purposes to integrations",
-    )
-
     return embed
