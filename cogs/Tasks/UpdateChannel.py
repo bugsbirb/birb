@@ -1,6 +1,7 @@
-from discord.ext import commands, tasks
-import discord
 import os
+
+import discord
+from discord.ext import commands, tasks
 
 
 class UpdateChannel(commands.Cog):
@@ -19,7 +20,7 @@ class UpdateChannel(commands.Cog):
 
         users = sum(guild.member_count or 0 for guild in self.client.guilds)
         try:
-            await channel.edit(name=f"{len(self.client.guilds)} Guilds | {users} Users")
+            await channel.edit(name=f"{len(self.client.guilds)} Guilds")
         except (discord.HTTPException, discord.Forbidden):
             pass
 
