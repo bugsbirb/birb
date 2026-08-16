@@ -1,7 +1,6 @@
 import discord
-from discord.ext import commands
-from core.format import IsSeperateBot
 from discord import app_commands
+from discord.ext import commands
 
 
 class Membership(commands.Cog):

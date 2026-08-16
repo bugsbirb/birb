@@ -1,15 +1,17 @@
-import aiohttp
-from motor.motor_asyncio import AsyncIOMotorClient
-import discord
-import os
-from discord.ext import commands
-import time
 import logging
+import os
+import time
+
+import aiohttp
+import discord
+from discord.ext import commands
+from pymongo import AsyncMongoClient
 
 logger = logging.getLogger(__name__)
 
 MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncMongoClient(MONGO_URL)
+
 db = client["astro"]
 infractions = db["infractions"]
 Suggestions = db["suggestions"]
@@ -62,7 +64,7 @@ async def Fallback(user: discord.User):
 async def GetUser(user: discord.User):
     token = await GetValidToken(user=user)
     user_info = None
-    if (token):
+    if token:
         user_info = await GetInfo(token)
 
     if not user_info:
@@ -259,13 +261,15 @@ async def RejectRequest(group_id: int, join_request_id: int, user: discord.User)
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, data='{}') as response:
+        async with session.post(url, headers=headers, data="{}") as response:
             if response.status == 200:
                 logger.info("[AcceptRequest] Successfully accepted join request.")
                 return True
             else:
-                logger.error(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
-                logger.error(await response.json())  
+                logger.error(
+                    f"[AcceptRequest] Failed to accept join request. Status: {response.status}"
+                )
+                logger.error(await response.json())
                 return None
 
 
@@ -283,15 +287,16 @@ async def AcceptRequest(group_id: int, join_request_id: int, user: discord.User)
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, headers=headers, data='{}') as response:
+        async with session.post(url, headers=headers, data="{}") as response:
             if response.status == 200:
                 logger.info("[AcceptRequest] Successfully accepted join request.")
                 return True
             else:
-                logger.error(f"[AcceptRequest] Failed to accept join request. Status: {response.status}")
-                logger.error(await response.json())  
+                logger.error(
+                    f"[AcceptRequest] Failed to accept join request. Status: {response.status}"
+                )
+                logger.error(await response.json())
                 return None
-
 
 
 async def UpdateMembership(
@@ -424,7 +429,9 @@ async def GetGroupMembership(
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status == 200:
-                logger.info("[GetGroupMembership] Successfully retrieved membership data.")
+                logger.info(
+                    "[GetGroupMembership] Successfully retrieved membership data."
+                )
                 return await response.json()
             else:
                 logger.error(

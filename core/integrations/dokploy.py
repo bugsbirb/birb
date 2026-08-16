@@ -4,7 +4,7 @@ from datetime import datetime
 
 import aiohttp
 from discord.ext import commands
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncMongoClient(MONGO_URL)
 db = client["astro"]
 premium = db["Subscriptions"]
 bots = db["bots"]

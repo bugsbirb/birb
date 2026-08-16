@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from pymongo import AsyncMongoClient
 
 load_dotenv()
 
@@ -8,7 +9,6 @@ import gc
 import time
 import logging
 
-from motor.motor_asyncio import AsyncIOMotorClient
 from cogs.Modules.promotions import SyncCommands
 from cogs.Events.on_suggestion import Voting as Voti
 
@@ -24,7 +24,6 @@ from cogs.Modules.tickets import ButtonHandler
 
 sys.dont_write_bytecode = True
 
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -32,6 +31,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
 gc.enable()
 
 PREFIX = os.getenv("PREFIX")
@@ -41,7 +41,7 @@ MONGO_URL = os.getenv("MONGO_URL")
 SHARDS = os.getenv("SHARDS")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncMongoClient(MONGO_URL)
 db = (
     client["BETA"]
     if ENVIRONMENT and ENVIRONMENT.lower() == "development"

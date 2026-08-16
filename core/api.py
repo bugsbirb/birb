@@ -4,18 +4,17 @@ import string
 import time
 from datetime import datetime
 
-import discord
 import uvicorn
 from bson import ObjectId
 from discord.ext import commands
 from fastapi import FastAPI, APIRouter, HTTPException, Request, status
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 
 from core.bot.emojis import *
 
 MONGO_URL = os.getenv("MONGO_URL")
 KEY = os.getenv("KEY")
-client = AsyncIOMotorClient(MONGO_URL)
+client = AsyncMongoClient(MONGO_URL)
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 db = (
     client["BETA"]

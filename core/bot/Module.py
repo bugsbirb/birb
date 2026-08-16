@@ -1,13 +1,13 @@
 from discord import app_commands
+from discord.ext import commands
+from pymongo import AsyncMongoClient
 
 from core.bot.emojis import *
-from discord.ext import commands
-from motor.motor_asyncio import AsyncIOMotorClient
 from core.errors.Modules import ModuleDisabled
 
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-client = AsyncIOMotorClient(os.getenv("MONGO_URL"))
+client = AsyncMongoClient(os.getenv("MONGO_URL"))
 DB = (
     client["BETA"]
     if ENVIRONMENT and ENVIRONMENT.lower() == "development"
