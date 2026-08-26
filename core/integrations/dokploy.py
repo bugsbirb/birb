@@ -4,17 +4,14 @@ from datetime import datetime
 
 import aiohttp
 from discord.ext import commands
-from pymongo import AsyncMongoClient
 
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
+from core.db import db
 
 logger = logging.getLogger(__name__)
 
 
-MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncMongoClient(MONGO_URL)
-db = client["astro"]
 premium = db["Subscriptions"]
 bots = db["bots"]
 

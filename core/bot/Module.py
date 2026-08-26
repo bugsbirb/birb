@@ -1,19 +1,12 @@
 from discord import app_commands
 from discord.ext import commands
-from pymongo import AsyncMongoClient
 
 from core.bot.emojis import *
+from core.db import db
 from core.errors.Modules import ModuleDisabled
 
 ENVIRONMENT = os.getenv("ENVIRONMENT")
-
-client = AsyncMongoClient(os.getenv("MONGO_URL"))
-DB = (
-    client["BETA"]
-    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
-    else client["astro"]
-)
-Configuration = DB["Config"]
+Configuration = db["Config"]
 
 
 def ModuleIsEnabled(module: str):

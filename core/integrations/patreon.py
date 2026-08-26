@@ -1,16 +1,14 @@
 import logging
 import os
 
-from pymongo import AsyncMongoClient
+from core.db import db
 
 logger = logging.getLogger(__name__)
 
 ClientID = os.getenv("PatreonClientID")
 ClientSecret = os.getenv("PatreonClientSecret")
 
-MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncMongoClient(MONGO_URL)
-db = client["astro"]
+
 Patreon = db["Patreon"]
 
 

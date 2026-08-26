@@ -5,14 +5,11 @@ import time
 import aiohttp
 import discord
 from discord.ext import commands
-from pymongo import AsyncMongoClient
 
 logger = logging.getLogger(__name__)
 
-MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncMongoClient(MONGO_URL)
+from core.db import db
 
-db = client["astro"]
 infractions = db["infractions"]
 Suggestions = db["suggestions"]
 loa_collection = db["loa"]

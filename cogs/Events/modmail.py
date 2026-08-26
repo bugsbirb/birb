@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 
 from core.bot.emojis import *
+from core.format import CommandType
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +60,8 @@ async def Reply(
 async def Close(interaction: discord.Interaction, reason=None):
     Text = None
     TranscriptMSG = None
-    msg = await interaction.followup.send(content=f"{Emojis.loading} Closing...")
+    I = CommandType(interaction)
+    msg = await I.send(content=f"{Emojis.loading} Closing...")
     if isinstance(interaction.channel, discord.DMChannel):
         Modmail = await interaction.client.db["modmail"].find_one(
             {"user_id": interaction.user.id}

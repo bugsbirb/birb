@@ -8,19 +8,12 @@ import uvicorn
 from bson import ObjectId
 from discord.ext import commands
 from fastapi import FastAPI, APIRouter, HTTPException, Request, status
-from pymongo import AsyncMongoClient
 
 from core.bot.emojis import *
+from core.db import client, db
 
-MONGO_URL = os.getenv("MONGO_URL")
 KEY = os.getenv("KEY")
-client = AsyncMongoClient(MONGO_URL)
-ENVIRONMENT = os.getenv("ENVIRONMENT")
-db = (
-    client["BETA"]
-    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
-    else client["astro"]
-)
+
 config = db["Config"]
 Keys = db["Keys"]
 dbq = client["quotadb"]

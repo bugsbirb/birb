@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-from pymongo import AsyncMongoClient
 
 load_dotenv()
 
@@ -21,6 +20,7 @@ from cogs.Tasks.qotd import *
 from cogs.Events.on_error import Tree
 from cogs.Events.modmail import ModmailClosure, Links
 from cogs.Modules.tickets import ButtonHandler
+from core.db import client, db
 
 sys.dont_write_bytecode = True
 
@@ -40,13 +40,6 @@ STATUS = os.getenv("STATUS")
 MONGO_URL = os.getenv("MONGO_URL")
 SHARDS = os.getenv("SHARDS")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
-
-client = AsyncMongoClient(MONGO_URL)
-db = (
-    client["BETA"]
-    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
-    else client["astro"]
-)
 
 prefixes = db["prefixes"]
 qotdd = db["qotd"]

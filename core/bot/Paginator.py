@@ -6,10 +6,6 @@ from core.bot.emojis import *
 
 
 class Simple(discord.ui.View):
-    """
-    Button Paginator with custom pagination buttons.
-    """
-
     def __init__(
         self,
         *,

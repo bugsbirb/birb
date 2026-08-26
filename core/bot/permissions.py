@@ -8,14 +8,11 @@ from core.bot.emojis import *
 from core.errors.Permissions import *
 from core.format import CommandType
 
+from core.db import client, db
+
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 MONGO_URL = os.getenv("MONGO_URL")
-client = AsyncMongoClient(MONGO_URL)
-db = (
-    client["BETA"]
-    if ENVIRONMENT and ENVIRONMENT.lower() == "development"
-    else client["astro"]
-)
+
 
 premiums = db["Subscriptions"]
 blacklist = db["blacklists"]
