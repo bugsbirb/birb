@@ -3,6 +3,7 @@ import re
 
 import discord.http
 
+from cogs.Configuration.Components.integrations import IntegrationsView
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
 from core.format import IsSeperateBot
@@ -745,14 +746,12 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         if interaction.user.id != self.author.id:
             return await interaction.followup.send(embed=NotYourPanel(), ephemeral=True)
 
-        Value = ""
         if self.type == "add":
             assert isinstance(self.name.component, discord.ui.TextInput)
             Value = self.name.component.value
         else:
             assert isinstance(self.name.component, discord.ui.Select)
             Value = self.name.component.values[0]
-        logger.debug(Value)
 
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
         if config is None:
@@ -790,6 +789,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
         )
         if self.type == "add":
             view = NoThanks()
+            view.add_item(ConfigureIntegrations(self.author, self.type).Configure)
             view.add_item(InfractionTypesAction(self.author, Value))
             return await interaction.edit_original_response(
                 content=f"{Emojis.tick} **{interaction.user.display_name}**, Do you want to add extra stuff to this infraction type?",
@@ -803,6 +803,7 @@ class InfractionTypeModal(discord.ui.Modal, title="Infraction Type"):
                 )
                 return await interaction.followup.send(embed=embed, ephemeral=True)
             view = Done()
+            view.add_item(ConfigureIntegrations(self.author, self.type).Configure)
             view.add_item(InfractionTypesAction(self.author, Value))
             return await interaction.edit_original_response(
                 content=f"{Emojis.tick} **{interaction.user.display_name}**, you are now editing the infraction type.",
@@ -1129,25 +1130,42 @@ class InfractionTypesAction(discord.ui.Select):
         self.author = author
         self.name = name
         options = [
-            discord.SelectOption(label="Send to channel", emoji=f"{Emojis.tags}"),
             discord.SelectOption(
-                label="Required Permissions", emoji=f"{Emojis.permissions}"
+                label="Send to channel",
+                emoji=f"{Emojis.tags}",
+                description="Deviates from your original set infraction channel.",
+            ),
+            discord.SelectOption(
+                label="Required Permissions",
+                emoji=f"{Emojis.permissions}",
+                description="Elevates permissions for the type.",
             ),
             discord.SelectOption(
                 label="Use Hierarchy",
                 description="This will use a demotion system with the Hierarchy system.",
                 emoji=f"{Emojis.hierarchy}",
             ),
-            discord.SelectOption(label="Give Roles", emoji=f"{Emojis.promotions}"),
-            discord.SelectOption(label="Remove Roles", emoji=f"{Emojis.infractions}"),
+            discord.SelectOption(
+                label="Give Roles",
+                emoji=f"{Emojis.promotions}",
+                description="Selected roles are given to the staff member.",
+            ),
+            discord.SelectOption(
+                label="Remove Roles",
+                emoji=f"{Emojis.infractions}",
+                description="Selected roles are removed from the staff member.",
+            ),
             discord.SelectOption(
                 label="Staff Database Removal", emoji=f"{Emojis.staff_db}"
             ),
-            discord.SelectOption(label="Escalate", emoji=f"{Emojis.escalate}"),
+            discord.SelectOption(
+                label="Escalate",
+                emoji=f"{Emojis.escalate}",
+                description="Escalates to another infraction type after hitting a threshold.",
+            ),
             discord.SelectOption(label="Change Group Role", emoji=f"{Emojis.roblox}"),
         ]
         super().__init__(
-            placeholder="Select Infraction Actions",
             min_values=1,
             max_values=1,
             options=options,
@@ -1164,7 +1182,6 @@ class InfractionTypesAction(discord.ui.Select):
                 ephemeral=True,
             )
         config = await interaction.client.config.find_one({"_id": interaction.guild.id})
-        from core.integrations.roblox import GroupRoles
 
         view = discord.ui.View()
 
@@ -1202,37 +1219,6 @@ class InfractionTypesAction(discord.ui.Select):
             )
             view = UseHierarchyToggle(interaction.user, self.name)
             return await interaction.edit_original_response(embed=embed, view=view)
-
-        elif option == "Change Group Role":
-            await interaction.response.defer()
-            Roles = await GroupRoles(interaction)
-            if Roles == 0:
-                from core.bot.HelpEmbeds import NotRobloxLinked
-
-                return await interaction.followup.send(
-                    embed=NotRobloxLinked(), ephemeral=True
-                )
-            if Roles == 1:
-                return await interaction.followup.send(
-                    f"{Emojis.no} **{interaction.user.display_name},** you don't have access to the group's roles.",
-                    ephemeral=True,
-                )
-            if Roles == 2:
-                return await interaction.followup.send(
-                    f"{Emojis.no} **{interaction.user.display_name},** a group hasn't been linked.",
-                    ephemeral=True,
-                )
-
-            Roles = Roles.get("groupRoles")
-            options = [
-                discord.SelectOption(
-                    label=role.get("displayName"), value=role.get("path")
-                )
-                for role in Roles
-            ]
-            view.add_item(ChangeGroupRole(self.author, self.name, options))
-            await interaction.edit_original_response(view=view)
-            return
 
         else:
             await interaction.response.defer()
@@ -1443,6 +1429,66 @@ class ChangeGroupRole(discord.ui.Select):
             content=f"{Emojis.tick} **{interaction.user.display_name},** successfully updated infraction type.",
             view=None,
         )
+
+
+class ConfigureIntegrations(discord.ui.View):
+    def __init__(self, author, name: str):
+        super().__init__()
+        self.author = author
+        self.name = name
+
+    @discord.ui.button(label="Integrations")
+    async def Configure(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await interaction.response.defer(ephemeral=True)
+        await interaction.followup.send(
+            view=IntegrationsView(
+                self.author, "infractions", extra={"name": self.name}
+            ),
+            ephemeral=True,
+        )
+
+
+class ConfigureGroupRoles(discord.ui.View):
+    def __init__(self, author: discord.Member, name: str):
+        super().__init__()
+        self.name = name
+        self.author = author
+
+    @discord.ui.button(label="Configure")
+    async def Configure(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        from core.integrations.roblox import GroupRoles
+
+        await interaction.response.defer()
+        Roles = await GroupRoles(interaction)
+        if Roles == 0:
+            from core.bot.HelpEmbeds import NotRobloxLinked
+
+            return await interaction.followup.send(
+                embed=NotRobloxLinked(), ephemeral=True
+            )
+        if Roles == 1:
+            return await interaction.followup.send(
+                f"{Emojis.no} **{interaction.user.display_name},** you don't have access to the group's roles.",
+                ephemeral=True,
+            )
+        if Roles == 2:
+            return await interaction.followup.send(
+                f"{Emojis.no} **{interaction.user.display_name},** a group hasn't been linked.",
+                ephemeral=True,
+            )
+
+        Roles = Roles.get("groupRoles")
+        options = [
+            discord.SelectOption(label=role.get("displayName"), value=role.get("path"))
+            for role in Roles
+        ]
+        view = discord.ui.View()
+        view.add_item(ChangeGroupRole(self.author, self.name, options))
+        await interaction.followup.send(view=view, ephemeral=True)
 
 
 async def WebhookEmbed(interaction: discord.Interaction, Config: dict):
