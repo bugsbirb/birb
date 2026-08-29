@@ -32,14 +32,12 @@ async def Create(name, user: discord.User):
         "Content-Type": "application/json",
     }
 
-    project_id = "AnhFqj439TjExphKiI7-x"
-
     data = {
         "name": str(name),
         "appName": f"custom-{name}",
         "description": f"{user.id} - {datetime.now().isoformat()}",
-        "projectId": project_id,
-        "environmentId": "env_prod_AnhFqj439TjExphKiI7-x_1757255169.949818",
+        "projectId": "Khhrh7sxCkdyE82U60KB0",
+        "environmentId": "xTowKgresYzv93oUwK_WD",
     }
 
     async with aiohttp.ClientSession() as session:
