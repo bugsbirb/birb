@@ -7,10 +7,9 @@ from discord.ext import commands
 
 from core.bot.HelpEmbeds import NotYourPanel
 from core.bot.emojis import *
-from core.db import db
+from core.db import db, MONGO_URL
 
 logger = logging.getLogger(__name__)
-
 
 premium = db["Subscriptions"]
 bots = db["bots"]
