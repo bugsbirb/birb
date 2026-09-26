@@ -34,6 +34,7 @@ class ContextClass(NamedTuple):
     author: Optional[Union[discord.Member, discord.User]]
     guild: Optional[discord.Guild]
     send: Optional[Callable[..., Awaitable[Any]]]
+    edit: Optional[Callable[..., Awaitable[Any]]]
     command: Optional[Union[commands.Command, discord.app_commands.Command]]
     client: Optional[discord.Client]
     channel: Optional[discord.TextChannel]
@@ -47,6 +48,7 @@ def CommandType(
             author=ctx.author,
             guild=ctx.guild,
             send=ctx.send,
+            edit=ctx.message.edit,
             command=ctx.command,
             client=ctx.bot,
             channel=ctx.channel,
@@ -56,10 +58,16 @@ def CommandType(
         send = (
             ctx.followup.send if ctx.response.is_done() else ctx.response.send_message
         )
+        edit = (
+            ctx.edit_original_response
+            if ctx.response.is_done()
+            else ctx.response.edit_message
+        )
         return ContextClass(
             author=ctx.user,
             guild=ctx.guild,
             send=send,
+            edit=edit,
             command=ctx.command,
             client=ctx.client,
             channel=ctx.channel,
