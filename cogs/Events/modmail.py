@@ -229,7 +229,7 @@ async def Close(interaction: discord.Interaction, reason=None):
             )
             try:
                 await msg.delete()
-            except (discord.Forbidden, discord.HTTPException):
+            except Exception:  # who fucking cares
                 pass
             await channel.edit(archived=True, locked=True)
         except (discord.Forbidden, discord.HTTPException):
