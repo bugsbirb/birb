@@ -222,14 +222,15 @@ async def Close(interaction: discord.Interaction, reason=None):
             "text": Text if Text else "Nothin",
         }
     )
-    if ModmailType == "channel":
-        await msg.delete()
-    else:
+    if ModmailType != "channel":
         try:
             await channel.send(
                 content=f"{Emojis.close} The modmail has been closed. This thread will be archived and locked.\n-# Locked by @{user.name}"
             )
-            await msg.delete()
+            try:
+                await msg.delete()
+            except (discord.Forbidden, discord.HTTPException):
+                pass
             await channel.edit(archived=True, locked=True)
         except (discord.Forbidden, discord.HTTPException):
             logger.warning(
