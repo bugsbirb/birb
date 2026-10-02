@@ -19,6 +19,12 @@ class PSelect(discord.ui.Select):
                 description="Set the channel for promotion messages.",
             ),
             discord.SelectOption(
+                label="Promotion Audit Log",
+                value="Promotion Audit Log",
+                emoji=f"{Emojis.log}",
+                description="Logs for creation, void, and modification.",
+            ),
+            discord.SelectOption(
                 label="Webhook",
                 value="Webhook",
                 emoji=f"{Emojis.webhook}",
@@ -31,10 +37,10 @@ class PSelect(discord.ui.Select):
                 description="Set a cooldown for promoting users.",
             ),
             discord.SelectOption(
-                label="Promotion Audit Log",
-                value="Promotion Audit Log",
-                emoji=f"{Emojis.log}",
-                description="Logs for creation, void, and modification.",
+                label="Integrations",
+                value="Integrations",
+                description="Trigger external services (e.g. Roblox rank update) when a promotion happens.",
+                emoji=f"{Emojis.integrations}",
             ),
             discord.SelectOption(
                 label="Customise Embed",
