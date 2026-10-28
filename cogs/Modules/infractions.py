@@ -125,10 +125,18 @@ class Infractions(commands.Cog):
                     self.view.stop()
 
             view = discord.ui.View()
+            flatDepartments = [
+                d
+                for group in Departments
+                for d in group
+                if isinstance(d, dict) and d.get("name")
+            ][:25]
+
             options = [
-                discord.SelectOption(label=dept.get("name"), value=dept.get("name"))
-                for dept in Departments
+                discord.SelectOption(label=d["name"], value=d["name"])
+                for d in flatDepartments
             ]
+
             view.add_item(DeptSelect(placeholder="Department", options=options))
             await msg.edit(
                 view=view,
