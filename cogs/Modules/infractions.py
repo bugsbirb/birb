@@ -127,7 +127,7 @@ class Infractions(commands.Cog):
             view = discord.ui.View()
             options = [
                 discord.SelectOption(label=dept.get("name"), value=dept.get("name"))
-                for dept in Departments[0]
+                for dept in Departments
             ]
             view.add_item(DeptSelect(placeholder="Department", options=options))
             await msg.edit(
